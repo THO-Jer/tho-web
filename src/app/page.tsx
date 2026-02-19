@@ -13,69 +13,90 @@ export default function HomePage() {
     <div className="min-h-screen">
       <Header />
 
-      <section className="bg-white">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-2 md:py-20">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-900" />
-              Consultoría estratégica en Concepción
+      {/* HERO — editorial, fondo gris tenue */}
+      <section className="bg-tho-bg">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-10 pt-14 md:grid-cols-12 md:pb-14 md:pt-20">
+          <div className="md:col-span-6">
+            <div className="flex items-center gap-3 text-xs tracking-wide text-slate-600">
+              <span className="h-[1px] w-10 bg-tho-blue" />
+              <span className="uppercase">Consultoría estratégica · Concepción</span>
             </div>
 
-            <h1 className="font-tho-title mt-5 text-4xl font-normal md:text-6xl">
-              Asegura la viabilidad de tu negocio potenciando tu cultura y tu entorno.
+            <h1 className="font-tho-title mt-6 text-[2.6rem] font-normal md:text-[4.2rem]">
+              Viabilidad.
+              <br />
+              Rigor.
+              <br />
+              Territorio.
             </h1>
 
-            <p className="mt-4 max-w-xl text-base text-slate-600 md:text-lg">
-              Sostenibilidad ESG, Gestión Comunitaria y Desarrollo Organizacional — integrado,
-              accionable y con foco en resultados.
+            <p className="mt-5 max-w-xl text-base text-slate-700 md:text-lg">
+              ESG, Gestión Comunitaria y Desarrollo Organizacional — integrado, accionable y con foco en decisiones que
+              se sostienen.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="#tickets"
-                className="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
-              >
+              <a href="#tickets" className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-slate-900">
                 Ver Tickets
               </a>
               <a
                 href="https://bit.ly/bookTHO"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-medium hover:bg-slate-50"
+                className="rounded-2xl border border-slate-300/70 bg-white/40 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white"
               >
                 Agendar conversación
               </a>
             </div>
+
+            <div className="mt-10 grid max-w-xl gap-3">
+              <div className="flex items-start gap-3">
+                <span className="mt-2 h-2 w-2 rounded-full bg-tho-orange" />
+                <p className="text-sm text-slate-700">
+                  No vendemos “buenas prácticas”. Detectamos fricción real y la convertimos en decisiones.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <span className="mt-2 h-2 w-2 rounded-full bg-tho-pink" />
+                <p className="text-sm text-slate-700">
+                  Cercanos, sí. Indulgentes, no. Si algo no da, lo decimos.
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-sm">
-            <Image
-              src="/hero/1.png"
-              alt="THO — trabajo en terreno"
-              fill
-              priority
-              className="object-cover opacity-80"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/35 to-white/10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+          <div className="md:col-span-6">
+            <div className="relative">
+              {/* Accent line */}
+              <div className="absolute -left-3 top-6 hidden h-32 w-[2px] bg-tho-yellow md:block" />
 
-            <div className="relative p-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-white/80">
-                <span className="h-1.5 w-1.5 rounded-full bg-tho-orange" />
-                Rigor + viabilidad
+              <div className="relative overflow-hidden rounded-[2.2rem] border border-slate-300/70 bg-slate-950 shadow-sm md:translate-y-6">
+                <Image src="/hero/1.png" alt="THO — trabajo en terreno" width={1200} height={900} priority className="h-[380px] w-full object-cover opacity-85 md:h-[520px]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/10 to-transparent" />
+                <div className="absolute bottom-5 left-5 right-5">
+                  <div className="grid gap-2 rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur">
+                    <div className="text-xs font-bold tracking-wide text-white/80">Cómo trabajamos</div>
+                    <div className="grid gap-2 md:grid-cols-3">
+                      <MiniPill title="Riesgos" desc="Antes de que exploten" />
+                      <MiniPill title="Confianza" desc="Con evidencia" />
+                      <MiniPill title="Acción" desc="Entregables claros" />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="mt-4 grid gap-3">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-semibold text-white">Riesgos</div>
-                  <div className="mt-1 text-sm text-white/75">Se detectan antes de explotar.</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-semibold text-white">Confianza</div>
-                  <div className="mt-1 text-sm text-white/75">Se construye con evidencia.</div>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <div className="text-sm font-semibold text-white">Acción</div>
-                  <div className="mt-1 text-sm text-white/75">Entregables rápidos y claros.</div>
+
+              {/* Soft cut */}
+              <div className="mt-6 grid gap-3 rounded-[2.2rem] border border-slate-300/60 bg-white/60 p-6 shadow-sm">
+                <div className="text-xs font-bold tracking-wide text-slate-700">Lo que evitamos</div>
+                <div className="grid gap-2 text-sm text-slate-700 md:grid-cols-2">
+                  <div className="flex items-start gap-3">
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-blue" />
+                    <span>Informes que nadie usa</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />
+                    <span>Relatos sin sustento</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -83,12 +104,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Section
-        title="Informes que no se leen. Comunidades que no escuchan. Equipos que no conectan."
-        subtitle="El modelo tradicional de consultoría está agotado. En THO rompemos ese ciclo: claridad, evidencia y acción."
-      >
-        <div />
-      </Section>
+      {/* PROBLEMA — editorial, menos “sección genérica” */}
+      <section className="border-t border-slate-200/70 bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-14 md:py-16">
+          <div className="grid gap-10 md:grid-cols-12">
+            <div className="md:col-span-7">
+              <h2 className="font-tho-title text-3xl font-normal md:text-5xl">
+                Cuando la organización se desconecta del entorno, el costo llega igual.
+              </h2>
+              <div className="mt-4 h-[2px] w-20 bg-tho-orange" />
+              <p className="mt-5 max-w-2xl text-base text-slate-700 md:text-lg">
+                La pregunta no es si tendrás tensión. La pregunta es si tendrás método, evidencia y gobernanza para
+                sostener decisiones cuando aparezca.
+              </p>
+            </div>
+            <div className="md:col-span-5">
+              <div className="rounded-[2.2rem] border border-slate-200 bg-tho-bg p-6">
+                <div className="text-xs font-bold tracking-wide text-slate-600">Señales típicas</div>
+                <ul className="mt-4 grid gap-3 text-sm text-slate-700">
+                  <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Se promete más de lo que se sostiene</li>
+                  <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-blue" />Se apaga el conflicto “con comunicaciones”</li>
+                  <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-yellow" />Se decide sin mapa de riesgos</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <Section
         id="tickets"
@@ -180,6 +222,15 @@ export default function HomePage() {
       </section>
 
       <Footer />
+    </div>
+  );
+}
+
+function MiniPill({ title, desc }: { title: string; desc: string }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
+      <div className="text-sm font-bold text-white">{title}</div>
+      <div className="text-xs text-white/70">{desc}</div>
     </div>
   );
 }

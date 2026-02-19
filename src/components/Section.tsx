@@ -7,12 +7,12 @@ export function Section(props: {
   children: ReactNode;
   tone?: "white" | "soft";
 }) {
-  const bg = props.tone === "soft" ? "bg-slate-50" : "bg-white";
+  const bg = props.tone === "soft" ? "bg-tho-bg" : "bg-white";
   return (
-    <section id={props.id} className={`border-t border-slate-200 ${bg}`}>
-      <div className="mx-auto max-w-6xl px-4 py-14">
+    <section id={props.id} className={`border-t border-slate-200/70 ${bg}`}>
+      <div className="mx-auto max-w-6xl px-4 py-14 md:py-16">
         <h2 className="font-tho-title text-3xl font-normal md:text-4xl">{props.title}</h2>
-        {props.subtitle ? <p className="mt-2 max-w-3xl text-slate-600">{props.subtitle}</p> : null}
+        {props.subtitle ? <p className="mt-3 max-w-3xl text-slate-700">{props.subtitle}</p> : null}
         <div className="mt-8">{props.children}</div>
       </div>
     </section>

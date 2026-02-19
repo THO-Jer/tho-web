@@ -30,7 +30,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-3">
           <div className="relative h-9 w-9 overflow-hidden rounded-2xl bg-white">
@@ -44,7 +44,7 @@ export function Header() {
           </div>
           <div className="leading-tight">
             <div className="font-tho-title text-lg">The Human Org</div>
-            <div className="text-xs text-slate-500">Consultoría estratégica · Concepción</div>
+            <div className="text-[11px] font-bold tracking-wide text-slate-600">Consultoría estratégica · Concepción</div>
           </div>
         </Link>
 
@@ -55,8 +55,8 @@ export function Header() {
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
                   className={cx(
-                    "rounded-xl px-3 py-2 text-sm transition",
-                    "text-slate-700 hover:bg-slate-100"
+                    "rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
+                    "text-slate-700 hover:bg-white/70"
                   )}
                 >
                   {item.label}
@@ -67,10 +67,10 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cx(
-                    "rounded-xl px-3 py-2 text-sm transition",
+                    "rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
                     pathname.startsWith(item.href)
-                      ? "bg-slate-100 text-slate-900"
-                      : "text-slate-700 hover:bg-slate-100"
+                      ? "bg-white/70 text-slate-950"
+                      : "text-slate-700 hover:bg-white/70"
                   )}
                 >
                   {item.label}
@@ -83,7 +83,7 @@ export function Header() {
             href="https://bit.ly/bookTHO"
             target="_blank"
             rel="noreferrer"
-            className="rounded-xl bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800"
+            className="rounded-xl bg-slate-950 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-slate-900"
           >
             Agendar conversación
           </a>

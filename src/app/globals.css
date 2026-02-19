@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  /* Soft gray base (no harsh white) */
+  --background: #f4f5f6;
   --foreground: #0b0b0c;
 
   /* Typography */
-  --font-body: "TT Firs Neue";
+  /* Body font comes from next/font/local variable injected on <html> */
+  --font-body: var(--font-tt);
 
   /* THO brand */
   --tho-pink: #d13ca2;
@@ -13,6 +15,7 @@
   --tho-orange: #fa7f33;
   --tho-yellow: #f2b705;
   --tho-green: #93bf24;
+  --tho-bg: #f4f5f6;
 }
 
 @theme inline {
@@ -25,6 +28,7 @@
   --color-tho-orange: var(--tho-orange);
   --color-tho-yellow: var(--tho-yellow);
   --color-tho-green: var(--tho-green);
+  --color-tho-bg: var(--tho-bg);
 
   /* typography */
   /* Body font: TT Firs Neue (self-hosted). Safe fallback if not installed yet. */
