@@ -21,14 +21,16 @@ export default function HomePage() {
         <img
           src="/hero/hands.png"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.35]"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.55]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/30" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/30" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-slate-950/80 via-slate-950/55 to-slate-950/15" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-slate-950/15" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white" />
 
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-3 text-xs tracking-wide text-white/70">
+          <div className="flex justify-end">
+          <div className="max-w-2xl text-right">
+            <div className="flex items-center justify-end gap-3 text-xs tracking-wide text-white/70">
               <span className="h-[1px] w-10 bg-tho-blue" />
               <span className="uppercase">Consultoría estratégica · Concepción</span>
             </div>
@@ -42,12 +44,12 @@ export default function HomePage() {
             </h1>
             <ScribbleUnderline className="mt-3" />
 
-            <p className="mt-6 max-w-xl text-base text-white/80 md:text-lg">
+            <p className="mt-6 ml-auto max-w-xl text-base text-white/80 md:text-lg">
               ESG, relacionamiento comunitario y desarrollo organizacional — integrado, accionable y con foco en
               decisiones que se sostienen.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#entradas"
                 className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white/90"
@@ -64,13 +66,16 @@ export default function HomePage() {
               </a>
             </div>
           </div>
+          </div>
         </div>
       </section>
 
-      <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" variant="scribble" />
+      <div className="-mt-14 relative z-20">
+        <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" variant="scribble" />
+      </div>
 
       {/* PROBLEMA — editorial, menos “sección genérica” */}
-      <section className="border-t border-slate-200/70 bg-white">
+      <section className="relative z-30 -mt-10 border-t border-slate-200/70 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
           <div className="grid gap-10 md:grid-cols-12">
             <div className="md:col-span-8">
