@@ -34,7 +34,7 @@ export function ContactForm(props: { ticket?: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-3 rounded-3xl bg-white/5 p-6 ring-1 ring-white/10">
+    <form onSubmit={onSubmit} className="grid gap-3 rounded-2xl bg-white/5 p-6 ring-1 ring-white/10">
       <div className="text-sm font-semibold text-white">Hablemos</div>
 
       <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
@@ -43,14 +43,14 @@ export function ContactForm(props: { ticket?: string }) {
         <input
           name="name"
           required
-          className="w-full rounded-2xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
+          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
         />
       </Field>
 
       <Field label="Empresa">
         <input
           name="company"
-          className="w-full rounded-2xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
+          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
         />
       </Field>
 
@@ -59,14 +59,14 @@ export function ContactForm(props: { ticket?: string }) {
           name="email"
           type="email"
           required
-          className="w-full rounded-2xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
+          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
         />
       </Field>
 
       <Field label="Teléfono">
         <input
           name="phone"
-          className="w-full rounded-2xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
+          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
         />
       </Field>
 
@@ -74,13 +74,13 @@ export function ContactForm(props: { ticket?: string }) {
         <textarea
           name="message"
           rows={3}
-          className="w-full rounded-2xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
+          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
         />
       </Field>
 
       <button
         disabled={status === "sending"}
-        className="mt-2 rounded-2xl bg-white px-5 py-3 text-sm font-medium text-slate-900 hover:bg-slate-100 disabled:opacity-60"
+        className="mt-2 rounded-xl bg-white px-5 py-3 text-sm font-medium text-slate-900 hover:bg-slate-100 disabled:opacity-60"
       >
         {status === "sending" ? "Enviando…" : "Enviar"}
       </button>

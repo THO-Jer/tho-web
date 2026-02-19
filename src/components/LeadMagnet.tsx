@@ -33,7 +33,7 @@ export function LeadMagnet() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
         <div className="text-xs font-medium text-slate-500">Manual descargable</div>
         <h3 className="mt-2 text-lg font-semibold">Manual de Gestión de la Diversidad (v1)</h3>
         <p className="mt-2 text-sm text-slate-600">
@@ -41,13 +41,13 @@ export function LeadMagnet() {
         </p>
         <button
           onClick={() => setOpen(true)}
-          className="mt-4 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
+          className="mt-4 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
         >
           Descargar manual
         </button>
       </div>
 
-      <div className="rounded-3xl border border-slate-200 bg-white p-6">
+      <div className="rounded-2xl border border-slate-200 bg-white p-6">
         <div className="text-xs font-medium text-slate-500">Cómo usarlo</div>
         <ul className="mt-3 list-disc pl-5 text-sm text-slate-600">
           <li>Marco conceptual claro y aplicable</li>
@@ -61,7 +61,7 @@ export function LeadMagnet() {
 
       {open ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-sm font-semibold">Descarga por email</div>
@@ -83,7 +83,7 @@ export function LeadMagnet() {
                 <input
                   name="name"
                   required
-                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
+                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
                 />
               </label>
 
@@ -93,18 +93,18 @@ export function LeadMagnet() {
                   name="email"
                   type="email"
                   required
-                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm"
+                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
                 />
               </label>
 
               <label className="grid gap-1">
                 <span className="text-xs text-slate-500">Empresa</span>
-                <input name="company" className="rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+                <input name="company" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
               </label>
 
               <button
                 disabled={status === "sending"}
-                className="mt-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+                className="mt-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
               >
                 {status === "sending" ? "Enviando…" : "Enviar"}
               </button>

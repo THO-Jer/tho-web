@@ -7,6 +7,7 @@ export type Ticket = {
   duration: string; // "2 a 3 meses"
   deliverables: string[];
   tags: string[];
+  pillar: "esg" | "comunidad" | "do";
 };
 
 export const TICKETS: Ticket[] = [
@@ -23,6 +24,7 @@ export const TICKETS: Ticket[] = [
       "Sesión de devolución para acuerdos y continuidad",
     ],
     tags: ["ESG", "Riesgos", "Hoja de ruta"],
+    pillar: "esg",
   },
   {
     slug: "scan-cultura-liderazgo",
@@ -37,6 +39,7 @@ export const TICKETS: Ticket[] = [
       "Síntesis de acuerdos, compromisos y ruta sugerida",
     ],
     tags: ["Cultura", "Liderazgo", "Cambio"],
+    pillar: "do",
   },
   {
     slug: "mapa-riesgos-socioambientales",
@@ -51,5 +54,6 @@ export const TICKETS: Ticket[] = [
       "Recomendaciones claras para plan de vinculación",
     ],
     tags: ["Territorio", "Riesgos", "Licencia social"],
+    pillar: "comunidad",
   },
 ];

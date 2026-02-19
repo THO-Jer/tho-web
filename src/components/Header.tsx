@@ -7,7 +7,8 @@ import { usePathname } from "next/navigation";
 import { cx } from "@/lib/utils";
 
 const HOME_NAV = [
-  { id: "tickets", label: "Tickets" },
+  { id: "servicios", label: "Servicios" },
+  { id: "entradas", label: "Entradas" },
   { id: "metodo", label: "Método" },
   { id: "recursos", label: "Recursos" },
   { id: "blog", label: "Blog" },
