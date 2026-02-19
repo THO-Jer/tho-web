@@ -15,16 +15,25 @@ export default function HomePage() {
     <div className="min-h-screen">
       <Header />
 
-      {/* HERO — limpio: imagen + texto + 2 CTA */}
-      <section className="bg-tho-bg">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-12 md:py-20">
-          <div className="md:col-span-6">
-            <div className="flex items-center gap-3 text-xs tracking-wide text-slate-600">
+      {/* HERO — imagen de fondo (atenuada) + texto encima */}
+      <section className="relative overflow-hidden bg-slate-950 text-white">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/hero/hands.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.35]"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-slate-950/30" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-slate-950/30" />
+
+        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-3 text-xs tracking-wide text-white/70">
               <span className="h-[1px] w-10 bg-tho-blue" />
               <span className="uppercase">Consultoría estratégica · Concepción</span>
             </div>
 
-            <h1 className="font-tho-title mt-6 text-[2.6rem] font-normal leading-[0.95] md:text-[4.2rem]">
+            <h1 className="font-tho-title mt-6 text-[2.6rem] font-normal leading-[0.95] md:text-[4.6rem]">
               Viabilidad.
               <br />
               Rigor.
@@ -33,7 +42,7 @@ export default function HomePage() {
             </h1>
             <ScribbleUnderline className="mt-3" />
 
-            <p className="mt-6 max-w-xl text-base text-slate-700 md:text-lg">
+            <p className="mt-6 max-w-xl text-base text-white/80 md:text-lg">
               ESG, relacionamiento comunitario y desarrollo organizacional — integrado, accionable y con foco en
               decisiones que se sostienen.
             </p>
@@ -41,7 +50,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
                 href="#entradas"
-                className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-slate-900"
+                className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white/90"
               >
                 Ver soluciones ágiles
               </a>
@@ -49,23 +58,10 @@ export default function HomePage() {
                 href="https://bit.ly/bookTHO"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-xl border border-slate-300/70 bg-white/40 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white"
+                className="rounded-xl border border-white/35 bg-white/5 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
               >
                 Agendar una conversación
               </a>
-            </div>
-          </div>
-
-          <div className="md:col-span-6">
-            <div className="relative overflow-hidden rounded-[2.25rem] border border-slate-200 bg-white shadow-sm">
-              {/* Usamos <img> para asegurar que siempre se vea sin depender de optimización */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/hero/1.png"
-                alt="THO — trabajo en terreno"
-                className="h-[320px] w-full object-cover md:h-[420px]"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-transparent" />
             </div>
           </div>
         </div>
