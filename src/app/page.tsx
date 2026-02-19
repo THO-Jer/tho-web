@@ -9,33 +9,22 @@ import { POSTS } from "@/content/posts";
 import { SectionDivider } from "@/components/SectionDivider";
 import { ScribbleUnderline } from "@/components/Scribble";
 import { PILLAR_META } from "@/lib/brand";
-import Image from "next/image";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
       <Header />
 
-      {/* HERO — imagen atenuada de fondo + texto protagonista */}
-      <section className="relative overflow-hidden bg-tho-bg">
-        <Image
-          src="/hero/1.png"
-          alt="THO — trabajo en terreno"
-          fill
-          priority
-          className="object-cover opacity-[0.22]"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-tho-bg via-tho-bg/90 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-tho-bg to-transparent" />
-
-        <div className="relative mx-auto max-w-6xl px-4 pb-12 pt-16 md:pb-16 md:pt-24">
-          <div className="max-w-2xl">
+      {/* HERO — limpio: imagen + texto + 2 CTA */}
+      <section className="bg-tho-bg">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 md:grid-cols-12 md:py-20">
+          <div className="md:col-span-6">
             <div className="flex items-center gap-3 text-xs tracking-wide text-slate-600">
               <span className="h-[1px] w-10 bg-tho-blue" />
               <span className="uppercase">Consultoría estratégica · Concepción</span>
             </div>
 
-            <h1 className="font-tho-title mt-6 text-[2.8rem] font-normal md:text-[4.4rem]">
+            <h1 className="font-tho-title mt-6 text-[2.6rem] font-normal leading-[0.95] md:text-[4.2rem]">
               Viabilidad.
               <br />
               Rigor.
@@ -44,17 +33,17 @@ export default function HomePage() {
             </h1>
             <ScribbleUnderline className="mt-3" />
 
-            <p className="mt-5 max-w-xl text-base text-slate-700 md:text-lg">
-              ESG, relación con el entorno y desarrollo organizacional — integrado, accionable y con foco en decisiones
-              que se sostienen.
+            <p className="mt-6 max-w-xl text-base text-slate-700 md:text-lg">
+              ESG, relacionamiento comunitario y desarrollo organizacional — integrado, accionable y con foco en
+              decisiones que se sostienen.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                href="#servicios"
+                href="#entradas"
                 className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white hover:bg-slate-900"
               >
-                Ver lo que hacemos
+                Ver soluciones ágiles
               </a>
               <a
                 href="https://bit.ly/bookTHO"
@@ -62,47 +51,33 @@ export default function HomePage() {
                 rel="noreferrer"
                 className="rounded-xl border border-slate-300/70 bg-white/40 px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white"
               >
-                Agendar conversación
+                Agendar una conversación
               </a>
-            </div>
-
-            <div className="mt-10 grid max-w-xl gap-3">
-              <div className="flex items-start gap-3">
-                <span className="mt-2 h-2 w-2 rounded-full bg-tho-orange" />
-                <p className="text-sm text-slate-700">No vendemos “buenas prácticas”. Convertimos fricción en decisiones.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="mt-2 h-2 w-2 rounded-full bg-tho-pink" />
-                <p className="text-sm text-slate-700">Cercanos, sí. Indulgentes, no. Si algo no da, lo decimos.</p>
-              </div>
             </div>
           </div>
 
-          {/* Quick credibility strip */}
-          <div className="mt-10 grid gap-3 md:grid-cols-3">
-            <div className={`rounded-2xl border p-4 ${PILLAR_META.esg.softBg} ${PILLAR_META.esg.softBorder}`}>
-              <div className="text-xs font-bold tracking-wide text-slate-800">ESG</div>
-              <div className="mt-1 text-sm text-slate-700">Riesgos, materialidad y ruta accionable.</div>
-            </div>
-            <div className={`rounded-2xl border p-4 ${PILLAR_META.comunidad.softBg} ${PILLAR_META.comunidad.softBorder}`}>
-              <div className="text-xs font-bold tracking-wide text-slate-800">Entorno</div>
-              <div className="mt-1 text-sm text-slate-700">Mapa de actores y licencia para operar.</div>
-            </div>
-            <div className={`rounded-2xl border p-4 ${PILLAR_META.do.softBg} ${PILLAR_META.do.softBorder}`}>
-              <div className="text-xs font-bold tracking-wide text-slate-800">Organización</div>
-              <div className="mt-1 text-sm text-slate-700">Cultura, liderazgo y cambio con evidencia.</div>
+          <div className="md:col-span-6">
+            <div className="relative overflow-hidden rounded-[2.25rem] border border-slate-200 bg-white shadow-sm">
+              {/* Usamos <img> para asegurar que siempre se vea sin depender de optimización */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/hero/1.png"
+                alt="THO — trabajo en terreno"
+                className="h-[320px] w-full object-cover md:h-[420px]"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-transparent" />
             </div>
           </div>
         </div>
       </section>
 
-      <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" />
+      <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" variant="scribble" />
 
       {/* PROBLEMA — editorial, menos “sección genérica” */}
       <section className="border-t border-slate-200/70 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14 md:py-16">
+        <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
           <div className="grid gap-10 md:grid-cols-12">
-            <div className="md:col-span-7">
+            <div className="md:col-span-8">
               <h2 className="font-tho-title text-3xl font-normal md:text-5xl">
                 Cuando la organización se desconecta del entorno, el costo llega igual.
               </h2>
@@ -112,76 +87,96 @@ export default function HomePage() {
                 sostener decisiones cuando aparezca.
               </p>
             </div>
-            <div className="md:col-span-5">
-              <div className="rounded-[2.2rem] border border-slate-200 bg-tho-bg p-6">
-                <div className="text-xs font-bold tracking-wide text-slate-600">Señales típicas</div>
-                <ul className="mt-4 grid gap-3 text-sm text-slate-700">
-                  <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Se promete más de lo que se sostiene</li>
-                  <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-blue" />Se apaga el conflicto “con comunicaciones”</li>
-                  <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-yellow" />Se decide sin mapa de riesgos</li>
-                </ul>
+            <div className="md:col-span-4">
+              <div className="rounded-[2.2rem] bg-tho-bg p-8">
+                <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Rigor sin frialdad</div>
+                <p className="mt-3 text-sm text-slate-700">
+                  Terreno + análisis. Diseño + gobernanza. Claridad incómoda cuando hace falta — y seguridad cuando
+                  hay que decidir.
+                </p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <SectionDivider fromClass="bg-white" toFill="#f4f5f6" flip />
+      <SectionDivider fromClass="bg-white" toFill="#f4f5f6" variant="scribble" flip />
 
       {/* SERVICIOS — antes de las entradas rápidas */}
       <Section
         id="servicios"
         tone="soft"
-        title="Lo que hacemos"
+        title="Nuestros servicios"
         subtitle="Tres frentes integrados. A veces el problema se ve ESG, pero nace en la organización o en el territorio. Nosotros lo tratamos completo."
       >
         <div className="grid gap-4 md:grid-cols-3">
-          <div className={`rounded-2xl border p-6 ${PILLAR_META.esg.softBg} ${PILLAR_META.esg.softBorder}`}>
+          <div className={`relative overflow-hidden rounded-[2rem] p-7 ${PILLAR_META.esg.softBg}`}>
+            <div className="pointer-events-none absolute inset-0">
+              <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
+                <path d="M14 42c28-22 78-30 130-18 52 12 84 6 120-8 44-17 90-7 122 22" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-800">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.esg.accentDot}`} />
               {PILLAR_META.esg.label}
             </div>
-            <p className="mt-3 text-sm text-slate-700">
-              Diagnósticos y hojas de ruta que aterrizan riesgos, prioridades e indicadores sin perder foco.
-            </p>
+            <p className="mt-3 text-sm text-slate-700">Sostenibilidad con foco en decisiones y ejecución.</p>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-700">
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Diagnóstico ESG: materialidad, priorización y matriz de riesgos.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Hoja de ruta con hitos, indicadores y gobernanza.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Alineación interna para sostener la estrategia.</li>
+            </ul>
           </div>
 
-          <div className={`rounded-2xl border p-6 ${PILLAR_META.comunidad.softBg} ${PILLAR_META.comunidad.softBorder}`}>
+          <div className={`relative overflow-hidden rounded-[2rem] p-7 ${PILLAR_META.comunidad.softBg}`}>
+            <div className="pointer-events-none absolute inset-0">
+              <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
+                <path d="M18 52c42-30 104-34 150-12 46 22 86 18 122 2 48-20 86-12 112 10" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-800">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.comunidad.accentDot}`} />
               Relacionamiento comunitario
             </div>
-            <p className="mt-3 text-sm text-slate-700">
-              Lectura territorial, actores clave, riesgos socioambientales y estrategias de vínculo que se sostienen.
-            </p>
+            <p className="mt-3 text-sm text-slate-700">Estrategias de vínculo que reducen riesgo y construyen confianza.</p>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-700">
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Diseño y ejecución de participación y consulta.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Modelos de gestión comunitaria para proyectos de alto impacto.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Prevención y resolución de conflictos con metodologías probadas.</li>
+            </ul>
           </div>
 
-          <div className={`rounded-2xl border p-6 ${PILLAR_META.do.softBg} ${PILLAR_META.do.softBorder}`}>
+          <div className={`relative overflow-hidden rounded-[2rem] p-7 ${PILLAR_META.do.softBg}`}>
+            <div className="pointer-events-none absolute inset-0">
+              <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
+                <path d="M16 46c34-20 78-26 124-12 46 14 82 10 120-6 50-22 98-10 126 14" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </div>
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-800">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.do.accentDot}`} />
               {PILLAR_META.do.label}
             </div>
-            <p className="mt-3 text-sm text-slate-700">
-              Cultura, liderazgo y cambio: evidencia breve, acuerdos claros y acompañamiento cuando el caso lo exige.
-            </p>
+            <p className="mt-3 text-sm text-slate-700">Equipos alineados, cultura fuerte y cambios que se sostienen.</p>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-700">
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Fortalecimiento cultural y cohesión interna.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Talento y liderazgo para optimizar desempeño.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Gestión del cambio y diagnósticos de clima y engagement.</li>
+            </ul>
           </div>
-        </div>
-
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white/60 p-6">
-          <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Cómo se ve hacia afuera</div>
-          <p className="mt-2 max-w-3xl text-sm text-slate-700">
-            Podemos entrar con un trabajo acotado (2–3 meses) para ordenar evidencia y decisiones. Si el caso lo amerita,
-            escalamos a estrategia e implementación anual sin perder método.
-          </p>
         </div>
       </Section>
 
       <Section
         id="entradas"
         tone="soft"
-        title="Entradas estratégicas (2–3 meses)"
-        subtitle="Servicios acotados para decidir con evidencia. Sin precios públicos. Si el caso lo amerita, esto escala a estrategia e implementación."
+        title="Entradas estratégicas"
+        subtitle="Servicios acotados (2–3 meses) para decidir con evidencia. Sin precios públicos. Si el caso lo amerita, esto escala a estrategia e implementación anual."
       >
+        <div className="mb-6 max-w-3xl text-sm text-slate-700">
+          <span className="font-semibold text-slate-900">¿Por qué partir por aquí?</span> Porque a veces lo más caro no es
+          “hacer algo”, sino seguir decidiendo sin evidencia. Estas entradas ordenan el problema, hacen visibles riesgos y
+          dejan una ruta clara.
+        </div>
         <div className="grid gap-4 md:grid-cols-3">
           {TICKETS.map((t) => (
             <TicketCard key={t.slug} t={t} />
