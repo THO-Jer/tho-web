@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# THO Web (Next.js)
 
-## Getting Started
+Sitio estático + formularios por API routes (Vercel) para The Human Org.
 
-First, run the development server:
+## Correr local
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Imágenes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Las imágenes deben estar en `public/` para que Vercel las sirva.
 
-## Learn More
+- Hero: `public/hero/1.png` (y 2–4)
+- Logos: `public/brand/logo-negro.png`, `logo-blanco.png`, `logo-small.png`
 
-To learn more about Next.js, take a look at the following resources:
+## Tipografías
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Títulos:** `Thocl-Regular.ttf` (ya incluido como `next/font/local`).
+- **Cuerpo:** **TT Firs Neue** (por ahora está declarado como `font-family: "TT Firs Neue"` con fallbacks).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Si quieres auto-hospedar TT Firs Neue, súbela a `public/fonts/` y luego la registramos como `next/font/local`.
 
-## Deploy on Vercel
+## Formularios
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+El formulario envía a `hola@tho.cl` usando un API route en `src/app/api/contact/route.ts`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Más adelante podemos conectar el envío con tu CRM (endpoint / pipeline) cuando esté listo.

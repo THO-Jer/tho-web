@@ -8,7 +8,7 @@ export function TicketCard({ t }: { t: Ticket }) {
         <div className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{t.duration}</div>
       </div>
 
-      <h3 className="mt-2 text-lg font-semibold">{t.name}</h3>
+      <h3 className="font-tho-title mt-3 text-2xl">{t.name}</h3>
       <p className="mt-3 text-sm text-slate-600">{t.short}</p>
 
       <p className="mt-3 text-sm text-slate-600">

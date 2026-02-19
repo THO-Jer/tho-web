@@ -43,7 +43,7 @@ export function Header() {
             />
           </div>
           <div className="leading-tight">
-            <div className="text-sm font-semibold tracking-tight">The Human Org</div>
+            <div className="font-tho-title text-lg">The Human Org</div>
             <div className="text-xs text-slate-500">Consultoría estratégica · Concepción</div>
           </div>
         </Link>

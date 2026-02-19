@@ -11,7 +11,7 @@ export function Section(props: {
   return (
     <section id={props.id} className={`border-t border-slate-200 ${bg}`}>
       <div className="mx-auto max-w-6xl px-4 py-14">
-        <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">{props.title}</h2>
+        <h2 className="font-tho-title text-3xl font-normal md:text-4xl">{props.title}</h2>
         {props.subtitle ? <p className="mt-2 max-w-3xl text-slate-600">{props.subtitle}</p> : null}
         <div className="mt-8">{props.children}</div>
       </div>

@@ -6,6 +6,7 @@ import { LeadMagnet } from "@/components/LeadMagnet";
 import { ContactForm } from "@/components/ContactForm";
 import { TICKETS } from "@/content/tickets";
 import { POSTS } from "@/content/posts";
+import Image from "next/image";
 
 export default function HomePage() {
   return (
@@ -20,7 +21,7 @@ export default function HomePage() {
               Consultoría estratégica en Concepción
             </div>
 
-            <h1 className="mt-5 text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
+            <h1 className="font-tho-title mt-5 text-4xl font-normal md:text-6xl">
               Asegura la viabilidad de tu negocio potenciando tu cultura y tu entorno.
             </h1>
 
@@ -47,23 +48,35 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm">
-            <div className="text-sm font-semibold">Mapa rápido de viabilidad</div>
-            <p className="mt-2 text-sm text-slate-600">
-              Cultura interna + entorno externo. Donde otros separan, nosotros integramos.
-            </p>
-            <div className="mt-6 grid gap-3">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="text-sm font-semibold">Riesgos</div>
-                <div className="mt-1 text-sm text-slate-600">Se ven antes de explotar</div>
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-sm">
+            <Image
+              src="/hero/1.png"
+              alt="THO — trabajo en terreno"
+              fill
+              priority
+              className="object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/35 to-white/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+
+            <div className="relative p-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-white/80">
+                <span className="h-1.5 w-1.5 rounded-full bg-tho-orange" />
+                Rigor + viabilidad
               </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="text-sm font-semibold">Confianza</div>
-                <div className="mt-1 text-sm text-slate-600">Se gestiona, no se promete</div>
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="text-sm font-semibold">Acción</div>
-                <div className="mt-1 text-sm text-slate-600">Entregables claros y rápidos</div>
+              <div className="mt-4 grid gap-3">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="text-sm font-semibold text-white">Riesgos</div>
+                  <div className="mt-1 text-sm text-white/75">Se detectan antes de explotar.</div>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="text-sm font-semibold text-white">Confianza</div>
+                  <div className="mt-1 text-sm text-white/75">Se construye con evidencia.</div>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="text-sm font-semibold text-white">Acción</div>
+                  <div className="mt-1 text-sm text-white/75">Entregables rápidos y claros.</div>
+                </div>
               </div>
             </div>
           </div>
@@ -93,26 +106,20 @@ export default function HomePage() {
       <Section
         id="metodo"
         title="Método THO"
-        subtitle="Ticket → Estrategia → Implementación. No como upsell: como continuidad cuando vale la pena."
+        subtitle="Entramos rápido, ordenamos con rigor y dejamos un camino claro. Si el caso lo amerita, escalamos sin perder el control."
       >
         <div className="grid gap-4 md:grid-cols-3">
           <div className="rounded-3xl border border-slate-200 bg-white p-6">
-            <div className="text-sm font-semibold">Nivel 1 — Ticket</div>
-            <p className="mt-2 text-sm text-slate-600">
-              2 a 3 meses. Claridad + diagnóstico accionable + próximos pasos.
-            </p>
+            <div className="text-sm font-semibold">Exploración rigurosa</div>
+            <p className="mt-2 text-sm text-slate-600">2 a 3 meses. Diagnóstico accionable, riesgos visibles y decisión informada.</p>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-6">
-            <div className="text-sm font-semibold">Nivel 2 — Estrategia</div>
-            <p className="mt-2 text-sm text-slate-600">
-              Horizonte anual. Diseño completo, gobernanza, indicadores y hoja de ruta.
-            </p>
+            <div className="text-sm font-semibold">Diseño estratégico</div>
+            <p className="mt-2 text-sm text-slate-600">Modelamos el sistema: gobernanza, indicadores y hoja de ruta con prioridades reales.</p>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-6">
-            <div className="text-sm font-semibold">Nivel 3 — Implementación</div>
-            <p className="mt-2 text-sm text-slate-600">
-              Acompañamiento sostenido. Ejecución, medición, ajuste y mejora continua.
-            </p>
+            <div className="text-sm font-semibold">Acompañamiento sostenido</div>
+            <p className="mt-2 text-sm text-slate-600">Ejecución, medición y ajuste. Lo que funciona se consolida; lo que no, se corrige.</p>
           </div>
         </div>
       </Section>
