@@ -1,0 +1,2 @@
+Placeholder: aquí va el PDF del Manual de Gestión de la Diversidad (v1).
+Cuando lo tengas, reemplaza por public/downloads/manual-diversidad-v1.pdf
