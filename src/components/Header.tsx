@@ -40,7 +40,14 @@ export function Header() {
               src="/brand/logo-negro.png"
               alt="The Human Org"
               fill
-              className="object-contain"
+              className="object-contain logo-light"
+              priority
+            />
+            <Image
+              src="/brand/logo-blanco.png"
+              alt="The Human Org"
+              fill
+              className="object-contain logo-dark"
               priority
             />
           </div>

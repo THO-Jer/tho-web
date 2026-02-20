@@ -25,16 +25,16 @@ export default function HomePage() {
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-[0.55]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-slate-950/80 via-slate-950/55 to-slate-950/15" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-slate-950/15" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-slate-950/92" />
-        <div className="pointer-events-none absolute inset-x-0 -bottom-28 h-36 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-zinc-900/68 via-zinc-900/44 to-zinc-900/14" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-900/36 via-transparent to-zinc-900/10" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-zinc-900/78" />
+        <div className="pointer-events-none absolute inset-x-0 -bottom-28 h-36 bg-gradient-to-b from-zinc-900/72 via-zinc-900/46 to-transparent" />
 
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="flex justify-end">
           <div className="max-w-2xl text-right">
             <div className="flex items-center justify-end gap-3 text-xs tracking-wide text-white/70">
-              <span className="h-[1px] w-10 bg-tho-blue" />
+              <span className="brand-block-divider h-[6px] w-36 rounded-sm" />
               <span className="uppercase">Consultoría estratégica · Concepción</span>
             </div>
 
@@ -88,7 +88,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="section-cut-diagonal-reverse -mt-2 mb-2" />
 
       <Section
         id="experiencia"

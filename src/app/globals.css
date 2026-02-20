@@ -59,6 +59,21 @@ body {
   font-size-adjust: 0.62;
 }
 
+.brand-block-divider {
+  background: linear-gradient(
+    90deg,
+    var(--tho-pink) 0 20%,
+    var(--tho-blue) 20% 40%,
+    var(--tho-orange) 40% 60%,
+    var(--tho-yellow) 60% 80%,
+    var(--tho-green) 80% 100%
+  );
+}
+
+.logo-dark {
+  opacity: 0;
+}
+
 /* THO gradient button (subtle, not neon) */
 .btn-tho-gradient {
   background-image: linear-gradient(
@@ -165,24 +180,6 @@ body {
   box-shadow: 0 0 0 4px rgba(209, 60, 162, 0.18), 0 14px 30px rgba(0, 0, 0, 0.2);
 }
 
-/* Transiciones diagonales de sección */
-.section-cut-diagonal,
-.section-cut-diagonal-reverse {
-  height: clamp(42px, 6vw, 88px);
-  width: min(1160px, calc(100% - 2rem));
-  margin-inline: auto;
-  background: linear-gradient(90deg, rgba(30, 113, 184, 0.22), rgba(209, 60, 162, 0.16), rgba(250, 127, 51, 0.2));
-  backdrop-filter: blur(1px);
-}
-
-.section-cut-diagonal {
-  clip-path: polygon(0 30%, 100% 0, 100% 70%, 0 100%);
-}
-
-.section-cut-diagonal-reverse {
-  clip-path: polygon(0 0, 100% 35%, 100% 100%, 0 65%);
-}
-
 .service-pill-contrast {
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(15, 23, 42, 0.86);
@@ -236,9 +233,12 @@ body {
     color: #f8fafc !important;
   }
 
-  .section-cut-diagonal,
-  .section-cut-diagonal-reverse {
-    background: linear-gradient(90deg, rgba(30, 113, 184, 0.35), rgba(209, 60, 162, 0.26), rgba(250, 127, 51, 0.3));
+  .logo-light {
+    opacity: 0;
+  }
+
+  .logo-dark {
+    opacity: 1;
   }
 
   .service-pill-contrast {
