@@ -18,7 +18,7 @@ export default function HomePage() {
 
       <main id="contenido">
         {/* HERO — imagen de fondo (atenuada) + texto encima */}
-        <section className="relative overflow-hidden bg-slate-950 text-white">
+        <section className="relative overflow-visible bg-slate-950 text-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero/hands.png"
@@ -27,8 +27,8 @@ export default function HomePage() {
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-slate-950/80 via-slate-950/55 to-slate-950/15" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-slate-950/15" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-tho-bg" />
-        <div className="pointer-events-none absolute -bottom-20 left-1/2 h-52 w-[min(1280px,92vw)] -translate-x-1/2 rounded-[100%] bg-gradient-to-r from-tho-blue/45 via-tho-pink/35 to-tho-orange/45 blur-3xl" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-slate-950/92" />
+        <div className="pointer-events-none absolute inset-x-0 -bottom-28 h-36 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-transparent" />
 
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="flex justify-end">
@@ -73,40 +73,22 @@ export default function HomePage() {
         </div>
         </section>
 
-      <div className="relative z-20 -mt-14">
-        <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" variant="scribble" />
-      </div>
-      <div className="section-cut-diagonal relative z-20 -mt-8" />
-
-      {/* PROBLEMA — editorial, menos “sección genérica” */}
-      <section className="relative z-30 -mt-6 border-t border-slate-200/70 bg-white">
-        <div className="mx-auto max-w-5xl px-6 py-16 md:px-10 md:py-20">
-          <div className="grid gap-10 md:grid-cols-12">
-            <div className="md:col-span-8">
-              <h2 className="font-tho-title text-3xl font-normal md:text-5xl">
-                Cuando la organización se desconecta del entorno, el costo llega igual.
-              </h2>
-              <div className="mt-4 h-[2px] w-20 bg-tho-orange" />
-              <p className="mt-5 max-w-2xl text-base text-slate-700 md:text-lg">
-                La pregunta no es si tendrás tensión. La pregunta es si tendrás método, evidencia y gobernanza para
-                sostener decisiones cuando aparezca.
-              </p>
-            </div>
-            <div className="md:col-span-4">
-              <div className="rounded-[2.2rem] bg-tho-bg p-8">
-                <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Rigor sin frialdad</div>
-                <p className="mt-3 text-sm text-slate-700">
-                  Terreno + análisis. Diseño + gobernanza. Claridad incómoda cuando hace falta — y seguridad cuando
-                  hay que decidir.
-                </p>
-              </div>
-            </div>
+      {/* PROBLEMA — editorial, panel blanco más estrecho sobre continuidad del hero */}
+      <section className="relative z-30 -mt-12 bg-transparent">
+        <div className="mx-auto max-w-4xl px-4 py-12 md:py-16">
+          <div className="rounded-[2.4rem] bg-white/95 px-7 py-12 text-center shadow-sm ring-1 ring-slate-200/60 backdrop-blur-sm md:px-12">
+            <h2 className="font-tho-title text-3xl font-normal md:text-5xl">
+              Cuando la organización se desconecta del entorno, el costo llega igual.
+            </h2>
+            <p className="mx-auto mt-6 max-w-3xl text-base text-slate-700 md:text-lg">
+              La pregunta no es si tendrás tensión. La pregunta es si tendrás método, evidencia y gobernanza para
+              sostener decisiones cuando aparezca.
+            </p>
           </div>
         </div>
       </section>
 
-      <SectionDivider fromClass="bg-white" toFill="#f4f5f6" variant="scribble" flip />
-      <div className="section-cut-diagonal-reverse -mt-3 mb-1" />
+      <div className="section-cut-diagonal-reverse -mt-2 mb-2" />
 
       <Section
         id="experiencia"
