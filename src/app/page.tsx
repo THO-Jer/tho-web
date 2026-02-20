@@ -5,6 +5,7 @@ import { LeadMagnet } from "@/components/LeadMagnet";
 import { ContactForm } from "@/components/ContactForm";
 import { POSTS } from "@/content/posts";
 import { SERVICES } from "@/content/services";
+import { PILLAR_META } from "@/lib/brand";
 import MethodTimeline from "@/components/MethodTimeline";
 
 export default function HomePage() {
@@ -145,20 +146,40 @@ export default function HomePage() {
         subtitle="Tres líneas estratégicas para resolver problemas críticos. Entra al servicio que más te duele hoy y escala desde ahí."
       >
         <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
-          {SERVICES.map((service) => (
-            <article key={service.slug} className="service-feature-card min-w-[88vw] snap-center md:min-w-0">
-              <div className="text-xs font-bold uppercase tracking-wide text-slate-600">{service.menuLabel}</div>
-              <h3 className="mt-3 text-3xl font-bold text-slate-900">{service.navLabel}</h3>
-              <p className="mt-3 text-sm text-slate-700">{service.problem}</p>
-              <p className="mt-3 text-sm font-medium text-slate-800">{service.promise}</p>
-              <a
-                href={`/soluciones/${service.slug}`}
-                className="btn-unified-motion btn-brand-neutral mt-6 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-900"
-              >
-                Ver detalle del servicio
-              </a>
-            </article>
-          ))}
+          {SERVICES.map((service) => {
+            const meta = PILLAR_META[service.pillar];
+            const cardTone =
+              service.pillar === "esg"
+                ? "service-feature-card--green"
+                : service.pillar === "comunidad"
+                  ? "service-feature-card--orange"
+                  : "service-feature-card--pink";
+
+            return (
+              <article key={service.slug} className={`service-feature-card ${cardTone} min-w-[88vw] snap-center md:min-w-0`}>
+                <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
+                  <span className={`h-2 w-2 rounded-full ${meta.accentDot}`} />
+                  {service.menuLabel}
+                </div>
+                <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.2rem]">{service.navLabel}</h3>
+                <p className="mt-2 text-sm text-slate-800">{service.problem}</p>
+                <ul className="mt-4 grid gap-2 text-sm text-slate-800">
+                  {service.teaser.map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <span className={`mt-2 h-1.5 w-1.5 rounded-full ${meta.accentDot}`} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={`/soluciones/${service.slug}`}
+                  className="btn-unified-motion btn-brand-neutral mt-6 inline-flex rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-bold text-slate-900"
+                >
+                  Ver detalle del servicio
+                </a>
+              </article>
+            );
+          })}
         </div>
       </Section>
 

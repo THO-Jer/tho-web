@@ -16,6 +16,7 @@ export type Service = {
   heroTitle: string;
   problem: string;
   promise: string;
+  teaser: string[];
   pillar: "esg" | "comunidad" | "do";
   leadTicketSlug: string;
   levels: ServiceLevel[];
@@ -31,6 +32,11 @@ export const SERVICES: Service[] = [
       "Cuando ESG se vuelve una lista de compliance, se pierde foco en riesgo real, reputación y viabilidad del negocio.",
     promise:
       "Convertimos exigencias ESG en una ruta clara, defendible y accionable para directorio y operación.",
+    teaser: [
+      "Materialidad y priorización estratégica",
+      "Roadmap, gobernanza e indicadores",
+      "Acompañamiento de implementación",
+    ],
     pillar: "esg",
     leadTicketSlug: "flash-audit-esg",
     levels: [
@@ -82,6 +88,11 @@ export const SERVICES: Service[] = [
       "Los proyectos se frenan cuando la lectura territorial llega tarde y la estrategia social no conversa con la operación.",
     promise:
       "Integramos riesgo socioambiental, actores clave y decisiones de negocio para proteger continuidad operativa.",
+    teaser: [
+      "Mapa de actores y riesgos",
+      "Diseño de estrategia territorial",
+      "Implementación y seguimiento",
+    ],
     pillar: "comunidad",
     leadTicketSlug: "mapa-riesgos-socioambientales",
     levels: [
@@ -126,6 +137,11 @@ export const SERVICES: Service[] = [
       "Muchas estrategias fallan porque cultura, liderazgo y operación avanzan desalineados.",
     promise:
       "Traducimos la estrategia en prácticas de liderazgo y gestión que se sostienen en la realidad del equipo.",
+    teaser: [
+      "Diagnóstico de cultura y liderazgo",
+      "Ruta de transformación anual",
+      "Acompañamiento de implementación",
+    ],
     pillar: "do",
     leadTicketSlug: "scan-cultura-liderazgo",
     levels: [
