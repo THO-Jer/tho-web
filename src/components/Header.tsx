@@ -84,7 +84,7 @@ export function Header() {
             href="https://bit.ly/bookTHO"
             target="_blank"
             rel="noreferrer"
-            className="rounded-xl bg-slate-950 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-slate-900"
+            className="btn-tho-gradient rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide text-white"
           >
             Agendar conversación
           </a>
