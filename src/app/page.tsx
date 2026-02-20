@@ -1,12 +1,10 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Section } from "@/components/Section";
-import { TicketCard } from "@/components/TicketCard";
 import { LeadMagnet } from "@/components/LeadMagnet";
 import { ContactForm } from "@/components/ContactForm";
-import { TICKETS } from "@/content/tickets";
 import { POSTS } from "@/content/posts";
-import { PILLAR_META } from "@/lib/brand";
+import { SERVICES } from "@/content/services";
 import MethodTimeline from "@/components/MethodTimeline";
 
 export default function HomePage() {
@@ -51,10 +49,10 @@ export default function HomePage() {
 
             <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
-                href="#entradas"
+                href="#servicios"
                 className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
               >
-                Ver soluciones ágiles
+                Ver servicios
               </a>
               <a
                 href="https://bit.ly/bookTHO"
@@ -140,67 +138,27 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* SERVICIOS — antes de las entradas rápidas */}
       <Section
         id="servicios"
         tone="soft"
         title="Nuestros servicios"
-        subtitle="Tres servicios troncales para diseño estratégico e implementación anual. Puedes deslizar para recorrerlos y luego activar una Solución Ágil asociada por color."
+        subtitle="Tres líneas estratégicas para resolver problemas críticos. Entra al servicio que más te duele hoy y escala desde ahí."
       >
-        <div id="entradas" className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
-          <article className="service-feature-card service-feature-card--green min-w-[88vw] snap-center md:min-w-0 md:first:scale-[1.02]">
-            <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
-              <span className={`h-2 w-2 rounded-full ${PILLAR_META.esg.accentDot}`} />
-              Sostenibilidad corporativa
-            </div>
-            <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.4rem]">De la materialidad al reporte</h3>
-            <p className="mt-2 text-sm text-slate-800">Priorizamos riesgos y oportunidades, diseñamos la hoja de ruta y acompañamos su implementación para sostener resultados.</p>
-            <ul className="mt-4 grid gap-2 text-sm text-slate-800">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Materialidad y priorización estratégica.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Roadmap, gobernanza e indicadores.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Acompañamiento de implementación.</li>
-            </ul>
-            <div className="mt-6 rounded-2xl border border-tho-green/45 bg-white/85 p-4">
-              <div className="text-[11px] font-bold uppercase tracking-wide text-tho-green">¿Cómo empezar? · Solución Ágil</div>
-              <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "esg")!} /></div>
-            </div>
-          </article>
-
-          <article className="service-feature-card service-feature-card--orange min-w-[88vw] snap-center md:min-w-0">
-            <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
-              <span className={`h-2 w-2 rounded-full ${PILLAR_META.comunidad.accentDot}`} />
-              Gestión social
-            </div>
-            <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.4rem]">Relacionamiento comunitario</h3>
-            <p className="mt-2 text-sm text-slate-800">Diseñamos y ejecutamos estrategias territoriales para reducir tensión social y fortalecer viabilidad de largo plazo.</p>
-            <ul className="mt-4 grid gap-2 text-sm text-slate-800">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Mapa de actores y riesgos.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Diseño de estrategia territorial.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Implementación y seguimiento.</li>
-            </ul>
-            <div className="mt-6 rounded-2xl border border-tho-orange/45 bg-white/85 p-4">
-              <div className="text-[11px] font-bold uppercase tracking-wide text-tho-orange">¿Cómo empezar? · Solución Ágil</div>
-              <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "comunidad")!} /></div>
-            </div>
-          </article>
-
-          <article className="service-feature-card service-feature-card--pink min-w-[88vw] snap-center md:min-w-0">
-            <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
-              <span className={`h-2 w-2 rounded-full ${PILLAR_META.do.accentDot}`} />
-              Cultura y liderazgo
-            </div>
-            <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.4rem]">Desarrollo Organizacional</h3>
-            <p className="mt-2 text-sm text-slate-800">Alineamos cultura, liderazgo y operación para sostener cambios estratégicos sin perder ejecución ni foco.</p>
-            <ul className="mt-4 grid gap-2 text-sm text-slate-800">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Diagnóstico de cultura y liderazgo.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Ruta de transformación anual.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Acompañamiento de implementación.</li>
-            </ul>
-            <div className="mt-6 rounded-2xl border border-tho-pink/45 bg-white/85 p-4">
-              <div className="text-[11px] font-bold uppercase tracking-wide text-tho-pink">¿Cómo empezar? · Solución Ágil</div>
-              <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "do")!} /></div>
-            </div>
-          </article>
+        <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
+          {SERVICES.map((service) => (
+            <article key={service.slug} className="service-feature-card min-w-[88vw] snap-center md:min-w-0">
+              <div className="text-xs font-bold uppercase tracking-wide text-slate-600">{service.menuLabel}</div>
+              <h3 className="mt-3 text-3xl font-bold text-slate-900">{service.navLabel}</h3>
+              <p className="mt-3 text-sm text-slate-700">{service.problem}</p>
+              <p className="mt-3 text-sm font-medium text-slate-800">{service.promise}</p>
+              <a
+                href={`/soluciones/${service.slug}`}
+                className="btn-unified-motion btn-brand-neutral mt-6 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-900"
+              >
+                Ver detalle del servicio
+              </a>
+            </article>
+          ))}
         </div>
       </Section>
 

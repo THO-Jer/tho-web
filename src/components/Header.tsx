@@ -4,11 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { SERVICES } from "@/content/services";
 import { cx } from "@/lib/utils";
 
 const HOME_NAV = [
   { id: "servicios", label: "Servicios", tone: "btn-brand-accent-pink" },
-  { id: "entradas", label: "Soluciones", tone: "btn-brand-accent-blue" },
   { id: "metodo", label: "Método", tone: "btn-brand-accent-orange" },
   { id: "recursos", label: "Recursos", tone: "btn-brand-accent-yellow" },
   { id: "blog", label: "Blog", tone: "btn-brand-accent-green" },
@@ -34,32 +34,37 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-3">
-          {/* Logo completo + texto lateral en TT Firs Neue */}
           <div className="relative h-9 w-32">
-            <Image
-              src="/brand/logo-negro.png"
-              alt="The Human Org"
-              fill
-              className="object-contain logo-light"
-              priority
-            />
-            <Image
-              src="/brand/logo-blanco.png"
-              alt="The Human Org"
-              fill
-              className="object-contain logo-dark"
-              priority
-            />
+            <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" priority />
+            <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" priority />
           </div>
           <div className="leading-tight">
             <div className="text-[12px] font-bold uppercase tracking-wide">The Human Org</div>
-            <div className="text-[11px] font-bold tracking-wide text-slate-600">
-              Consultoría estratégica · Concepción
-            </div>
+            <div className="text-[11px] font-bold tracking-wide text-slate-600">Consultoría estratégica · Concepción</div>
           </div>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
+          <div className="group relative">
+            <button
+              className="btn-unified-motion btn-brand-accent btn-brand-accent-blue rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700"
+              type="button"
+            >
+              Soluciones
+            </button>
+            <div className="pointer-events-none absolute left-0 top-full mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-md transition group-hover:pointer-events-auto group-hover:opacity-100">
+              {SERVICES.map((service) => (
+                <Link
+                  key={service.slug}
+                  href={`/soluciones/${service.slug}`}
+                  className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                >
+                  {service.menuLabel}
+                </Link>
+              ))}
+            </div>
+          </div>
+
           {isHome
             ? HOME_NAV.map((item) => (
                 <button
@@ -80,9 +85,7 @@ export function Header() {
                   className={cx(
                     "btn-unified-motion btn-brand-accent rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
                     item.tone,
-                    pathname.startsWith(item.href)
-                      ? "text-slate-950"
-                      : "text-slate-700"
+                    pathname.startsWith(item.href) ? "text-slate-950" : "text-slate-700"
                   )}
                 >
                   {item.label}

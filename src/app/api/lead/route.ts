@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   if (body.hp) return NextResponse.json({ ok: true });
 
   const payload = {
-    type: body.type as "contact" | "lead_magnet",
+    type: body.type as "contact" | "lead_magnet" | "brochure_download",
     name: String(body.name || "").trim(),
     email: String(body.email || "").trim(),
     phone: String(body.phone || "").trim() || undefined,
@@ -29,7 +29,9 @@ export async function POST(req: Request) {
     subject:
       payload.type === "lead_magnet"
         ? "Nuevo lead — Lead magnet (Manual Diversidad)"
-        : "Nuevo lead — Formulario web",
+        : payload.type === "brochure_download"
+          ? "Nuevo lead — Descarga de brochure"
+          : "Nuevo lead — Formulario web",
     text: JSON.stringify(payload, null, 2),
   });
 

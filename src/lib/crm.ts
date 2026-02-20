@@ -1,5 +1,5 @@
 export type LeadPayload = {
-  type: "contact" | "lead_magnet";
+  type: "contact" | "lead_magnet" | "brochure_download";
   name: string;
   email: string;
   phone?: string;
