@@ -22,7 +22,7 @@ export function ActionGallery() {
 
   return (
     <div className="tho-action-main relative overflow-hidden rounded-[2rem] p-1 md:p-2">
-      <div className="pointer-events-none absolute inset-0 z-10 rounded-[2rem] bg-[radial-gradient(circle_at_center,transparent_42%,rgba(244,245,246,0.72)_100%)]" />
+      <div className="tho-action-fade pointer-events-none absolute inset-0 z-10 rounded-[2rem]" />
       <div className="tho-action-boxes relative mx-auto h-[460px] w-full max-w-[1200px] md:h-[620px]">
         {grouped.map((columnItems, colIdx) => {
           const duration = [40, 35, 26][colIdx];
