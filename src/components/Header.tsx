@@ -10,7 +10,7 @@ import { cx } from "@/lib/utils";
 const HOME_NAV = [
   { id: "servicios", label: "Servicios", tone: "btn-brand-accent-pink" },
   { id: "metodo", label: "Método", tone: "btn-brand-accent-orange" },
-  { id: "recursos", label: "Recursos", tone: "btn-brand-accent-yellow" },
+  { id: "accion", label: "THO en acción", tone: "btn-brand-accent-yellow" },
   { id: "blog", label: "Blog", tone: "btn-brand-accent-green" },
 ];
 

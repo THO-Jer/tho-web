@@ -1,12 +1,13 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Section } from "@/components/Section";
-import { LeadMagnet } from "@/components/LeadMagnet";
 import { ContactForm } from "@/components/ContactForm";
 import { POSTS } from "@/content/posts";
 import { SERVICES } from "@/content/services";
 import { PILLAR_META } from "@/lib/brand";
 import MethodTimeline from "@/components/MethodTimeline";
+import { ActionGallery } from "@/components/ActionGallery";
+import { ResourcesModal } from "@/components/ResourcesModal";
 
 export default function HomePage() {
   return (
@@ -216,17 +217,26 @@ export default function HomePage() {
             },
           ]}
         />
+        <div className="mt-6">
+          <ResourcesModal />
+        </div>
       </Section>
 
-
-      <Section
-        id="recursos"
-        title="Recursos prácticos"
-        subtitle="Para quienes aún están evaluando. Por ahora, un recurso general; luego vendrán recursos por servicio."
-      >
-        <LeadMagnet />
-      </Section>
-
+      <section id="accion" className="bg-tho-bg">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:py-16">
+          <div>
+            <h2 className="font-tho-title text-[3rem] text-slate-950 md:text-[4.2rem]">THO en Acción</h2>
+            <p className="mt-3 text-sm text-slate-700 md:text-base">
+              Lo que ves aquí es terreno real: procesos, facilitación, sesiones ejecutivas y acompañamiento en momentos críticos.
+              Diseñamos con evidencia, ejecutamos con equipos y dejamos capacidad instalada.
+            </p>
+            <p className="mt-3 text-sm font-semibold text-slate-800 md:text-base">
+              Haz click en una foto para verla en detalle.
+            </p>
+          </div>
+          <ActionGallery />
+        </div>
+      </section>
 
       <Section id="blog" title="Blog" subtitle="Desde el territorio: análisis y tendencias (placeholder).">
         <div className="grid gap-4 md:grid-cols-3">

@@ -378,3 +378,71 @@ body {
   }
 }
 
+
+.tho-action-main {
+  perspective: 800px;
+}
+
+.tho-action-boxes {
+  transform: rotateX(14deg) rotateY(-15deg) rotateZ(10deg);
+  transform-style: preserve-3d;
+}
+
+.tho-photo-box {
+  position: absolute;
+  left: 50%;
+  width: 80%;
+  height: 280px;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background-size: cover;
+  background-position: center;
+  transform: translateX(-50%) scale(0.5);
+  opacity: 1;
+  z-index: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.tho-photo-box.paused {
+  animation-play-state: paused;
+}
+
+.tho-photo-box.is-hovered {
+  transform: translateX(-50%) scale(0.62);
+  z-index: 9;
+}
+
+.tho-photo-box.opacity-35 {
+  opacity: 0.35;
+}
+
+.tho-drift-down {
+  animation-name: tho-drift-down;
+}
+
+.tho-drift-up {
+  animation-name: tho-drift-up;
+}
+
+@keyframes tho-drift-down {
+  from { transform: translate(-50%, -575px) scale(0.5) rotate(-0.05deg); }
+  to { transform: translate(-50%, 800px) scale(0.5) rotate(0.05deg); }
+}
+
+@keyframes tho-drift-up {
+  from { transform: translate(-50%, 800px) scale(0.5) rotate(-0.05deg); }
+  to { transform: translate(-50%, -575px) scale(0.5) rotate(0.05deg); }
+}
+
+@media (max-width: 767px) {
+  .tho-action-boxes {
+    transform: rotateX(8deg) rotateY(-8deg) rotateZ(6deg);
+  }
+
+  .tho-photo-box {
+    width: 92%;
+    height: 210px;
+  }
+}
