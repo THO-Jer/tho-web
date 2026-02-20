@@ -193,27 +193,27 @@ export default function HomePage() {
           steps={[
             {
               n: "01",
-              title: "Aterrizaje y foco",
-              desc: "Alineamos expectativas, restricciones, riesgos y criterios de decisión. Sin humo.",
-              tone: "neutral",
-            },
-            {
-              n: "02",
               title: "Lectura del sistema",
-              desc: "Datos + señales blandas: actores, cultura, gobernanza, tensiones y puntos ciegos.",
+              desc: "Mapeamos actores, riesgos, cultura y señales críticas del contexto.",
               tone: "com",
             },
             {
-              n: "03",
-              title: "Diseño de ruta",
-              desc: "Opciones, prioridades y plan ejecutable. Entregables claros, responsables y hitos.",
+              n: "02",
+              title: "Diseño de estrategia",
+              desc: "Definimos decisiones, prioridades y hoja de ruta viable.",
               tone: "esg",
             },
             {
-              n: "04",
-              title: "Acompañamiento",
-              desc: "Transferimos método, instalamos capacidades y ajustamos con feedback real.",
+              n: "03",
+              title: "Implementación",
+              desc: "Acompañamos ejecución, coordinación y gobernanza en terreno.",
               tone: "do",
+            },
+            {
+              n: "04",
+              title: "Evaluación y aprendizaje",
+              desc: "Medimos resultados, ajustamos y reiniciamos el ciclo con evidencia.",
+              tone: "neutral",
             },
           ]}
         />

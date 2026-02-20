@@ -1,3 +1,5 @@
+"use client";
+
 type Step = {
   n: string;
   title: string;
@@ -5,69 +7,88 @@ type Step = {
   tone: "do" | "com" | "esg" | "neutral";
 };
 
-const grayScale = [
-  {
-    card: "from-slate-100 to-slate-200 border-slate-300",
-    chip: "bg-slate-100 text-slate-700 border-slate-400/60",
-    dot: "bg-slate-500",
-    ink: "text-slate-900",
-  },
-  {
-    card: "from-slate-300 to-slate-400 border-slate-500/70",
-    chip: "bg-slate-300 text-slate-800 border-slate-600/60",
-    dot: "bg-slate-700",
-    ink: "text-slate-950",
-  },
-  {
-    card: "from-slate-500 to-slate-600 border-slate-700/80",
-    chip: "bg-slate-500 text-slate-100 border-slate-800/70",
-    dot: "bg-slate-100",
-    ink: "text-white",
-  },
-  {
-    card: "from-slate-700 to-slate-900 border-black/70",
-    chip: "bg-slate-800 text-slate-100 border-slate-600/70",
-    dot: "bg-white",
-    ink: "text-white",
-  },
-];
+const BRAND_HOVER = ["var(--tho-blue)", "var(--tho-orange)", "var(--tho-pink)", "var(--tho-green)"];
+const GRAYS = ["#cbd5e1", "#b8c3d2", "#a5b4c8", "#94a3b8"];
+
+function polar(cx: number, cy: number, r: number, angleDeg: number) {
+  const a = (angleDeg * Math.PI) / 180;
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+
+function donutSlicePath(cx: number, cy: number, rOuter: number, rInner: number, startDeg: number, endDeg: number) {
+  const p1 = polar(cx, cy, rOuter, startDeg);
+  const p2 = polar(cx, cy, rOuter, endDeg);
+  const p3 = polar(cx, cy, rInner, endDeg);
+  const p4 = polar(cx, cy, rInner, startDeg);
+  const largeArc = endDeg - startDeg > 180 ? 1 : 0;
+
+  return `M ${p1.x} ${p1.y} A ${rOuter} ${rOuter} 0 ${largeArc} 1 ${p2.x} ${p2.y} L ${p3.x} ${p3.y} A ${rInner} ${rInner} 0 ${largeArc} 0 ${p4.x} ${p4.y} Z`;
+}
+
+function textArcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: number) {
+  const p1 = polar(cx, cy, r, startDeg);
+  const p2 = polar(cx, cy, r, endDeg);
+  const largeArc = endDeg - startDeg > 180 ? 1 : 0;
+  return `M ${p1.x} ${p1.y} A ${r} ${r} 0 ${largeArc} 1 ${p2.x} ${p2.y}`;
+}
 
 export default function MethodTimeline({ steps }: { steps: Step[] }) {
+  const visibleSteps = steps.slice(0, 4);
+  const cx = 500;
+  const cy = 460;
+  const rOuter = 430;
+  const rInner = 210;
+
   return (
-    <div className="relative">
-      <div className="pointer-events-none absolute left-6 right-6 top-8 hidden h-px border-t border-dashed border-slate-400/60 md:block" />
+    <div className="relative overflow-hidden rounded-[2.2rem] bg-white p-4 ring-1 ring-slate-200/70 md:p-6">
+      <div className="mx-auto max-w-5xl">
+        <svg viewBox="0 0 1000 540" className="h-[340px] w-full md:h-[460px]">
+          <defs>
+            {visibleSteps.map((step, i) => {
+              const start = 180 + i * 45;
+              const end = 225 + i * 45;
+              return <path key={step.n} id={`method-text-arc-${i}`} d={textArcPath(cx, cy, (rOuter + rInner) / 2, start + 6, end - 6)} />;
+            })}
+          </defs>
 
-      <div className="grid gap-5 md:grid-cols-4">
-        {steps.map((s, i) => {
-          const st = grayScale[i] ?? grayScale[grayScale.length - 1];
-          return (
-            <article
-              key={s.n}
-              className={`method-card group relative overflow-hidden rounded-3xl border bg-gradient-to-br p-6 transition duration-300 hover:-translate-y-1 hover:[transform:perspective(1100px)_rotateX(4deg)_rotateY(-3deg)] ${st.card}`}
-            >
-              <div className="relative z-10">
-                <div className="mb-4 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-3">
-                    <div className={`h-3 w-3 rounded-full ${st.dot}`} />
-                    <span className="text-sm font-semibold tracking-[0.08em] text-inherit/80">{s.n}</span>
-                  </div>
-                  <span className={`rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${st.chip}`}>
-                    Paso
-                  </span>
-                </div>
+          <circle cx={cx} cy={cy} r={rInner - 6} fill="var(--background)" />
 
-                <h3 className={`text-2xl font-semibold leading-tight ${st.ink}`}>{s.title}</h3>
-                <p className={`mt-3 text-sm leading-relaxed ${i >= 2 ? "text-slate-100/90" : "text-slate-700"}`}>
-                  {s.desc}
-                </p>
-              </div>
+          {visibleSteps.map((step, i) => {
+            const start = 180 + i * 45;
+            const end = 225 + i * 45;
+            const d = donutSlicePath(cx, cy, rOuter, rInner, start, end);
+            const label = `${step.title} · ${step.desc}`;
 
-              <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-white/20 opacity-0 transition group-hover:opacity-100" />
-              <div className="pointer-events-none absolute right-4 top-4 h-3 w-3 border-r border-t border-white/35" />
-              <div className="pointer-events-none absolute bottom-4 left-4 h-3 w-3 border-b border-l border-white/35" />
-            </article>
-          );
-        })}
+            return (
+              <g key={step.n} className="group cursor-pointer">
+                <path
+                  d={d}
+                  fill={GRAYS[i]}
+                  className="transition duration-300 group-hover:brightness-110"
+                  style={{
+                    transformOrigin: `${cx}px ${cy}px`,
+                  }}
+                >
+                  <animate attributeName="fill" dur="0.2s" begin="mouseover" fill="freeze" to={BRAND_HOVER[i]} />
+                  <animate attributeName="fill" dur="0.2s" begin="mouseout" fill="freeze" to={GRAYS[i]} />
+                </path>
+                <path d={d} fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="6" />
+                <text fontSize="18" fontWeight="700" fill="#0f172a" letterSpacing="0.02em">
+                  <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle">
+                    {label}
+                  </textPath>
+                </text>
+              </g>
+            );
+          })}
+
+          <text x={cx} y={cy - 15} textAnchor="middle" fontSize="34" fontWeight="700" fill="#0f172a">
+            Proceso iterativo
+          </text>
+          <text x={cx} y={cy + 20} textAnchor="middle" fontSize="18" fill="#475569">
+            Método THO
+          </text>
+        </svg>
       </div>
     </div>
   );
