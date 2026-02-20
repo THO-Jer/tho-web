@@ -173,7 +173,7 @@ export default function HomePage() {
                   ))}
                 </ul>
                 <a
-                  href={`/soluciones/${service.slug}`}
+                  href={`/servicios/${service.slug}`}
                   className="btn-unified-motion btn-brand-neutral mt-6 inline-flex rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-bold text-slate-900"
                 >
                   Ver detalle del servicio

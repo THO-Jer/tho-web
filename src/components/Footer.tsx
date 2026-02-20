@@ -27,6 +27,9 @@ export function Footer() {
             <Link className="hover:text-white" href="/quienes">
               Quiénes somos
             </Link>
+            <Link className="hover:text-white" href="/nuestra-experiencia">
+              Nuestra experiencia
+            </Link>
             <Link className="hover:text-white" href="/blog">
               Blog
             </Link>
