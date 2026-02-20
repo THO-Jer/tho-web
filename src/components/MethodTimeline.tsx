@@ -44,8 +44,12 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
   const rInner = 220;
 
   return (
-    <div className="method-arc-shell relative overflow-hidden rounded-[2.6rem] bg-white/95 p-2 ring-1 ring-slate-200/80 md:p-4">
-      <div className="method-arc-stage relative mx-auto max-w-6xl" onMouseLeave={() => setActive(null)}>
+    <div className="method-arc-shell relative overflow-hidden px-1 pt-2 md:px-2" onMouseLeave={() => setActive(null)}>
+      <div className="method-arc-fade-top pointer-events-none absolute inset-x-0 top-0 z-10 h-14" />
+      <div className="method-arc-fade-sides pointer-events-none absolute inset-y-0 left-0 z-10 w-16 md:w-24" />
+      <div className="method-arc-fade-sides pointer-events-none absolute inset-y-0 right-0 z-10 w-16 md:w-24 scale-x-[-1]" />
+
+      <div className="method-arc-stage relative mx-auto max-w-6xl">
         <svg viewBox="0 0 1000 590" className="h-[360px] w-full md:h-[520px]">
           <defs>
             {visibleSteps.map((step, i) => {
@@ -92,7 +96,7 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
           <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" />
         </div>
 
-        <div className="method-arc-cut pointer-events-none absolute inset-x-[-8%] bottom-[-62px] z-30 h-40 bg-tho-bg" />
+        <div className="method-arc-cut pointer-events-none absolute inset-x-[-8%] bottom-[-70px] z-30 h-36 bg-tho-bg" />
       </div>
     </div>
   );

@@ -461,7 +461,15 @@ body {
 }
 
 .method-arc-shell {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.96));
+  background: transparent;
+}
+
+.method-arc-fade-top {
+  background: linear-gradient(180deg, rgba(244, 245, 246, 0.95), rgba(244, 245, 246, 0));
+}
+
+.method-arc-fade-sides {
+  background: linear-gradient(90deg, rgba(244, 245, 246, 0.95), rgba(244, 245, 246, 0));
 }
 
 .method-arc-stage {
@@ -471,17 +479,16 @@ body {
 }
 
 .method-arc-cut {
-  transform: rotate(-2.6deg);
+  transform: rotate(-0.85deg);
   transform-origin: center;
-  border-top: 1px solid rgba(148, 163, 184, 0.45);
 }
 
 @media (prefers-color-scheme: dark) {
-  .method-arc-shell {
-    background: linear-gradient(180deg, rgba(36, 36, 36, 0.96), rgba(28, 28, 28, 0.97));
+  .method-arc-fade-top {
+    background: linear-gradient(180deg, rgba(21, 21, 21, 0.94), rgba(21, 21, 21, 0));
   }
 
-  .method-arc-cut {
-    border-top-color: rgba(71, 85, 105, 0.55);
+  .method-arc-fade-sides {
+    background: linear-gradient(90deg, rgba(21, 21, 21, 0.94), rgba(21, 21, 21, 0));
   }
 }
