@@ -39,10 +39,7 @@ Configura estas variables para salir del modo stub:
 - `RESEND_API_KEY`: API key de Resend para envío de correos.
 - `MAIL_FROM`: remitente verificado en Resend (ej: `THO Web <contacto@tu-dominio.com>`).
 - `CRM_ENDPOINT`: endpoint HTTP de tu CRM o middleware SQL que reciba el lead en `POST`.
-- `CRM_API_KEY` (opcional): bearer token para autenticar contra `CRM_ENDPOINT`.
+- `LEADS_API_KEY`: clave usada para auth con CRM (se envía como `Authorization: Bearer`, `x-api-key` y también `apiKey` en body como fallback).
+- `CRM_API_KEY` (opcional/legacy): usado solo si no existe `LEADS_API_KEY`.
 
-- `SUPABASE_URL`: (alternativa a `CRM_ENDPOINT`) URL del proyecto Supabase.
-- `SUPABASE_SERVICE_ROLE_KEY`: clave service-role para insertar en SQL vía REST.
-- `CRM_TABLE` (opcional): tabla destino en Supabase; por defecto `crm_leads`.
-
-Si faltan destinos de CRM (`CRM_ENDPOINT` o `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`), la API responde error para evitar perder leads silenciosamente. El mail puede seguir en stub si falta `RESEND_API_KEY`.
+Si falta `CRM_ENDPOINT`, la API responde error para evitar perder leads silenciosamente. El mail puede seguir en stub si falta `RESEND_API_KEY`.
