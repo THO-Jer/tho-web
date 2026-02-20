@@ -10,7 +10,8 @@ export type LeadPayload = {
   utm?: Record<string, string | undefined>;
 };
 
-export async function pushToCRM(_payload: LeadPayload) {
+export async function pushToCRM(payload: LeadPayload) {
+  void payload;
   // Stub: el CRM aún no recibe leads.
   // Cuando el dev vuelva, esto se transforma en un fetch a tu endpoint.
   // Ej:

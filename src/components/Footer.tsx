@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -17,18 +18,18 @@ export function Footer() {
           </div>
 
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
-            <a className="hover:text-white" href="/tickets">
+            <Link className="hover:text-white" href="/tickets">
               Tickets
-            </a>
-            <a className="hover:text-white" href="/etica">
+            </Link>
+            <Link className="hover:text-white" href="/etica">
               Código de Ética
-            </a>
-            <a className="hover:text-white" href="/quienes">
+            </Link>
+            <Link className="hover:text-white" href="/quienes">
               Quiénes somos
-            </a>
-            <a className="hover:text-white" href="/blog">
+            </Link>
+            <Link className="hover:text-white" href="/blog">
               Blog
-            </a>
+            </Link>
             <a className="hover:text-white" href="mailto:hola@tho.cl">
               hola@tho.cl
             </a>

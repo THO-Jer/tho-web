@@ -346,12 +346,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-function MiniPill({ title, desc }: { title: string; desc: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2">
-      <div className="text-sm font-bold text-white">{title}</div>
-      <div className="text-xs text-white/70">{desc}</div>
-    </div>
-  );
-}
