@@ -27,7 +27,8 @@ export default function HomePage() {
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-slate-950/80 via-slate-950/55 to-slate-950/15" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/45 via-transparent to-slate-950/15" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-tho-bg" />
+        <div className="pointer-events-none absolute -bottom-20 left-1/2 h-52 w-[min(1280px,92vw)] -translate-x-1/2 rounded-[100%] bg-gradient-to-r from-tho-blue/45 via-tho-pink/35 to-tho-orange/45 blur-3xl" />
 
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="flex justify-end">
@@ -72,13 +73,14 @@ export default function HomePage() {
         </div>
         </section>
 
-      <div className="-mt-14 relative z-20">
+      <div className="relative z-20 -mt-14">
         <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" variant="scribble" />
       </div>
+      <div className="section-cut-diagonal relative z-20 -mt-8" />
 
       {/* PROBLEMA — editorial, menos “sección genérica” */}
-      <section className="relative z-30 -mt-10 border-t border-slate-200/70 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <section className="relative z-30 -mt-6 border-t border-slate-200/70 bg-white">
+        <div className="mx-auto max-w-5xl px-6 py-16 md:px-10 md:py-20">
           <div className="grid gap-10 md:grid-cols-12">
             <div className="md:col-span-8">
               <h2 className="font-tho-title text-3xl font-normal md:text-5xl">
@@ -104,6 +106,7 @@ export default function HomePage() {
       </section>
 
       <SectionDivider fromClass="bg-white" toFill="#f4f5f6" variant="scribble" flip />
+      <div className="section-cut-diagonal-reverse -mt-3 mb-1" />
 
       <Section
         id="experiencia"
@@ -167,13 +170,13 @@ export default function HomePage() {
         subtitle="Tres frentes integrados. A veces el problema se ve ESG, pero nace en la organización o en el territorio. Nosotros lo tratamos completo."
       >
         <div className="grid gap-4 md:grid-cols-3">
-          <div className={`relative overflow-hidden rounded-[2rem] p-7 ${PILLAR_META.esg.softBg}`}>
+          <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.esg.softBg}`}>
             <div className="pointer-events-none absolute inset-0">
               <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
                 <path d="M14 42c28-22 78-30 130-18 52 12 84 6 120-8 44-17 90-7 122 22" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-800">
+            <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.esg.accentDot}`} />
               {PILLAR_META.esg.label}
             </div>
@@ -185,13 +188,13 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className={`relative overflow-hidden rounded-[2rem] p-7 ${PILLAR_META.comunidad.softBg}`}>
+          <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.comunidad.softBg}`}>
             <div className="pointer-events-none absolute inset-0">
               <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
                 <path d="M18 52c42-30 104-34 150-12 46 22 86 18 122 2 48-20 86-12 112 10" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-800">
+            <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.comunidad.accentDot}`} />
               Relacionamiento comunitario
             </div>
@@ -203,13 +206,13 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className={`relative overflow-hidden rounded-[2rem] p-7 ${PILLAR_META.do.softBg}`}>
+          <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.do.softBg}`}>
             <div className="pointer-events-none absolute inset-0">
               <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
                 <path d="M16 46c34-20 78-26 124-12 46 14 82 10 120-6 50-22 98-10 126 14" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
               </svg>
             </div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-800">
+            <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.do.accentDot}`} />
               {PILLAR_META.do.label}
             </div>

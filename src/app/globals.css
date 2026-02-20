@@ -74,14 +74,15 @@ body {
   filter: brightness(1.05);
 }
 
-/* Botón THO (efecto glow/gradiente en hover, aplicado en todo el sitio) */
+/* Botón THO (gradiente bloque + diagonales animadas, estilo corporativo) */
 .btn-tho-hover-gradient {
   --btn-i: var(--tho-pink);
   --btn-j: var(--tho-blue);
+  --btn-k: var(--tho-orange);
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  transition: 0.5s;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, border-color 0.35s ease;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
@@ -90,49 +91,103 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(45deg, var(--btn-i), var(--btn-j));
+  background: linear-gradient(120deg, var(--btn-i), var(--btn-j), var(--btn-k));
   opacity: 0;
-  transition: 0.5s;
-  z-index: 0;
+  transition: opacity 0.45s ease;
+  z-index: -2;
 }
 
 .btn-tho-hover-gradient::after {
   content: "";
   position: absolute;
-  top: 8px;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: -20% -10%;
   border-radius: inherit;
-  background: linear-gradient(45deg, var(--btn-i), var(--btn-j));
-  filter: blur(14px);
+  background:
+    linear-gradient(
+      125deg,
+      transparent 0%,
+      transparent 9%,
+      color-mix(in oklab, var(--btn-i), white 24%) 9%,
+      color-mix(in oklab, var(--btn-i), white 24%) 16%,
+      transparent 16%,
+      transparent 27%,
+      color-mix(in oklab, var(--btn-j), white 18%) 27%,
+      color-mix(in oklab, var(--btn-j), white 18%) 34%,
+      transparent 34%,
+      transparent 45%,
+      color-mix(in oklab, var(--btn-k), white 14%) 45%,
+      color-mix(in oklab, var(--btn-k), white 14%) 52%,
+      transparent 52%,
+      transparent 63%,
+      color-mix(in oklab, var(--btn-j), white 22%) 63%,
+      color-mix(in oklab, var(--btn-j), white 22%) 70%,
+      transparent 70%,
+      transparent 81%,
+      color-mix(in oklab, var(--btn-i), white 20%) 81%,
+      color-mix(in oklab, var(--btn-i), white 20%) 88%,
+      transparent 88%,
+      transparent 100%
+    );
   opacity: 0;
-  transition: 0.5s;
+  transform: translateX(-12%);
+  transition: opacity 0.45s ease;
+  animation: tho-button-stripes 5.5s linear infinite;
   z-index: -1;
 }
 
-.btn-tho-hover-gradient:hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0);
+@keyframes tho-button-stripes {
+  0% { transform: translateX(-12%) translateY(0); }
+  50% { transform: translateX(12%) translateY(-2%); }
+  100% { transform: translateX(-12%) translateY(0); }
+}
+
+.btn-tho-hover-gradient:hover,
+.btn-tho-hover-gradient:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
   color: #fff;
   border-color: transparent;
 }
 
-.btn-tho-hover-gradient:hover::before {
+.btn-tho-hover-gradient:hover::before,
+.btn-tho-hover-gradient:focus-visible::before {
   opacity: 1;
 }
 
-.btn-tho-hover-gradient:hover::after {
-  opacity: 0.5;
+.btn-tho-hover-gradient:hover::after,
+.btn-tho-hover-gradient:focus-visible::after {
+  opacity: 0.45;
 }
 
-.btn-tho-hover-gradient > * {
-  position: relative;
-  z-index: 1;
-}
 
 .btn-tho-hover-gradient:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(209, 60, 162, 0.18);
+  box-shadow: 0 0 0 4px rgba(209, 60, 162, 0.18), 0 14px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Transiciones diagonales de sección */
+.section-cut-diagonal,
+.section-cut-diagonal-reverse {
+  height: clamp(42px, 6vw, 88px);
+  width: min(1160px, calc(100% - 2rem));
+  margin-inline: auto;
+  background: linear-gradient(90deg, rgba(30, 113, 184, 0.22), rgba(209, 60, 162, 0.16), rgba(250, 127, 51, 0.2));
+  backdrop-filter: blur(1px);
+}
+
+.section-cut-diagonal {
+  clip-path: polygon(0 30%, 100% 0, 100% 70%, 0 100%);
+}
+
+.section-cut-diagonal-reverse {
+  clip-path: polygon(0 0, 100% 35%, 100% 100%, 0 65%);
+}
+
+.service-pill-contrast {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(15, 23, 42, 0.86);
+  color: #f8fafc;
+  box-shadow: 0 8px 18px rgba(2, 6, 23, 0.28);
 }
 
 /* Modo oscuro integral (preferencia del sistema) */
@@ -179,6 +234,16 @@ body {
   .btn-tho-hover-gradient {
     background-color: #1f2937 !important;
     color: #f8fafc !important;
+  }
+
+  .section-cut-diagonal,
+  .section-cut-diagonal-reverse {
+    background: linear-gradient(90deg, rgba(30, 113, 184, 0.35), rgba(209, 60, 162, 0.26), rgba(250, 127, 51, 0.3));
+  }
+
+  .service-pill-contrast {
+    background: rgba(2, 6, 23, 0.9);
+    border-color: rgba(148, 163, 184, 0.3);
   }
 }
 
