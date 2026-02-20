@@ -7,11 +7,12 @@ import { usePathname } from "next/navigation";
 import { SERVICES } from "@/content/services";
 import { cx } from "@/lib/utils";
 
-const HOME_NAV = [
-  { id: "servicios", label: "Servicios", tone: "btn-brand-accent-pink" },
-  { id: "metodo", label: "Método", tone: "btn-brand-accent-orange" },
-  { id: "accion", label: "THO en acción", tone: "btn-brand-accent-yellow" },
-  { id: "blog", label: "Blog", tone: "btn-brand-accent-green" },
+const HOME_NAV = [{ id: "blog", label: "Blog", tone: "btn-brand-accent-green" }];
+
+const ABOUT_MENU = [
+  { href: "/quienes", label: "Quiénes somos" },
+  { href: "/etica", label: "Código de Ética" },
+  { href: "/#experiencia", label: "Nuestra experiencia" },
 ];
 
 const SITE_NAV = [
@@ -47,10 +48,13 @@ export function Header() {
         <nav className="hidden items-center gap-1 md:flex">
           <div className="group relative">
             <button
-              className="btn-unified-motion btn-brand-accent btn-brand-accent-blue rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700"
+              className="btn-unified-motion btn-brand-accent btn-brand-accent-pink rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700"
               type="button"
+              onClick={() => {
+                if (isHome) scrollTo("servicios");
+              }}
             >
-              Soluciones
+              Servicios
             </button>
             <div className="pointer-events-none absolute left-0 top-full mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-md transition group-hover:pointer-events-auto group-hover:opacity-100">
               {SERVICES.map((service) => (
@@ -60,6 +64,26 @@ export function Header() {
                   className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
                 >
                   {service.menuLabel}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="group relative">
+            <button
+              className="btn-unified-motion btn-brand-accent btn-brand-accent-orange rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700"
+              type="button"
+            >
+              Nosotros
+            </button>
+            <div className="pointer-events-none absolute left-0 top-full mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-md transition group-hover:pointer-events-auto group-hover:opacity-100">
+              {ABOUT_MENU.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                >
+                  {item.label}
                 </Link>
               ))}
             </div>
@@ -93,12 +117,10 @@ export function Header() {
               ))}
         </nav>
 
-
-
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center gap-2">
           <details className="group relative">
-            <summary className="list-none btn-unified-motion btn-brand-accent btn-brand-accent-blue cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700">
-              Soluciones
+            <summary className="list-none btn-unified-motion btn-brand-accent btn-brand-accent-pink cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700">
+              Servicios
             </summary>
             <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
               {SERVICES.map((service) => (
@@ -108,6 +130,23 @@ export function Header() {
                   className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
                 >
                   {service.menuLabel}
+                </Link>
+              ))}
+            </div>
+          </details>
+
+          <details className="group relative">
+            <summary className="list-none btn-unified-motion btn-brand-accent btn-brand-accent-orange cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700">
+              Nosotros
+            </summary>
+            <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
+              {ABOUT_MENU.map((item) => (
+                <Link
+                  key={`mobile-${item.href}`}
+                  href={item.href}
+                  className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                >
+                  {item.label}
                 </Link>
               ))}
             </div>
