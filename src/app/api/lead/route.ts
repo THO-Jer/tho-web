@@ -52,11 +52,12 @@ export async function POST(req: Request) {
     }
 
     if (crmResult.value.skipped) {
-      console.error("[LEAD CRM ERROR] CRM destination not configured");
+      console.error("[LEAD CRM ERROR]", crmResult.value.reason);
       return NextResponse.json({ ok: false, error: "CRM pipeline not configured" }, { status: 500 });
     }
 
-    return NextResponse.json({ ok: true, crm: crmResult.value.provider });
+    console.log("[LEAD CRM OK]", crmResult.value.endpoint, crmResult.value.status);
+    return NextResponse.json({ ok: true, crm: crmResult.value.provider, crmStatus: crmResult.value.status });
   } catch (error) {
     console.error("[LEAD API ERROR]", error);
     return NextResponse.json({ ok: false, error: "Lead processing failed" }, { status: 500 });

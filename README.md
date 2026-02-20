@@ -38,8 +38,19 @@ Configura estas variables para salir del modo stub:
 
 - `RESEND_API_KEY`: API key de Resend para envío de correos.
 - `MAIL_FROM`: remitente verificado en Resend (ej: `THO Web <contacto@tu-dominio.com>`).
-- `CRM_ENDPOINT`: endpoint HTTP de tu CRM o middleware SQL que reciba el lead en `POST`.
+- `CRM_ENDPOINT`: endpoint HTTP de tu CRM. Si no se define, usa por defecto `https://crm-tho.vercel.app/api/public/leads`.
 - `LEADS_API_KEY`: clave usada para auth con CRM (se envía como `Authorization: Bearer`, `x-api-key` y también `apiKey` en body como fallback).
 - `CRM_API_KEY` (opcional/legacy): usado solo si no existe `LEADS_API_KEY`.
 
 Si falta `CRM_ENDPOINT`, la API responde error para evitar perder leads silenciosamente. El mail puede seguir en stub si falta `RESEND_API_KEY`.
+
+
+## Verificación rápida de pipeline
+
+En logs de Vercel (función `/api/lead`) filtra por `CRM PUSH` y confirma:
+
+- request: `[CRM PUSH REQUEST] POST https://crm-tho.vercel.app/api/public/leads email=<...>`
+- response: `[CRM PUSH RESPONSE] 201 ...` (o el error real 4xx/5xx)
+- éxito final: `[LEAD CRM OK] <endpoint> <status>`
+
+Si ves `CRM pipeline not configured`, falta `LEADS_API_KEY` (o `CRM_API_KEY` legacy).

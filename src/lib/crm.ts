@@ -16,33 +16,43 @@ type CRMResult = {
   provider?: "endpoint";
   skipped?: boolean;
   reason?: string;
+  endpoint?: string;
+  status?: number;
 };
 
+const DEFAULT_CRM_ENDPOINT = "https://crm-tho.vercel.app/api/public/leads";
+
 export async function pushToCRM(payload: LeadPayload): Promise<CRMResult> {
-  const endpoint = process.env.CRM_ENDPOINT;
+  const endpoint = process.env.CRM_ENDPOINT || DEFAULT_CRM_ENDPOINT;
   const leadsApiKey = process.env.LEADS_API_KEY || process.env.CRM_API_KEY;
 
-  if (!endpoint) {
-    return { ok: true, skipped: true, reason: "missing CRM_ENDPOINT" };
+  if (!leadsApiKey) {
+    return { ok: true, skipped: true, reason: "missing LEADS_API_KEY", endpoint };
   }
+
+  const body = {
+    ...payload,
+    apiKey: leadsApiKey,
+  };
+
+  console.log("[CRM PUSH REQUEST]", "POST", endpoint, "email=", payload.email, "type=", payload.type);
 
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(leadsApiKey ? { Authorization: `Bearer ${leadsApiKey}` } : {}),
-      ...(leadsApiKey ? { "x-api-key": leadsApiKey } : {}),
+      Authorization: `Bearer ${leadsApiKey}`,
+      "x-api-key": leadsApiKey,
     },
-    body: JSON.stringify({
-      ...payload,
-      ...(leadsApiKey ? { apiKey: leadsApiKey } : {}),
-    }),
+    body: JSON.stringify(body),
   });
+
+  console.log("[CRM PUSH RESPONSE]", response.status, endpoint, "email=", payload.email);
 
   if (!response.ok) {
     const err = await response.text();
     throw new Error(`CRM endpoint error (${response.status}): ${err}`);
   }
 
-  return { ok: true, pushed: true, provider: "endpoint" };
+  return { ok: true, pushed: true, provider: "endpoint", endpoint, status: response.status };
 }
