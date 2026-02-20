@@ -66,7 +66,7 @@ export function Header() {
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
                   className={cx(
-                    "btn-brand-accent rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition",
+                    "btn-unified-motion btn-brand-accent rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition",
                     item.tone
                   )}
                 >
@@ -78,7 +78,7 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cx(
-                    "btn-brand-accent rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
+                    "btn-unified-motion btn-brand-accent rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
                     item.tone,
                     pathname.startsWith(item.href)
                       ? "text-slate-950"
@@ -95,7 +95,7 @@ export function Header() {
             href="https://bit.ly/bookTHO"
             target="_blank"
             rel="noreferrer"
-            className="btn-tho-hover-gradient rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide text-white"
+            className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white"
           >
             <span className="relative z-10">Agendar conversación</span>
           </a>

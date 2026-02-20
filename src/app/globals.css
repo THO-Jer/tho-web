@@ -74,6 +74,21 @@ body {
   opacity: 0;
 }
 
+/* Base compartida de dinamismo para botones */
+.btn-unified-motion {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+}
+
+.btn-unified-motion:hover,
+.btn-unified-motion:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.22);
+}
+
 /* THO gradient button (subtle, not neon) */
 .btn-tho-gradient {
   background-image: linear-gradient(
@@ -95,7 +110,7 @@ body {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  transition: color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease;
 }
 
 .btn-brand-neutral::before {
@@ -125,7 +140,7 @@ body {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  transition: color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, border-color 0.35s ease;
 }
 
 .btn-brand-accent::before {
@@ -174,7 +189,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(120deg, var(--btn-i), var(--btn-j), var(--btn-k));
+  background: linear-gradient(90deg, var(--tho-pink) 0 20%, var(--tho-blue) 20% 40%, var(--tho-orange) 40% 60%, var(--tho-yellow) 60% 80%, var(--tho-green) 80% 100%);
   opacity: 0;
   transition: opacity 0.45s ease;
   z-index: -2;
@@ -190,24 +205,24 @@ body {
       125deg,
       transparent 0%,
       transparent 9%,
-      color-mix(in oklab, var(--btn-i), white 24%) 9%,
-      color-mix(in oklab, var(--btn-i), white 24%) 16%,
+      color-mix(in oklab, var(--tho-pink), white 24%) 9%,
+      color-mix(in oklab, var(--tho-pink), white 24%) 16%,
       transparent 16%,
       transparent 27%,
-      color-mix(in oklab, var(--btn-j), white 18%) 27%,
-      color-mix(in oklab, var(--btn-j), white 18%) 34%,
+      color-mix(in oklab, var(--tho-blue), white 18%) 27%,
+      color-mix(in oklab, var(--tho-blue), white 18%) 34%,
       transparent 34%,
       transparent 45%,
-      color-mix(in oklab, var(--btn-k), white 14%) 45%,
-      color-mix(in oklab, var(--btn-k), white 14%) 52%,
+      color-mix(in oklab, var(--tho-orange), white 14%) 45%,
+      color-mix(in oklab, var(--tho-orange), white 14%) 52%,
       transparent 52%,
       transparent 63%,
-      color-mix(in oklab, var(--btn-j), white 22%) 63%,
-      color-mix(in oklab, var(--btn-j), white 22%) 70%,
+      color-mix(in oklab, var(--tho-yellow), white 22%) 63%,
+      color-mix(in oklab, var(--tho-yellow), white 22%) 70%,
       transparent 70%,
       transparent 81%,
-      color-mix(in oklab, var(--btn-i), white 20%) 81%,
-      color-mix(in oklab, var(--btn-i), white 20%) 88%,
+      color-mix(in oklab, var(--tho-green), white 20%) 81%,
+      color-mix(in oklab, var(--tho-green), white 20%) 88%,
       transparent 88%,
       transparent 100%
     );
@@ -248,6 +263,10 @@ body {
   box-shadow: 0 0 0 4px rgba(209, 60, 162, 0.18), 0 14px 30px rgba(0, 0, 0, 0.2);
 }
 
+.hero-transition-panel {
+  color: #0f172a;
+}
+
 .service-pill-contrast {
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(15, 23, 42, 0.86);
@@ -258,9 +277,9 @@ body {
 /* Modo oscuro integral (preferencia del sistema) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0b1120;
+    --background: #151515;
     --foreground: #e5e7eb;
-    --tho-bg: #0f172a;
+    --tho-bg: #1c1c1c;
   }
 
   body {
@@ -270,19 +289,7 @@ body {
   .bg-white,
   .bg-slate-50,
   .bg-tho-bg {
-    background-color: #111827 !important;
-  }
-
-  .text-slate-950,
-  .text-slate-900,
-  .text-slate-800 {
-    color: #f3f4f6 !important;
-  }
-
-  .text-slate-700,
-  .text-slate-600,
-  .text-slate-500 {
-    color: #cbd5e1 !important;
+    background-color: #1f1f1f !important;
   }
 
   .border-slate-200,
@@ -317,6 +324,10 @@ body {
 
   .logo-dark {
     opacity: 1;
+  }
+
+  .hero-transition-panel {
+    color: #0f172a !important;
   }
 
   .service-pill-contrast {

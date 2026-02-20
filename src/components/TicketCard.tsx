@@ -24,7 +24,7 @@ export function TicketCard({ t }: { t: Ticket }) {
         <div className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-slate-700">{t.duration}</div>
       </div>
 
-      <h3 className="font-tho-title title-tho-strong mt-4 text-[1.95rem] leading-[1.02] text-slate-950 md:text-[2.2rem]">{t.name}</h3>
+      <h3 className="font-tho-title title-tho-strong mt-4 text-[2.2rem] leading-[1.02] text-slate-950 md:text-[2.6rem]">{t.name}</h3>
       <p className="mt-3 text-sm text-slate-600">{t.short}</p>
 
       <p className="mt-3 text-sm text-slate-600">
@@ -48,7 +48,7 @@ export function TicketCard({ t }: { t: Ticket }) {
 
       <a
         href={`/tickets/${t.slug}`}
-        className={`btn-brand-accent ${actionTone} mt-6 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 transition`}
+        className={`btn-unified-motion btn-brand-accent ${actionTone} mt-6 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 transition`}
       >
         Ver detalle
       </a>

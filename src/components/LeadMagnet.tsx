@@ -41,7 +41,7 @@ export function LeadMagnet() {
         </p>
         <button
           onClick={() => setOpen(true)}
-          className="btn-brand-accent btn-brand-accent-pink mt-4 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-800"
+          className="btn-unified-motion btn-brand-accent btn-brand-accent-pink mt-4 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-800"
         >
           Descargar manual
         </button>
@@ -69,7 +69,7 @@ export function LeadMagnet() {
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="btn-brand-neutral rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
+                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
               >
                 Cerrar
               </button>
@@ -104,7 +104,7 @@ export function LeadMagnet() {
 
               <button
                 disabled={status === "sending"}
-                className="btn-brand-neutral mt-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
+                className="btn-unified-motion btn-brand-neutral mt-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
               >
                 {status === "sending" ? "Enviando…" : "Enviar"}
               </button>

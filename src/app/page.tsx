@@ -36,7 +36,7 @@ export default function HomePage() {
               <span className="uppercase">Consultoría estratégica · Concepción</span>
             </div>
 
-            <h1 className="font-tho-title mt-6 text-[2.6rem] font-normal leading-[0.95] md:text-[4.6rem]">
+            <h1 className="font-tho-title mt-6 text-[3.2rem] font-normal leading-[0.94] md:text-[5.6rem]">
               Viabilidad.
               <br />
               Rigor.
@@ -52,7 +52,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#entradas"
-                className="btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
+                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
               >
                 Ver soluciones ágiles
               </a>
@@ -60,7 +60,7 @@ export default function HomePage() {
                 href="https://bit.ly/bookTHO"
                 target="_blank"
                 rel="noreferrer"
-                className="btn-tho-hover-gradient rounded-xl border border-white/35 bg-white/5 px-5 py-3 text-sm font-bold text-white"
+                className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-white/35 bg-white/5 px-5 py-3 text-sm font-bold text-white"
               >
                 Agendar una conversación
               </a>
@@ -73,8 +73,8 @@ export default function HomePage() {
       {/* PROBLEMA — editorial, panel blanco más estrecho sobre continuidad del hero */}
       <section className="relative z-30 -mt-12 bg-transparent">
         <div className="mx-auto max-w-4xl px-4 py-12 md:py-16">
-          <div className="rounded-[2.4rem] bg-white/95 px-7 py-12 text-center shadow-sm ring-1 ring-slate-200/60 backdrop-blur-sm md:px-12">
-            <h2 className="font-tho-title text-3xl font-normal md:text-5xl">
+          <div className="hero-transition-panel rounded-[2.4rem] bg-white/95 px-7 py-12 text-center shadow-sm ring-1 ring-slate-200/60 backdrop-blur-sm md:px-12">
+            <h2 className="font-tho-title text-[3rem] font-normal md:text-[5.2rem]">
               Cuando la organización se desconecta del entorno, el costo llega igual.
             </h2>
             <p className="mx-auto mt-6 max-w-3xl text-base text-slate-700 md:text-lg">
@@ -187,26 +187,20 @@ export default function HomePage() {
             </ul>
           </div>
         </div>
-      </Section>
 
-      <Section
-        id="entradas"
-        tone="soft"
-        title="Soluciones Ágiles"
-        subtitle="Servicios acotados (2–3 meses) para decidir con evidencia. Sin precios públicos. Si el caso lo amerita, esto escala a estrategia e implementación anual."
-      >
-        <div className="mb-6 max-w-3xl text-sm text-slate-700">
-          <span className="font-semibold text-slate-900">¿Por qué partir por aquí?</span> Porque a veces lo más caro no es
-          “hacer algo”, sino seguir decidiendo sin evidencia. Estas entradas ordenan el problema, hacen visibles riesgos y
-          dejan una ruta clara.
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {TICKETS.map((t) => (
-            <TicketCard key={t.slug} t={t} />
-          ))}
+        <div id="entradas" className="mt-12 rounded-[2rem] border border-slate-200 bg-white/70 p-6 md:p-8">
+          <div className="text-xs font-bold uppercase tracking-wide text-slate-500">¿Cómo empezar?</div>
+          <h3 className="mt-2 font-tho-title text-[2.1rem] text-slate-950 md:text-[3rem]">Soluciones Ágiles</h3>
+          <p className="mt-2 max-w-3xl text-sm text-slate-700 md:text-base">
+            Si aún no están listos para un servicio integral, pueden entrar con tickets acotados (2–3 meses) y desde ahí escalar con evidencia.
+          </p>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {TICKETS.map((t) => (
+              <TicketCard key={t.slug} t={t} />
+            ))}
+          </div>
         </div>
       </Section>
-
 
       <Section
         id="metodo"
@@ -266,7 +260,7 @@ export default function HomePage() {
               <p className="mt-2 text-sm text-slate-600">{p.excerpt}</p>
               <a
                 href={`/blog/${p.slug}`}
-                className="btn-brand-neutral mt-5 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
+                className="btn-unified-motion btn-brand-neutral mt-5 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
               >
                 Leer
               </a>
@@ -278,7 +272,7 @@ export default function HomePage() {
       <section className="border-t border-slate-200 bg-slate-900 text-white" id="contacto">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
               ¿Hablamos de lo que realmente importa?
             </h2>
             <p className="mt-4 text-slate-200">Agenda una conversación estratégica o deja tus datos. Sin spam. Sin humo.</p>
@@ -287,13 +281,13 @@ export default function HomePage() {
                 href="https://bit.ly/bookTHO"
                 target="_blank"
                 rel="noreferrer"
-                className="btn-tho-hover-gradient inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-medium text-slate-900"
+                className="btn-unified-motion btn-tho-hover-gradient inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-medium text-slate-900"
               >
                 Agendar conversación
               </a>
               <a
                 href="mailto:hola@tho.cl"
-                className="btn-brand-neutral inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white"
+                className="btn-unified-motion btn-brand-neutral inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white"
               >
                 Escribir por mail
               </a>
