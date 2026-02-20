@@ -11,10 +11,27 @@ export type LeadPayload = {
 };
 
 export async function pushToCRM(payload: LeadPayload) {
-  void payload;
-  // Stub: el CRM aún no recibe leads.
-  // Cuando el dev vuelva, esto se transforma en un fetch a tu endpoint.
-  // Ej:
-  // await fetch(process.env.CRM_ENDPOINT!, { method: "POST", headers: {...}, body: JSON.stringify(_payload) })
-  return { ok: true, skipped: true };
+  const endpoint = process.env.CRM_ENDPOINT;
+  const apiKey = process.env.CRM_API_KEY;
+
+  if (!endpoint) {
+    console.log("[CRM STUB] missing CRM_ENDPOINT", payload.type, payload.email);
+    return { ok: true, skipped: true };
+  }
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`CRM error (${response.status}): ${err}`);
+  }
+
+  return { ok: true, pushed: true };
 }

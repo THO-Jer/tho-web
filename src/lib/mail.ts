@@ -1,9 +1,34 @@
 export type Mail = { to: string; subject: string; text: string };
 
-export async function sendMail(_mail: Mail) {
-  // MVP: sin proveedor de correo configurado.
-  // En producción lo conectamos a un proveedor (Resend/Mailgun/SMTP).
-  // Por ahora: no rompe nada; deja log en server.
-  console.log("[MAIL STUB]", _mail.subject, "->", _mail.to);
-  return { ok: true, stub: true };
+const RESEND_API_URL = "https://api.resend.com/emails";
+
+export async function sendMail(mail: Mail) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.MAIL_FROM || "THO Web <noreply@tho.cl>";
+
+  if (!apiKey) {
+    console.log("[MAIL STUB]", mail.subject, "->", mail.to);
+    return { ok: true, stub: true };
+  }
+
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [mail.to],
+      subject: mail.subject,
+      text: mail.text,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Resend error (${response.status}): ${err}`);
+  }
+
+  return { ok: true, provider: "resend" };
 }

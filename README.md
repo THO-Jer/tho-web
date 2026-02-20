@@ -30,3 +30,15 @@ Si quieres auto-hospedar TT Firs Neue, súbela a `public/fonts/` y luego la regi
 El formulario envía a `hola@tho.cl` usando un API route en `src/app/api/contact/route.ts`.
 
 Más adelante podemos conectar el envío con tu CRM (endpoint / pipeline) cuando esté listo.
+
+
+## Variables de entorno (Vercel)
+
+Configura estas variables para salir del modo stub:
+
+- `RESEND_API_KEY`: API key de Resend para envío de correos.
+- `MAIL_FROM`: remitente verificado en Resend (ej: `THO Web <contacto@tu-dominio.com>`).
+- `CRM_ENDPOINT`: endpoint HTTP de tu CRM o middleware SQL que reciba el lead en `POST`.
+- `CRM_API_KEY` (opcional): bearer token para autenticar contra `CRM_ENDPOINT`.
+
+Si faltan `RESEND_API_KEY` o `CRM_ENDPOINT`, el sistema cae en modo de compatibilidad y deja logs `[MAIL STUB]` / `[CRM STUB]`.
