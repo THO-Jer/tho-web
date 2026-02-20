@@ -315,6 +315,24 @@ body {
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45) !important;
   }
 
+  .text-slate-950,
+  .text-slate-900 {
+    color: #f8fafc !important;
+  }
+
+  .text-slate-800 {
+    color: #e2e8f0 !important;
+  }
+
+  .text-slate-700 {
+    color: #cbd5e1 !important;
+  }
+
+  .text-slate-600,
+  .text-slate-500 {
+    color: #94a3b8 !important;
+  }
+
   .btn-tho-hover-gradient {
     background-color: #1f1f1f !important;
     color: #f8fafc !important;
@@ -359,5 +377,4 @@ body {
     background: linear-gradient(140deg, rgba(209,60,162,0.22), rgba(36,36,36,0.92)) !important;
   }
 }
-
 
