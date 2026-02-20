@@ -145,59 +145,61 @@ export default function HomePage() {
         id="servicios"
         tone="soft"
         title="Nuestros servicios"
-        subtitle="Tres frentes integrados. A veces el problema se ve ESG, pero nace en la organización o en el territorio. Nosotros lo tratamos completo."
+        subtitle="Tres frentes integrados para diseño estratégico e implementación (acompañamiento anual). Si aún no es momento de un programa completo, puedes comenzar con una Solución Ágil asociada a cada frente."
       >
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.esg.softBg}`}>
+        <div id="entradas" className="grid gap-5 md:grid-cols-3">
+          <div className="rounded-[2rem] border border-tho-green/50 bg-gradient-to-br from-tho-green/20 to-tho-green/10 p-7 ring-1 ring-tho-green/30">
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.esg.accentDot}`} />
               {PILLAR_META.esg.label}
             </div>
-            <p className="mt-3 text-sm text-slate-700">Sostenibilidad con foco en decisiones y ejecución.</p>
-            <ul className="mt-4 grid gap-2 text-sm text-slate-700">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Diagnóstico ESG: materialidad, priorización y matriz de riesgos.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Hoja de ruta con hitos, indicadores y gobernanza.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Alineación interna para sostener la estrategia.</li>
+            <h3 className="mt-4 text-2xl font-bold text-slate-900 md:text-3xl">Estrategia e implementación anual</h3>
+            <p className="mt-2 text-sm text-slate-800">Diseño de estrategia ESG integral con acompañamiento de ejecución, gobernanza y decisiones críticas.</p>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-800">
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Diagnóstico y priorización ESG.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Plan anual con hitos, KPIs y gobernanza.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Acompañamiento de implementación.</li>
             </ul>
+            <div className="mt-6 rounded-2xl border border-tho-green/40 bg-white/85 p-4">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-tho-green">¿Cómo empezar? · Solución Ágil</div>
+              <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "esg")!} /></div>
+            </div>
           </div>
 
-          <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.comunidad.softBg}`}>
+          <div className="rounded-[2rem] border border-tho-orange/50 bg-gradient-to-br from-tho-orange/20 to-tho-orange/10 p-7 ring-1 ring-tho-orange/30">
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.comunidad.accentDot}`} />
               Relacionamiento comunitario
             </div>
-            <p className="mt-3 text-sm text-slate-700">Estrategias de vínculo que reducen riesgo y construyen confianza.</p>
-            <ul className="mt-4 grid gap-2 text-sm text-slate-700">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Diseño y ejecución de participación y consulta.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Modelos de gestión comunitaria para proyectos de alto impacto.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Prevención y resolución de conflictos con metodologías probadas.</li>
+            <h3 className="mt-4 text-2xl font-bold text-slate-900 md:text-3xl">Estrategia territorial e implementación anual</h3>
+            <p className="mt-2 text-sm text-slate-800">Modelo anual de relacionamiento para reducir riesgo social y aumentar viabilidad del proyecto.</p>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-800">
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Diseño y conducción de participación.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Gestión de actores y conflictos complejos.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Acompañamiento continuo en terreno.</li>
             </ul>
+            <div className="mt-6 rounded-2xl border border-tho-orange/40 bg-white/85 p-4">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-tho-orange">¿Cómo empezar? · Solución Ágil</div>
+              <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "comunidad")!} /></div>
+            </div>
           </div>
 
-          <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.do.softBg}`}>
+          <div className="rounded-[2rem] border border-tho-pink/50 bg-gradient-to-br from-tho-pink/20 to-tho-pink/10 p-7 ring-1 ring-tho-pink/30">
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.do.accentDot}`} />
               {PILLAR_META.do.label}
             </div>
-            <p className="mt-3 text-sm text-slate-700">Equipos alineados, cultura fuerte y cambios que se sostienen.</p>
-            <ul className="mt-4 grid gap-2 text-sm text-slate-700">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Fortalecimiento cultural y cohesión interna.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Talento y liderazgo para optimizar desempeño.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Gestión del cambio y diagnósticos de clima y engagement.</li>
+            <h3 className="mt-4 text-2xl font-bold text-slate-900 md:text-3xl">Estrategia organizacional e implementación anual</h3>
+            <p className="mt-2 text-sm text-slate-800">Transformación cultural y de liderazgo con método, gobernanza y transferencia de capacidades.</p>
+            <ul className="mt-4 grid gap-2 text-sm text-slate-800">
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Diagnóstico de cultura y liderazgo.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Diseño de ruta anual de cambio.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Acompañamiento de implementación.</li>
             </ul>
-          </div>
-        </div>
-
-        <div id="entradas" className="mt-12 rounded-[2rem] border border-slate-200 bg-white/70 p-6 md:p-8">
-          <div className="text-xs font-bold uppercase tracking-wide text-slate-500">¿Cómo empezar?</div>
-          <h3 className="mt-2 font-tho-title text-[2.1rem] text-slate-950 md:text-[3rem]">Soluciones Ágiles</h3>
-          <p className="mt-2 max-w-3xl text-sm text-slate-700 md:text-base">
-            Si aún no están listos para un servicio integral, pueden entrar con tickets acotados (2–3 meses) y desde ahí escalar con evidencia.
-          </p>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {TICKETS.map((t) => (
-              <TicketCard key={t.slug} t={t} />
-            ))}
+            <div className="mt-6 rounded-2xl border border-tho-pink/40 bg-white/85 p-4">
+              <div className="text-[11px] font-bold uppercase tracking-wide text-tho-pink">¿Cómo empezar? · Solución Ágil</div>
+              <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "do")!} /></div>
+            </div>
           </div>
         </div>
       </Section>

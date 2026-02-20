@@ -80,13 +80,13 @@ body {
   overflow: hidden;
   isolation: isolate;
   transition: transform 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+  box-shadow: none;
 }
 
 .btn-unified-motion:hover,
 .btn-unified-motion:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.22);
+  box-shadow: none;
 }
 
 /* THO gradient button (subtle, not neon) */
@@ -172,16 +172,12 @@ body {
 .btn-brand-accent-yellow { --btn-i: var(--tho-yellow); }
 .btn-brand-accent-green { --btn-i: var(--tho-green); }
 
-/* Botón THO (gradiente bloque + diagonales animadas, estilo corporativo) */
+/* Botón THO primario (5 colores oficiales integrados en un solo efecto) */
 .btn-tho-hover-gradient {
-  --btn-i: var(--tho-pink);
-  --btn-j: var(--tho-blue);
-  --btn-k: var(--tho-orange);
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  transition: transform 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, border-color 0.35s ease;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  transition: transform 0.35s ease, color 0.35s ease, border-color 0.35s ease, filter 0.35s ease;
 }
 
 .btn-tho-hover-gradient::before {
@@ -189,62 +185,35 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--tho-pink) 0 20%, var(--tho-blue) 20% 40%, var(--tho-orange) 40% 60%, var(--tho-yellow) 60% 80%, var(--tho-green) 80% 100%);
-  opacity: 0;
-  transition: opacity 0.45s ease;
-  z-index: -2;
-}
-
-.btn-tho-hover-gradient::after {
-  content: "";
-  position: absolute;
-  inset: -20% -10%;
-  border-radius: inherit;
-  background:
-    linear-gradient(
-      125deg,
-      transparent 0%,
-      transparent 9%,
-      color-mix(in oklab, var(--tho-pink), white 24%) 9%,
-      color-mix(in oklab, var(--tho-pink), white 24%) 16%,
-      transparent 16%,
-      transparent 27%,
-      color-mix(in oklab, var(--tho-blue), white 18%) 27%,
-      color-mix(in oklab, var(--tho-blue), white 18%) 34%,
-      transparent 34%,
-      transparent 45%,
-      color-mix(in oklab, var(--tho-orange), white 14%) 45%,
-      color-mix(in oklab, var(--tho-orange), white 14%) 52%,
-      transparent 52%,
-      transparent 63%,
-      color-mix(in oklab, var(--tho-yellow), white 22%) 63%,
-      color-mix(in oklab, var(--tho-yellow), white 22%) 70%,
-      transparent 70%,
-      transparent 81%,
-      color-mix(in oklab, var(--tho-green), white 20%) 81%,
-      color-mix(in oklab, var(--tho-green), white 20%) 88%,
-      transparent 88%,
-      transparent 100%
-    );
-  opacity: 0;
-  transform: translateX(-12%);
-  transition: opacity 0.45s ease;
-  animation: tho-button-stripes 5.5s linear infinite;
+  background: linear-gradient(
+    100deg,
+    var(--tho-pink) 0% 20%,
+    var(--tho-blue) 20% 40%,
+    var(--tho-orange) 40% 60%,
+    var(--tho-yellow) 60% 80%,
+    var(--tho-green) 80% 100%
+  );
+  background-size: 180% 100%;
+  animation: tho-brand-flow 6s linear infinite;
+  opacity: 0.98;
   z-index: -1;
 }
 
-@keyframes tho-button-stripes {
-  0% { transform: translateX(-12%) translateY(0); }
-  50% { transform: translateX(12%) translateY(-2%); }
-  100% { transform: translateX(-12%) translateY(0); }
+@keyframes tho-brand-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 .btn-tho-hover-gradient:hover,
 .btn-tho-hover-gradient:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2);
   color: #fff;
-  border-color: transparent;
+  border-color: rgba(0, 0, 0, 0.75);
+  filter: saturate(1.08) brightness(1.02);
+}
+
+.btn-tho-hover-gradient:focus-visible {
+  outline: none;
 }
 
 .btn-tho-hover-gradient:hover::before,
@@ -304,7 +273,7 @@ body {
   }
 
   .btn-tho-hover-gradient {
-    background-color: #1f2937 !important;
+    background-color: #1f1f1f !important;
     color: #f8fafc !important;
   }
 
@@ -315,7 +284,7 @@ body {
   }
 
   .btn-brand-neutral::before {
-    background: linear-gradient(120deg, #1f2937, #334155 55%, #64748b);
+    background: linear-gradient(120deg, #252525, #3b3b3b 55%, #666666);
   }
 
   .logo-light {
