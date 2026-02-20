@@ -386,21 +386,23 @@ body {
 .tho-action-boxes {
   transform: rotateX(14deg) rotateY(-15deg) rotateZ(10deg);
   transform-style: preserve-3d;
+  filter: saturate(1.02) contrast(1.02);
 }
 
 .tho-photo-box {
   position: absolute;
   left: 50%;
-  width: 80%;
-  height: 280px;
+  width: 92%;
+  height: 360px;
   border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background-size: cover;
   background-position: center;
-  transform: translateX(-50%) scale(0.5);
-  opacity: 1;
+  transform: translateX(-50%) scale(0.68);
+  opacity: 0.92;
   z-index: 1;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  box-shadow: 0 20px 45px rgba(2, 6, 23, 0.24);
+  transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
@@ -410,7 +412,8 @@ body {
 }
 
 .tho-photo-box.is-hovered {
-  transform: translateX(-50%) scale(0.62);
+  transform: translateX(-50%) scale(0.76);
+  filter: saturate(1.06);
   z-index: 9;
 }
 
@@ -427,13 +430,13 @@ body {
 }
 
 @keyframes tho-drift-down {
-  from { transform: translate(-50%, -575px) scale(0.5) rotate(-0.05deg); }
-  to { transform: translate(-50%, 800px) scale(0.5) rotate(0.05deg); }
+  from { transform: translate(-50%, -575px) scale(0.68) rotate(-0.05deg); }
+  to { transform: translate(-50%, 800px) scale(0.68) rotate(0.05deg); }
 }
 
 @keyframes tho-drift-up {
-  from { transform: translate(-50%, 800px) scale(0.5) rotate(-0.05deg); }
-  to { transform: translate(-50%, -575px) scale(0.5) rotate(0.05deg); }
+  from { transform: translate(-50%, 800px) scale(0.68) rotate(-0.05deg); }
+  to { transform: translate(-50%, -575px) scale(0.68) rotate(0.05deg); }
 }
 
 @media (max-width: 767px) {
@@ -442,7 +445,7 @@ body {
   }
 
   .tho-photo-box {
-    width: 92%;
-    height: 210px;
+    width: 96%;
+    height: 230px;
   }
 }
