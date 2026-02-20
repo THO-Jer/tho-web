@@ -9,14 +9,16 @@ import { POSTS } from "@/content/posts";
 import { SectionDivider } from "@/components/SectionDivider";
 import { ScribbleUnderline } from "@/components/Scribble";
 import { PILLAR_META } from "@/lib/brand";
+import MethodTimeline from "@/components/MethodTimeline";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
       <Header />
 
-      {/* HERO — imagen de fondo (atenuada) + texto encima */}
-      <section className="relative overflow-hidden bg-slate-950 text-white">
+      <main id="contenido">
+        {/* HERO — imagen de fondo (atenuada) + texto encima */}
+        <section className="relative overflow-hidden bg-slate-950 text-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/hero/hands.png"
@@ -68,7 +70,7 @@ export default function HomePage() {
           </div>
           </div>
         </div>
-      </section>
+        </section>
 
       <div className="-mt-14 relative z-20">
         <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" variant="scribble" />
@@ -102,6 +104,60 @@ export default function HomePage() {
       </section>
 
       <SectionDivider fromClass="bg-white" toFill="#f4f5f6" variant="scribble" flip />
+
+      <Section
+        id="experiencia"
+        tone="soft"
+        title="Se ve serio porque lo es"
+        subtitle="Trabajamos con equipos que no pueden fallar: decisiones con costo reputacional, social y financiero. Aportamos método, claridad y ejecución."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Enfoque</div>
+            <p className="mt-2 text-sm text-slate-700">
+              Viabilidad primero: lo que proponemos debe funcionar con tu estructura, tu presión y tu contexto.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Terreno</div>
+            <p className="mt-2 text-sm text-slate-700">
+              No asesoramos desde una planilla: leemos el sistema real, con actores reales, y con tiempos reales.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
+            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Transferencia</div>
+            <p className="mt-2 text-sm text-slate-700">
+              Dejamos capacidades instaladas: herramientas, criterios y gobernanza para sostener el avance.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-10 rounded-[2.2rem] bg-white p-6 ring-1 ring-slate-200/70">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Señales de rigor</div>
+              <p className="mt-1 text-sm text-slate-700">
+                Documentación clara, trazabilidad y entregables que se pueden defender en comité.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Matriz de riesgos",
+                "Mapa de actores",
+                "Hoja de ruta",
+                "Gobernanza & KPIs",
+              ].map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full bg-slate-950/5 px-3 py-1 text-xs font-semibold text-slate-700"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Section>
 
       {/* SERVICIOS — antes de las entradas rápidas */}
       <Section
@@ -189,23 +245,41 @@ export default function HomePage() {
 
       <Section
         id="metodo"
-        title="Método THO"
-        subtitle="Entramos rápido, ordenamos con rigor y dejamos un camino claro. Si el caso lo amerita, escalamos sin perder el control."
+        title="Cómo trabajamos"
+        subtitle="Un método que aguanta auditoría: claridad, puntos de control y foco en viabilidad. Si el caso lo amerita, escalamos sin perder control."
       >
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <div className="text-sm font-semibold">Exploración rigurosa</div>
-            <p className="mt-2 text-sm text-slate-600">2 a 3 meses. Diagnóstico accionable, riesgos visibles y decisión informada.</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <div className="text-sm font-semibold">Diseño estratégico</div>
-            <p className="mt-2 text-sm text-slate-600">Modelamos el sistema: gobernanza, indicadores y hoja de ruta con prioridades reales.</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-6">
-            <div className="text-sm font-semibold">Acompañamiento sostenido</div>
-            <p className="mt-2 text-sm text-slate-600">Ejecución, medición y ajuste. Lo que funciona se consolida; lo que no, se corrige.</p>
-          </div>
-        </div>
+        <MethodTimeline
+          steps={[
+            {
+              n: "01",
+              title: "Aterrizaje y foco",
+              desc: "Alineamos expectativas, restricciones, riesgos y criterios de decisión. Sin humo.",
+              duration: "1 semana",
+              tone: "neutral",
+            },
+            {
+              n: "02",
+              title: "Lectura del sistema",
+              desc: "Datos + señales blandas: actores, cultura, gobernanza, tensiones y puntos ciegos.",
+              duration: "1–2 semanas",
+              tone: "com",
+            },
+            {
+              n: "03",
+              title: "Diseño de ruta",
+              desc: "Opciones, prioridades y plan ejecutable. Entregables claros, responsables y hitos.",
+              duration: "1 semana",
+              tone: "esg",
+            },
+            {
+              n: "04",
+              title: "Acompañamiento",
+              desc: "Transferimos método, instalamos capacidades y ajustamos con feedback real.",
+              duration: "2–4 semanas",
+              tone: "do",
+            },
+          ]}
+        />
       </Section>
 
       <SectionDivider fromClass="bg-white" toFill="#f4f5f6" flip />
@@ -268,6 +342,7 @@ export default function HomePage() {
       </section>
 
       <Footer />
+      </main>
     </div>
   );
 }
