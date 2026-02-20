@@ -7,18 +7,18 @@ import { usePathname } from "next/navigation";
 import { cx } from "@/lib/utils";
 
 const HOME_NAV = [
-  { id: "servicios", label: "Servicios" },
-  { id: "entradas", label: "Entradas" },
-  { id: "metodo", label: "Método" },
-  { id: "recursos", label: "Recursos" },
-  { id: "blog", label: "Blog" },
+  { id: "servicios", label: "Servicios", tone: "btn-brand-accent-pink" },
+  { id: "entradas", label: "Soluciones", tone: "btn-brand-accent-blue" },
+  { id: "metodo", label: "Método", tone: "btn-brand-accent-orange" },
+  { id: "recursos", label: "Recursos", tone: "btn-brand-accent-yellow" },
+  { id: "blog", label: "Blog", tone: "btn-brand-accent-green" },
 ];
 
 const SITE_NAV = [
-  { href: "/tickets", label: "Tickets" },
-  { href: "/blog", label: "Blog" },
-  { href: "/etica", label: "Código de Ética" },
-  { href: "/quienes", label: "Quiénes somos" },
+  { href: "/tickets", label: "Tickets", tone: "btn-brand-accent-blue" },
+  { href: "/blog", label: "Blog", tone: "btn-brand-accent-green" },
+  { href: "/etica", label: "Código de Ética", tone: "btn-brand-accent-orange" },
+  { href: "/quienes", label: "Quiénes somos", tone: "btn-brand-accent-pink" },
 ];
 
 export function Header() {
@@ -66,7 +66,8 @@ export function Header() {
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
                   className={cx(
-                    "btn-tho-hover-gradient rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition"
+                    "btn-brand-accent rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition",
+                    item.tone
                   )}
                 >
                   {item.label}
@@ -77,7 +78,8 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cx(
-                    "btn-tho-hover-gradient rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
+                    "btn-brand-accent rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
+                    item.tone,
                     pathname.startsWith(item.href)
                       ? "text-slate-950"
                       : "text-slate-700"

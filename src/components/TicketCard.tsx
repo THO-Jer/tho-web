@@ -3,23 +3,13 @@ import { PILLAR_META } from "@/lib/brand";
 
 export function TicketCard({ t }: { t: Ticket }) {
   const meta = PILLAR_META[t.pillar];
+  const actionTone = t.pillar === "esg" ? "btn-brand-accent-green" : t.pillar === "comunidad" ? "btn-brand-accent-orange" : "btn-brand-accent-pink";
   return (
     <div
       className={`group relative overflow-hidden bg-white p-7 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md rounded-[2rem]`}
     >
-      {/* Soft color wash + hand-drawn hint */}
+      {/* Soft color wash */}
       <div className={`pointer-events-none absolute inset-0 ${meta.softBg} opacity-[0.55]`} />
-      <div className="pointer-events-none absolute inset-0">
-        <svg viewBox="0 0 420 260" className="h-full w-full" aria-hidden>
-          <path
-            d="M18 62c46-34 122-42 182-18 60 24 112 20 162 0 34-14 58-14 76-6"
-            fill="none"
-            stroke="rgba(11,11,12,0.14)"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
-      </div>
 
       {/* Accent rail */}
       <div className={`pointer-events-none absolute left-0 top-0 h-full w-[3px] ${meta.accentDot} opacity-70`} />
@@ -58,7 +48,7 @@ export function TicketCard({ t }: { t: Ticket }) {
 
       <a
         href={`/tickets/${t.slug}`}
-        className={`btn-tho-hover-gradient mt-6 inline-flex w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition`}
+        className={`btn-brand-accent ${actionTone} mt-6 inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-800 transition`}
       >
         Ver detalle
       </a>

@@ -6,8 +6,6 @@ import { LeadMagnet } from "@/components/LeadMagnet";
 import { ContactForm } from "@/components/ContactForm";
 import { TICKETS } from "@/content/tickets";
 import { POSTS } from "@/content/posts";
-import { SectionDivider } from "@/components/SectionDivider";
-import { ScribbleUnderline } from "@/components/Scribble";
 import { PILLAR_META } from "@/lib/brand";
 import MethodTimeline from "@/components/MethodTimeline";
 
@@ -45,7 +43,6 @@ export default function HomePage() {
               <br />
               Territorio.
             </h1>
-            <ScribbleUnderline className="mt-3" />
 
             <p className="mt-6 ml-auto max-w-xl text-base text-white/80 md:text-lg">
               ESG, relacionamiento comunitario y desarrollo organizacional — integrado, accionable y con foco en
@@ -55,7 +52,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#entradas"
-                className="btn-tho-hover-gradient rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950"
+                className="btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
               >
                 Ver soluciones ágiles
               </a>
@@ -152,11 +149,6 @@ export default function HomePage() {
       >
         <div className="grid gap-4 md:grid-cols-3">
           <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.esg.softBg}`}>
-            <div className="pointer-events-none absolute inset-0">
-              <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
-                <path d="M14 42c28-22 78-30 130-18 52 12 84 6 120-8 44-17 90-7 122 22" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.esg.accentDot}`} />
               {PILLAR_META.esg.label}
@@ -170,11 +162,6 @@ export default function HomePage() {
           </div>
 
           <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.comunidad.softBg}`}>
-            <div className="pointer-events-none absolute inset-0">
-              <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
-                <path d="M18 52c42-30 104-34 150-12 46 22 86 18 122 2 48-20 86-12 112 10" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.comunidad.accentDot}`} />
               Relacionamiento comunitario
@@ -188,11 +175,6 @@ export default function HomePage() {
           </div>
 
           <div className={`relative overflow-hidden rounded-[2rem] border border-slate-200/70 p-7 shadow-sm ${PILLAR_META.do.softBg}`}>
-            <div className="pointer-events-none absolute inset-0">
-              <svg viewBox="0 0 400 220" className="h-full w-full" aria-hidden>
-                <path d="M16 46c34-20 78-26 124-12 46 14 82 10 120-6 50-22 98-10 126 14" fill="none" stroke="rgba(11,11,12,0.14)" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            </div>
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.do.accentDot}`} />
               {PILLAR_META.do.label}
@@ -210,7 +192,7 @@ export default function HomePage() {
       <Section
         id="entradas"
         tone="soft"
-        title="Entradas estratégicas"
+        title="Soluciones Ágiles"
         subtitle="Servicios acotados (2–3 meses) para decidir con evidencia. Sin precios públicos. Si el caso lo amerita, esto escala a estrategia e implementación anual."
       >
         <div className="mb-6 max-w-3xl text-sm text-slate-700">
@@ -225,7 +207,6 @@ export default function HomePage() {
         </div>
       </Section>
 
-      <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" />
 
       <Section
         id="metodo"
@@ -266,7 +247,6 @@ export default function HomePage() {
         />
       </Section>
 
-      <SectionDivider fromClass="bg-white" toFill="#f4f5f6" flip />
 
       <Section
         id="recursos"
@@ -276,7 +256,6 @@ export default function HomePage() {
         <LeadMagnet />
       </Section>
 
-      <SectionDivider fromClass="bg-tho-bg" toFill="#ffffff" />
 
       <Section id="blog" title="Blog" subtitle="Desde el territorio: análisis y tendencias (placeholder).">
         <div className="grid gap-4 md:grid-cols-3">
@@ -287,7 +266,7 @@ export default function HomePage() {
               <p className="mt-2 text-sm text-slate-600">{p.excerpt}</p>
               <a
                 href={`/blog/${p.slug}`}
-                className="btn-tho-hover-gradient mt-5 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium"
+                className="btn-brand-neutral mt-5 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
               >
                 Leer
               </a>
@@ -314,7 +293,7 @@ export default function HomePage() {
               </a>
               <a
                 href="mailto:hola@tho.cl"
-                className="btn-tho-hover-gradient inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white"
+                className="btn-brand-neutral inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white"
               >
                 Escribir por mail
               </a>

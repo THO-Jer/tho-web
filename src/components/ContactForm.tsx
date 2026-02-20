@@ -80,7 +80,7 @@ export function ContactForm(props: { ticket?: string }) {
 
       <button
         disabled={status === "sending"}
-        className="btn-tho-hover-gradient mt-2 rounded-xl border border-white/20 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
+        className="btn-brand-neutral mt-2 rounded-xl border border-white/20 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
       >
         {status === "sending" ? "Enviando…" : "Enviar"}
       </button>

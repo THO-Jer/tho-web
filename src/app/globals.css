@@ -9,7 +9,7 @@
   /* Body font comes from next/font/local variable injected on <html> */
   --font-body: var(--font-tt);
 
-  /* THO brand */
+  /* THO brand (paleta oficial de la línea divisoria) */
   --tho-pink: #d13ca2;
   --tho-blue: #1e71b8;
   --tho-orange: #fa7f33;
@@ -88,6 +88,74 @@ body {
 .btn-tho-gradient:hover {
   filter: brightness(1.05);
 }
+
+
+/* Botones por rol */
+.btn-brand-neutral {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease;
+}
+
+.btn-brand-neutral::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, #f8fafc, #dbe1e8 55%, #a8b1bb);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: -1;
+}
+
+.btn-brand-neutral:hover,
+.btn-brand-neutral:focus-visible {
+  color: #0f172a;
+  border-color: rgba(148, 163, 184, 0.9);
+}
+
+.btn-brand-neutral:hover::before,
+.btn-brand-neutral:focus-visible::before {
+  opacity: 1;
+}
+
+.btn-brand-accent {
+  --btn-i: var(--tho-blue);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  transition: color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.btn-brand-accent::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, color-mix(in oklab, var(--btn-i), white 28%), var(--btn-i));
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: -1;
+}
+
+.btn-brand-accent:hover,
+.btn-brand-accent:focus-visible {
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 10px 22px color-mix(in oklab, var(--btn-i), black 72%);
+}
+
+.btn-brand-accent:hover::before,
+.btn-brand-accent:focus-visible::before {
+  opacity: 1;
+}
+
+.btn-brand-accent-pink { --btn-i: var(--tho-pink); }
+.btn-brand-accent-blue { --btn-i: var(--tho-blue); }
+.btn-brand-accent-orange { --btn-i: var(--tho-orange); }
+.btn-brand-accent-yellow { --btn-i: var(--tho-yellow); }
+.btn-brand-accent-green { --btn-i: var(--tho-green); }
 
 /* Botón THO (gradiente bloque + diagonales animadas, estilo corporativo) */
 .btn-tho-hover-gradient {
@@ -231,6 +299,16 @@ body {
   .btn-tho-hover-gradient {
     background-color: #1f2937 !important;
     color: #f8fafc !important;
+  }
+
+  .btn-brand-neutral:hover,
+  .btn-brand-neutral:focus-visible {
+    color: #f8fafc;
+    border-color: rgba(148, 163, 184, 0.55);
+  }
+
+  .btn-brand-neutral::before {
+    background: linear-gradient(120deg, #1f2937, #334155 55%, #64748b);
   }
 
   .logo-light {
