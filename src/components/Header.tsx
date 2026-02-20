@@ -59,8 +59,7 @@ export function Header() {
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
                   className={cx(
-                    "rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
-                    "text-slate-700 hover:bg-white/70"
+                    "btn-tho-hover-gradient rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition"
                   )}
                 >
                   {item.label}
@@ -71,10 +70,10 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   className={cx(
-                    "rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
+                    "btn-tho-hover-gradient rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
                     pathname.startsWith(item.href)
-                      ? "bg-white/70 text-slate-950"
-                      : "text-slate-700 hover:bg-white/70"
+                      ? "text-slate-950"
+                      : "text-slate-700"
                   )}
                 >
                   {item.label}

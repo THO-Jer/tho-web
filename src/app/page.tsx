@@ -324,13 +324,13 @@ export default function HomePage() {
                 href="https://bit.ly/bookTHO"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-medium text-slate-900 hover:bg-slate-100"
+                className="btn-tho-hover-gradient inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-medium text-slate-900"
               >
                 Agendar conversación
               </a>
               <a
                 href="mailto:hola@tho.cl"
-                className="inline-flex items-center justify-center rounded-2xl border border-white/20 px-5 py-3 text-sm font-medium hover:bg-white/10"
+                className="btn-tho-hover-gradient inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white"
               >
                 Escribir por mail
               </a>

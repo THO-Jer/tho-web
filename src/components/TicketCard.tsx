@@ -58,7 +58,7 @@ export function TicketCard({ t }: { t: Ticket }) {
 
       <a
         href={`/tickets/${t.slug}`}
-        className={`mt-6 inline-flex w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-slate-900`}
+        className={`btn-tho-hover-gradient mt-6 inline-flex w-full items-center justify-center rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white transition`}
       >
         Ver detalle
       </a>

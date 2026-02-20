@@ -41,7 +41,7 @@ export function LeadMagnet() {
         </p>
         <button
           onClick={() => setOpen(true)}
-          className="mt-4 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800"
+          className="btn-tho-hover-gradient mt-4 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white"
         >
           Descargar manual
         </button>
@@ -69,7 +69,7 @@ export function LeadMagnet() {
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2 text-sm hover:bg-slate-100"
+                className="btn-tho-hover-gradient rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
               >
                 Cerrar
               </button>
@@ -104,7 +104,7 @@ export function LeadMagnet() {
 
               <button
                 disabled={status === "sending"}
-                className="mt-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+                className="btn-tho-hover-gradient mt-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white disabled:opacity-60"
               >
                 {status === "sending" ? "Enviando…" : "Enviar"}
               </button>
