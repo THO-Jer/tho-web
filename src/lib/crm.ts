@@ -20,6 +20,20 @@ type CRMResult = {
   status?: number;
 };
 
+export class CRMRequestError extends Error {
+  status: number;
+  endpoint: string;
+  responseBody: string;
+
+  constructor(opts: { status: number; endpoint: string; responseBody: string }) {
+    super(`CRM endpoint error (${opts.status}): ${opts.responseBody}`);
+    this.name = "CRMRequestError";
+    this.status = opts.status;
+    this.endpoint = opts.endpoint;
+    this.responseBody = opts.responseBody;
+  }
+}
+
 const DEFAULT_CRM_ENDPOINT = "https://crm-tho.vercel.app/api/public/leads";
 
 export async function pushToCRM(payload: LeadPayload): Promise<CRMResult> {
@@ -47,11 +61,15 @@ export async function pushToCRM(payload: LeadPayload): Promise<CRMResult> {
     body: JSON.stringify(body),
   });
 
-  console.log("[CRM PUSH RESPONSE]", response.status, endpoint, "email=", payload.email);
+  const responseBody = await response.text();
+  console.log("[CRM PUSH RESPONSE]", response.status, endpoint, "email=", payload.email, "body=", responseBody);
 
   if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`CRM endpoint error (${response.status}): ${err}`);
+    throw new CRMRequestError({
+      status: response.status,
+      endpoint,
+      responseBody,
+    });
   }
 
   return { ok: true, pushed: true, provider: "endpoint", endpoint, status: response.status };

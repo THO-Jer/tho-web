@@ -54,3 +54,15 @@ En logs de Vercel (función `/api/lead`) filtra por `CRM PUSH` y confirma:
 - éxito final: `[LEAD CRM OK] <endpoint> <status>`
 
 Si ves `CRM pipeline not configured`, falta `LEADS_API_KEY` (o `CRM_API_KEY` legacy).
+
+
+### Error 500 del CRM remoto (caso actual)
+
+Si en Vercel aparece:
+
+`CRM endpoint error (500): {"error":"Server misconfigured: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (or SERVICE_ROLE_KEY) and LEADS_OWNER_USER_ID are required"}`
+
+ese error viene del **servicio CRM** (`crm-tho`), no de esta web.
+Debes configurar esas variables en el proyecto `crm-tho` de Vercel.
+
+Esta web ya está enviando `POST` a `/api/public/leads` con auth (`Bearer`, `x-api-key`, `apiKey`).

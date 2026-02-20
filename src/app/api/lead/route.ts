@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { pushToCRM } from "@/lib/crm";
+import { CRMRequestError, pushToCRM } from "@/lib/crm";
 import { sendMail } from "@/lib/mail";
 
 export async function POST(req: Request) {
@@ -47,6 +47,21 @@ export async function POST(req: Request) {
     }
 
     if (crmResult.status === "rejected") {
+      if (crmResult.reason instanceof CRMRequestError) {
+        const upstream = crmResult.reason.responseBody;
+        console.error("[LEAD CRM ERROR]", crmResult.reason.message);
+        return NextResponse.json(
+          {
+            ok: false,
+            error: "CRM pipeline failed",
+            crmStatus: crmResult.reason.status,
+            crmEndpoint: crmResult.reason.endpoint,
+            crmMessage: upstream,
+          },
+          { status: 502 }
+        );
+      }
+
       console.error("[LEAD CRM ERROR]", crmResult.reason);
       return NextResponse.json({ ok: false, error: "CRM pipeline failed" }, { status: 502 });
     }
