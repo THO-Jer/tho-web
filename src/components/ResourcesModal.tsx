@@ -4,18 +4,30 @@ import { useState } from "react";
 
 import { LeadMagnet } from "@/components/LeadMagnet";
 
-export function ResourcesModal() {
-  const [open, setOpen] = useState(false);
+export function ResourcesModal(props?: { autoOpen?: boolean }) {
+  const [open, setOpen] = useState(() => {
+    if (!props?.autoOpen) return false;
+    if (typeof window === "undefined") return false;
+    const key = "tho_resources_modal_seen";
+    const seen = window.sessionStorage.getItem(key);
+    if (!seen) {
+      window.sessionStorage.setItem(key, "1");
+      return true;
+    }
+    return false;
+  });
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
-      >
-        Recursos prácticos
-      </button>
+      {!props?.autoOpen ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
+        >
+          Recursos prácticos
+        </button>
+      ) : null}
 
       {open ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">

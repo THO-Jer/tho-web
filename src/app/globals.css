@@ -459,3 +459,29 @@ body {
     background: radial-gradient(circle at center, transparent 42%, rgba(21, 21, 21, 0.78) 100%);
   }
 }
+
+.method-arc-shell {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.96));
+}
+
+.method-arc-stage {
+  transform: perspective(1500px) rotateX(32deg) rotateZ(-7deg);
+  transform-origin: center 70%;
+  filter: saturate(1.02) contrast(1.03);
+}
+
+.method-arc-cut {
+  transform: rotate(-2.6deg);
+  transform-origin: center;
+  border-top: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  .method-arc-shell {
+    background: linear-gradient(180deg, rgba(36, 36, 36, 0.96), rgba(28, 28, 28, 0.97));
+  }
+
+  .method-arc-cut {
+    border-top-color: rgba(71, 85, 105, 0.55);
+  }
+}

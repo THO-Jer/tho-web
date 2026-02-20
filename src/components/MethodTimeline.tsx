@@ -1,5 +1,8 @@
 "use client";
 
+import Image from "next/image";
+import { useState } from "react";
+
 type Step = {
   n: string;
   title: string;
@@ -8,7 +11,7 @@ type Step = {
 };
 
 const BRAND_HOVER = ["var(--tho-blue)", "var(--tho-orange)", "var(--tho-pink)", "var(--tho-green)"];
-const GRAYS = ["#cbd5e1", "#b8c3d2", "#a5b4c8", "#94a3b8"];
+const GRAYS = ["#d1d5db", "#c4c9d2", "#b7bdc8", "#aab2bf"];
 
 function polar(cx: number, cy: number, r: number, angleDeg: number) {
   const a = (angleDeg * Math.PI) / 180;
@@ -33,62 +36,63 @@ function textArcPath(cx: number, cy: number, r: number, startDeg: number, endDeg
 }
 
 export default function MethodTimeline({ steps }: { steps: Step[] }) {
+  const [active, setActive] = useState<number | null>(null);
   const visibleSteps = steps.slice(0, 4);
   const cx = 500;
-  const cy = 460;
-  const rOuter = 430;
-  const rInner = 210;
+  const cy = 500;
+  const rOuter = 460;
+  const rInner = 220;
 
   return (
-    <div className="relative overflow-hidden rounded-[2.2rem] bg-white p-4 ring-1 ring-slate-200/70 md:p-6">
-      <div className="mx-auto max-w-5xl">
-        <svg viewBox="0 0 1000 540" className="h-[340px] w-full md:h-[460px]">
+    <div className="method-arc-shell relative overflow-hidden rounded-[2.6rem] bg-white/95 p-2 ring-1 ring-slate-200/80 md:p-4">
+      <div className="method-arc-stage relative mx-auto max-w-6xl" onMouseLeave={() => setActive(null)}>
+        <svg viewBox="0 0 1000 590" className="h-[360px] w-full md:h-[520px]">
           <defs>
             {visibleSteps.map((step, i) => {
               const start = 180 + i * 45;
               const end = 225 + i * 45;
-              return <path key={step.n} id={`method-text-arc-${i}`} d={textArcPath(cx, cy, (rOuter + rInner) / 2, start + 6, end - 6)} />;
+              return <path key={step.n} id={`method-text-arc-${i}`} d={textArcPath(cx, cy, (rOuter + rInner) / 2, start + 8, end - 8)} />;
             })}
           </defs>
-
-          <circle cx={cx} cy={cy} r={rInner - 6} fill="var(--background)" />
 
           {visibleSteps.map((step, i) => {
             const start = 180 + i * 45;
             const end = 225 + i * 45;
             const d = donutSlicePath(cx, cy, rOuter, rInner, start, end);
-            const label = `${step.title} · ${step.desc}`;
+            const fill = active === null ? GRAYS[i] : active === i ? BRAND_HOVER[i] : "#9ca3af";
 
             return (
-              <g key={step.n} className="group cursor-pointer">
-                <path
-                  d={d}
-                  fill={GRAYS[i]}
-                  className="transition duration-300 group-hover:brightness-110"
-                  style={{
-                    transformOrigin: `${cx}px ${cy}px`,
-                  }}
-                >
-                  <animate attributeName="fill" dur="0.2s" begin="mouseover" fill="freeze" to={BRAND_HOVER[i]} />
-                  <animate attributeName="fill" dur="0.2s" begin="mouseout" fill="freeze" to={GRAYS[i]} />
-                </path>
-                <path d={d} fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="6" />
-                <text fontSize="18" fontWeight="700" fill="#0f172a" letterSpacing="0.02em">
+              <g
+                key={step.n}
+                className="cursor-pointer transition duration-300"
+                onMouseEnter={() => setActive(i)}
+                style={{
+                  transformOrigin: `${cx}px ${cy}px`,
+                  transform: active === i ? "translateY(-12px)" : "translateY(0)",
+                }}
+              >
+                <path d={d} fill={fill} stroke="rgba(255,255,255,0.92)" strokeWidth="7" />
+                <text fontSize="18" fontWeight="700" fill="#0f172a" letterSpacing="0.015em">
                   <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle">
-                    {label}
+                    {step.title}
+                  </textPath>
+                </text>
+                <text fontSize="13" fill="#1e293b" letterSpacing="0.01em">
+                  <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle" dy="24">
+                    {step.desc}
                   </textPath>
                 </text>
               </g>
             );
           })}
-
-          <text x={cx} y={cy - 15} textAnchor="middle" fontSize="34" fontWeight="700" fill="#0f172a">
-            Proceso iterativo
-          </text>
-          <text x={cx} y={cy + 20} textAnchor="middle" fontSize="18" fill="#475569">
-            Método THO
-          </text>
         </svg>
+
+        <div className="pointer-events-none absolute left-1/2 top-[58%] z-20 h-28 w-60 -translate-x-1/2 -translate-y-1/2 md:h-36 md:w-80">
+          <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" />
+          <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" />
+        </div>
+
+        <div className="method-arc-cut pointer-events-none absolute inset-x-[-8%] bottom-[-62px] z-30 h-40 bg-tho-bg" />
       </div>
     </div>
   );

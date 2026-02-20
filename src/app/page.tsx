@@ -15,6 +15,7 @@ export default function HomePage() {
       <Header />
 
       <main id="contenido">
+        <ResourcesModal autoOpen />
         {/* HERO — imagen de fondo (atenuada) + texto encima */}
         <section className="relative overflow-visible bg-slate-950 text-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -217,9 +218,6 @@ export default function HomePage() {
             },
           ]}
         />
-        <div className="mt-6">
-          <ResourcesModal />
-        </div>
       </Section>
 
       <section id="accion" className="bg-tho-bg">
