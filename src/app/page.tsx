@@ -54,7 +54,7 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#entradas"
-                className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 hover:bg-white/90"
+                className="btn-tho-hover-gradient rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950"
               >
                 Ver soluciones ágiles
               </a>
@@ -62,7 +62,7 @@ export default function HomePage() {
                 href="https://bit.ly/bookTHO"
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-xl border border-white/35 bg-white/5 px-5 py-3 text-sm font-bold text-white hover:bg-white/10"
+                className="btn-tho-hover-gradient rounded-xl border border-white/35 bg-white/5 px-5 py-3 text-sm font-bold text-white"
               >
                 Agendar una conversación
               </a>
@@ -303,7 +303,7 @@ export default function HomePage() {
               <p className="mt-2 text-sm text-slate-600">{p.excerpt}</p>
               <a
                 href={`/blog/${p.slug}`}
-                className="mt-5 inline-flex rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium hover:bg-slate-50"
+                className="btn-tho-hover-gradient mt-5 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium"
               >
                 Leer
               </a>

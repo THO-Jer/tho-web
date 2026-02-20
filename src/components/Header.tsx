@@ -89,7 +89,7 @@ export function Header() {
             rel="noreferrer"
             className="btn-tho-hover-gradient rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide text-white"
           >
-            Agendar conversación
+            <span className="relative z-10">Agendar conversación</span>
           </a>
         </div>
       </div>
