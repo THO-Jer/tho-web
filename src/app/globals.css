@@ -75,3 +75,23 @@ body {
 .btn-tho-gradient:hover {
   filter: brightness(1.05);
 }
+
+/* CTA del header: normal “normal”, gradiente sólo en hover */
+.btn-tho-hover-gradient {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  transition: background 200ms ease, border-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+}
+
+.btn-tho-hover-gradient:hover {
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--tho-pink), black 10%),
+    color-mix(in oklab, var(--tho-blue), black 15%),
+    color-mix(in oklab, var(--tho-orange), black 15%)
+  );
+  border-color: transparent;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}

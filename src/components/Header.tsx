@@ -34,9 +34,10 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="flex items-center gap-3">
-          <div className="relative h-9 w-9 overflow-hidden rounded-2xl bg-white">
+          {/* Logo completo + texto lateral en TT Firs Neue */}
+          <div className="relative h-9 w-32">
             <Image
-              src="/brand/logo-small.png"
+              src="/brand/logo-negro.png"
               alt="The Human Org"
               fill
               className="object-contain"
@@ -44,8 +45,10 @@ export function Header() {
             />
           </div>
           <div className="leading-tight">
-            <div className="font-tho-title text-lg">The Human Org</div>
-            <div className="text-[11px] font-bold tracking-wide text-slate-600">Consultoría estratégica · Concepción</div>
+            <div className="text-[12px] font-bold uppercase tracking-wide">The Human Org</div>
+            <div className="text-[11px] font-bold tracking-wide text-slate-600">
+              Consultoría estratégica · Concepción
+            </div>
           </div>
         </Link>
 
@@ -84,7 +87,7 @@ export function Header() {
             href="https://bit.ly/bookTHO"
             target="_blank"
             rel="noreferrer"
-            className="btn-tho-gradient rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide text-white"
+            className="btn-tho-hover-gradient rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wide text-white"
           >
             Agendar conversación
           </a>
