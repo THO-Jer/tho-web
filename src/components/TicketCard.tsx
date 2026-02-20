@@ -21,7 +21,6 @@ export function TicketCard({ t }: { t: Ticket }) {
           <span className={`h-1.5 w-1.5 rounded-full ${meta.accentDot}`} />
           {meta.label}
         </div>
-        <div className="rounded-full bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-slate-700">{t.duration}</div>
       </div>
 
       <h3 className="font-tho-title title-tho-strong mt-4 text-[2.2rem] leading-[1.02] text-slate-950 md:text-[2.6rem]">{t.name}</h3>

@@ -145,62 +145,62 @@ export default function HomePage() {
         id="servicios"
         tone="soft"
         title="Nuestros servicios"
-        subtitle="Tres frentes integrados para diseño estratégico e implementación (acompañamiento anual). Si aún no es momento de un programa completo, puedes comenzar con una Solución Ágil asociada a cada frente."
+        subtitle="Tres servicios troncales para diseño estratégico e implementación anual. Puedes deslizar para recorrerlos y ver su entrada de Solución Ágil asociada."
       >
-        <div id="entradas" className="grid gap-5 md:grid-cols-3">
-          <div className="rounded-[2rem] border border-tho-green/50 bg-gradient-to-br from-tho-green/20 to-tho-green/10 p-7 ring-1 ring-tho-green/30">
+        <div id="entradas" className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 md:grid md:grid-cols-3 md:overflow-visible">
+          <article className="min-w-[88vw] snap-center rounded-[2rem] border border-tho-green/55 bg-gradient-to-br from-tho-green/25 to-tho-green/10 p-7 ring-1 ring-tho-green/35 md:min-w-0 md:first:scale-[1.02]">
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.esg.accentDot}`} />
-              {PILLAR_META.esg.label}
+              Sostenibilidad corporativa
             </div>
-            <h3 className="mt-4 text-2xl font-bold text-slate-900 md:text-3xl">Estrategia e implementación anual</h3>
-            <p className="mt-2 text-sm text-slate-800">Diseño de estrategia ESG integral con acompañamiento de ejecución, gobernanza y decisiones críticas.</p>
+            <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.4rem]">Estrategia ESG</h3>
+            <p className="mt-2 text-sm text-slate-800">Diseño de estrategia ESG, priorización, gobernanza y acompañamiento de implementación para decisiones de alto impacto.</p>
             <ul className="mt-4 grid gap-2 text-sm text-slate-800">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Diagnóstico y priorización ESG.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Plan anual con hitos, KPIs y gobernanza.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Diagnóstico y materialidad.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Roadmap ejecutivo y KPIs.</li>
               <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-green" />Acompañamiento de implementación.</li>
             </ul>
             <div className="mt-6 rounded-2xl border border-tho-green/40 bg-white/85 p-4">
               <div className="text-[11px] font-bold uppercase tracking-wide text-tho-green">¿Cómo empezar? · Solución Ágil</div>
               <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "esg")!} /></div>
             </div>
-          </div>
+          </article>
 
-          <div className="rounded-[2rem] border border-tho-orange/50 bg-gradient-to-br from-tho-orange/20 to-tho-orange/10 p-7 ring-1 ring-tho-orange/30">
+          <article className="min-w-[88vw] snap-center rounded-[2rem] border border-tho-orange/55 bg-gradient-to-br from-tho-orange/25 to-tho-orange/10 p-7 ring-1 ring-tho-orange/35 md:min-w-0">
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.comunidad.accentDot}`} />
-              Relacionamiento comunitario
+              Gestión social
             </div>
-            <h3 className="mt-4 text-2xl font-bold text-slate-900 md:text-3xl">Estrategia territorial e implementación anual</h3>
-            <p className="mt-2 text-sm text-slate-800">Modelo anual de relacionamiento para reducir riesgo social y aumentar viabilidad del proyecto.</p>
+            <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.4rem]">Estrategia territorial</h3>
+            <p className="mt-2 text-sm text-slate-800">Modelo de relacionamiento comunitario para anticipar conflicto, alinear actores y sostener viabilidad en el territorio.</p>
             <ul className="mt-4 grid gap-2 text-sm text-slate-800">
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Diseño y conducción de participación.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Gestión de actores y conflictos complejos.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Acompañamiento continuo en terreno.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Mapa de actores y riesgos.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Diseño de estrategia territorial.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-orange" />Implementación y seguimiento.</li>
             </ul>
             <div className="mt-6 rounded-2xl border border-tho-orange/40 bg-white/85 p-4">
               <div className="text-[11px] font-bold uppercase tracking-wide text-tho-orange">¿Cómo empezar? · Solución Ágil</div>
               <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "comunidad")!} /></div>
             </div>
-          </div>
+          </article>
 
-          <div className="rounded-[2rem] border border-tho-pink/50 bg-gradient-to-br from-tho-pink/20 to-tho-pink/10 p-7 ring-1 ring-tho-pink/30">
+          <article className="min-w-[88vw] snap-center rounded-[2rem] border border-tho-pink/55 bg-gradient-to-br from-tho-pink/25 to-tho-pink/10 p-7 ring-1 ring-tho-pink/35 md:min-w-0">
             <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
               <span className={`h-2 w-2 rounded-full ${PILLAR_META.do.accentDot}`} />
-              {PILLAR_META.do.label}
+              Cultura y liderazgo
             </div>
-            <h3 className="mt-4 text-2xl font-bold text-slate-900 md:text-3xl">Estrategia organizacional e implementación anual</h3>
-            <p className="mt-2 text-sm text-slate-800">Transformación cultural y de liderazgo con método, gobernanza y transferencia de capacidades.</p>
+            <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.4rem]">Estrategia organizacional</h3>
+            <p className="mt-2 text-sm text-slate-800">Diseño de cambio cultural, liderazgo y cohesión organizacional con acompañamiento para implementación anual.</p>
             <ul className="mt-4 grid gap-2 text-sm text-slate-800">
               <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Diagnóstico de cultura y liderazgo.</li>
-              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Diseño de ruta anual de cambio.</li>
+              <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Ruta de transformación anual.</li>
               <li className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-tho-pink" />Acompañamiento de implementación.</li>
             </ul>
             <div className="mt-6 rounded-2xl border border-tho-pink/40 bg-white/85 p-4">
               <div className="text-[11px] font-bold uppercase tracking-wide text-tho-pink">¿Cómo empezar? · Solución Ágil</div>
               <div className="mt-2"><TicketCard t={TICKETS.find((x) => x.pillar === "do")!} /></div>
             </div>
-          </div>
+          </article>
         </div>
       </Section>
 
@@ -215,28 +215,24 @@ export default function HomePage() {
               n: "01",
               title: "Aterrizaje y foco",
               desc: "Alineamos expectativas, restricciones, riesgos y criterios de decisión. Sin humo.",
-              duration: "1 semana",
               tone: "neutral",
             },
             {
               n: "02",
               title: "Lectura del sistema",
               desc: "Datos + señales blandas: actores, cultura, gobernanza, tensiones y puntos ciegos.",
-              duration: "1–2 semanas",
               tone: "com",
             },
             {
               n: "03",
               title: "Diseño de ruta",
               desc: "Opciones, prioridades y plan ejecutable. Entregables claros, responsables y hitos.",
-              duration: "1 semana",
               tone: "esg",
             },
             {
               n: "04",
               title: "Acompañamiento",
               desc: "Transferimos método, instalamos capacidades y ajustamos con feedback real.",
-              duration: "2–4 semanas",
               tone: "do",
             },
           ]}
@@ -283,13 +279,13 @@ export default function HomePage() {
                 href="https://bit.ly/bookTHO"
                 target="_blank"
                 rel="noreferrer"
-                className="btn-unified-motion btn-tho-hover-gradient inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white px-5 py-3 text-sm font-medium text-slate-900"
+                className="btn-unified-motion btn-tho-hover-gradient inline-flex items-center justify-center rounded-2xl border border-black/60 bg-white px-5 py-3 text-sm font-medium text-slate-900"
               >
                 Agendar conversación
               </a>
               <a
                 href="mailto:hola@tho.cl"
-                className="btn-unified-motion btn-brand-neutral inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/5 px-5 py-3 text-sm font-medium text-white"
+                className="btn-unified-motion btn-brand-neutral inline-flex items-center justify-center rounded-2xl border border-black/60 bg-white/5 px-5 py-3 text-sm font-medium text-white"
               >
                 Escribir por mail
               </a>
