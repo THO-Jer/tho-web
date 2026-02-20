@@ -232,6 +232,49 @@ body {
   box-shadow: 0 0 0 4px rgba(209, 60, 162, 0.18), 0 14px 30px rgba(0, 0, 0, 0.2);
 }
 
+
+.services-gallery {
+  scroll-behavior: smooth;
+}
+
+.services-gallery::-webkit-scrollbar {
+  height: 8px;
+}
+
+.services-gallery::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.45);
+  border-radius: 999px;
+}
+
+.service-feature-card {
+  border-radius: 2rem;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  padding: 1.75rem;
+  background: #fff;
+  transition: transform 0.45s ease, border-color 0.35s ease, filter 0.35s ease;
+  transform-style: preserve-3d;
+}
+
+.service-feature-card:hover {
+  transform: perspective(1200px) rotateX(2.5deg) rotateY(-2deg) translateY(-2px);
+  filter: saturate(1.03);
+}
+
+.service-feature-card--green {
+  background: linear-gradient(140deg, rgba(147,191,36,0.24), rgba(147,191,36,0.10));
+  border-color: rgba(147,191,36,0.5);
+}
+
+.service-feature-card--orange {
+  background: linear-gradient(140deg, rgba(250,127,51,0.24), rgba(250,127,51,0.10));
+  border-color: rgba(250,127,51,0.5);
+}
+
+.service-feature-card--pink {
+  background: linear-gradient(140deg, rgba(209,60,162,0.24), rgba(209,60,162,0.10));
+  border-color: rgba(209,60,162,0.5);
+}
+
 .hero-transition-panel {
   color: #0f172a;
 }
@@ -287,13 +330,8 @@ body {
     background: linear-gradient(120deg, #252525, #3b3b3b 55%, #666666);
   }
 
-  .logo-light {
-    opacity: 0;
-  }
-
-  .logo-dark {
-    opacity: 1;
-  }
+  .logo-light { opacity: 0; }
+  .logo-dark { opacity: 1; }
 
   .hero-transition-panel {
     color: #0f172a !important;
@@ -303,5 +341,23 @@ body {
     background: rgba(2, 6, 23, 0.9);
     border-color: rgba(148, 163, 184, 0.3);
   }
+
+  .service-feature-card {
+    background: #242424 !important;
+    border-color: rgba(148, 163, 184, 0.35) !important;
+  }
+
+  .service-feature-card--green {
+    background: linear-gradient(140deg, rgba(147,191,36,0.22), rgba(36,36,36,0.92)) !important;
+  }
+
+  .service-feature-card--orange {
+    background: linear-gradient(140deg, rgba(250,127,51,0.22), rgba(36,36,36,0.92)) !important;
+  }
+
+  .service-feature-card--pink {
+    background: linear-gradient(140deg, rgba(209,60,162,0.22), rgba(36,36,36,0.92)) !important;
+  }
 }
+
 
