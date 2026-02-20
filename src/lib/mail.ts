@@ -1,9 +1,25 @@
+import { Resend } from "resend";
+
 export type Mail = { to: string; subject: string; text: string };
 
-export async function sendMail(_mail: Mail) {
-  // MVP: sin proveedor de correo configurado.
-  // En producción lo conectamos a un proveedor (Resend/Mailgun/SMTP).
-  // Por ahora: no rompe nada; deja log en server.
-  console.log("[MAIL STUB]", _mail.subject, "->", _mail.to);
-  return { ok: true, stub: true };
+export async function sendMail(mail: Mail) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.MAIL_FROM;
+  const toDefault = process.env.MAIL_TO;
+
+  if (!apiKey) throw new Error("Missing RESEND_API_KEY");
+  if (!from) throw new Error("Missing MAIL_FROM");
+  const to = mail.to || toDefault;
+  if (!to) throw new Error("Missing MAIL_TO or mail.to");
+
+  const resend = new Resend(apiKey);
+
+  const result = await resend.emails.send({
+    from,
+    to,
+    subject: mail.subject,
+    text: mail.text,
+  });
+
+  return result;
 }
