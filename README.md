@@ -41,4 +41,8 @@ Configura estas variables para salir del modo stub:
 - `CRM_ENDPOINT`: endpoint HTTP de tu CRM o middleware SQL que reciba el lead en `POST`.
 - `CRM_API_KEY` (opcional): bearer token para autenticar contra `CRM_ENDPOINT`.
 
-Si faltan `RESEND_API_KEY` o `CRM_ENDPOINT`, el sistema cae en modo de compatibilidad y deja logs `[MAIL STUB]` / `[CRM STUB]`.
+- `SUPABASE_URL`: (alternativa a `CRM_ENDPOINT`) URL del proyecto Supabase.
+- `SUPABASE_SERVICE_ROLE_KEY`: clave service-role para insertar en SQL vía REST.
+- `CRM_TABLE` (opcional): tabla destino en Supabase; por defecto `crm_leads`.
+
+Si faltan destinos de CRM (`CRM_ENDPOINT` o `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY`), la API responde error para evitar perder leads silenciosamente. El mail puede seguir en stub si falta `RESEND_API_KEY`.

@@ -33,15 +33,30 @@ export async function POST(req: Request) {
           ? "Nuevo lead — Descarga de brochure"
           : "Nuevo lead — Formulario web";
 
-    await sendMail({
-      to: "hola@tho.cl",
-      subject: mailSubject,
-      text: JSON.stringify(payload, null, 2),
-    });
+    const [mailResult, crmResult] = await Promise.allSettled([
+      sendMail({
+        to: "hola@tho.cl",
+        subject: mailSubject,
+        text: JSON.stringify(payload, null, 2),
+      }),
+      pushToCRM(payload),
+    ]);
 
-    await pushToCRM(payload);
+    if (mailResult.status === "rejected") {
+      console.error("[LEAD MAIL ERROR]", mailResult.reason);
+    }
 
-    return NextResponse.json({ ok: true });
+    if (crmResult.status === "rejected") {
+      console.error("[LEAD CRM ERROR]", crmResult.reason);
+      return NextResponse.json({ ok: false, error: "CRM pipeline failed" }, { status: 502 });
+    }
+
+    if (crmResult.value.skipped) {
+      console.error("[LEAD CRM ERROR] CRM destination not configured");
+      return NextResponse.json({ ok: false, error: "CRM pipeline not configured" }, { status: 500 });
+    }
+
+    return NextResponse.json({ ok: true, crm: crmResult.value.provider });
   } catch (error) {
     console.error("[LEAD API ERROR]", error);
     return NextResponse.json({ ok: false, error: "Lead processing failed" }, { status: 500 });
