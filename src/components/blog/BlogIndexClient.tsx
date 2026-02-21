@@ -14,6 +14,8 @@ type BlogPost = {
   title: string;
   excerpt: string;
   minutes: number;
+  publishedAt?: string | null;
+  updatedAt?: string;
   coverImage?: string;
   coverImageAlt?: string;
   tags: string[];
@@ -45,6 +47,10 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
       if (!byCategory) return false;
       if (!q) return true;
       return `${post.title} ${post.excerpt} ${post.tags.join(" ")} ${post.category || ""}`.toLowerCase().includes(q);
+    }).sort((a, b) => {
+      const aTime = new Date(a.publishedAt || a.updatedAt || 0).getTime();
+      const bTime = new Date(b.publishedAt || b.updatedAt || 0).getTime();
+      return bTime - aTime;
     });
   }, [posts, query, categoryKey]);
 
@@ -65,7 +71,7 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
         </select>
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
+      <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filtered.map((post) => (
           <Link
             key={post.slug}
@@ -77,9 +83,9 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
                 <Image src={post.coverImage} alt={post.coverImageAlt || post.title} fill className="object-cover" />
               </div>
             ) : null}
-            <div className="p-6">
+            <div className="p-4 md:p-5">
               <div className="text-xs text-slate-500">{post.minutes} min</div>
-              <div className="mt-2 text-lg font-semibold text-slate-900">{post.title}</div>
+              <div className="mt-1.5 text-base font-semibold text-slate-900 md:text-lg">{post.title}</div>
               <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p>
               {post.category ? <div className="mt-2 text-xs text-slate-500">Categoría: {post.category}</div> : null}
               {post.tags.length ? (
