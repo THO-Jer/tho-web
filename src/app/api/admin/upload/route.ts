@@ -210,8 +210,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (!uploadRes.ok) {
-      const reason = await uploadRes.text();
-      const missingBucket = uploadRes.status === 404 && /bucket not found/i.test(reason);
+      let lastReason = await uploadRes.text();
+      const missingBucket = uploadRes.status === 404 && /bucket not found/i.test(lastReason);
 
       if (missingBucket && service) {
         try {
@@ -225,6 +225,9 @@ export async function POST(req: NextRequest) {
             apikey: service,
             bearer: service,
           });
+          if (!uploadRes.ok) {
+            lastReason = await uploadRes.text();
+          }
         } catch (error) {
           return NextResponse.json(
             { error: error instanceof Error ? error.message : "No se pudo crear bucket de Storage" },
@@ -234,9 +237,8 @@ export async function POST(req: NextRequest) {
       }
 
       if (!uploadRes.ok) {
-        const retryReason = await uploadRes.text();
         const hint = missingBucket && !service ? ` (configura bucket '${bucket}' en Supabase o define SERVICE_ROLE)` : "";
-        return NextResponse.json({ error: `No se pudo subir a Storage: ${retryReason}${hint}` }, { status: 500 });
+        return NextResponse.json({ error: `No se pudo subir a Storage: ${lastReason}${hint}` }, { status: 500 });
       }
     }
 
