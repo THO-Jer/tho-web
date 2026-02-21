@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Footer } from "@/components/Footer";
@@ -22,20 +23,27 @@ export default async function BlogPage() {
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
+                className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
               >
-                <div className="text-xs text-slate-500">{post.minutes} min</div>
-                <div className="mt-2 text-lg font-semibold text-slate-900">{post.title}</div>
-                <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p>
-                {post.tags.length ? (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {post.tags.map((tag) => (
-                      <span key={tag} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-700">
-                        #{tag}
-                      </span>
-                    ))}
+                {post.coverImage ? (
+                  <div className="relative aspect-[16/9] w-full">
+                    <Image src={post.coverImage} alt={post.coverImageAlt || post.title} fill className="object-cover" />
                   </div>
                 ) : null}
+                <div className="p-6">
+                  <div className="text-xs text-slate-500">{post.minutes} min</div>
+                  <div className="mt-2 text-lg font-semibold text-slate-900">{post.title}</div>
+                  <p className="mt-2 text-sm text-slate-600">{post.excerpt}</p>
+                  {post.tags.length ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {post.tags.map((tag) => (
+                        <span key={tag} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-700">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               </Link>
             ))}
           </div>

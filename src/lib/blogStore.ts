@@ -13,6 +13,8 @@ export type BlogPost = {
   status: BlogStatus;
   publishedAt: string | null;
   updatedAt: string;
+  coverImage?: string;
+  coverImageAlt?: string;
   seoTitle?: string;
   seoDescription?: string;
 };
@@ -79,6 +81,8 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
     tags,
     status,
     publishedAt,
+    coverImage: input.coverImage?.trim() || undefined,
+    coverImageAlt: input.coverImageAlt?.trim() || undefined,
     seoTitle: input.seoTitle?.trim() || undefined,
     seoDescription: input.seoDescription?.trim() || undefined,
   };

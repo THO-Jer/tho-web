@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 
 type BlogPost = {
   slug: string;
@@ -12,6 +12,8 @@ type BlogPost = {
   status: "draft" | "published";
   publishedAt: string | null;
   updatedAt: string;
+  coverImage?: string;
+  coverImageAlt?: string;
   seoTitle?: string;
   seoDescription?: string;
 };
@@ -24,6 +26,8 @@ type FormState = {
   minutes: string;
   tags: string;
   status: "draft" | "published";
+  coverImage: string;
+  coverImageAlt: string;
   seoTitle: string;
   seoDescription: string;
 };
@@ -36,6 +40,8 @@ const EMPTY_FORM: FormState = {
   minutes: "5",
   tags: "",
   status: "published",
+  coverImage: "",
+  coverImageAlt: "",
   seoTitle: "",
   seoDescription: "",
 };
@@ -89,6 +95,8 @@ export default function BlogStudioPage() {
       minutes: String(post.minutes),
       tags: post.tags.join(", "),
       status: post.status,
+      coverImage: post.coverImage ?? "",
+      coverImageAlt: post.coverImageAlt ?? "",
       seoTitle: post.seoTitle ?? "",
       seoDescription: post.seoDescription ?? "",
     });
@@ -97,6 +105,47 @@ export default function BlogStudioPage() {
   function resetForm() {
     setForm(EMPTY_FORM);
     setEditingSlug(null);
+  }
+
+  function insertTemplate(type: "h2" | "h3" | "quote" | "divider" | "toc" | "image") {
+    const snippets: Record<typeof type, string> = {
+      h2: "\n\n## Nuevo subtítulo\n\n",
+      h3: "\n\n### Sub-sección\n\n",
+      quote: "\n\n> Cita destacada\n\n",
+      divider: "\n\n---\n\n",
+      toc: "\n\n## Índice\n\n- Punto 1\n- Punto 2\n\n",
+      image: "\n\n![Texto alternativo](/uploads/blog/tu-imagen.jpg)\n\n",
+    };
+    setForm((prev) => ({ ...prev, content: `${prev.content}${snippets[type]}` }));
+  }
+
+  async function onUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+    setLoading(true);
+    setMessage("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { "x-admin-token": token },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo subir la imagen");
+      setForm((prev) => ({
+        ...prev,
+        coverImage: prev.coverImage || data.url,
+        content: `${prev.content}\n\n![${file.name}](${data.url})\n\n`,
+      }));
+      setMessage(`Imagen subida: ${data.url}`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Error al subir imagen");
+    } finally {
+      setLoading(false);
+      e.target.value = "";
+    }
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -111,6 +160,8 @@ export default function BlogStudioPage() {
       minutes: Number(form.minutes),
       tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
       status: form.status,
+      coverImage: form.coverImage,
+      coverImageAlt: form.coverImageAlt,
       seoTitle: form.seoTitle,
       seoDescription: form.seoDescription,
     };
@@ -166,7 +217,7 @@ export default function BlogStudioPage() {
     <main className="min-h-screen bg-tho-bg px-4 py-10">
       <div className="mx-auto max-w-6xl">
         <h1 className="font-tho-title text-5xl text-slate-950">Studio Blog</h1>
-        <p className="mt-2 text-sm text-slate-600">CMS nativo: crea, edita y publica entradas sin WordPress.</p>
+        <p className="mt-2 text-sm text-slate-600">Editor nativo con bloques rápidos, portada, citas, separadores, índice e imágenes.</p>
 
         <div className="mt-6 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
           <label className="grow text-sm">
@@ -188,11 +239,18 @@ export default function BlogStudioPage() {
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <form onSubmit={onSubmit} className="rounded-2xl border border-slate-200 bg-white p-5">
             <h2 className="text-xl font-semibold text-slate-900">{editingSlug ? `Editar: ${editingSlug}` : "Nuevo post"}</h2>
+            <div className="mt-3 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
+              <button type="button" onClick={() => insertTemplate("h2")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H2</button>
+              <button type="button" onClick={() => insertTemplate("h3")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H3</button>
+              <button type="button" onClick={() => insertTemplate("quote")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cita</button>
+              <button type="button" onClick={() => insertTemplate("divider")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Separador</button>
+              <button type="button" onClick={() => insertTemplate("image")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen</button>
+            </div>
             <div className="mt-4 grid gap-3">
               <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Slug (opcional)" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
               <textarea className="min-h-20 rounded-lg border border-slate-300 px-3 py-2" placeholder="Extracto" value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} />
-              <textarea className="min-h-56 rounded-lg border border-slate-300 px-3 py-2" placeholder="Contenido (texto/markdown simple)" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
+              <textarea className="min-h-56 rounded-lg border border-slate-300 px-3 py-2" placeholder="Contenido (markdown enriquecido)" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
               <div className="grid gap-3 md:grid-cols-2">
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Minutos de lectura" value={form.minutes} onChange={(e) => setForm({ ...form, minutes: e.target.value })} />
                 <select className="rounded-lg border border-slate-300 px-3 py-2" value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as "draft" | "published" })}>
@@ -200,6 +258,12 @@ export default function BlogStudioPage() {
                   <option value="draft">Borrador</option>
                 </select>
               </div>
+              <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Imagen principal URL" value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} />
+              <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Alt imagen principal" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
+              <label className="text-xs text-slate-600">
+                Subir imagen (jpg/png/webp)
+                <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUpload} />
+              </label>
               <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
               <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="SEO title" value={form.seoTitle} onChange={(e) => setForm({ ...form, seoTitle: e.target.value })} />
               <textarea className="min-h-20 rounded-lg border border-slate-300 px-3 py-2" placeholder="SEO description" value={form.seoDescription} onChange={(e) => setForm({ ...form, seoDescription: e.target.value })} />
