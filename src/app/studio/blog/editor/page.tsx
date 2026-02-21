@@ -316,9 +316,10 @@ export default function BlogStudioPage() {
           window.history.replaceState({}, document.title, nextUrl);
         }
       }
+      const savedSlug = data.post?.slug || editingSlug || form.slug;
       await fetchPosts();
-      setMessage(editingSlug ? "Post actualizado." : "Post creado.");
-      if (!editingSlug && !data.post) resetForm();
+      router.replace(`/studio/blog?notice=${editingSlug ? "updated" : "created"}&slug=${encodeURIComponent(savedSlug)}`);
+      return;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error guardando.");
     } finally {
@@ -362,7 +363,8 @@ export default function BlogStudioPage() {
           <Link href="/studio/blog" className="rounded-lg border border-slate-300 px-3 py-2 text-xs">Volver al listado</Link>
         </div>
 
-        {message ? <p className="mt-3 text-sm text-slate-700">{message}</p> : null}
+        {message ? <p className="mt-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">{message}</p> : null}
+        {loading ? <p className="mt-3 text-xs text-slate-500">Procesando cambios...</p> : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
           <form onSubmit={onSubmit} className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -432,8 +434,8 @@ export default function BlogStudioPage() {
               ) : null}
 
               <div className="mt-4 flex gap-3">
-                <button disabled={!canSubmit || loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" type="submit">{editingSlug ? "Guardar cambios" : "Crear post"}</button>
-                <button className="rounded-lg border border-slate-300 px-4 py-2 text-sm" type="button" onClick={resetForm}>Limpiar</button>
+                <button disabled={!canSubmit || loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.99] disabled:opacity-50" type="submit">{loading ? "Guardando..." : editingSlug ? "Guardar cambios" : "Crear post"}</button>
+                <button className="rounded-lg border border-slate-300 px-4 py-2 text-sm transition hover:bg-slate-50 active:scale-[0.99]" type="button" onClick={resetForm}>Limpiar</button>
               </div>
             </fieldset>
           </form>
