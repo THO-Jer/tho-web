@@ -45,6 +45,7 @@ Configura estas variables para salir del modo stub:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: anon key pública para OTP/email auth.
 - `SUPABASE_SERVICE_ROLE_KEY` (o `SERVICE_ROLE_KEY`): service key para validar allowlist de editores en backend.
 - Tabla `public.blog_editors` en Supabase (ver SQL en `sql/supabase_blog_editors.sql`).
+- En Supabase Auth habilita proveedor **Azure/Microsoft** y agrega redirect URL de este proyecto (`https://tu-dominio/studio/blog` y `http://localhost:3000/studio/blog`).
 
 Si falta `CRM_ENDPOINT`, la API responde error para evitar perder leads silenciosamente. El mail puede seguir en stub si falta `RESEND_API_KEY`.
 

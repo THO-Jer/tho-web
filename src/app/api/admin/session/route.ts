@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { isAllowedEditorEmail, readSession, SESSION_COOKIE } from "@/lib/adminAuth";
+import { isAllowedEditorEmail, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +22,32 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const payload = (await req.json()) as { action?: string; email?: string; otp?: string };
+    const payload = (await req.json()) as {
+      action?: string;
+      email?: string;
+      otp?: string;
+      accessToken?: string;
+    };
     const action = payload.action;
     const email = (payload.email || "").trim().toLowerCase();
+
+    if (action === "oauth_login") {
+      const token = (payload.accessToken || "").trim();
+      if (!token) return NextResponse.json({ error: "Token OAuth faltante." }, { status: 400 });
+
+      const valid = await validateSupabaseAccessToken(token);
+      if (!valid) return NextResponse.json({ error: "No autorizado para Studio." }, { status: 403 });
+
+      const response = NextResponse.json({ ok: true, email: valid.email });
+      response.cookies.set(SESSION_COOKIE, token, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 12,
+      });
+      return response;
+    }
 
     if (!email) return NextResponse.json({ error: "Debes enviar email." }, { status: 400 });
 

@@ -52,6 +52,14 @@ export async function isAllowedEditorEmail(email: string) {
   return Boolean(rows[0] && rows[0].active !== false);
 }
 
+export async function validateSupabaseAccessToken(token: string) {
+  const email = await getUserEmailFromToken(token);
+  if (!email) return null;
+  const allowed = await isAllowedEditorEmail(email);
+  if (!allowed) return null;
+  return { email };
+}
+
 export async function readSession(req: NextRequest) {
   const authHeader = req.headers.get("authorization") || "";
   const headerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
@@ -59,12 +67,10 @@ export async function readSession(req: NextRequest) {
   const token = headerToken || cookieToken;
   if (!token) return null;
 
-  const email = await getUserEmailFromToken(token);
-  if (!email) return null;
-  const allowed = await isAllowedEditorEmail(email);
-  if (!allowed) return null;
+  const valid = await validateSupabaseAccessToken(token);
+  if (!valid) return null;
 
-  return { email, token };
+  return { email: valid.email, token };
 }
 
 export async function isAdminAuthorized(req: NextRequest) {

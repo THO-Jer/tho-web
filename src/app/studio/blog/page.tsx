@@ -69,10 +69,39 @@ export default function BlogStudioPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
   useEffect(() => {
     const cachedEmail = localStorage.getItem("blog_admin_email");
     if (cachedEmail) setEmail(cachedEmail);
+
+    const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+
+    if (accessToken) {
+      fetch("/api/admin/session", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ action: "oauth_login", accessToken }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.ok) {
+            setAuthenticated(true);
+            if (data.email) {
+              setEmail(data.email);
+              localStorage.setItem("blog_admin_email", data.email);
+            }
+            setMessage("Sesión iniciada con Microsoft.");
+          }
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        });
+    }
 
     fetch("/api/admin/session", { credentials: "include" })
       .then((res) => res.json())
@@ -158,6 +187,16 @@ export default function BlogStudioPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function onMicrosoftLogin() {
+    if (!supabaseUrl) {
+      setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth Microsoft.");
+      return;
+    }
+    const redirectTo = `${window.location.origin}/studio/blog`;
+    const url = `${supabaseUrl}/auth/v1/authorize?provider=azure&redirect_to=${encodeURIComponent(redirectTo)}`;
+    window.location.href = url;
   }
 
   async function onSendOtp() {
@@ -368,7 +407,7 @@ export default function BlogStudioPage() {
     <main className="min-h-screen bg-tho-bg px-4 py-10">
       <div className="mx-auto max-w-7xl">
         <h1 className="font-tho-title text-5xl text-slate-950">Studio Blog</h1>
-        <p className="mt-2 text-sm text-slate-600">Acceso con email + código OTP de Supabase. Sin token manual para los editores.</p>
+        <p className="mt-2 text-sm text-slate-600">Acceso con OTP o con Microsoft (OAuth Supabase). Sin token manual para los editores.</p>
 
         <div className="mt-6 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
           <label className="min-w-[220px] grow text-sm">
@@ -381,6 +420,7 @@ export default function BlogStudioPage() {
           </label>
           <button onClick={onSendOtp} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white" type="button">Enviar código</button>
           <button onClick={onVerifyOtp} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700" type="button">Verificar e ingresar</button>
+          <button onClick={onMicrosoftLogin} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">Ingresar con Microsoft</button>
           <button onClick={onLoad} className="rounded-lg border border-slate-300 px-4 py-2 text-sm" type="button">Cargar posts</button>
           <button onClick={onLogout} className="rounded-lg border border-slate-300 px-4 py-2 text-sm" type="button">Salir</button>
           <div className="w-full text-xs text-slate-500">Estado: {authenticated ? `autenticado como ${email || "editor"}` : "sin sesión"}</div>
