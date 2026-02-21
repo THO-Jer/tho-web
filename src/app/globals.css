@@ -279,6 +279,11 @@ body {
   color: #0f172a;
 }
 
+.hero-transition-panel h2,
+.hero-transition-panel p {
+  text-wrap: balance;
+}
+
 .service-pill-contrast {
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(15, 23, 42, 0.86);
@@ -473,9 +478,16 @@ body {
 }
 
 .method-arc-stage {
-  transform: perspective(1600px) rotateX(34deg) rotateZ(-8deg);
-  transform-origin: center 70%;
-  filter: saturate(1.03) contrast(1.04);
+  transform: perspective(1800px) rotateX(20deg) rotateZ(-3deg);
+  transform-origin: center 76%;
+  filter: saturate(1.02) contrast(1.03);
+}
+
+.method-hover-panel {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.9));
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(8px);
 }
 
 @media (prefers-color-scheme: dark) {

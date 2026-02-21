@@ -71,18 +71,17 @@ export default function HomePage() {
         </div>
         </section>
 
-      {/* PROBLEMA — editorial, panel blanco más estrecho sobre continuidad del hero */}
-      <section className="relative z-30 -mt-12 bg-transparent">
-        <div className="mx-auto max-w-4xl px-4 py-12 md:py-16">
-          <div className="hero-transition-panel rounded-[2.4rem] bg-white/95 px-7 py-12 text-center shadow-sm ring-1 ring-slate-200/60 backdrop-blur-sm md:px-12">
-            <h2 className="font-tho-title text-[3rem] font-normal md:text-[5.2rem]">
-              Cuando la organización se desconecta del entorno, el costo llega igual.
-            </h2>
-            <p className="mx-auto mt-6 max-w-3xl text-base text-slate-700 md:text-lg">
-              La pregunta no es si tendrás tensión. La pregunta es si tendrás método, evidencia y gobernanza para
-              sostener decisiones cuando aparezca.
-            </p>
-          </div>
+      {/* PROBLEMA — editorial integrado al flujo, sin "tarjeta maqueta" */}
+      <section className="hero-transition-panel relative z-30 -mt-10 bg-transparent">
+        <div className="mx-auto max-w-5xl px-4 py-12 text-center md:py-16">
+          <div className="mx-auto h-px w-24 bg-slate-300/70" />
+          <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
+            Cuando la organización se desconecta del entorno, el costo llega igual.
+          </h2>
+          <p className="mx-auto mt-6 max-w-3xl text-base text-slate-700 md:text-lg">
+            La pregunta no es si tendrás tensión. La pregunta es si tendrás método, evidencia y gobernanza para
+            sostener decisiones cuando aparezca.
+          </p>
         </div>
       </section>
 
@@ -220,7 +219,7 @@ export default function HomePage() {
         />
       </Section>
 
-      <section id="accion" className="relative z-30 border-t border-slate-200/70 bg-tho-bg">
+      <section id="accion" className="relative z-30 border-t border-slate-200/70 bg-tho-bg pt-10 md:pt-14">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:py-16">
           <div>
             <h2 className="font-tho-title text-[3rem] text-slate-950 md:text-[4.2rem]">THO en Acción</h2>
