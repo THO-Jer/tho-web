@@ -265,6 +265,17 @@ export default function BlogStudioPage() {
     e.target.value = "";
   }
 
+  async function savePost(endpoint: string, method: "POST" | "PATCH", payload: Record<string, unknown>) {
+    const res = await fetch(endpoint, {
+      method,
+      headers: { "content-type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return { res, data };
+  }
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!canSubmit) return;
@@ -293,13 +304,13 @@ export default function BlogStudioPage() {
     setLoading(true);
     setMessage("");
     try {
-      const res = await fetch(endpoint, {
-        method,
-        headers: { "content-type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
+      let { res, data } = await savePost(endpoint, method, payload);
+
+      if (!res.ok && method === "PATCH" && payload.slug && payload.slug !== editingSlug && (res.status === 400 || res.status === 404)) {
+        const retryEndpoint = `/api/admin/blog/${encodeURIComponent(String(payload.slug))}`;
+        ({ res, data } = await savePost(retryEndpoint, "PATCH", payload));
+      }
+
       if (!res.ok) {
         const reason = data.error || "Error guardando";
         if (res.status === 404) {
