@@ -61,6 +61,20 @@ function isMissingSupabaseTableError(error: unknown) {
   return error.message.includes("PGRST205") || error.message.includes("Could not find the table");
 }
 
+function getMissingSupabaseColumn(error: unknown) {
+  if (!(error instanceof Error)) return null;
+  const match = error.message.match(/column\s+[^.]+\.([a-zA-Z0-9_]+)\s+does not exist/i);
+  return match?.[1] ?? null;
+}
+
+function stripUnsupportedColumns<T extends Record<string, unknown>>(payload: T, columns: string[]) {
+  const clone = { ...payload };
+  for (const col of columns) {
+    delete clone[col];
+  }
+  return clone;
+}
+
 async function supabaseRequest(pathname: string, init?: RequestInit) {
   const { url, service } = getSupabaseEnv();
   if (!url || !service) throw new Error("Supabase store no configurado");
@@ -213,6 +227,17 @@ export async function listAllPosts() {
       if (isMissingSupabaseTableError(error)) {
         return readFileStore();
       }
+
+      const missingColumn = getMissingSupabaseColumn(error);
+      if (missingColumn === "category") {
+        const legacyQuery = new URLSearchParams({
+          select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+          order: "updated_at.desc",
+        });
+        const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`)) as Omit<BlogPostRow, "category">[];
+        return rows.map((row) => rowToPost({ ...(row as BlogPostRow), category: null }));
+      }
+
       throw error;
     }
   }
@@ -237,12 +262,25 @@ export async function createPost(input: Partial<BlogPostInput>) {
   const created: BlogPost = { ...next, slug: uniqueSlug, updatedAt: new Date().toISOString() };
 
   if (hasSupabaseStore()) {
-    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
-      method: "POST",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(postToRowInput(created)),
-    })) as BlogPostRow[];
-    return rowToPost(rows[0]);
+    try {
+      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
+        method: "POST",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify(postToRowInput(created)),
+      })) as BlogPostRow[];
+      return rowToPost(rows[0]);
+    } catch (error) {
+      if (getMissingSupabaseColumn(error) === "category") {
+        const payload = stripUnsupportedColumns(postToRowInput(created), ["category"]);
+        const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
+          method: "POST",
+          headers: { Prefer: "return=representation" },
+          body: JSON.stringify(payload),
+        })) as Omit<BlogPostRow, "category">[];
+        return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
+      }
+      throw error;
+    }
   }
 
   await writeFileStore([created, ...posts]);
@@ -281,13 +319,32 @@ export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
       slug: `eq.${current.slug}`,
       select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
     });
-    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, {
-      method: "PATCH",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(postToRowInput(updated)),
-    })) as BlogPostRow[];
-    if (!rows.length) throw new Error("Post no encontrado.");
-    return rowToPost(rows[0]);
+
+    try {
+      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, {
+        method: "PATCH",
+        headers: { Prefer: "return=representation" },
+        body: JSON.stringify(postToRowInput(updated)),
+      })) as BlogPostRow[];
+      if (!rows.length) throw new Error("Post no encontrado.");
+      return rowToPost(rows[0]);
+    } catch (error) {
+      if (getMissingSupabaseColumn(error) === "category") {
+        const legacyQuery = new URLSearchParams({
+          slug: `eq.${current.slug}`,
+          select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+        });
+        const payload = stripUnsupportedColumns(postToRowInput(updated), ["category"]);
+        const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`, {
+          method: "PATCH",
+          headers: { Prefer: "return=representation" },
+          body: JSON.stringify(payload),
+        })) as Omit<BlogPostRow, "category">[];
+        if (!rows.length) throw new Error("Post no encontrado.");
+        return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
+      }
+      throw error;
+    }
   }
 
   const clone = [...posts];
