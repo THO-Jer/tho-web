@@ -49,6 +49,9 @@ export default function StudioIndexPage() {
     const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
     const params = new URLSearchParams(hash);
     const accessToken = params.get("access_token");
+    const hashError = params.get("error_description") || params.get("error");
+    const queryParams = new URLSearchParams(window.location.search);
+    const queryError = queryParams.get("error_description") || queryParams.get("error");
 
     const verifySession = async () => {
       const res = await fetch("/api/admin/session", { credentials: "include" });
@@ -66,6 +69,10 @@ export default function StudioIndexPage() {
     const run = async () => {
       setChecking(true);
       try {
+        if (hashError || queryError) {
+          throw new Error(decodeURIComponent(hashError || queryError || "OAuth error"));
+        }
+
         if (accessToken) {
           const res = await fetch("/api/admin/session", {
             method: "POST",
@@ -81,7 +88,7 @@ export default function StudioIndexPage() {
 
         await verifySession();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión.");
+        setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión con Microsoft.");
       } finally {
         setChecking(false);
       }
@@ -97,8 +104,12 @@ export default function StudioIndexPage() {
       return;
     }
 
-    const url = `${supabaseUrl}/auth/v1/authorize?provider=azure&redirect_to=${encodeURIComponent(redirectTo)}`;
-    window.location.href = url;
+    const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
+    authUrl.searchParams.set("provider", "azure");
+    authUrl.searchParams.set("redirect_to", redirectTo);
+    authUrl.searchParams.set("scopes", "openid profile email");
+    authUrl.searchParams.set("prompt", "select_account");
+    window.location.href = authUrl.toString();
   }
 
   async function onLogout() {
