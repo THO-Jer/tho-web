@@ -63,8 +63,13 @@ function isMissingSupabaseTableError(error: unknown) {
 
 function getMissingSupabaseColumn(error: unknown) {
   if (!(error instanceof Error)) return null;
-  const match = error.message.match(/column\s+[^.]+\.([a-zA-Z0-9_]+)\s+does not exist/i);
-  return match?.[1] ?? null;
+  const pgMatch = error.message.match(/column\s+[^.]+\.([a-zA-Z0-9_]+)\s+does not exist/i);
+  if (pgMatch?.[1]) return pgMatch[1];
+
+  const postgrestMatch = error.message.match(/Could not find the ['"]([a-zA-Z0-9_]+)['"] column/i);
+  if (postgrestMatch?.[1]) return postgrestMatch[1];
+
+  return null;
 }
 
 function stripUnsupportedColumns<T extends Record<string, unknown>>(payload: T, columns: string[]) {
