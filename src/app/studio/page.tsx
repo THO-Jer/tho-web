@@ -37,7 +37,8 @@ export default function StudioIndexPage() {
   const [email, setEmail] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const [message, setMessage] = useState("");
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const [oauthBaseUrl, setOauthBaseUrl] = useState("");
+  const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
   const redirectTo = useMemo(() => {
     if (typeof window === "undefined") return "";
@@ -56,6 +57,9 @@ export default function StudioIndexPage() {
         setEmail(data.email ?? null);
       } else {
         setEmail(null);
+      }
+      if (typeof data.oauthBaseUrl === "string") {
+        setOauthBaseUrl(data.oauthBaseUrl);
       }
     };
 
@@ -87,6 +91,7 @@ export default function StudioIndexPage() {
   }, []);
 
   function onMicrosoftLogin() {
+    const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
     if (!supabaseUrl) {
       setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth Microsoft.");
       return;

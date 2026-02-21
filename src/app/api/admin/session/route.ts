@@ -5,14 +5,17 @@ import { isAllowedEditorEmail, readSession, SESSION_COOKIE, validateSupabaseAcce
 export const dynamic = "force-dynamic";
 
 function getSupabaseEnv() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anon = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const rawUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_SUPABASE_PUBLIC_URL;
+  const url = rawUrl?.trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
+  const anon = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_SUPABASE_ANON_KEY;
   return { url, anon };
 }
 
+
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
-  return NextResponse.json({ authenticated: Boolean(session), email: session?.email ?? null });
+  const { url } = getSupabaseEnv();
+  return NextResponse.json({ authenticated: Boolean(session), email: session?.email ?? null, oauthBaseUrl: url ?? null });
 }
 
 export async function POST(req: NextRequest) {
