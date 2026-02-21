@@ -81,6 +81,81 @@ async function ensureBucketExists(url: string, bucket: string, service: string) 
   }
 }
 
+
+async function listStorageImageTree(params: { url: string; bucket: string; apikey: string; bearer: string }) {
+  const { url, bucket, apikey, bearer } = params;
+  const res = await fetch(`${url}/storage/v1/object/list/${encodeURIComponent(bucket)}`, {
+    method: "POST",
+    headers: {
+      apikey,
+      Authorization: `Bearer ${bearer}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      prefix: "blog",
+      limit: 1000,
+      offset: 0,
+      sortBy: { column: "name", order: "asc" },
+    }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const reason = await res.text();
+    throw new Error(`No se pudo listar Storage: ${reason}`);
+  }
+
+  const rows = (await res.json()) as Array<{ name: string }>;
+  const root: RepoTreeNode[] = [];
+
+  function ensureDir(nodes: RepoTreeNode[], name: string, relPath: string) {
+    let existing = nodes.find((node) => node.kind === "dir" && node.name === name);
+    if (!existing) {
+      existing = { kind: "dir", name, path: relPath, children: [] };
+      nodes.push(existing);
+    }
+    return existing;
+  }
+
+  for (const row of rows) {
+    if (!row?.name) continue;
+    const fullPath = `blog/${row.name}`;
+    const ext = path.extname(fullPath).toLowerCase();
+    if (!IMAGE_EXT.has(ext)) continue;
+
+    const parts = fullPath.split("/").filter(Boolean);
+    let nodes = root;
+    let rel = "";
+
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      rel = rel ? `${rel}/${part}` : part;
+      const isLast = i === parts.length - 1;
+
+      if (isLast) {
+        const encodedPath = encodeStoragePath(rel);
+        const publicUrl = `${url}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encodedPath}`;
+        nodes.push({ kind: "file", name: part, path: publicUrl });
+      } else {
+        const dir = ensureDir(nodes, part, rel);
+        if (!dir.children) dir.children = [];
+        nodes = dir.children;
+      }
+    }
+  }
+
+  function sortTree(nodes: RepoTreeNode[]): RepoTreeNode[] {
+    return nodes
+      .map((node) => (node.kind === "dir" && node.children ? { ...node, children: sortTree(node.children) } : node))
+      .sort((a, b) => {
+        if (a.kind !== b.kind) return a.kind === "dir" ? -1 : 1;
+        return a.name.localeCompare(b.name, "es");
+      });
+  }
+
+  return sortTree(root);
+}
+
 async function listImagesFromDir(rootDir: string, publicPrefix: string) {
   try {
     const entries = await fs.readdir(rootDir, { withFileTypes: true });
@@ -135,6 +210,27 @@ export async function GET(req: NextRequest) {
 
   const publicDir = path.join(process.cwd(), "public");
 
+  if (req.nextUrl.searchParams.get("storageTree") === "1") {
+    const { url, service, anon, bucket } = getStorageEnv();
+    if (!url) {
+      return NextResponse.json({ error: "Storage no configurado. Define SUPABASE_URL." }, { status: 500 });
+    }
+
+    const session = await readSession(req);
+    const apikey = service || anon;
+    const bearer = service || session?.token;
+    if (!apikey || !bearer) {
+      return NextResponse.json({ error: "Credenciales insuficientes para listar Storage." }, { status: 500 });
+    }
+
+    try {
+      const tree = await listStorageImageTree({ url, bucket, apikey, bearer });
+      return NextResponse.json({ root: `supabase:${bucket}`, tree });
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : "No se pudo listar Storage" }, { status: 500 });
+    }
+  }
+
   if (req.nextUrl.searchParams.get("tree") === "1") {
     try {
       const tree = await listImageTree(publicDir);
@@ -145,7 +241,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (req.nextUrl.searchParams.get("list") !== "1") {
-    return NextResponse.json({ error: "Parámetro list=1 o tree=1 requerido" }, { status: 400 });
+    return NextResponse.json({ error: "Parámetro list=1, tree=1 o storageTree=1 requerido" }, { status: 400 });
   }
 
   const uploadsDir = path.join(publicDir, "uploads", "blog");

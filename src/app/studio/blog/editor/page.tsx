@@ -132,9 +132,13 @@ export default function BlogStudioPage() {
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [repoPickerMode, setRepoPickerMode] = useState<"cover" | "inline" | null>(null);
+  const [pickerSource, setPickerSource] = useState<"repo" | "storage">("repo");
   const [repoTree, setRepoTree] = useState<RepoTreeNode[]>([]);
   const [repoTreeLoading, setRepoTreeLoading] = useState(false);
   const [repoTreeError, setRepoTreeError] = useState("");
+  const [storageTree, setStorageTree] = useState<RepoTreeNode[]>([]);
+  const [storageTreeLoading, setStorageTreeLoading] = useState(false);
+  const [storageTreeError, setStorageTreeError] = useState("");
   const [lastUploadedUrl, setLastUploadedUrl] = useState("");
 
   useEffect(() => {
@@ -305,7 +309,7 @@ export default function BlogStudioPage() {
 
       setLastUploadedUrl(String(data.url || ""));
       setMessage(mode === "cover" ? `Portada subida a Storage: ${data.url}` : `Imagen subida a Storage e insertada: ${data.url}`);
-      await fetchRepoTree(true);
+      await Promise.all([fetchRepoTree(true), fetchStorageTree(true)]);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error al subir imagen");
     } finally {
@@ -334,9 +338,31 @@ export default function BlogStudioPage() {
     }
   }
 
-  async function openRepoPicker(mode: "cover" | "inline") {
+  async function fetchStorageTree(force = false) {
+    if (!force && storageTree.length) return;
+
+    setStorageTreeLoading(true);
+    setStorageTreeError("");
+    try {
+      const res = await fetch("/api/admin/upload?storageTree=1", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo leer Storage");
+      setStorageTree(data.tree || []);
+    } catch (error) {
+      setStorageTreeError(error instanceof Error ? error.message : "No se pudo leer Storage");
+    } finally {
+      setStorageTreeLoading(false);
+    }
+  }
+
+  async function openRepoPicker(mode: "cover" | "inline", source: "repo" | "storage" = "repo") {
     setRepoPickerMode(mode);
-    await fetchRepoTree();
+    setPickerSource(source);
+    if (source === "repo") await fetchRepoTree();
+    else await fetchStorageTree();
   }
 
   function selectRepoImage(path: string) {
@@ -498,7 +524,8 @@ export default function BlogStudioPage() {
                 <button type="button" onClick={() => insertTemplate("h3")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H3</button>
                 <button type="button" onClick={() => insertTemplate("quote")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cita</button>
                 <button type="button" onClick={() => insertTemplate("divider")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Separador</button>
-                <button type="button" onClick={() => openRepoPicker("inline")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen repo</button>
+                <button type="button" onClick={() => openRepoPicker("inline", "repo")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen repo</button>
+                <button type="button" onClick={() => openRepoPicker("inline", "storage")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen storage</button>
                 <label htmlFor="inline-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen subir</label>
                 <button type="button" onClick={() => insertTemplate("youtube")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">YouTube</button>
                 <button type="button" onClick={() => insertTemplate("pdf")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">PDF</button>
@@ -532,7 +559,8 @@ export default function BlogStudioPage() {
                   <p className="mt-1 text-xs text-slate-500">Elige una del repo o súbela desde tu computador.</p>
                   <p className="mt-1 text-[11px] text-slate-500">La subida envía la imagen a Supabase Storage y retorna una URL pública lista para usar en el post. No se guarda en <code>/public</code> ni hace commit al repositorio Git.</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <button type="button" onClick={() => openRepoPicker("cover")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen del repo</button>
+                    <button type="button" onClick={() => openRepoPicker("cover", "repo")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen del repo</button>
+                    <button type="button" onClick={() => openRepoPicker("cover", "storage")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen de Storage</button>
                     <label htmlFor="cover-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Examinar...</label>
                   </div>
                   {form.coverImage ? <p className="mt-2 text-xs text-slate-600">Actual: {form.coverImage}</p> : null}
@@ -641,19 +669,37 @@ export default function BlogStudioPage() {
           <div className="w-full max-w-3xl rounded-2xl bg-white p-5 shadow-2xl">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Seleccionar imagen desde repo/public</h3>
-                <p className="text-xs text-slate-500">Directorio visible del repo (solo archivos de imagen).</p>
+                <h3 className="text-lg font-semibold text-slate-900">Seleccionar imagen</h3>
+                <p className="text-xs text-slate-500">Elige desde repo/public o desde Supabase Storage.</p>
               </div>
               <button type="button" className="rounded-md border border-slate-300 px-3 py-1 text-xs" onClick={() => setRepoPickerMode(null)}>Cerrar</button>
             </div>
 
+            <div className="mt-3 flex gap-2">
+              <button type="button" className={`rounded-md border px-3 py-1 text-xs ${pickerSource === "repo" ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white"}`} onClick={() => { setPickerSource("repo"); void fetchRepoTree(); }}>Repo/public</button>
+              <button type="button" className={`rounded-md border px-3 py-1 text-xs ${pickerSource === "storage" ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300 bg-white"}`} onClick={() => { setPickerSource("storage"); void fetchStorageTree(); }}>Supabase Storage</button>
+            </div>
+
             <div className="mt-3 max-h-[60vh] overflow-auto rounded-lg border border-slate-200 p-3">
-              {repoTreeLoading ? <p className="text-sm text-slate-500">Cargando directorio...</p> : null}
-              {repoTreeError ? <p className="text-sm text-rose-700">{repoTreeError}</p> : null}
-              {!repoTreeLoading && !repoTreeError && !repoTree.length ? (
-                <p className="text-sm text-slate-500">No se encontraron imágenes en /public.</p>
-              ) : null}
-              {!repoTreeLoading && !repoTreeError && repoTree.length ? renderRepoTree(repoTree, selectRepoImage) : null}
+              {pickerSource === "repo" ? (
+                <>
+                  {repoTreeLoading ? <p className="text-sm text-slate-500">Cargando directorio...</p> : null}
+                  {repoTreeError ? <p className="text-sm text-rose-700">{repoTreeError}</p> : null}
+                  {!repoTreeLoading && !repoTreeError && !repoTree.length ? (
+                    <p className="text-sm text-slate-500">No se encontraron imágenes en /public.</p>
+                  ) : null}
+                  {!repoTreeLoading && !repoTreeError && repoTree.length ? renderRepoTree(repoTree, selectRepoImage) : null}
+                </>
+              ) : (
+                <>
+                  {storageTreeLoading ? <p className="text-sm text-slate-500">Cargando Storage...</p> : null}
+                  {storageTreeError ? <p className="text-sm text-rose-700">{storageTreeError}</p> : null}
+                  {!storageTreeLoading && !storageTreeError && !storageTree.length ? (
+                    <p className="text-sm text-slate-500">No se encontraron imágenes en Supabase Storage (prefijo blog).</p>
+                  ) : null}
+                  {!storageTreeLoading && !storageTreeError && storageTree.length ? renderRepoTree(storageTree, selectRepoImage) : null}
+                </>
+              )}
             </div>
           </div>
         </div>
