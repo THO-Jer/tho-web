@@ -33,7 +33,7 @@ export function Footer() {
             <Link className="hover:text-white" href="/blog">
               Blog
             </Link>
-            <Link className="hover:text-white" href="/studio/blog">
+            <Link className="hover:text-white" href="/studio">
               Acceso editorial
             </Link>
             <a className="hover:text-white" href="mailto:hola@tho.cl">

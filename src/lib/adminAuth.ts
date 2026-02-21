@@ -2,49 +2,73 @@ import { NextRequest } from "next/server";
 
 const SESSION_COOKIE = "blog_admin_session";
 
-function normalize(value: string) {
-  return value.trim().toLowerCase();
+type EditorRecord = { email: string; active?: boolean };
+
+function getSupabaseEnv() {
+  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const service = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY;
+  return { url, anon, service };
 }
 
-function getAllowedEmails() {
-  const raw = process.env.BLOG_ADMIN_ALLOWED_EMAILS || "";
-  return raw
-    .split(",")
-    .map((email) => normalize(email))
-    .filter(Boolean);
+async function getUserEmailFromToken(token: string) {
+  const { url, anon } = getSupabaseEnv();
+  if (!url || !anon || !token) return null;
+
+  const res = await fetch(`${url}/auth/v1/user`, {
+    headers: {
+      apikey: anon,
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) return null;
+
+  const user = (await res.json()) as { email?: string };
+  return user.email?.trim().toLowerCase() || null;
 }
 
-export function isAllowedEditorEmail(email: string) {
-  const allowlist = getAllowedEmails();
-  if (allowlist.length === 0) return true;
-  return allowlist.includes(normalize(email));
+export async function isAllowedEditorEmail(email: string) {
+  const { url, service } = getSupabaseEnv();
+  if (!url || !service || !email) return false;
+
+  const query = new URLSearchParams({
+    select: "email,active",
+    email: `eq.${email.trim().toLowerCase()}`,
+    limit: "1",
+  });
+
+  const res = await fetch(`${url}/rest/v1/blog_editors?${query.toString()}`, {
+    headers: {
+      apikey: service,
+      Authorization: `Bearer ${service}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) return false;
+  const rows = (await res.json()) as EditorRecord[];
+  return Boolean(rows[0] && rows[0].active !== false);
 }
 
-export function buildSessionValue(email: string, token: string) {
-  return `${normalize(email)}::${token}`;
+export async function readSession(req: NextRequest) {
+  const authHeader = req.headers.get("authorization") || "";
+  const headerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
+  const cookieToken = req.cookies.get(SESSION_COOKIE)?.value || "";
+  const token = headerToken || cookieToken;
+  if (!token) return null;
+
+  const email = await getUserEmailFromToken(token);
+  if (!email) return null;
+  const allowed = await isAllowedEditorEmail(email);
+  if (!allowed) return null;
+
+  return { email, token };
 }
 
-export function readSession(req: NextRequest) {
-  const expected = process.env.BLOG_ADMIN_TOKEN;
-  if (!expected) return null;
-
-  const headerToken = req.headers.get("x-admin-token") || "";
-  if (headerToken && headerToken === expected) {
-    return { email: "header-auth", via: "header" as const };
-  }
-
-  const cookie = req.cookies.get(SESSION_COOKIE)?.value || "";
-  if (!cookie.includes("::")) return null;
-
-  const [email, token] = cookie.split("::");
-  if (!email || token !== expected) return null;
-  if (!isAllowedEditorEmail(email)) return null;
-
-  return { email, via: "cookie" as const };
-}
-
-export function isAdminAuthorized(req: NextRequest) {
-  return Boolean(readSession(req));
+export async function isAdminAuthorized(req: NextRequest) {
+  return Boolean(await readSession(req));
 }
 
 export { SESSION_COOKIE };
