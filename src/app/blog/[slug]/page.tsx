@@ -88,6 +88,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             ) : null}
 
+            {post.category ? (
+              <div className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
+                Categoría: {post.category}
+              </div>
+            ) : null}
+
             {post.tags.length ? (
               <div className="mt-4 flex flex-wrap gap-2">
                 {post.tags.map((tag) => (

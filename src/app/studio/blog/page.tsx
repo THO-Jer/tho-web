@@ -12,6 +12,7 @@ type BlogPost = {
   updatedAt: string;
   minutes: number;
   tags: string[];
+  category?: string;
 };
 
 type PostFilter = "all" | "draft" | "published";
@@ -159,7 +160,8 @@ export default function BlogStudioIndexPage() {
                   </div>
                 </div>
                 <p className="mt-2 text-sm text-slate-700">{post.excerpt}</p>
-                {post.tags?.length ? <p className="mt-2 text-xs text-slate-500">Tags: {post.tags.join(", ")}</p> : null}
+                {post.category ? <p className="mt-2 text-xs text-slate-500">Categoría: <strong>{post.category}</strong></p> : null}
+                {post.tags?.length ? <p className="mt-1 text-xs text-slate-500">Tags: {post.tags.join(", ")}</p> : null}
               </article>
             ))}
             {!visiblePosts.length ? <p className="text-sm text-slate-500">No hay entradas para este filtro.</p> : null}

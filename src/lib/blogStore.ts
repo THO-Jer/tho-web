@@ -10,6 +10,7 @@ export type BlogPost = {
   content: string;
   minutes: number;
   tags: string[];
+  category?: string;
   status: BlogStatus;
   publishedAt: string | null;
   updatedAt: string;
@@ -28,6 +29,7 @@ type BlogPostRow = {
   content: string;
   minutes: number;
   tags: string[] | null;
+  category: string | null;
   status: BlogStatus;
   published_at: string | null;
   updated_at: string;
@@ -91,6 +93,7 @@ function rowToPost(row: BlogPostRow): BlogPost {
     content: row.content,
     minutes: row.minutes,
     tags: row.tags || [],
+    category: row.category || undefined,
     status: row.status,
     publishedAt: row.published_at,
     updatedAt: row.updated_at,
@@ -109,6 +112,7 @@ function postToRowInput(post: BlogPost) {
     content: post.content,
     minutes: post.minutes,
     tags: post.tags,
+    category: post.category ?? null,
     status: post.status,
     published_at: post.publishedAt,
     updated_at: post.updatedAt,
@@ -171,6 +175,7 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
   const content = (input.content ?? "").trim();
   const minutes = Number(input.minutes ?? 5);
   const tags = Array.isArray(input.tags) ? input.tags.map((t) => t.trim()).filter(Boolean) : [];
+  const category = (input.category ?? "").trim();
   const status: BlogStatus = input.status === "draft" ? "draft" : "published";
   const publishedAt = status === "published" ? input.publishedAt ?? new Date().toISOString() : null;
 
@@ -185,6 +190,7 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
     content,
     minutes: Number.isFinite(minutes) && minutes > 0 ? minutes : 5,
     tags,
+    category: category || undefined,
     status,
     publishedAt,
     coverImage: input.coverImage?.trim() || undefined,
@@ -198,7 +204,7 @@ export async function listAllPosts() {
   if (hasSupabaseStore()) {
     try {
       const query = new URLSearchParams({
-        select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+        select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
         order: "updated_at.desc",
       });
       const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
@@ -273,7 +279,7 @@ export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
   if (hasSupabaseStore()) {
     const query = new URLSearchParams({
       slug: `eq.${current.slug}`,
-      select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+      select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
     });
     const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, {
       method: "PATCH",

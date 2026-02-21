@@ -13,6 +13,7 @@ type BlogPost = {
   content: string;
   minutes: number;
   tags: string[];
+  category?: string;
   status: "draft" | "published";
   publishedAt: string | null;
   updatedAt: string;
@@ -29,6 +30,8 @@ type FormState = {
   content: string;
   minutes: string;
   tags: string;
+  category: string;
+  publishedAt: string;
   status: "draft" | "published";
   coverImage: string;
   coverImageAlt: string;
@@ -43,6 +46,8 @@ const EMPTY_FORM: FormState = {
   content: "",
   minutes: "5",
   tags: "",
+  category: "",
+  publishedAt: "",
   status: "published",
   coverImage: "",
   coverImageAlt: "",
@@ -60,6 +65,8 @@ function toFormState(post: BlogPost): FormState {
     content: post.content,
     minutes: String(post.minutes),
     tags: post.tags.join(", "),
+    category: post.category ?? "",
+    publishedAt: post.publishedAt ? post.publishedAt.slice(0, 16) : "",
     status: post.status,
     coverImage: post.coverImage ?? "",
     coverImageAlt: post.coverImageAlt ?? "",
@@ -218,6 +225,15 @@ export default function BlogStudioPage() {
     setForm((prev) => ({ ...prev, content: `${prev.content}${snippets[type]}` }));
   }
 
+
+  function insertLink() {
+    const text = window.prompt("Texto del enlace", "Ver más");
+    const url = window.prompt("URL del enlace", "https://");
+    if (!text || !url) return;
+    const snippet = `\n\n[${text}](${url})\n\n`;
+    setForm((prev) => ({ ...prev, content: `${prev.content}${snippet}` }));
+  }
+
   function insertInternalLink(post: BlogPost) {
     const snippet = `\n\n[Leer también: ${post.title}](/blog/${post.slug})\n\n`;
     setForm((prev) => ({ ...prev, content: `${prev.content}${snippet}` }));
@@ -291,6 +307,8 @@ export default function BlogStudioPage() {
       content: form.content,
       minutes: Number(form.minutes),
       tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+      category: form.category.trim(),
+      publishedAt: form.publishedAt ? new Date(form.publishedAt).toISOString() : null,
       status: form.status,
       coverImage: form.coverImage,
       coverImageAlt: form.coverImageAlt,
@@ -396,6 +414,9 @@ export default function BlogStudioPage() {
                 <button type="button" onClick={() => insertTemplate("image")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen</button>
                 <button type="button" onClick={() => insertTemplate("youtube")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">YouTube</button>
                 <button type="button" onClick={() => insertTemplate("pdf")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">PDF</button>
+                <button type="button" onClick={insertLink} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Link</button>
+                <button type="button" onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}**texto en negrita**` }))} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Negrita</button>
+                <button type="button" onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}*texto en cursiva*` }))} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cursiva</button>
               </div>
 
               <div className="mt-4 grid gap-3">
@@ -418,15 +439,21 @@ export default function BlogStudioPage() {
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Imagen principal URL" value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} />
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Texto alternativo de portada" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
                 <div className="grid gap-3 md:grid-cols-2">
-                  <label className="text-xs text-slate-600">Subir portada
+                  <label className="text-xs text-slate-600">Subir imagen principal (portada de tarjeta y cabecera)
                     <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUploadCover} />
                   </label>
-                  <label className="text-xs text-slate-600">Subir imagen dentro del artículo
+                  <label className="text-xs text-slate-600">Subir imagen para el cuerpo (se inserta en contenido)
                     <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUploadInline} />
                   </label>
                 </div>
 
-                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Categoría (ej: sostenibilidad)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+                </div>
+                <label className="text-xs text-slate-600">Fecha de publicación
+                  <input type="datetime-local" className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} />
+                </label>
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="SEO title" value={form.seoTitle} onChange={(e) => setForm({ ...form, seoTitle: e.target.value })} />
                 <textarea className="min-h-20 rounded-lg border border-slate-300 px-3 py-2" placeholder="SEO description" value={form.seoDescription} onChange={(e) => setForm({ ...form, seoDescription: e.target.value })} />
               </div>
