@@ -34,6 +34,53 @@ function encodeStoragePath(objectPath: string) {
     .join("/");
 }
 
+async function uploadToBucket(params: {
+  url: string;
+  bucket: string;
+  encodedPath: string;
+  fileType: string;
+  bytes: ArrayBuffer;
+  apikey: string;
+  bearer: string;
+}) {
+  const { url, bucket, encodedPath, fileType, bytes, apikey, bearer } = params;
+  return fetch(`${url}/storage/v1/object/${encodeURIComponent(bucket)}/${encodedPath}`, {
+    method: "POST",
+    headers: {
+      apikey,
+      Authorization: `Bearer ${bearer}`,
+      "content-type": fileType,
+      "x-upsert": "false",
+    },
+    body: new Blob([bytes], { type: fileType }),
+    cache: "no-store",
+  });
+}
+
+async function ensureBucketExists(url: string, bucket: string, service: string) {
+  const createRes = await fetch(`${url}/storage/v1/bucket`, {
+    method: "POST",
+    headers: {
+      apikey: service,
+      Authorization: `Bearer ${service}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      id: bucket,
+      name: bucket,
+      public: true,
+      file_size_limit: null,
+      allowed_mime_types: ["image/jpeg", "image/png", "image/webp"],
+    }),
+    cache: "no-store",
+  });
+
+  if (!createRes.ok) {
+    const reason = await createRes.text();
+    throw new Error(`No se pudo crear bucket '${bucket}': ${reason}`);
+  }
+}
+
 async function listImagesFromDir(rootDir: string, publicPrefix: string) {
   try {
     const entries = await fs.readdir(rootDir, { withFileTypes: true });
@@ -145,28 +192,52 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const bytes = Buffer.from(await file.arrayBuffer());
+    const bytes = await file.arrayBuffer();
     const rawExt = file.name.split(".").pop() || "jpg";
     const ext = rawExt.toLowerCase();
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
     const objectPath = `blog/${filename}`;
     const encodedPath = encodeStoragePath(objectPath);
 
-    const uploadRes = await fetch(`${url}/storage/v1/object/${encodeURIComponent(bucket)}/${encodedPath}`, {
-      method: "POST",
-      headers: {
-        apikey,
-        Authorization: `Bearer ${bearer}`,
-        "content-type": file.type,
-        "x-upsert": "false",
-      },
-      body: bytes,
-      cache: "no-store",
+    let uploadRes = await uploadToBucket({
+      url,
+      bucket,
+      encodedPath,
+      fileType: file.type,
+      bytes,
+      apikey,
+      bearer,
     });
 
     if (!uploadRes.ok) {
       const reason = await uploadRes.text();
-      return NextResponse.json({ error: `No se pudo subir a Storage: ${reason}` }, { status: 500 });
+      const missingBucket = uploadRes.status === 404 && /bucket not found/i.test(reason);
+
+      if (missingBucket && service) {
+        try {
+          await ensureBucketExists(url, bucket, service);
+          uploadRes = await uploadToBucket({
+            url,
+            bucket,
+            encodedPath,
+            fileType: file.type,
+            bytes,
+            apikey: service,
+            bearer: service,
+          });
+        } catch (error) {
+          return NextResponse.json(
+            { error: error instanceof Error ? error.message : "No se pudo crear bucket de Storage" },
+            { status: 500 }
+          );
+        }
+      }
+
+      if (!uploadRes.ok) {
+        const retryReason = await uploadRes.text();
+        const hint = missingBucket && !service ? ` (configura bucket '${bucket}' en Supabase o define SERVICE_ROLE)` : "";
+        return NextResponse.json({ error: `No se pudo subir a Storage: ${retryReason}${hint}` }, { status: 500 });
+      }
     }
 
     const publicUrl = `${url}/storage/v1/object/public/${encodeURIComponent(bucket)}/${encodedPath}`;
