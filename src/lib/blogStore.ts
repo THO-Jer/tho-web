@@ -128,9 +128,16 @@ export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
   if (index === -1) throw new Error("Post no encontrado.");
 
   const current = posts[index];
-  const merged = sanitizePostInput({ ...current, ...input });
+  const merged = sanitizePostInput({
+    ...current,
+    ...input,
+    title: input.title?.trim() ? input.title : current.title,
+    excerpt: input.excerpt?.trim() ? input.excerpt : current.excerpt,
+    content: input.content?.trim() ? input.content : current.content,
+    slug: input.slug?.trim() ? input.slug : current.slug,
+  });
 
-  if (merged.slug !== slug && posts.some((post, i) => i !== index && post.slug === merged.slug)) {
+  if (merged.slug !== current.slug && posts.some((post, i) => i !== index && post.slug === merged.slug)) {
     throw new Error("Ya existe otro post con ese slug.");
   }
 
