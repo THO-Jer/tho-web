@@ -21,7 +21,98 @@ export type BlogPost = {
 
 type BlogPostInput = Omit<BlogPost, "updatedAt"> & { updatedAt?: string };
 
+type BlogPostRow = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  minutes: number;
+  tags: string[] | null;
+  status: BlogStatus;
+  published_at: string | null;
+  updated_at: string;
+  cover_image: string | null;
+  cover_image_alt: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+};
+
 const BLOG_PATH = path.join(process.cwd(), "data", "blog", "posts.json");
+const BLOG_TABLE = process.env.BLOG_POSTS_TABLE || "blog_posts";
+
+function getSupabaseEnv() {
+  const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_SUPABASE_PUBLIC_URL || "")
+    .trim()
+    .replace(/^ttps:\/\//, "https://")
+    .replace(/\/$/, "");
+  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY || "").trim();
+  return { url, service };
+}
+
+function hasSupabaseStore() {
+  const { url, service } = getSupabaseEnv();
+  return Boolean(url && service);
+}
+
+async function supabaseRequest(pathname: string, init?: RequestInit) {
+  const { url, service } = getSupabaseEnv();
+  if (!url || !service) throw new Error("Supabase store no configurado");
+
+  const res = await fetch(`${url}${pathname}`, {
+    ...init,
+    headers: {
+      apikey: service,
+      Authorization: `Bearer ${service}`,
+      "content-type": "application/json",
+      ...(init?.headers || {}),
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase blog store error (${res.status}): ${body}`);
+  }
+
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+function rowToPost(row: BlogPostRow): BlogPost {
+  return {
+    slug: row.slug,
+    title: row.title,
+    excerpt: row.excerpt,
+    content: row.content,
+    minutes: row.minutes,
+    tags: row.tags || [],
+    status: row.status,
+    publishedAt: row.published_at,
+    updatedAt: row.updated_at,
+    coverImage: row.cover_image || undefined,
+    coverImageAlt: row.cover_image_alt || undefined,
+    seoTitle: row.seo_title || undefined,
+    seoDescription: row.seo_description || undefined,
+  };
+}
+
+function postToRowInput(post: BlogPost) {
+  return {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    minutes: post.minutes,
+    tags: post.tags,
+    status: post.status,
+    published_at: post.publishedAt,
+    updated_at: post.updatedAt,
+    cover_image: post.coverImage ?? null,
+    cover_image_alt: post.coverImageAlt ?? null,
+    seo_title: post.seoTitle ?? null,
+    seo_description: post.seoDescription ?? null,
+  };
+}
 
 async function ensureStore() {
   await fs.mkdir(path.dirname(BLOG_PATH), { recursive: true });
@@ -32,7 +123,7 @@ async function ensureStore() {
   }
 }
 
-async function readStore(): Promise<BlogPost[]> {
+async function readFileStore(): Promise<BlogPost[]> {
   await ensureStore();
   const raw = await fs.readFile(BLOG_PATH, "utf8");
   const parsed = JSON.parse(raw) as BlogPost[];
@@ -43,11 +134,10 @@ async function readStore(): Promise<BlogPost[]> {
   });
 }
 
-async function writeStore(posts: BlogPost[]) {
+async function writeFileStore(posts: BlogPost[]) {
   await ensureStore();
   await fs.writeFile(BLOG_PATH, `${JSON.stringify(posts, null, 2)}\n`, "utf8");
 }
-
 
 function ensureUniqueSlug(baseSlug: string, posts: BlogPost[]) {
   let candidate = baseSlug;
@@ -77,8 +167,7 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
   const minutes = Number(input.minutes ?? 5);
   const tags = Array.isArray(input.tags) ? input.tags.map((t) => t.trim()).filter(Boolean) : [];
   const status: BlogStatus = input.status === "draft" ? "draft" : "published";
-  const publishedAt =
-    status === "published" ? input.publishedAt ?? new Date().toISOString() : null;
+  const publishedAt = status === "published" ? input.publishedAt ?? new Date().toISOString() : null;
 
   if (!title || !slug || !excerpt || !content) {
     throw new Error("Campos obligatorios faltantes: title, slug, excerpt, content.");
@@ -101,11 +190,20 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
 }
 
 export async function listAllPosts() {
-  return readStore();
+  if (hasSupabaseStore()) {
+    const query = new URLSearchParams({
+      select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+      order: "updated_at.desc",
+    });
+    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
+    return rows.map(rowToPost);
+  }
+
+  return readFileStore();
 }
 
 export async function listPublishedPosts() {
-  const posts = await readStore();
+  const posts = await listAllPosts();
   return posts.filter((post) => post.status === "published");
 }
 
@@ -115,26 +213,33 @@ export async function getPublishedPostBySlug(slug: string) {
 }
 
 export async function createPost(input: Partial<BlogPostInput>) {
-  const posts = await readStore();
+  const posts = await listAllPosts();
   const next = sanitizePostInput(input);
   const uniqueSlug = ensureUniqueSlug(next.slug, posts);
   const created: BlogPost = { ...next, slug: uniqueSlug, updatedAt: new Date().toISOString() };
-  await writeStore([created, ...posts]);
+
+  if (hasSupabaseStore()) {
+    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(postToRowInput(created)),
+    })) as BlogPostRow[];
+    return rowToPost(rows[0]);
+  }
+
+  await writeFileStore([created, ...posts]);
   return created;
 }
 
 export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
-  const posts = await readStore();
+  const posts = await listAllPosts();
   const normalizedParamSlug = normalizeSlug(slug);
   const normalizedInputSlug = typeof input.slug === "string" ? normalizeSlug(input.slug) : "";
 
   let index = posts.findIndex((post) => post.slug === normalizedParamSlug);
-
-  // Fallback for stale editor state: if URL slug is outdated, try payload slug.
   if (index === -1 && normalizedInputSlug) {
     index = posts.findIndex((post) => post.slug === normalizedInputSlug);
   }
-
   if (index === -1) throw new Error("Post no encontrado.");
 
   const current = posts[index];
@@ -152,17 +257,38 @@ export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
   }
 
   const updated: BlogPost = { ...merged, updatedAt: new Date().toISOString() };
+
+  if (hasSupabaseStore()) {
+    const query = new URLSearchParams({
+      slug: `eq.${current.slug}`,
+      select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+    });
+    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(postToRowInput(updated)),
+    })) as BlogPostRow[];
+    if (!rows.length) throw new Error("Post no encontrado.");
+    return rowToPost(rows[0]);
+  }
+
   const clone = [...posts];
   clone[index] = updated;
-  await writeStore(clone);
+  await writeFileStore(clone);
   return updated;
 }
 
 export async function deletePost(slug: string) {
-  const posts = await readStore();
-  const filtered = posts.filter((post) => post.slug !== slug);
-  if (filtered.length === posts.length) {
-    throw new Error("Post no encontrado.");
+  const posts = await listAllPosts();
+  const target = posts.find((post) => post.slug === slug);
+  if (!target) throw new Error("Post no encontrado.");
+
+  if (hasSupabaseStore()) {
+    const query = new URLSearchParams({ slug: `eq.${target.slug}` });
+    await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, { method: "DELETE" });
+    return;
   }
-  await writeStore(filtered);
+
+  const filtered = posts.filter((post) => post.slug !== slug);
+  await writeFileStore(filtered);
 }

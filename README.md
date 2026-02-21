@@ -80,3 +80,10 @@ Esta web ya está enviando `POST` a `/api/public/leads` con auth (`Bearer`, `x-a
 
 - En Supabase Auth (URL Configuration), agrega `https://TU_DOMINIO/studio` y `http://localhost:3000/studio` en **Redirect URLs**; si no, Supabase puede caer al `SITE_URL` de otro proyecto (ej. `crm-tho`).
 - En el proveedor Azure/Microsoft, asegúrate de pedir scope `email` (además de `openid profile`) para evitar errores `Error getting user email from external provider`.
+
+
+### Studio Blog persistence (producción)
+
+- En Vercel, el filesystem es efímero/no persistente para este caso; para Studio Blog usa Supabase tabla `blog_posts`.
+- Ejecuta `sql/supabase_blog_posts.sql` en tu proyecto Supabase.
+- Asegura `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (o `SERVICE_ROLE_KEY`) configuradas en el deploy para que el editor guarde en Supabase.
