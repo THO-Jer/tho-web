@@ -39,6 +39,14 @@ type FormState = {
   seoDescription: string;
 };
 
+
+type RepoTreeNode = {
+  kind: "dir" | "file";
+  name: string;
+  path: string;
+  children?: RepoTreeNode[];
+};
+
 const EMPTY_FORM: FormState = {
   slug: "",
   title: "",
@@ -84,6 +92,33 @@ function cleanWords(value: string) {
     .filter((item) => item.length > 2);
 }
 
+
+function renderRepoTree(nodes: RepoTreeNode[], onPick: (path: string) => void, depth = 0) {
+  return (
+    <ul className={depth === 0 ? "space-y-1" : "ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3"}>
+      {nodes.map((node) => (
+        <li key={`${node.kind}:${node.path}`}>
+          {node.kind === "dir" ? (
+            <details open>
+              <summary className="cursor-pointer rounded px-1 py-0.5 text-xs text-slate-700 hover:bg-slate-100">📁 {node.name}</summary>
+              {node.children?.length ? renderRepoTree(node.children, onPick, depth + 1) : null}
+            </details>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onPick(node.path)}
+              className="w-full rounded px-1 py-0.5 text-left text-xs text-slate-700 hover:bg-slate-100"
+            >
+              🖼️ {node.name}
+              <span className="ml-2 text-[11px] text-slate-500">{node.path}</span>
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function BlogStudioPage() {
   const router = useRouter();
   const [selectedSlug, setSelectedSlug] = useState("");
@@ -96,6 +131,10 @@ export default function BlogStudioPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
+  const [repoPickerMode, setRepoPickerMode] = useState<"cover" | "inline" | null>(null);
+  const [repoTree, setRepoTree] = useState<RepoTreeNode[]>([]);
+  const [repoTreeLoading, setRepoTreeLoading] = useState(false);
+  const [repoTreeError, setRepoTreeError] = useState("");
   const coverInputRef = useRef<HTMLInputElement | null>(null);
   const inlineInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -274,21 +313,42 @@ export default function BlogStudioPage() {
   }
 
 
-  function setCoverImageFromRepo() {
-    const path = window.prompt("Ruta de imagen del repo/public", form.coverImage || "/hero/hands.png");
-    if (!path) return;
-    setForm((prev) => ({ ...prev, coverImage: path.trim() }));
+  async function openRepoPicker(mode: "cover" | "inline") {
+    setRepoPickerMode(mode);
+    setRepoTreeError("");
+    if (repoTree.length) return;
+
+    setRepoTreeLoading(true);
+    try {
+      const res = await fetch("/api/admin/upload?tree=1", {
+        credentials: "include",
+        cache: "no-store",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo leer el directorio");
+      setRepoTree(data.tree || []);
+    } catch (error) {
+      setRepoTreeError(error instanceof Error ? error.message : "No se pudo leer el directorio");
+    } finally {
+      setRepoTreeLoading(false);
+    }
   }
 
-  function insertInlineImageFromRepo() {
-    const path = window.prompt("Ruta de imagen del repo/public", "/uploads/blog/tu-imagen.jpg");
-    if (!path) return;
-    const alt = window.prompt("Texto alternativo", "Imagen") || "Imagen";
-    setForm((prev) => ({ ...prev, content: `${prev.content}
+  function selectRepoImage(path: string) {
+    if (repoPickerMode === "cover") {
+      setForm((prev) => ({ ...prev, coverImage: path }));
+      setMessage(`Portada seleccionada: ${path}`);
+    } else if (repoPickerMode === "inline") {
+      const filename = path.split("/").pop() || "Imagen";
+      const alt = filename.replace(/\.[a-z0-9]+$/i, "").replace(/[\-_]+/g, " ");
+      setForm((prev) => ({ ...prev, content: `${prev.content}
 
-![${alt}](${path.trim()})
+![${alt}](${path})
 
 ` }));
+      setMessage(`Imagen insertada: ${path}`);
+    }
+    setRepoPickerMode(null);
   }
 
   async function onUploadCover(e: ChangeEvent<HTMLInputElement>) {
@@ -433,7 +493,7 @@ export default function BlogStudioPage() {
                 <button type="button" onClick={() => insertTemplate("h3")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H3</button>
                 <button type="button" onClick={() => insertTemplate("quote")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cita</button>
                 <button type="button" onClick={() => insertTemplate("divider")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Separador</button>
-                <button type="button" onClick={insertInlineImageFromRepo} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen repo</button>
+                <button type="button" onClick={() => openRepoPicker("inline")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen repo</button>
                 <button type="button" onClick={() => inlineInputRef.current?.click()} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen subir</button>
                 <button type="button" onClick={() => insertTemplate("youtube")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">YouTube</button>
                 <button type="button" onClick={() => insertTemplate("pdf")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">PDF</button>
@@ -466,7 +526,7 @@ export default function BlogStudioPage() {
                   <div className="text-xs font-semibold text-slate-700">Imagen principal (cabecera/tarjeta)</div>
                   <p className="mt-1 text-xs text-slate-500">Elige una del repo o súbela desde tu computador.</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <button type="button" onClick={setCoverImageFromRepo} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen del repo</button>
+                    <button type="button" onClick={() => openRepoPicker("cover")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen del repo</button>
                     <button type="button" onClick={() => coverInputRef.current?.click()} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Examinar...</button>
                   </div>
                   {form.coverImage ? <p className="mt-2 text-xs text-slate-600">Actual: {form.coverImage}</p> : null}
@@ -566,6 +626,29 @@ export default function BlogStudioPage() {
           </aside>
         </div>
       </div>
+
+      {repoPickerMode ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+          <div className="w-full max-w-3xl rounded-2xl bg-white p-5 shadow-2xl">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Seleccionar imagen desde repo/public</h3>
+                <p className="text-xs text-slate-500">Directorio visible del repo (solo archivos de imagen).</p>
+              </div>
+              <button type="button" className="rounded-md border border-slate-300 px-3 py-1 text-xs" onClick={() => setRepoPickerMode(null)}>Cerrar</button>
+            </div>
+
+            <div className="mt-3 max-h-[60vh] overflow-auto rounded-lg border border-slate-200 p-3">
+              {repoTreeLoading ? <p className="text-sm text-slate-500">Cargando directorio...</p> : null}
+              {repoTreeError ? <p className="text-sm text-rose-700">{repoTreeError}</p> : null}
+              {!repoTreeLoading && !repoTreeError && !repoTree.length ? (
+                <p className="text-sm text-slate-500">No se encontraron imágenes en /public.</p>
+              ) : null}
+              {!repoTreeLoading && !repoTreeError && repoTree.length ? renderRepoTree(repoTree, selectRepoImage) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
