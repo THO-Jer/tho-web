@@ -1,5 +1,5 @@
 export type LeadPayload = {
-  type: "contact" | "lead_magnet";
+  type: "contact" | "lead_magnet" | "brochure_download";
   name: string;
   email: string;
   phone?: string;
@@ -10,10 +10,67 @@ export type LeadPayload = {
   utm?: Record<string, string | undefined>;
 };
 
-export async function pushToCRM(_payload: LeadPayload) {
-  // Stub: el CRM aún no recibe leads.
-  // Cuando el dev vuelva, esto se transforma en un fetch a tu endpoint.
-  // Ej:
-  // await fetch(process.env.CRM_ENDPOINT!, { method: "POST", headers: {...}, body: JSON.stringify(_payload) })
-  return { ok: true, skipped: true };
+type CRMResult = {
+  ok: boolean;
+  pushed?: boolean;
+  provider?: "endpoint";
+  skipped?: boolean;
+  reason?: string;
+  endpoint?: string;
+  status?: number;
+};
+
+export class CRMRequestError extends Error {
+  status: number;
+  endpoint: string;
+  responseBody: string;
+
+  constructor(opts: { status: number; endpoint: string; responseBody: string }) {
+    super(`CRM endpoint error (${opts.status}): ${opts.responseBody}`);
+    this.name = "CRMRequestError";
+    this.status = opts.status;
+    this.endpoint = opts.endpoint;
+    this.responseBody = opts.responseBody;
+  }
+}
+
+const DEFAULT_CRM_ENDPOINT = "https://crm-tho.vercel.app/api/public/leads";
+
+export async function pushToCRM(payload: LeadPayload): Promise<CRMResult> {
+  const endpoint = process.env.CRM_ENDPOINT || DEFAULT_CRM_ENDPOINT;
+  const leadsApiKey = process.env.LEADS_API_KEY || process.env.CRM_API_KEY;
+
+  if (!leadsApiKey) {
+    return { ok: true, skipped: true, reason: "missing LEADS_API_KEY", endpoint };
+  }
+
+  const body = {
+    ...payload,
+    apiKey: leadsApiKey,
+  };
+
+  console.log("[CRM PUSH REQUEST]", "POST", endpoint, "email=", payload.email, "type=", payload.type);
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${leadsApiKey}`,
+      "x-api-key": leadsApiKey,
+    },
+    body: JSON.stringify(body),
+  });
+
+  const responseBody = await response.text();
+  console.log("[CRM PUSH RESPONSE]", response.status, endpoint, "email=", payload.email, "body=", responseBody);
+
+  if (!response.ok) {
+    throw new CRMRequestError({
+      status: response.status,
+      endpoint,
+      responseBody,
+    });
+  }
+
+  return { ok: true, pushed: true, provider: "endpoint", endpoint, status: response.status };
 }

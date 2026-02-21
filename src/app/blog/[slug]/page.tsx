@@ -1,26 +1,137 @@
+import type { Metadata } from "next";
+import Script from "next/script";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { POSTS } from "@/content/posts";
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = POSTS.find((p) => p.slug === params.slug);
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { BlogContent, getToc } from "@/components/blog/BlogContent";
+import { getPublishedPostBySlug, listPublishedPosts } from "@/lib/blogStore";
+
+const SITE = "https://tho-web.vercel.app";
+
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  const posts = await listPublishedPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const post = await getPublishedPostBySlug(slug);
+  if (!post) return {};
+
+  const title = post.seoTitle || `${post.title} | The Human Org`;
+  const description = post.seoDescription || post.excerpt;
+  const canonical = `${SITE}/blog/${post.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url: canonical,
+      siteName: "The Human Org",
+      images: post.coverImage ? [{ url: post.coverImage, alt: post.coverImageAlt || post.title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const post = await getPublishedPostBySlug(slug);
   if (!post) return notFound();
+  const toc = getToc(post.content);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt,
+    image: post.coverImage ? [`${SITE}${post.coverImage}`] : undefined,
+    mainEntityOfPage: `${SITE}/blog/${post.slug}`,
+    author: {
+      "@type": "Organization",
+      name: "The Human Org",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "The Human Org",
+    },
+  };
 
   return (
     <div className="min-h-screen">
       <Header />
       <main className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-3xl px-4 py-14">
-          <div className="text-xs text-slate-500">{post.minutes} min</div>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">{post.title}</h1>
-          <p className="mt-4 text-slate-600">{post.excerpt}</p>
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 lg:grid-cols-[1fr_280px]">
+          <div className="max-w-3xl">
+            <div className="text-xs text-slate-500">{post.minutes} min</div>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">{post.title}</h1>
+            <p className="mt-4 text-slate-600">{post.excerpt}</p>
 
-          <div className="mt-8 rounded-3xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-700">
-            Placeholder: luego lo conectamos a contenido real (MDX/Markdown) y traemos los posts desde archivos.
+            {post.coverImage ? (
+              <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-2xl border border-slate-200">
+                <Image src={post.coverImage} alt={post.coverImageAlt || post.title} fill className="object-cover" />
+              </div>
+            ) : null}
+
+            {post.category ? (
+              <div className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
+                Categoría: {post.category}
+              </div>
+            ) : null}
+
+            {post.tags.length ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span key={tag} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-700">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="mt-8 border-t border-slate-200 pt-4 text-xs text-slate-500">
+              Actualizado: {new Date(post.updatedAt).toLocaleDateString("es-CL")}
+            </div>
+
+            <div className="mt-8">
+              <BlogContent content={post.content} />
+            </div>
           </div>
+
+          {toc.length ? (
+            <aside className="hidden lg:block">
+              <div className="sticky top-24 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Índice</div>
+                <ul className="mt-3 space-y-2">
+                  {toc.map((item) => (
+                    <li key={item.id} className={item.level === 3 ? "pl-4" : ""}>
+                      <a href={`#${item.id}`} className="text-sm text-slate-700 hover:text-slate-900">
+                        {item.text}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          ) : null}
         </div>
       </main>
+      <Script id={`ld-blog-${post.slug}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Footer />
     </div>
   );
