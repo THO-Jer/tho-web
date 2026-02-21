@@ -48,6 +48,8 @@ const EMPTY_FORM: FormState = {
 
 export default function BlogStudioPage() {
   const [token, setToken] = useState("");
+  const [email, setEmail] = useState("");
+  const [authenticated, setAuthenticated] = useState(false);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
@@ -56,14 +58,27 @@ export default function BlogStudioPage() {
 
   useEffect(() => {
     const cached = localStorage.getItem("blog_admin_token");
+    const cachedEmail = localStorage.getItem("blog_admin_email");
     if (cached) setToken(cached);
+    if (cachedEmail) setEmail(cachedEmail);
+
+    fetch("/api/admin/session", { credentials: "include" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated) {
+          setAuthenticated(true);
+          if (data.email) setEmail(data.email);
+        }
+      })
+      .catch(() => undefined);
   }, []);
 
-  const canSubmit = useMemo(() => Boolean(token && form.title && form.excerpt && form.content), [token, form]);
+  const canSubmit = useMemo(() => Boolean(authenticated && form.title && form.excerpt && form.content), [authenticated, form]);
 
-  async function fetchPosts(currentToken: string) {
+  async function fetchPosts(currentToken?: string) {
     const res = await fetch("/api/admin/blog", {
-      headers: { "x-admin-token": currentToken },
+      headers: currentToken ? { "x-admin-token": currentToken } : undefined,
+      credentials: "include",
       cache: "no-store",
     });
     const data = await res.json();
@@ -72,17 +87,49 @@ export default function BlogStudioPage() {
   }
 
   async function onLoad() {
-    if (!token) return;
+    if (!authenticated) return;
     setLoading(true);
     setMessage("");
     try {
-      await fetchPosts(token);
-      localStorage.setItem("blog_admin_token", token);
+      await fetchPosts(token || undefined);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error al cargar.");
     } finally {
       setLoading(false);
     }
+  }
+
+
+  async function onLogin() {
+    if (!token || !email) return;
+    setLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/admin/session", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, token }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo iniciar sesión");
+      setAuthenticated(true);
+      localStorage.setItem("blog_admin_token", token);
+      localStorage.setItem("blog_admin_email", email);
+      await fetchPosts(token);
+      setMessage("Sesión editorial iniciada.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Error de autenticación");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onLogout() {
+    await fetch("/api/admin/session", { method: "DELETE", credentials: "include" });
+    setAuthenticated(false);
+    setPosts([]);
+    setMessage("Sesión cerrada.");
   }
 
   function fillForm(post: BlogPost) {
@@ -129,7 +176,8 @@ export default function BlogStudioPage() {
       formData.append("file", file);
       const res = await fetch("/api/admin/upload", {
         method: "POST",
-        headers: { "x-admin-token": token },
+        headers: token ? { "x-admin-token": token } : undefined,
+        credentials: "include",
         body: formData,
       });
       const data = await res.json();
@@ -176,8 +224,9 @@ export default function BlogStudioPage() {
         method,
         headers: {
           "content-type": "application/json",
-          "x-admin-token": token,
+          ...(token ? { "x-admin-token": token } : {}),
         },
+        credentials: "include",
         body: JSON.stringify(payload),
       });
       const data = await res.json();
@@ -199,7 +248,8 @@ export default function BlogStudioPage() {
     try {
       const res = await fetch(`/api/admin/blog/${slug}`, {
         method: "DELETE",
-        headers: { "x-admin-token": token },
+        headers: token ? { "x-admin-token": token } : undefined,
+        credentials: "include",
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo eliminar");
@@ -220,7 +270,16 @@ export default function BlogStudioPage() {
         <p className="mt-2 text-sm text-slate-600">Editor nativo con bloques rápidos, portada, citas, separadores, índice e imágenes.</p>
 
         <div className="mt-6 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <label className="grow text-sm">
+          <label className="min-w-[220px] grow text-sm">
+            Email editor
+            <input
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="nombre@tuempresa.com"
+            />
+          </label>
+          <label className="min-w-[220px] grow text-sm">
             Token administrador
             <input
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
@@ -229,15 +288,24 @@ export default function BlogStudioPage() {
               placeholder="BLOG_ADMIN_TOKEN"
             />
           </label>
-          <button onClick={onLoad} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white" type="button">
+          <button onClick={onLogin} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white" type="button">
+            Ingresar al Studio
+          </button>
+          <button onClick={onLoad} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700" type="button">
             Cargar posts
           </button>
+          <button onClick={onLogout} className="rounded-lg border border-slate-300 px-4 py-2 text-sm" type="button">
+            Salir
+          </button>
+          <div className="w-full text-xs text-slate-500">Estado: {authenticated ? `autenticado como ${email || 'editor'}` : 'sin sesión'}</div>
         </div>
 
         {message ? <p className="mt-3 text-sm text-slate-700">{message}</p> : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <form onSubmit={onSubmit} className="rounded-2xl border border-slate-200 bg-white p-5">
+            {!authenticated ? <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">Inicia sesión con email permitido para editar contenido.</p> : null}
+            <fieldset disabled={!authenticated || loading} className="contents">
             <h2 className="text-xl font-semibold text-slate-900">{editingSlug ? `Editar: ${editingSlug}` : "Nuevo post"}</h2>
             <div className="mt-3 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
               <button type="button" onClick={() => insertTemplate("h2")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H2</button>
@@ -277,6 +345,7 @@ export default function BlogStudioPage() {
                 Limpiar
               </button>
             </div>
+            </fieldset>
           </form>
 
           <aside className="rounded-2xl border border-slate-200 bg-white p-5">

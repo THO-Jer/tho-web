@@ -41,6 +41,8 @@ Configura estas variables para salir del modo stub:
 - `CRM_ENDPOINT`: endpoint HTTP de tu CRM. Si no se define, usa por defecto `https://crm-tho.vercel.app/api/public/leads`.
 - `LEADS_API_KEY`: clave usada para auth con CRM (se envía como `Authorization: Bearer`, `x-api-key` y también `apiKey` en body como fallback).
 - `CRM_API_KEY` (opcional/legacy): usado solo si no existe `LEADS_API_KEY`.
+- `BLOG_ADMIN_TOKEN`: token para acceder al Studio del blog y APIs administrativas.
+- `BLOG_ADMIN_ALLOWED_EMAILS`: lista separada por comas con emails autorizados para entrar al Studio (ej: `a@tho.cl,b@tho.cl,c@tho.cl`).
 
 Si falta `CRM_ENDPOINT`, la API responde error para evitar perder leads silenciosamente. El mail puede seguir en stub si falta `RESEND_API_KEY`.
 
