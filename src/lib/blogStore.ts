@@ -48,6 +48,18 @@ async function writeStore(posts: BlogPost[]) {
   await fs.writeFile(BLOG_PATH, `${JSON.stringify(posts, null, 2)}\n`, "utf8");
 }
 
+
+function ensureUniqueSlug(baseSlug: string, posts: BlogPost[]) {
+  let candidate = baseSlug;
+  let counter = 2;
+  const existing = new Set(posts.map((post) => post.slug));
+  while (existing.has(candidate)) {
+    candidate = `${baseSlug}-${counter}`;
+    counter += 1;
+  }
+  return candidate;
+}
+
 function normalizeSlug(slug: string) {
   return slug
     .trim()
@@ -105,10 +117,8 @@ export async function getPublishedPostBySlug(slug: string) {
 export async function createPost(input: Partial<BlogPostInput>) {
   const posts = await readStore();
   const next = sanitizePostInput(input);
-  if (posts.some((post) => post.slug === next.slug)) {
-    throw new Error("Ya existe un post con ese slug.");
-  }
-  const created: BlogPost = { ...next, updatedAt: new Date().toISOString() };
+  const uniqueSlug = ensureUniqueSlug(next.slug, posts);
+  const created: BlogPost = { ...next, slug: uniqueSlug, updatedAt: new Date().toISOString() };
   await writeStore([created, ...posts]);
   return created;
 }
