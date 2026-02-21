@@ -2,14 +2,16 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Section } from "@/components/Section";
 import { ContactForm } from "@/components/ContactForm";
-import { POSTS } from "@/content/posts";
 import { SERVICES } from "@/content/services";
 import { PILLAR_META } from "@/lib/brand";
 import MethodTimeline from "@/components/MethodTimeline";
 import { ActionGallery } from "@/components/ActionGallery";
 import { ResourcesModal } from "@/components/ResourcesModal";
+import { listPublishedPosts } from "@/lib/blogStore";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const posts = await listPublishedPosts();
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -237,7 +239,7 @@ export default function HomePage() {
 
       <Section id="blog" title="Blog" subtitle="Desde el territorio: análisis y tendencias (placeholder).">
         <div className="grid gap-4 md:grid-cols-3">
-          {POSTS.map((p) => (
+          {posts.slice(0, 3).map((p) => (
             <div key={p.slug} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="text-xs text-slate-500">{p.minutes} min</div>
               <div className="mt-2 text-base font-semibold">{p.title}</div>

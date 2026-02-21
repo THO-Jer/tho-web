@@ -1,0 +1,28 @@
+[
+  {
+    "slug": "gestion-de-riesgos",
+    "title": "Gestión de riesgos en consultoría",
+    "excerpt": "Cómo convertir incertidumbre en decisiones, sin maquillaje.",
+    "content": "# Gestión de riesgos en consultoría\n\nLa incertidumbre no se elimina: se gestiona con método, señales y gobernanza.\n\n## Qué hacemos\n\n- Identificamos riesgos críticos.\n- Priorizamos por impacto y probabilidad.\n- Diseñamos respuestas ejecutables.\n\n## Resultado\n\nDecisiones más robustas y menos improvisación.",
+    "minutes": 5,
+    "tags": ["riesgos", "estrategia"],
+    "status": "published",
+    "publishedAt": "2026-01-10T12:00:00.000Z",
+    "updatedAt": "2026-01-10T12:00:00.000Z",
+    "seoTitle": "Gestión de riesgos en consultoría | The Human Org",
+    "seoDescription": "Cómo abordar riesgos estratégicos con evidencia y gobernanza para sostener decisiones complejas."
+  },
+  {
+    "slug": "confianza-activo",
+    "title": "La confianza como activo intangible",
+    "excerpt": "La confianza no se declara: se diseña y se gestiona.",
+    "content": "# La confianza como activo intangible\n\nLa confianza es un habilitador operativo y reputacional.\n\n## Claves\n\n- Coherencia entre relato y operación.\n- Ritmo de comunicación sostenido.\n- Evidencia verificable de compromisos.\n\nSin sistema de confianza, el costo aparece igual.",
+    "minutes": 6,
+    "tags": ["confianza", "reputación"],
+    "status": "published",
+    "publishedAt": "2026-01-17T12:00:00.000Z",
+    "updatedAt": "2026-01-17T12:00:00.000Z",
+    "seoTitle": "Confianza organizacional: activo estratégico | The Human Org",
+    "seoDescription": "Por qué la confianza es un activo de gestión y cómo diseñarla con consistencia operativa."
+  }
+]
