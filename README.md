@@ -71,3 +71,9 @@ ese error viene del **servicio CRM** (`crm-tho`), no de esta web.
 Debes configurar esas variables en el proyecto `crm-tho` de Vercel.
 
 Esta web ya está enviando `POST` a `/api/public/leads` con auth (`Bearer`, `x-api-key`, `apiKey`).
+
+### Studio Auth (flujo recomendado)
+
+- El acceso al Studio se inicia en `/studio` con botón **Ingresar con Microsoft**.
+- Una vez autenticado, la sesión habilita cualquier módulo (`/studio/blog`, etc.) sin pedir login nuevamente.
+- Si más adelante quieres Gmail + auto-onboarding (sin insertar correos manualmente), crea una función server-side/post-login que inserte en `blog_editors` según dominio permitido (ej: `@tho.cl`) y rol por defecto.

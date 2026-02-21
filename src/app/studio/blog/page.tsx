@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { BlogContent, getToc } from "@/components/blog/BlogContent";
 
@@ -60,61 +61,35 @@ function cleanWords(value: string) {
 }
 
 export default function BlogStudioPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 
   useEffect(() => {
-    const cachedEmail = localStorage.getItem("blog_admin_email");
-    if (cachedEmail) setEmail(cachedEmail);
-
-    const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get("access_token");
-
-    if (accessToken) {
-      fetch("/api/admin/session", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ action: "oauth_login", accessToken }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.ok) {
-            setAuthenticated(true);
-            if (data.email) {
-              setEmail(data.email);
-              localStorage.setItem("blog_admin_email", data.email);
-            }
-            setMessage("Sesión iniciada con Microsoft.");
-          }
-        })
-        .catch(() => undefined)
-        .finally(() => {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        });
-    }
-
     fetch("/api/admin/session", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        if (data.authenticated) {
-          setAuthenticated(true);
-          if (data.email) setEmail(data.email);
+        if (!data.authenticated) {
+          router.replace("/studio");
+          return;
         }
+        setAuthenticated(true);
+        if (data.email) setEmail(data.email);
       })
-      .catch(() => undefined);
-  }, []);
+      .catch(() => {
+        router.replace("/studio");
+      })
+      .finally(() => setCheckingAuth(false));
+  }, [router]);
 
-  const draftKey = useMemo(() => `${DRAFT_KEY_PREFIX}:${email || "anon"}`, [email]);
+  const draftKey = useMemo(() => `${DRAFT_KEY_PREFIX}:${email || "editor"}`, [email]);
 
   useEffect(() => {
     if (!authenticated) return;
@@ -176,82 +151,10 @@ export default function BlogStudioPage() {
     setPosts(data.posts);
   }
 
-  async function onLoad() {
+  useEffect(() => {
     if (!authenticated) return;
-    setLoading(true);
-    setMessage("");
-    try {
-      await fetchPosts();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Error al cargar.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function onMicrosoftLogin() {
-    if (!supabaseUrl) {
-      setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth Microsoft.");
-      return;
-    }
-    const redirectTo = `${window.location.origin}/studio/blog`;
-    const url = `${supabaseUrl}/auth/v1/authorize?provider=azure&redirect_to=${encodeURIComponent(redirectTo)}`;
-    window.location.href = url;
-  }
-
-  async function onSendOtp() {
-    if (!email) return;
-    setLoading(true);
-    setMessage("");
-    try {
-      const res = await fetch("/api/admin/session", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ action: "send_otp", email }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo enviar el código");
-      localStorage.setItem("blog_admin_email", email);
-      setMessage("Te enviamos un código de 6 dígitos por correo.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Error de autenticación");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onVerifyOtp() {
-    if (!email || !otp) return;
-    setLoading(true);
-    setMessage("");
-    try {
-      const res = await fetch("/api/admin/session", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ action: "verify_otp", email, otp }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Código inválido");
-      setAuthenticated(true);
-      localStorage.setItem("blog_admin_email", email);
-      await fetchPosts();
-      setMessage("Sesión editorial iniciada.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Error de autenticación");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function onLogout() {
-    await fetch("/api/admin/session", { method: "DELETE", credentials: "include" });
-    setAuthenticated(false);
-    setPosts([]);
-    setOtp("");
-    setMessage("Sesión cerrada.");
-  }
+    fetchPosts().catch(() => undefined);
+  }, [authenticated]);
 
   function fillForm(post: BlogPost) {
     setEditingSlug(post.slug);
@@ -403,34 +306,20 @@ export default function BlogStudioPage() {
     }
   }
 
+  if (checkingAuth) {
+    return <main className="min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
+  }
+
   return (
     <main className="min-h-screen bg-tho-bg px-4 py-10">
       <div className="mx-auto max-w-7xl">
         <h1 className="font-tho-title text-5xl text-slate-950">Studio Blog</h1>
-        <p className="mt-2 text-sm text-slate-600">Acceso con OTP o con Microsoft (OAuth Supabase). Sin token manual para los editores.</p>
-
-        <div className="mt-6 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
-          <label className="min-w-[220px] grow text-sm">
-            Email editor
-            <input className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="nombre@tuempresa.com" />
-          </label>
-          <label className="min-w-[180px] grow text-sm">
-            Código OTP
-            <input className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={otp} onChange={(e) => setOtp(e.target.value)} placeholder="123456" />
-          </label>
-          <button onClick={onSendOtp} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white" type="button">Enviar código</button>
-          <button onClick={onVerifyOtp} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700" type="button">Verificar e ingresar</button>
-          <button onClick={onMicrosoftLogin} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">Ingresar con Microsoft</button>
-          <button onClick={onLoad} className="rounded-lg border border-slate-300 px-4 py-2 text-sm" type="button">Cargar posts</button>
-          <button onClick={onLogout} className="rounded-lg border border-slate-300 px-4 py-2 text-sm" type="button">Salir</button>
-          <div className="w-full text-xs text-slate-500">Estado: {authenticated ? `autenticado como ${email || "editor"}` : "sin sesión"}</div>
-        </div>
+        <p className="mt-2 text-sm text-slate-600">Sesión heredada desde /studio. Todo lo que edites aquí usa ese acceso común.</p>
 
         {message ? <p className="mt-3 text-sm text-slate-700">{message}</p> : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
           <form onSubmit={onSubmit} className="rounded-2xl border border-slate-200 bg-white p-5">
-            {!authenticated ? <p className="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">Primero verifica tu código OTP para editar contenido.</p> : null}
             <fieldset disabled={!authenticated || loading} className="contents">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-xl font-semibold text-slate-900">{editingSlug ? `Editar: ${editingSlug}` : "Nuevo post"}</h2>
