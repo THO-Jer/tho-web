@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -135,8 +135,6 @@ export default function BlogStudioPage() {
   const [repoTree, setRepoTree] = useState<RepoTreeNode[]>([]);
   const [repoTreeLoading, setRepoTreeLoading] = useState(false);
   const [repoTreeError, setRepoTreeError] = useState("");
-  const coverInputRef = useRef<HTMLInputElement | null>(null);
-  const inlineInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -494,7 +492,7 @@ export default function BlogStudioPage() {
                 <button type="button" onClick={() => insertTemplate("quote")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cita</button>
                 <button type="button" onClick={() => insertTemplate("divider")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Separador</button>
                 <button type="button" onClick={() => openRepoPicker("inline")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen repo</button>
-                <button type="button" onClick={() => inlineInputRef.current?.click()} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen subir</button>
+                <label htmlFor="inline-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen subir</label>
                 <button type="button" onClick={() => insertTemplate("youtube")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">YouTube</button>
                 <button type="button" onClick={() => insertTemplate("pdf")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">PDF</button>
                 <button type="button" onClick={insertLink} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Link</button>
@@ -502,8 +500,8 @@ export default function BlogStudioPage() {
                 <button type="button" onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}*texto en cursiva*` }))} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cursiva</button>
               </div>
 
-              <input ref={coverInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadCover} />
-              <input ref={inlineInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadInline} />
+              <input id="cover-upload-input" type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadCover} />
+              <input id="inline-upload-input" type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadInline} />
 
               <div className="mt-4 grid gap-3">
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
@@ -527,7 +525,7 @@ export default function BlogStudioPage() {
                   <p className="mt-1 text-xs text-slate-500">Elige una del repo o súbela desde tu computador.</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button type="button" onClick={() => openRepoPicker("cover")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen del repo</button>
-                    <button type="button" onClick={() => coverInputRef.current?.click()} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Examinar...</button>
+                    <label htmlFor="cover-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Examinar...</label>
                   </div>
                   {form.coverImage ? <p className="mt-2 text-xs text-slate-600">Actual: {form.coverImage}</p> : null}
                 </div>
@@ -605,8 +603,6 @@ export default function BlogStudioPage() {
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5">
               <h2 className="text-xl font-semibold text-slate-900">Entradas ({posts.length})</h2>
-              <input ref={coverInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadCover} />
-              <input ref={inlineInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadInline} />
 
               <div className="mt-4 grid gap-3">
                 {posts.map((post) => (
