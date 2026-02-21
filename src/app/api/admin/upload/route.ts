@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { isAdminAuthorized } from "@/lib/adminAuth";
+import { isAdminAuthorized, readSession } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +20,9 @@ function getStorageEnv() {
   const rawUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_SUPABASE_PUBLIC_URL;
   const url = rawUrl?.trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
   const service = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY;
+  const anon = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_SUPABASE_ANON_KEY;
   const bucket = process.env.SUPABASE_STORAGE_BUCKET || "blog-assets";
-  return { url, service, bucket };
+  return { url, service, anon, bucket };
 }
 
 
@@ -128,10 +129,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Formato no soportado (jpg/png/webp)." }, { status: 400 });
     }
 
-    const { url, service, bucket } = getStorageEnv();
-    if (!url || !service) {
+    const { url, service, anon, bucket } = getStorageEnv();
+    if (!url) {
+      return NextResponse.json({ error: "Storage no configurado. Define SUPABASE_URL." }, { status: 500 });
+    }
+
+    const session = await readSession(req);
+    const apikey = service || anon;
+    const bearer = service || session?.token;
+
+    if (!apikey || !bearer) {
       return NextResponse.json(
-        { error: "Storage no configurado. Define SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY." },
+        { error: "Storage no configurado. Define SERVICE_ROLE o ANON_KEY + sesión válida." },
         { status: 500 }
       );
     }
@@ -146,8 +155,8 @@ export async function POST(req: NextRequest) {
     const uploadRes = await fetch(`${url}/storage/v1/object/${encodeURIComponent(bucket)}/${encodedPath}`, {
       method: "POST",
       headers: {
-        apikey: service,
-        Authorization: `Bearer ${service}`,
+        apikey,
+        Authorization: `Bearer ${bearer}`,
         "content-type": file.type,
         "x-upsert": "false",
       },

@@ -135,6 +135,7 @@ export default function BlogStudioPage() {
   const [repoTree, setRepoTree] = useState<RepoTreeNode[]>([]);
   const [repoTreeLoading, setRepoTreeLoading] = useState(false);
   const [repoTreeError, setRepoTreeError] = useState("");
+  const [lastUploadedUrl, setLastUploadedUrl] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -302,6 +303,7 @@ export default function BlogStudioPage() {
         content: mode === "inline" ? `${prev.content}\n\n![${file.name}](${data.url})\n\n` : prev.content,
       }));
 
+      setLastUploadedUrl(String(data.url || ""));
       setMessage(mode === "cover" ? `Portada subida a Storage: ${data.url}` : `Imagen subida a Storage e insertada: ${data.url}`);
       await fetchRepoTree(true);
     } catch (error) {
@@ -534,6 +536,11 @@ export default function BlogStudioPage() {
                     <label htmlFor="cover-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Examinar...</label>
                   </div>
                   {form.coverImage ? <p className="mt-2 text-xs text-slate-600">Actual: {form.coverImage}</p> : null}
+                  {lastUploadedUrl ? (
+                    <p className="mt-1 text-xs text-emerald-700">
+                      Última URL subida: <a className="underline" href={lastUploadedUrl} target="_blank" rel="noreferrer">{lastUploadedUrl}</a>
+                    </p>
+                  ) : null}
                 </div>
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Texto alternativo de portada" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
 
