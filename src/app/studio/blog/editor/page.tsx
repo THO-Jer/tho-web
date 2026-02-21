@@ -300,7 +300,14 @@ export default function BlogStudioPage() {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error guardando");
+      if (!res.ok) {
+        const reason = data.error || "Error guardando";
+        if (res.status === 404) {
+          await fetchPosts();
+          throw new Error(`La entrada ya no existe o cambió de slug. ${reason}`);
+        }
+        throw new Error(reason);
+      }
       if (data.post) {
         setEditingSlug(data.post.slug);
         setForm(toFormState(data.post as BlogPost));

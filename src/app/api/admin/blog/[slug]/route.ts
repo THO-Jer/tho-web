@@ -16,10 +16,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sl
     const post = await updatePost(slug, payload);
     return NextResponse.json({ post });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "No se pudo actualizar el post." },
-      { status: 400 }
-    );
+    const message = error instanceof Error ? error.message : "No se pudo actualizar el post.";
+    const status = message.includes("no encontrado") ? 404 : message.includes("Ya existe") ? 409 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
 }
 
@@ -33,9 +32,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ s
     await deletePost(slug);
     return NextResponse.json({ ok: true });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "No se pudo eliminar el post." },
-      { status: 400 }
-    );
+    const message = error instanceof Error ? error.message : "No se pudo eliminar el post.";
+    const status = message.includes("no encontrado") ? 404 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
 }

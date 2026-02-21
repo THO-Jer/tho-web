@@ -115,7 +115,16 @@ export async function createPost(input: Partial<BlogPostInput>) {
 
 export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
   const posts = await readStore();
-  const index = posts.findIndex((post) => post.slug === slug);
+  const normalizedParamSlug = normalizeSlug(slug);
+  const normalizedInputSlug = typeof input.slug === "string" ? normalizeSlug(input.slug) : "";
+
+  let index = posts.findIndex((post) => post.slug === normalizedParamSlug);
+
+  // Fallback for stale editor state: if URL slug is outdated, try payload slug.
+  if (index === -1 && normalizedInputSlug) {
+    index = posts.findIndex((post) => post.slug === normalizedInputSlug);
+  }
+
   if (index === -1) throw new Error("Post no encontrado.");
 
   const current = posts[index];
