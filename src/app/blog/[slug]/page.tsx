@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Footer } from "@/components/Footer";
@@ -52,6 +53,20 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const post = await getPublishedPostBySlug(slug);
   if (!post) return notFound();
   const toc = getToc(post.content);
+
+  const allPosts = await listPublishedPosts();
+  const currentTags = new Set(post.tags.map((tag) => tag.toLowerCase()));
+  const relatedPosts = allPosts
+    .filter((item) => item.slug !== post.slug)
+    .map((item) => {
+      const sharedTags = item.tags.filter((tag) => currentTags.has(tag.toLowerCase())).length;
+      const sameCategory = post.category && item.category && post.category.toLowerCase() === item.category.toLowerCase() ? 2 : 0;
+      const score = sharedTags * 3 + sameCategory;
+      return { item, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map((entry) => entry.item);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -111,6 +126,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div className="mt-8">
               <BlogContent content={post.content} />
             </div>
+
+            {relatedPosts.length ? (
+              <section className="mt-10 border-t border-slate-200 pt-6">
+                <h2 className="text-xl font-semibold text-slate-900">También te puede interesar</h2>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {relatedPosts.map((related) => (
+                    <Link key={related.slug} href={`/blog/${related.slug}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white">
+                      <div className="text-xs text-slate-500">{related.minutes} min</div>
+                      <div className="mt-1 text-sm font-semibold text-slate-900">{related.title}</div>
+                      <p className="mt-1 text-xs text-slate-600">{related.excerpt}</p>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </div>
 
           {toc.length ? (
