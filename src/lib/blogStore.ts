@@ -54,6 +54,11 @@ function hasSupabaseStore() {
   return Boolean(url && service);
 }
 
+function isMissingSupabaseTableError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  return error.message.includes("PGRST205") || error.message.includes("Could not find the table");
+}
+
 async function supabaseRequest(pathname: string, init?: RequestInit) {
   const { url, service } = getSupabaseEnv();
   if (!url || !service) throw new Error("Supabase store no configurado");
@@ -191,12 +196,19 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
 
 export async function listAllPosts() {
   if (hasSupabaseStore()) {
-    const query = new URLSearchParams({
-      select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-      order: "updated_at.desc",
-    });
-    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
-    return rows.map(rowToPost);
+    try {
+      const query = new URLSearchParams({
+        select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+        order: "updated_at.desc",
+      });
+      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
+      return rows.map(rowToPost);
+    } catch (error) {
+      if (isMissingSupabaseTableError(error)) {
+        return readFileStore();
+      }
+      throw error;
+    }
   }
 
   return readFileStore();
