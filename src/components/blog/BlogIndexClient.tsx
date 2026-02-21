@@ -4,6 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+
+function normalizeCategory(value?: string) {
+  return (value || "").trim().toLowerCase();
+}
+
 type BlogPost = {
   slug: string;
   title: string;
@@ -17,22 +22,31 @@ type BlogPost = {
 
 export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
+  const [categoryKey, setCategoryKey] = useState("all");
 
   const categories = useMemo(() => {
-    const values = Array.from(new Set(posts.map((post) => post.category).filter(Boolean))) as string[];
-    return values.sort();
+    const map = new Map<string, { key: string; label: string; count: number }>();
+    for (const post of posts) {
+      const key = normalizeCategory(post.category);
+      if (!key) continue;
+      if (!map.has(key)) {
+        map.set(key, { key, label: (post.category || "").trim(), count: 1 });
+      } else {
+        map.get(key)!.count += 1;
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label, "es"));
   }, [posts]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return posts.filter((post) => {
-      const byCategory = category === "all" || post.category === category;
+      const byCategory = categoryKey === "all" || normalizeCategory(post.category) === categoryKey;
       if (!byCategory) return false;
       if (!q) return true;
       return `${post.title} ${post.excerpt} ${post.tags.join(" ")} ${post.category || ""}`.toLowerCase().includes(q);
     });
-  }, [posts, query, category]);
+  }, [posts, query, categoryKey]);
 
   return (
     <>
@@ -43,10 +57,10 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
           placeholder="Buscar por título, tema o tag"
           className="min-w-[260px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+        <select value={categoryKey} onChange={(e) => setCategoryKey(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
           <option value="all">Todas las categorías</option>
           {categories.map((item) => (
-            <option key={item} value={item}>{item}</option>
+            <option key={item.key} value={item.key}>{item.label} ({item.count})</option>
           ))}
         </select>
       </div>

@@ -118,7 +118,7 @@ export default function BlogStudioIndexPage() {
           </div>
           <div className="flex gap-2">
             <Link href="/studio" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50 active:scale-[0.99]">Volver al Studio</Link>
-            <Link href="/studio/blog/editor" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 active:scale-[0.99]">Nueva entrada</Link>
+            <Link href="/studio/blog/editor?fresh=1" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 active:scale-[0.99]">Nueva entrada</Link>
           </div>
         </div>
 

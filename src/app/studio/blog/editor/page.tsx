@@ -122,6 +122,7 @@ function renderRepoTree(nodes: RepoTreeNode[], onPick: (path: string) => void, d
 export default function BlogStudioPage() {
   const router = useRouter();
   const [selectedSlug, setSelectedSlug] = useState("");
+  const [startFresh, setStartFresh] = useState(false);
   const [email, setEmail] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -145,6 +146,7 @@ export default function BlogStudioPage() {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     setSelectedSlug(params.get("slug") || "");
+    setStartFresh(params.get("fresh") === "1");
   }, []);
 
   useEffect(() => {
@@ -168,6 +170,13 @@ export default function BlogStudioPage() {
 
   useEffect(() => {
     if (!authenticated) return;
+    if (selectedSlug || startFresh) {
+      setForm(EMPTY_FORM);
+      setEditingSlug(null);
+      localStorage.removeItem(draftKey);
+      return;
+    }
+
     try {
       const saved = localStorage.getItem(draftKey);
       if (saved) {
@@ -177,7 +186,7 @@ export default function BlogStudioPage() {
     } catch {
       // ignore malformed drafts
     }
-  }, [authenticated, draftKey]);
+  }, [authenticated, draftKey, selectedSlug, startFresh]);
 
   useEffect(() => {
     if (!authenticated) return;
