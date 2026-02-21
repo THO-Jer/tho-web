@@ -107,10 +107,15 @@ function renderRepoTree(nodes: RepoTreeNode[], onPick: (path: string) => void, d
             <button
               type="button"
               onClick={() => onPick(node.path)}
-              className="w-full rounded px-1 py-0.5 text-left text-xs text-slate-700 hover:bg-slate-100"
+              className="flex w-full items-center gap-2 rounded px-1 py-1 text-left text-xs text-slate-700 hover:bg-slate-100"
             >
-              🖼️ {node.name}
-              <span className="ml-2 text-[11px] text-slate-500">{node.path}</span>
+              <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded border border-slate-200 bg-slate-100">
+                <img src={node.path} alt={node.name} className="h-full w-full object-cover" loading="lazy" />
+              </span>
+              <span className="min-w-0">
+                <span className="block truncate">🖼️ {node.name}</span>
+                <span className="block truncate text-[11px] text-slate-500">{node.path}</span>
+              </span>
             </button>
           )}
         </li>
