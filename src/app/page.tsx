@@ -220,7 +220,7 @@ export default function HomePage() {
         />
       </Section>
 
-      <section id="accion" className="border-t border-slate-200/70 bg-tho-bg">
+      <section id="accion" className="relative z-30 border-t border-slate-200/70 bg-tho-bg">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:py-16">
           <div>
             <h2 className="font-tho-title text-[3rem] text-slate-950 md:text-[4.2rem]">THO en Acción</h2>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type Step = {
   n: string;
@@ -11,7 +11,7 @@ type Step = {
 };
 
 const BRAND_HOVER = ["var(--tho-blue)", "var(--tho-orange)", "var(--tho-pink)", "var(--tho-green)"];
-const GRAYS = ["#d1d5db", "#c4c9d2", "#b7bdc8", "#aab2bf"];
+const GRAYS = ["#d5dbe4", "#c6cfdb", "#b9c4d3", "#acb8ca"];
 
 function polar(cx: number, cy: number, r: number, angleDeg: number) {
   const a = (angleDeg * Math.PI) / 180;
@@ -36,54 +36,60 @@ function textArcPath(cx: number, cy: number, r: number, startDeg: number, endDeg
 }
 
 export default function MethodTimeline({ steps }: { steps: Step[] }) {
-  const [active, setActive] = useState<number | null>(null);
   const visibleSteps = steps.slice(0, 4);
-  const cx = 500;
-  const cy = 500;
-  const rOuter = 460;
-  const rInner = 220;
+  const [active, setActive] = useState(0);
+  const current = visibleSteps[active] ?? visibleSteps[0];
+
+  const cfg = useMemo(
+    () => ({ cx: 560, cy: 590, rOuter: 520, rInner: 250 }),
+    []
+  );
 
   return (
-    <div className="method-arc-shell relative overflow-hidden px-1 pt-2 md:px-2" onMouseLeave={() => setActive(null)}>
-      <div className="method-arc-fade-top pointer-events-none absolute inset-x-0 top-0 z-10 h-14" />
+    <div className="method-arc-shell relative -mb-20 overflow-visible pt-2 md:-mb-24">
+      <div className="method-arc-fade-top pointer-events-none absolute inset-x-0 top-0 z-10 h-12" />
       <div className="method-arc-fade-sides pointer-events-none absolute inset-y-0 left-0 z-10 w-16 md:w-24" />
       <div className="method-arc-fade-sides pointer-events-none absolute inset-y-0 right-0 z-10 w-16 md:w-24 scale-x-[-1]" />
 
       <div className="method-arc-stage relative mx-auto max-w-6xl">
-        <svg viewBox="0 0 1000 590" className="h-[360px] w-full md:h-[520px]">
+        <svg viewBox="0 0 1120 670" className="h-[360px] w-full md:h-[520px]" role="img" aria-label="Diagrama iterativo de cuatro etapas">
           <defs>
             {visibleSteps.map((step, i) => {
               const start = 180 + i * 45;
               const end = 225 + i * 45;
-              return <path key={step.n} id={`method-text-arc-${i}`} d={textArcPath(cx, cy, (rOuter + rInner) / 2, start + 8, end - 8)} />;
+              return (
+                <path
+                  key={step.n}
+                  id={`method-text-arc-${i}`}
+                  d={textArcPath(cfg.cx, cfg.cy, (cfg.rOuter + cfg.rInner) / 2 + 8, start + 6, end - 6)}
+                />
+              );
             })}
           </defs>
 
           {visibleSteps.map((step, i) => {
             const start = 180 + i * 45;
             const end = 225 + i * 45;
-            const d = donutSlicePath(cx, cy, rOuter, rInner, start, end);
-            const fill = active === null ? GRAYS[i] : active === i ? BRAND_HOVER[i] : "#9ca3af";
+            const d = donutSlicePath(cfg.cx, cfg.cy, cfg.rOuter, cfg.rInner, start, end);
+            const isActive = active === i;
+            const fill = isActive ? BRAND_HOVER[i] : GRAYS[i];
 
             return (
               <g
                 key={step.n}
-                className="cursor-pointer transition duration-300"
+                className="cursor-pointer"
                 onMouseEnter={() => setActive(i)}
                 style={{
-                  transformOrigin: `${cx}px ${cy}px`,
-                  transform: active === i ? "translateY(-12px)" : "translateY(0)",
+                  transformOrigin: `${cfg.cx}px ${cfg.cy}px`,
+                  transform: isActive ? "translateY(-16px) scale(1.01)" : "translateY(0) scale(1)",
+                  transition: "transform 280ms ease, filter 280ms ease",
+                  filter: isActive ? "saturate(1.08) brightness(1.03)" : "none",
                 }}
               >
-                <path d={d} fill={fill} stroke="rgba(255,255,255,0.92)" strokeWidth="7" />
-                <text fontSize="18" fontWeight="700" fill="#0f172a" letterSpacing="0.015em">
+                <path d={d} fill={fill} stroke="rgba(255,255,255,0.9)" strokeWidth="7" />
+                <text fontSize="19" fontWeight="700" fill="#0f172a" letterSpacing="0.012em">
                   <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle">
                     {step.title}
-                  </textPath>
-                </text>
-                <text fontSize="13" fill="#1e293b" letterSpacing="0.01em">
-                  <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle" dy="24">
-                    {step.desc}
                   </textPath>
                 </text>
               </g>
@@ -91,13 +97,19 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
           })}
         </svg>
 
-        <div className="pointer-events-none absolute left-1/2 top-[58%] z-20 h-28 w-60 -translate-x-1/2 -translate-y-1/2 md:h-36 md:w-80">
+        <div className="pointer-events-none absolute left-1/2 top-[58%] z-30 h-28 w-64 -translate-x-1/2 -translate-y-1/2 md:h-36 md:w-[22rem]">
           <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" />
           <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" />
         </div>
-
-        <div className="method-arc-cut pointer-events-none absolute inset-x-[-8%] bottom-[-70px] z-30 h-36 bg-tho-bg" />
       </div>
+
+      {current ? (
+        <div className="relative z-40 mx-auto mt-2 max-w-3xl rounded-2xl border border-slate-200/80 bg-white/92 p-4 shadow-sm backdrop-blur-sm md:p-5">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Etapa activa {current.n}</div>
+          <h3 className="mt-1 text-lg font-semibold text-slate-900 md:text-xl">{current.title}</h3>
+          <p className="mt-2 text-sm text-slate-700 md:text-base">{current.desc}</p>
+        </div>
+      ) : null}
     </div>
   );
 }

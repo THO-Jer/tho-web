@@ -473,14 +473,9 @@ body {
 }
 
 .method-arc-stage {
-  transform: perspective(1500px) rotateX(32deg) rotateZ(-7deg);
+  transform: perspective(1600px) rotateX(34deg) rotateZ(-8deg);
   transform-origin: center 70%;
-  filter: saturate(1.02) contrast(1.03);
-}
-
-.method-arc-cut {
-  transform: rotate(-0.85deg);
-  transform-origin: center;
+  filter: saturate(1.03) contrast(1.04);
 }
 
 @media (prefers-color-scheme: dark) {
