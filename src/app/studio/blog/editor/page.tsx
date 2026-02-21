@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -96,6 +96,8 @@ export default function BlogStudioPage() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
+  const coverInputRef = useRef<HTMLInputElement | null>(null);
+  const inlineInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -169,6 +171,8 @@ export default function BlogStudioPage() {
       .sort((a, b) => b.score - a.score)
       .slice(0, 4);
   }, [posts, form, editingSlug]);
+
+  const categoryOptions = useMemo(() => Array.from(new Set(posts.map((post) => post.category).filter(Boolean))) as string[], [posts]);
 
   const canSubmit = useMemo(() => Boolean(authenticated && form.title && form.excerpt && form.content), [authenticated, form]);
 
@@ -267,6 +271,24 @@ export default function BlogStudioPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+
+  function setCoverImageFromRepo() {
+    const path = window.prompt("Ruta de imagen del repo/public", form.coverImage || "/hero/hands.png");
+    if (!path) return;
+    setForm((prev) => ({ ...prev, coverImage: path.trim() }));
+  }
+
+  function insertInlineImageFromRepo() {
+    const path = window.prompt("Ruta de imagen del repo/public", "/uploads/blog/tu-imagen.jpg");
+    if (!path) return;
+    const alt = window.prompt("Texto alternativo", "Imagen") || "Imagen";
+    setForm((prev) => ({ ...prev, content: `${prev.content}
+
+![${alt}](${path.trim()})
+
+` }));
   }
 
   async function onUploadCover(e: ChangeEvent<HTMLInputElement>) {
@@ -411,13 +433,17 @@ export default function BlogStudioPage() {
                 <button type="button" onClick={() => insertTemplate("h3")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H3</button>
                 <button type="button" onClick={() => insertTemplate("quote")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cita</button>
                 <button type="button" onClick={() => insertTemplate("divider")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Separador</button>
-                <button type="button" onClick={() => insertTemplate("image")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen</button>
+                <button type="button" onClick={insertInlineImageFromRepo} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen repo</button>
+                <button type="button" onClick={() => inlineInputRef.current?.click()} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen subir</button>
                 <button type="button" onClick={() => insertTemplate("youtube")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">YouTube</button>
                 <button type="button" onClick={() => insertTemplate("pdf")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">PDF</button>
                 <button type="button" onClick={insertLink} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Link</button>
                 <button type="button" onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}**texto en negrita**` }))} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Negrita</button>
                 <button type="button" onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}*texto en cursiva*` }))} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cursiva</button>
               </div>
+
+              <input ref={coverInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadCover} />
+              <input ref={inlineInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadInline} />
 
               <div className="mt-4 grid gap-3">
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
@@ -436,21 +462,25 @@ export default function BlogStudioPage() {
                   </select>
                 </div>
 
-                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Imagen principal URL" value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} />
-                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Texto alternativo de portada" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
-                <div className="grid gap-3 md:grid-cols-2">
-                  <label className="text-xs text-slate-600">Subir imagen principal (portada de tarjeta y cabecera)
-                    <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUploadCover} />
-                  </label>
-                  <label className="text-xs text-slate-600">Subir imagen para el cuerpo (se inserta en contenido)
-                    <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUploadInline} />
-                  </label>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                  <div className="text-xs font-semibold text-slate-700">Imagen principal (cabecera/tarjeta)</div>
+                  <p className="mt-1 text-xs text-slate-500">Elige una del repo o súbela desde tu computador.</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button type="button" onClick={setCoverImageFromRepo} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen del repo</button>
+                    <button type="button" onClick={() => coverInputRef.current?.click()} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Examinar...</button>
+                  </div>
+                  {form.coverImage ? <p className="mt-2 text-xs text-slate-600">Actual: {form.coverImage}</p> : null}
                 </div>
+                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Texto alternativo de portada" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
 
                 <div className="grid gap-3 md:grid-cols-2">
-                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Categoría (ej: sostenibilidad)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+                  <select className="rounded-lg border border-slate-300 px-3 py-2" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+                    <option value="">Categoría (sin categoría)</option>
+                    {categoryOptions.map((item) => (<option key={item} value={item}>{item}</option>))}
+                  </select>
+                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Nueva categoría (opcional)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
                 </div>
+                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
                 <label className="text-xs text-slate-600">Fecha de publicación
                   <input type="datetime-local" className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} />
                 </label>
@@ -515,6 +545,9 @@ export default function BlogStudioPage() {
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5">
               <h2 className="text-xl font-semibold text-slate-900">Entradas ({posts.length})</h2>
+              <input ref={coverInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadCover} />
+              <input ref={inlineInputRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadInline} />
+
               <div className="mt-4 grid gap-3">
                 {posts.map((post) => (
                   <article key={post.slug} className="rounded-xl border border-slate-200 p-3">
