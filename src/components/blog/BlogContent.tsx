@@ -22,6 +22,60 @@ function headingInfo(line: string) {
   return null;
 }
 
+function extractYoutubeEmbed(url: string) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes("youtu.be")) {
+      const id = parsed.pathname.split("/").filter(Boolean)[0];
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+    if (parsed.hostname.includes("youtube.com")) {
+      const id = parsed.searchParams.get("v");
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function isHttpUrl(value: string) {
+  return /^https?:\/\//i.test(value);
+}
+
+function renderAutoEmbed(url: string, key: number) {
+  const yt = extractYoutubeEmbed(url);
+  if (yt) {
+    return (
+      <div key={key} className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+        <div className="aspect-video w-full">
+          <iframe src={yt} className="h-full w-full" title="Video embebido" allowFullScreen loading="lazy" />
+        </div>
+      </div>
+    );
+  }
+
+  if (url.toLowerCase().endsWith(".pdf")) {
+    return (
+      <div key={key} className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+        <iframe src={url} className="h-[540px] w-full" title="Documento PDF" loading="lazy" />
+      </div>
+    );
+  }
+
+  return (
+    <a
+      key={key}
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="mt-6 block rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 hover:bg-slate-100"
+    >
+      Enlace externo: {url}
+    </a>
+  );
+}
+
 function renderBlock(block: string, index: number) {
   const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
   if (lines.length === 0) return null;
@@ -69,6 +123,10 @@ function renderBlock(block: string, index: number) {
         {alt ? <figcaption className="px-4 py-2 text-xs text-slate-500">{alt}</figcaption> : null}
       </figure>
     );
+  }
+
+  if (lines.length === 1 && isHttpUrl(first)) {
+    return renderAutoEmbed(first, index);
   }
 
   return (

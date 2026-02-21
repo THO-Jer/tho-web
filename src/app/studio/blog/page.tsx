@@ -50,6 +50,15 @@ const EMPTY_FORM: FormState = {
 
 const DRAFT_KEY_PREFIX = "blog_studio_draft";
 
+function cleanWords(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[#>*`\-\[\]()!.,:;"']/g, " ")
+    .split(/\s+/)
+    .map((item) => item.trim())
+    .filter((item) => item.length > 2);
+}
+
 export default function BlogStudioPage() {
   const [token, setToken] = useState("");
   const [email, setEmail] = useState("");
@@ -98,16 +107,35 @@ export default function BlogStudioPage() {
     localStorage.setItem(draftKey, JSON.stringify(form));
   }, [authenticated, draftKey, form]);
 
-  const contentWords = useMemo(() => {
-    return form.content
-      .replace(/[#>*`\-\[\]()!]/g, " ")
-      .split(/\s+/)
-      .map((word) => word.trim())
-      .filter(Boolean).length;
-  }, [form.content]);
-
+  const contentWords = useMemo(() => cleanWords(form.content).length, [form.content]);
   const smartMinutes = useMemo(() => Math.max(1, Math.ceil(contentWords / 200)), [contentWords]);
   const toc = useMemo(() => getToc(form.content), [form.content]);
+
+  const readability = useMemo(() => {
+    if (contentWords < 120) return "Muy corto: agrega más contexto para SEO y comprensión.";
+    if (contentWords < 350) return "Bien para lectura rápida. Puedes sumar un caso o ejemplo.";
+    if (contentWords < 900) return "Buen largo para una entrada sólida.";
+    return "Entrada extensa: revisa subtítulos y párrafos para mantener claridad.";
+  }, [contentWords]);
+
+  const internalSuggestions = useMemo(() => {
+    const currentTags = form.tags.split(",").map((tag) => tag.trim().toLowerCase()).filter(Boolean);
+    const currentWords = new Set(cleanWords(`${form.title} ${form.excerpt} ${form.content}`).slice(0, 120));
+
+    return posts
+      .filter((post) => post.slug !== editingSlug)
+      .map((post) => {
+        const postTags = post.tags.map((tag) => tag.toLowerCase());
+        const tagMatches = postTags.filter((tag) => currentTags.includes(tag)).length;
+        const postWords = cleanWords(`${post.title} ${post.excerpt}`);
+        const wordMatches = postWords.filter((word) => currentWords.has(word)).length;
+        const score = tagMatches * 3 + wordMatches;
+        return { post, score };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 4);
+  }, [posts, form, editingSlug]);
 
   const canSubmit = useMemo(() => Boolean(authenticated && form.title && form.excerpt && form.content), [authenticated, form]);
 
@@ -194,20 +222,27 @@ export default function BlogStudioPage() {
     setForm((prev) => ({ ...prev, minutes: String(smartMinutes) }));
   }
 
-  function insertTemplate(type: "h2" | "h3" | "quote" | "divider" | "image") {
+  function insertTemplate(type: "h2" | "h3" | "quote" | "divider" | "image" | "youtube" | "pdf") {
     const snippets: Record<typeof type, string> = {
       h2: "\n\n## Nuevo subtítulo\n\n",
       h3: "\n\n### Sub-sección\n\n",
       quote: "\n\n> Cita destacada\n\n",
       divider: "\n\n---\n\n",
       image: "\n\n![Texto alternativo](/uploads/blog/tu-imagen.jpg)\n\n",
+      youtube: "\n\nhttps://www.youtube.com/watch?v=VIDEO_ID\n\n",
+      pdf: "\n\nhttps://tu-dominio.com/archivo.pdf\n\n",
     };
     setForm((prev) => ({ ...prev, content: `${prev.content}${snippets[type]}` }));
   }
 
-  async function onUpload(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file || !token) return;
+  function insertInternalLink(post: BlogPost) {
+    const snippet = `\n\n[Leer también: ${post.title}](/blog/${post.slug})\n\n`;
+    setForm((prev) => ({ ...prev, content: `${prev.content}${snippet}` }));
+    setMessage(`Link interno insertado: /blog/${post.slug}`);
+  }
+
+  async function uploadImage(file: File, mode: "cover" | "inline") {
+    if (!token) return;
     setLoading(true);
     setMessage("");
     try {
@@ -221,18 +256,32 @@ export default function BlogStudioPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo subir la imagen");
+
       setForm((prev) => ({
         ...prev,
-        coverImage: prev.coverImage || data.url,
-        content: `${prev.content}\n\n![${file.name}](${data.url})\n\n`,
+        coverImage: mode === "cover" ? data.url : prev.coverImage || data.url,
+        coverImageAlt: mode === "cover" && !prev.coverImageAlt ? file.name : prev.coverImageAlt,
+        content: mode === "inline" ? `${prev.content}\n\n![${file.name}](${data.url})\n\n` : prev.content,
       }));
-      setMessage(`Imagen subida: ${data.url}`);
+
+      setMessage(mode === "cover" ? `Portada subida: ${data.url}` : `Imagen insertada: ${data.url}`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error al subir imagen");
     } finally {
       setLoading(false);
-      e.target.value = "";
     }
+  }
+
+  async function onUploadCover(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) await uploadImage(file, "cover");
+    e.target.value = "";
+  }
+
+  async function onUploadInline(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) await uploadImage(file, "inline");
+    e.target.value = "";
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -306,7 +355,7 @@ export default function BlogStudioPage() {
     <main className="min-h-screen bg-tho-bg px-4 py-10">
       <div className="mx-auto max-w-7xl">
         <h1 className="font-tho-title text-5xl text-slate-950">Studio Blog</h1>
-        <p className="mt-2 text-sm text-slate-600">Editor nativo con preview en vivo, checklist editorial y auto-guardado local.</p>
+        <p className="mt-2 text-sm text-slate-600">Editor interno con lenguaje simple: escribe, previsualiza, inserta medios y mejora SEO en el mismo flujo.</p>
 
         <div className="mt-6 flex flex-wrap items-end gap-3 rounded-2xl border border-slate-200 bg-white p-4">
           <label className="min-w-[220px] grow text-sm">
@@ -343,13 +392,15 @@ export default function BlogStudioPage() {
                 <button type="button" onClick={() => insertTemplate("quote")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cita</button>
                 <button type="button" onClick={() => insertTemplate("divider")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Separador</button>
                 <button type="button" onClick={() => insertTemplate("image")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen</button>
+                <button type="button" onClick={() => insertTemplate("youtube")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">YouTube</button>
+                <button type="button" onClick={() => insertTemplate("pdf")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">PDF</button>
               </div>
 
               <div className="mt-4 grid gap-3">
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Slug (opcional)" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
-                <textarea className="min-h-20 rounded-lg border border-slate-300 px-3 py-2" placeholder="Extracto" value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} />
-                <textarea className="min-h-56 rounded-lg border border-slate-300 px-3 py-2" placeholder="Contenido (markdown enriquecido)" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
+                <textarea className="min-h-20 rounded-lg border border-slate-300 px-3 py-2" placeholder="Extracto (resumen simple)" value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} />
+                <textarea className="min-h-56 rounded-lg border border-slate-300 px-3 py-2" placeholder="Contenido del artículo" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
 
                 <div className="grid gap-3 md:grid-cols-2">
                   <div className="space-y-1">
@@ -363,10 +414,15 @@ export default function BlogStudioPage() {
                 </div>
 
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Imagen principal URL" value={form.coverImage} onChange={(e) => setForm({ ...form, coverImage: e.target.value })} />
-                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Alt imagen principal" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
-                <label className="text-xs text-slate-600">Subir imagen (jpg/png/webp)
-                  <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUpload} />
-                </label>
+                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Texto alternativo de portada" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <label className="text-xs text-slate-600">Subir portada
+                    <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUploadCover} />
+                  </label>
+                  <label className="text-xs text-slate-600">Subir imagen dentro del artículo
+                    <input type="file" accept="image/png,image/jpeg,image/webp" className="mt-1 block w-full text-xs" onChange={onUploadInline} />
+                  </label>
+                </div>
 
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="SEO title" value={form.seoTitle} onChange={(e) => setForm({ ...form, seoTitle: e.target.value })} />
@@ -398,14 +454,33 @@ export default function BlogStudioPage() {
               <h2 className="text-xl font-semibold text-slate-900">Checklist editorial</h2>
               <ul className="mt-3 space-y-2 text-sm">
                 <li>{form.title ? "✅" : "⚠️"} Título definido</li>
-                <li>{form.excerpt.length > 80 ? "✅" : "⚠️"} Extracto con contexto (&gt;80 chars)</li>
+                <li>{form.excerpt.length > 80 ? "✅" : "⚠️"} Extracto claro (&gt;80 caracteres)</li>
                 <li>{form.coverImage ? "✅" : "⚠️"} Imagen principal</li>
                 <li>{form.seoTitle ? "✅" : "⚠️"} SEO title</li>
                 <li>{form.seoDescription ? "✅" : "⚠️"} SEO description</li>
-                <li>{toc.length ? "✅" : "⚠️"} Estructura con H2/H3 para índice</li>
+                <li>{toc.length ? "✅" : "⚠️"} Secciones para índice (H2/H3)</li>
               </ul>
               <div className="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
                 Palabras: <strong>{contentWords}</strong> · Lectura sugerida: <strong>{smartMinutes} min</strong> · Secciones índice: <strong>{toc.length}</strong>
+                <div className="mt-2">{readability}</div>
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-slate-200 bg-white p-5">
+              <h2 className="text-xl font-semibold text-slate-900">Sugerencias de links internos</h2>
+              <p className="mt-1 text-xs text-slate-500">Basado en tags y tema del contenido actual.</p>
+              <div className="mt-3 grid gap-2">
+                {internalSuggestions.map(({ post, score }) => (
+                  <div key={post.slug} className="rounded-lg border border-slate-200 p-3">
+                    <div className="text-xs text-slate-500">Relevancia: {score}</div>
+                    <div className="text-sm font-semibold text-slate-900">{post.title}</div>
+                    <div className="mt-2 flex gap-2">
+                      <button type="button" className="rounded-md border border-slate-300 px-2.5 py-1 text-xs" onClick={() => insertInternalLink(post)}>Insertar link</button>
+                      <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 px-2.5 py-1 text-xs">Ver</a>
+                    </div>
+                  </div>
+                ))}
+                {!internalSuggestions.length ? <p className="text-sm text-slate-500">Sin sugerencias aún. Agrega más texto o tags.</p> : null}
               </div>
             </section>
 
