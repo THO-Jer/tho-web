@@ -52,6 +52,22 @@ const EMPTY_FORM: FormState = {
 
 const DRAFT_KEY_PREFIX = "blog_studio_draft";
 
+function toFormState(post: BlogPost): FormState {
+  return {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    minutes: String(post.minutes),
+    tags: post.tags.join(", "),
+    status: post.status,
+    coverImage: post.coverImage ?? "",
+    coverImageAlt: post.coverImageAlt ?? "",
+    seoTitle: post.seoTitle ?? "",
+    seoDescription: post.seoDescription ?? "",
+  };
+}
+
 function cleanWords(value: string) {
   return value
     .toLowerCase()
@@ -167,24 +183,16 @@ export default function BlogStudioPage() {
   useEffect(() => {
     if (!selectedSlug || !posts.length) return;
     const selected = posts.find((post) => post.slug === selectedSlug);
-    if (selected) fillForm(selected);
+    if (selected) {
+      fillForm(selected);
+      return;
+    }
+    setMessage(`No se encontró la entrada ${selectedSlug}.`);
   }, [selectedSlug, posts]);
 
   function fillForm(post: BlogPost) {
     setEditingSlug(post.slug);
-    setForm({
-      slug: post.slug,
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      minutes: String(post.minutes),
-      tags: post.tags.join(", "),
-      status: post.status,
-      coverImage: post.coverImage ?? "",
-      coverImageAlt: post.coverImageAlt ?? "",
-      seoTitle: post.seoTitle ?? "",
-      seoDescription: post.seoDescription ?? "",
-    });
+    setForm(toFormState(post));
   }
 
   function resetForm() {
@@ -260,6 +268,10 @@ export default function BlogStudioPage() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!canSubmit) return;
+    if (selectedSlug && !editingSlug) {
+      setMessage("Todavía estamos cargando la entrada. Intenta guardar nuevamente en unos segundos.");
+      return;
+    }
 
     const payload = {
       slug: form.slug,
@@ -289,9 +301,17 @@ export default function BlogStudioPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Error guardando");
+      if (data.post) {
+        setEditingSlug(data.post.slug);
+        setForm(toFormState(data.post as BlogPost));
+        if (typeof window !== "undefined") {
+          const nextUrl = `/studio/blog/editor?slug=${encodeURIComponent(data.post.slug as string)}`;
+          window.history.replaceState({}, document.title, nextUrl);
+        }
+      }
       await fetchPosts();
       setMessage(editingSlug ? "Post actualizado." : "Post creado.");
-      if (!editingSlug) resetForm();
+      if (!editingSlug && !data.post) resetForm();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error guardando.");
     } finally {
