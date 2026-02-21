@@ -7,6 +7,41 @@ import { isAdminAuthorized } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
+const IMAGE_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
+
+async function listImagesFromDir(rootDir: string, publicPrefix: string) {
+  try {
+    const entries = await fs.readdir(rootDir, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile())
+      .filter((entry) => IMAGE_EXT.has(path.extname(entry.name).toLowerCase()))
+      .map((entry) => `${publicPrefix}/${entry.name}`);
+  } catch {
+    return [] as string[];
+  }
+}
+
+export async function GET(req: NextRequest) {
+  if (!(await isAdminAuthorized(req))) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  if (req.nextUrl.searchParams.get("list") !== "1") {
+    return NextResponse.json({ error: "Parámetro list=1 requerido" }, { status: 400 });
+  }
+
+  const publicDir = path.join(process.cwd(), "public");
+  const uploadsDir = path.join(publicDir, "uploads", "blog");
+  const heroDir = path.join(publicDir, "hero");
+
+  const [uploads, hero] = await Promise.all([
+    listImagesFromDir(uploadsDir, "/uploads/blog"),
+    listImagesFromDir(heroDir, "/hero"),
+  ]);
+
+  return NextResponse.json({ images: [...hero, ...uploads] });
+}
+
 export async function POST(req: NextRequest) {
   if (!(await isAdminAuthorized(req))) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
