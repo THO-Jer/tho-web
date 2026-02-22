@@ -74,64 +74,10 @@ export default async function HomePage() {
       <div className="mx-auto mt-6 mb-2 h-[6px] w-36 rounded-sm brand-block-divider" aria-hidden />
 
       <Section
-        id="experiencia"
-        tone="soft"
-        title="Se ve serio porque lo es"
-        subtitle="Trabajamos con equipos que no pueden fallar: decisiones con costo reputacional, social y financiero. Aportamos método, claridad y ejecución."
-      >
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
-            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Enfoque</div>
-            <p className="mt-2 text-sm text-slate-700">
-              Viabilidad primero: lo que proponemos debe funcionar con tu estructura, tu presión y tu contexto.
-            </p>
-          </div>
-          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
-            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Terreno</div>
-            <p className="mt-2 text-sm text-slate-700">
-              No asesoramos desde una planilla: leemos el sistema real, con actores reales, y con tiempos reales.
-            </p>
-          </div>
-          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
-            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Transferencia</div>
-            <p className="mt-2 text-sm text-slate-700">
-              Dejamos capacidades instaladas: herramientas, criterios y gobernanza para sostener el avance.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-10 rounded-[2.2rem] bg-white p-6 ring-1 ring-slate-200/70">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Señales de rigor</div>
-              <p className="mt-1 text-sm text-slate-700">
-                Documentación clara, trazabilidad y entregables que se pueden defender en comité.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "Matriz de riesgos",
-                "Mapa de actores",
-                "Hoja de ruta",
-                "Gobernanza & KPIs",
-              ].map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full bg-slate-950/5 px-3 py-1 text-xs font-semibold text-slate-700"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Section>
-
-      <Section
         id="servicios"
         tone="soft"
         title="Nuestros servicios"
-        subtitle="Tres líneas estratégicas para resolver problemas críticos. Entra al servicio que más te duele hoy y escala desde ahí."
+        subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas. Estamos preparados para agregar valor a tu organización sea que trabajemos una línea o integrando diferentes servicios."
       >
         <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
           {SERVICES.map((service) => {
@@ -149,7 +95,7 @@ export default async function HomePage() {
                   <span className={`h-2 w-2 rounded-full ${meta.accentDot}`} />
                   {service.menuLabel}
                 </div>
-                <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.2rem]">{service.navLabel}</h3>
+                <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.2rem]">{service.slug === "sostenibilidad-corporativa" ? "Hacia la reportabilidad integrada" : service.slug === "relacionamiento-comunitario" ? "Comunidades comprometidas" : "Una organización efectiva"}</h3>
                 <p className="mt-2 text-sm text-slate-800">{service.problem}</p>
                 <ul className="mt-4 grid gap-2 text-sm text-slate-800">
                   {service.teaser.map((item) => (
@@ -163,7 +109,7 @@ export default async function HomePage() {
                   href={`/servicios/${service.slug}`}
                   className="btn-unified-motion btn-brand-neutral mt-6 inline-flex rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-bold text-slate-900"
                 >
-                  Ver detalle del servicio
+                  Conoce los niveles
                 </a>
               </article>
             );
