@@ -30,10 +30,10 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-20 md:py-32">
+        <div className="relative mx-auto max-w-6xl px-4 py-24 md:py-36">
           <div className="flex justify-end">
           <div className="max-w-2xl text-right">
-            <div className="mt-20 text-xs uppercase tracking-wide text-white/75 md:mt-32">
+            <div className="mt-24 text-xs uppercase tracking-wide text-white/75 md:mt-40">
               Consultoría estratégica · Concepción
             </div>
             <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
@@ -73,6 +73,7 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <div className="mx-auto mt-6 mb-2 h-[6px] w-36 rounded-sm brand-block-divider" aria-hidden />
 
       <Section
         id="experiencia"
