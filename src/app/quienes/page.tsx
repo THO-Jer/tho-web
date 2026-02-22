@@ -1,17 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 
 const BACKGROUND_IMAGES = ["/accion/03.png", "/accion/06.png", "/accion/09.png", "/accion/11.png"] as const;
 
+const GHOST_ILLUSTRATIONS = [
+  "/ilustraciones/2.png",
+  "/ilustraciones/5.png",
+  "/ilustraciones/8.png",
+  "/ilustraciones/10.png",
+] as const;
+
 const IDENTITY_VALUES = [
   {
     key: "humanidad",
     title: "Humanidad",
     color: "text-tho-pink",
+    icon: "/brand/H_valor.svg",
     description:
       "Reconocemos que toda organización es un entramado de historias, expectativas y tensiones humanas. Diseñamos desde esa comprensión.",
   },
@@ -19,6 +27,7 @@ const IDENTITY_VALUES = [
     key: "colaboracion",
     title: "Colaboración",
     color: "text-tho-orange",
+    icon: "/brand/O_valor.svg",
     description:
       "Creemos que las soluciones impuestas duran poco. Las soluciones construidas en conjunto transforman.",
   },
@@ -26,26 +35,13 @@ const IDENTITY_VALUES = [
     key: "adaptabilidad",
     title: "Adaptabilidad",
     color: "text-tho-green",
+    icon: "/brand/T_valor.svg",
     description:
       "El entorno cambia. Las organizaciones cambian. Las comunidades cambian. Ajustar no es debilidad; es resiliencia estratégica.",
   },
 ] as const;
 
-function normalizeIndex(angle: number) {
-  const idx = ((Math.round(-angle / 120) % 3) + 3) % 3;
-  return idx;
-}
-
-function splitFromPointer(clientX: number, rect: DOMRect) {
-  const raw = ((clientX - rect.left) / rect.width) * 100;
-  return Math.max(14, Math.min(86, raw));
-}
-
 export default function QuienesPage() {
-  const [thesisSplit, setThesisSplit] = useState(50);
-  const [cubeAngle, setCubeAngle] = useState(0);
-  const [activeValue, setActiveValue] = useState(0);
-  const [dragState, setDragState] = useState<{ startX: number; startAngle: number } | null>(null);
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -80,8 +76,6 @@ export default function QuienesPage() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const selectedValue = useMemo(() => IDENTITY_VALUES[activeValue], [activeValue]);
 
   return (
     <div className="min-h-screen bg-tho-bg">
@@ -119,6 +113,15 @@ export default function QuienesPage() {
             ))}
           </div>
 
+          <div className="pointer-events-none absolute inset-0">
+            {GHOST_ILLUSTRATIONS.map((imagePath, idx) => (
+              <figure key={imagePath} className={`quienes-ghost quienes-ghost-${idx + 1}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imagePath} alt="" className="h-full w-full object-contain" />
+              </figure>
+            ))}
+          </div>
+
           <div className="relative z-10">
             <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
               <div data-reveal>
@@ -131,19 +134,19 @@ export default function QuienesPage() {
             </section>
 
             <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
-              <div className="md:mr-[6%] md:ml-auto p-3 text-right md:max-w-[64%] md:p-0">
+              <div className="mx-auto max-w-[48rem] p-3 md:p-0">
                 <p className="text-justify text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
                 <p className="mt-6 text-[1.02rem] text-slate-700">Cada integrante de THO aporta experiencia previa en:</p>
-                <ul className="mt-3 ml-auto grid max-w-[31rem] gap-2 text-left text-[1.02rem] text-slate-700">
+                <ul className="mt-3 grid max-w-[34rem] gap-2 text-left text-[1.02rem] text-slate-700">
                   <li>• Diagnóstico e intervención organizacional</li>
                   <li>• Diseño de procesos participativos</li>
                   <li>• Análisis de impacto social</li>
                   <li>• Gestión estratégica en entornos complejos</li>
                 </ul>
-                <p className="mt-6 text-justify text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
+                <p className="mt-6 max-w-[44rem] text-justify text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
                   En The Human Org reconocemos estas trayectorias y sabemos que la expertise que cada uno trae profundiza
                   el propósito de la consultora.
                 </p>
@@ -160,47 +163,24 @@ export default function QuienesPage() {
                 comunidades y entorno. Esta mirada integra nuestra misión y visión en una misma dirección estratégica.
               </p>
 
-              <div
-                className="identity-block-space splitview skewed mt-10"
-                onMouseMove={(event) => {
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  setThesisSplit(splitFromPointer(event.clientX, rect));
-                }}
-                onTouchMove={(event) => {
-                  const touch = event.touches[0];
-                  if (!touch) return;
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  setThesisSplit(splitFromPointer(touch.clientX, rect));
-                }}
-              >
-                <div className="panel bottom" style={{ clipPath: `inset(0 0 0 ${thesisSplit}%)` }}>
-                  <div className="content">
-                    <div className="description">
-                      <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Visión</h3>
-                      <p className="mt-2 text-xs leading-relaxed text-white md:text-sm">
-                        Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica,
-                        por nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
-                      </p>
-                    </div>
-                  </div>
+              <div className="identity-block-space mx-auto mt-12 grid max-w-5xl gap-8 md:grid-cols-2 md:gap-10">
+                <div className="pr-0 md:pr-8">
+                  <h3 className="text-[1.4rem] font-semibold text-slate-900 md:text-[1.7rem]">Misión</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">
+                    Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante intervenciones
+                    estratégicas técnicamente sólidas y humanamente sostenibles.
+                  </p>
                 </div>
-
-                <div className="panel top" style={{ clipPath: `inset(0 ${100 - thesisSplit}% 0 0)` }}>
-                  <div className="content">
-                    <div className="description">
-                      <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Misión</h3>
-                      <p className="mt-2 text-xs leading-relaxed text-white md:text-sm">
-                        Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante
-                        intervenciones estratégicas técnicamente sólidas y humanamente sostenibles.
-                      </p>
-                    </div>
-                  </div>
+                <div className="border-l border-slate-200 pl-6 md:pl-10">
+                  <h3 className="text-[1.4rem] font-semibold text-slate-900 md:text-[1.7rem]">Visión</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">
+                    Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica, por
+                    nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
+                  </p>
                 </div>
-
-                <div className="handle brand-block-divider" style={{ left: `${thesisSplit}%` }} />
               </div>
 
-              <p className="identity-block-space font-tho-title mt-10 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
+              <p className="identity-block-space font-tho-title mt-12 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
                 Nuestra promesa es diseñar
                 <br />
                 soluciones estratégicas y exitosas.
@@ -211,63 +191,17 @@ export default function QuienesPage() {
                 articuladores de sentido y conducta en cada relación, intervención y proceso que acompañamos.
               </p>
 
-              <div className="identity-block-space mt-16 grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]">
-                <div>
-                  <p className="mb-4 text-center text-xs uppercase tracking-[0.14em] text-slate-500">Arrastra o toca para girar</p>
-                  <div className="identity-cube-wrap">
-                    <div
-                      className="identity-cube"
-                      style={{ transform: `rotateX(-12deg) rotateY(${cubeAngle}deg)` }}
-                      onPointerDown={(event) => {
-                        (event.currentTarget as HTMLDivElement).setPointerCapture(event.pointerId);
-                        setDragState({ startX: event.clientX, startAngle: cubeAngle });
-                      }}
-                      onPointerMove={(event) => {
-                        if (!dragState) return;
-                        const delta = event.clientX - dragState.startX;
-                        setCubeAngle(dragState.startAngle + delta * 0.3);
-                      }}
-                      onPointerUp={() => {
-                        const snapped = Math.round(cubeAngle / 120) * 120;
-                        setCubeAngle(snapped);
-                        setActiveValue(normalizeIndex(snapped));
-                        setDragState(null);
-                      }}
-                    >
-                      <div className="identity-cube-face identity-cube-face--humanidad">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/brand/H_valor.svg" alt="" aria-hidden className="h-full w-full object-contain p-4" />
-                      </div>
-                      <div className="identity-cube-face identity-cube-face--colaboracion">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/brand/O_valor.svg" alt="" aria-hidden className="h-full w-full object-contain p-4" />
-                      </div>
-                      <div className="identity-cube-face identity-cube-face--adaptabilidad">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/brand/T_valor.svg" alt="" aria-hidden className="h-full w-full object-contain p-4" />
-                      </div>
+              <div className="identity-block-space mt-14 space-y-10 md:space-y-12">
+                {IDENTITY_VALUES.map((value) => (
+                  <article key={value.key} className="grid gap-5 md:grid-cols-[130px_1fr] md:items-center md:gap-8">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={value.icon} alt="" aria-hidden className="mx-auto h-24 w-24 object-contain md:h-28 md:w-28" />
+                    <div className="md:mr-28 lg:mr-40">
+                      <h3 className={`text-2xl font-semibold ${value.color}`}>{value.title}</h3>
+                      <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">{value.description}</p>
                     </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className={`text-3xl font-semibold ${selectedValue.color}`}>{selectedValue.title}</h3>
-                  <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">{selectedValue.description}</p>
-                  <div className="mt-6 flex gap-2">
-                    {IDENTITY_VALUES.map((item, idx) => (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => {
-                          setActiveValue(idx);
-                          setCubeAngle(-idx * 120);
-                        }}
-                        className={`h-2.5 w-10 rounded-full ${idx === activeValue ? "bg-slate-700" : "bg-slate-300"}`}
-                        aria-label={`Ver valor ${item.title}`}
-                      />
-                    ))}
-                  </div>
-                </div>
+                  </article>
+                ))}
               </div>
             </section>
           </div>
@@ -279,7 +213,7 @@ export default function QuienesPage() {
             src="/brujula.svg"
             alt=""
             aria-hidden
-            className="quienes-compass-bg pointer-events-none absolute right-[-8%] top-[-6%]"
+            className="quienes-compass-bg pointer-events-none absolute right-[-12%] top-[-20%]"
             style={{ transform: `translate3d(0, ${scrollY * 0.045}px, 0)` }}
           />
 
