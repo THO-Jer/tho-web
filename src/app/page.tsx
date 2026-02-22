@@ -30,10 +30,10 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <div className="relative mx-auto max-w-6xl px-4 py-20 md:py-32">
           <div className="flex justify-end">
           <div className="max-w-2xl text-right">
-            <div className="mt-16 text-xs uppercase tracking-wide text-white/75 md:mt-24">
+            <div className="mt-20 text-xs uppercase tracking-wide text-white/75 md:mt-32">
               Consultoría estratégica · Concepción
             </div>
             <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
@@ -57,7 +57,7 @@ export default async function HomePage() {
         </section>
 
       {/* PROBLEMA — editorial integrado al flujo, sin "tarjeta maqueta" */}
-      <section className="hero-transition-panel relative z-30 -mt-10 bg-transparent">
+      <section className="hero-transition-panel relative z-30 mt-20 bg-transparent md:mt-24">
         <div className="mx-auto max-w-5xl px-4 py-12 text-center md:py-16">
           <div className="mx-auto h-px w-24 bg-slate-300/70" />
           <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
