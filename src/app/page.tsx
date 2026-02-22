@@ -7,6 +7,7 @@ import { PILLAR_META } from "@/lib/brand";
 import MethodTimeline from "@/components/MethodTimeline";
 import { ActionGallery } from "@/components/ActionGallery";
 import { ResourcesModal } from "@/components/ResourcesModal";
+import { TrustSlider } from "@/components/TrustSlider";
 import { listPublishedPosts } from "@/lib/blogStore";
 
 export default async function HomePage() {
@@ -166,6 +167,11 @@ export default async function HomePage() {
           <ActionGallery />
         </div>
       </section>
+
+
+      <Section id="confian" title="Confían en nosotros" subtitle="Organizaciones con las que hemos construido procesos estratégicos en sostenibilidad, territorio y desarrollo organizacional.">
+        <TrustSlider />
+      </Section>
 
       <Section id="blog" title="Blog" subtitle="Desde el territorio: análisis y tendencias (placeholder).">
         <div className="grid gap-4 md:grid-cols-3">

@@ -1,0 +1,6 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='320' height='120' viewBox='0 0 320 120'>
+  <rect width='320' height='120' rx='18' fill='#f8fafc'/>
+  <circle cx='52' cy='60' r='28' fill='#1e71b8'/>
+  <path d='M40 70 L52 42 L64 70 Z' fill='#f2b705'/>
+  <text x='92' y='66' font-family='Arial, sans-serif' font-size='26' font-weight='700' fill='#0f172a'>Andes Industrial</text>
+</svg>

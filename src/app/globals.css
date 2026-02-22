@@ -523,6 +523,38 @@ body {
   }
 }
 
+
+.trust-track {
+  animation: trust-marquee 46s linear infinite;
+}
+
+.trust-slider:hover .trust-track {
+  animation-play-state: paused;
+}
+
+.trust-logo-card {
+  filter: grayscale(1) saturate(0.75);
+  opacity: 0.78;
+  transition: filter 0.28s ease, opacity 0.28s ease, transform 0.28s ease;
+}
+
+.trust-logo-card:hover {
+  filter: grayscale(0) saturate(1);
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+@keyframes trust-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-track {
+    animation: none;
+  }
+}
+
 .method-arc-shell {
   background: transparent;
 }
