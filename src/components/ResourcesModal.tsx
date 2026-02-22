@@ -5,17 +5,7 @@ import { useState } from "react";
 import { LeadMagnet } from "@/components/LeadMagnet";
 
 export function ResourcesModal(props?: { autoOpen?: boolean }) {
-  const [open, setOpen] = useState(() => {
-    if (!props?.autoOpen) return false;
-    if (typeof window === "undefined") return false;
-    const key = "tho_resources_modal_seen";
-    const seen = window.sessionStorage.getItem(key);
-    if (!seen) {
-      window.sessionStorage.setItem(key, "1");
-      return true;
-    }
-    return false;
-  });
+  const [open, setOpen] = useState(Boolean(props?.autoOpen));
 
   return (
     <>

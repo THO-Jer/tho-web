@@ -5,6 +5,8 @@ import { useState } from "react";
 export function LeadMagnet() {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
+  const manualPdfUrl = "/downloads/manual-diversidad-v1.pdf";
+  const manualPreviewUrl = `${manualPdfUrl}#page=1&view=FitH`;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -61,7 +63,7 @@ export function LeadMagnet() {
 
       {open ? (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-4xl rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-sm font-semibold">Descarga por email</div>
@@ -75,47 +77,58 @@ export function LeadMagnet() {
               </button>
             </div>
 
-            <form onSubmit={onSubmit} className="mt-4 grid gap-3">
-              <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
-
-              <label className="grid gap-1">
-                <span className="text-xs text-slate-500">Nombre</span>
-                <input
-                  name="name"
-                  required
-                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
+            <div className="mt-4 grid gap-5 md:grid-cols-[1fr_1.1fr]">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Vista previa (página 1)</div>
+                <iframe
+                  src={manualPreviewUrl}
+                  title="Vista previa del Manual de Gestión de la Diversidad"
+                  className="h-[380px] w-full rounded-lg border border-slate-200 bg-white"
                 />
-              </label>
+              </div>
 
-              <label className="grid gap-1">
-                <span className="text-xs text-slate-500">Email</span>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
-                />
-              </label>
+              <form onSubmit={onSubmit} className="grid gap-3">
+                <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
 
-              <label className="grid gap-1">
-                <span className="text-xs text-slate-500">Empresa</span>
-                <input name="company" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              </label>
+                <label className="grid gap-1">
+                  <span className="text-xs text-slate-500">Nombre</span>
+                  <input
+                    name="name"
+                    required
+                    className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
+                  />
+                </label>
 
-              <button
-                disabled={status === "sending"}
-                className="btn-unified-motion btn-brand-neutral mt-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
-              >
-                {status === "sending" ? "Enviando…" : "Enviar"}
-              </button>
+                <label className="grid gap-1">
+                  <span className="text-xs text-slate-500">Email</span>
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
+                  />
+                </label>
 
-              {status === "ok" ? (
-                <p className="text-sm text-slate-600">
-                  Listo. Te llegará el link (por ahora queda registrado y nos llega a hola@tho.cl; activamos envío automático al enchufar proveedor).
-                </p>
-              ) : null}
-              {status === "error" ? <p className="text-sm text-slate-600">Algo falló. Intenta de nuevo.</p> : null}
-            </form>
+                <label className="grid gap-1">
+                  <span className="text-xs text-slate-500">Empresa</span>
+                  <input name="company" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+                </label>
+
+                <button
+                  disabled={status === "sending"}
+                  className="btn-unified-motion btn-brand-neutral mt-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
+                >
+                  {status === "sending" ? "Enviando…" : "Enviar"}
+                </button>
+
+                {status === "ok" ? (
+                  <p className="text-sm text-slate-600">
+                    Listo. Te llegará el link (por ahora queda registrado y nos llega a hola@tho.cl; activamos envío automático al enchufar proveedor).
+                  </p>
+                ) : null}
+                {status === "error" ? <p className="text-sm text-slate-600">Algo falló. Intenta de nuevo.</p> : null}
+              </form>
+            </div>
           </div>
         </div>
       ) : null}
