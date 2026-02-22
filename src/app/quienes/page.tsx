@@ -37,10 +37,11 @@ function normalizeIndex(angle: number) {
 }
 
 export default function QuienesPage() {
-  const [thesisSplit, setThesisSplit] = useState(52);
+  const [thesisSplit, setThesisSplit] = useState(50);
   const [cubeAngle, setCubeAngle] = useState(0);
   const [activeValue, setActiveValue] = useState(0);
   const [dragState, setDragState] = useState<{ startX: number; startAngle: number } | null>(null);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
@@ -58,6 +59,21 @@ export default function QuienesPage() {
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setScrollY(window.scrollY);
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const selectedValue = useMemo(() => IDENTITY_VALUES[activeValue], [activeValue]);
@@ -84,10 +100,14 @@ export default function QuienesPage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden">
+        <section className="relative overflow-hidden pb-10">
           <div className="pointer-events-none absolute inset-0">
             {BACKGROUND_IMAGES.map((imagePath, idx) => (
-              <figure key={imagePath} className={`quienes-bg-image quienes-bg-image-${idx + 1}`}>
+              <figure
+                key={imagePath}
+                className={`quienes-bg-image quienes-bg-image-${idx + 1}`}
+                style={{ transform: `translate3d(0, ${scrollY * (0.03 + idx * 0.012)}px, 0)` }}
+              >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={imagePath} alt="" className="h-full w-full object-cover" />
               </figure>
@@ -105,14 +125,14 @@ export default function QuienesPage() {
               </div>
             </section>
 
-            <section className="mx-auto max-w-6xl px-4 py-5 md:py-9" data-reveal>
-              <div className="ml-auto rounded-3xl border border-slate-200/80 bg-white/80 p-8 text-right backdrop-blur-sm md:max-w-[68%] md:p-11">
-                <p className="text-lg leading-relaxed text-slate-700 md:text-[1.25rem]">
+            <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
+              <div className="ml-auto p-3 text-right md:max-w-[72%] md:p-0">
+                <p className="text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
-                <p className="mt-6 text-base text-slate-700">Cada integrante de THO aporta experiencia previa en:</p>
-                <ul className="mt-3 grid gap-2 text-base text-slate-700">
+                <p className="mt-6 text-[1.02rem] text-slate-700">Cada integrante de THO aporta experiencia previa en:</p>
+                <ul className="mt-3 grid gap-2 text-[1.02rem] text-slate-700">
                   <li>- Diagnóstico e intervención organizacional</li>
                   <li>- Diseño de procesos participativos</li>
                   <li>- Análisis de impacto social</li>
@@ -125,51 +145,62 @@ export default function QuienesPage() {
               </div>
             </section>
 
-            <section className="mx-auto max-w-6xl px-4 py-14 md:py-16" data-reveal>
-              <div className="mission-vision-shell rounded-3xl p-7 md:p-10">
-                <div className="relative overflow-hidden rounded-2xl bg-white/88 p-6 md:p-8">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 bg-[linear-gradient(120deg,#ffffff_0%,#f8fafc_68%,#e2e8f0_100%)]" style={{ width: `${thesisSplit}%` }} />
-                  <div className="pointer-events-none absolute inset-y-0 w-px bg-slate-300" style={{ left: `${thesisSplit}%` }} />
-                  <input
-                    type="range"
-                    min={20}
-                    max={80}
-                    value={thesisSplit}
-                    onChange={(event) => setThesisSplit(Number(event.target.value))}
-                    className="absolute inset-x-6 top-4 z-20 accent-slate-700"
-                    aria-label="Comparar misión y visión"
-                  />
-                  <div className="relative z-10 grid gap-7 pt-6 md:grid-cols-2 md:gap-10">
-                    <article>
-                      <h3 className="text-2xl font-semibold text-slate-900">Misión</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante intervenciones estratégicas técnicamente sólidas y humanamente sostenibles, asegurando que cada proyecto fortalezca tanto a la organización como a su entorno.</p>
-                    </article>
-                    <article>
-                      <h3 className="text-2xl font-semibold text-slate-900">Visión</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica, por nuestro compromiso inquebrantable con la ética, la innovación y la humanización, potenciando así el bienestar de las comunidades y el crecimiento sostenible de las organizaciones que servimos.</p>
-                    </article>
+            <section className="identity-section mx-auto max-w-6xl px-4 py-16 md:py-20" data-reveal>
+              <h2 className="text-center font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.6rem]">Nuestra identidad</h2>
+              <div className="mx-auto mt-5 h-[6px] w-36 rounded-sm brand-block-divider" />
+
+              <div className="identity-block-space splitview skewed mt-12 rounded-3xl">
+                <div className="panel bottom">
+                  <div className="content">
+                    <div className="description">
+                      <h3 className="text-[2rem] font-semibold text-white md:text-[2.4rem]">Visión</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-white/90 md:text-base">
+                        Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica,
+                        por nuestro compromiso inquebrantable con la ética, la innovación y la humanización,
+                        potenciando así el bienestar de las comunidades y el crecimiento sostenible de las organizaciones
+                        que servimos.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </section>
 
-            <section className="mx-auto max-w-6xl px-4 py-8 md:py-12">
-              <div data-reveal>
-                <h2 className="text-center font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">Nuestra identidad</h2>
-                <div className="mx-auto mt-5 h-[6px] w-36 rounded-sm brand-block-divider" />
-                <p className="mx-auto mt-8 max-w-4xl text-center text-lg leading-relaxed text-slate-700 md:text-[1.25rem]">
-                  Transformamos la asesoría estratégica integrando innovación, humanidad y sostenibilidad, asegurando
-                  que las organizaciones no solo alcancen sus objetivos, sino que lo hagan impactando positivamente a sus
-                  comunidades y entorno.
-                </p>
-                <p className="font-tho-title mx-auto mt-4 max-w-4xl text-center text-[1.5rem] text-slate-900 md:text-[2rem]">
-                  Nuestra promesa es diseñar soluciones estratégicas y exitosas.
-                </p>
+                <div className="panel top" style={{ width: `calc(${thesisSplit}% + 1000px)` }}>
+                  <div className="content">
+                    <div className="description">
+                      <h3 className="text-[2rem] font-semibold text-white md:text-[2.4rem]">Misión</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-white/90 md:text-base">
+                        Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante
+                        intervenciones estratégicas técnicamente sólidas y humanamente sostenibles, asegurando que cada
+                        proyecto fortalezca tanto a la organización como a su entorno.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="handle" style={{ left: `${thesisSplit}%` }} />
+                <input
+                  type="range"
+                  min={20}
+                  max={80}
+                  value={thesisSplit}
+                  onChange={(event) => setThesisSplit(Number(event.target.value))}
+                  className="split-range"
+                  aria-label="Comparar misión y visión"
+                />
               </div>
 
-              <div className="mt-10 grid items-center gap-8 md:grid-cols-[0.9fr_1.1fr]" data-reveal>
+              <p className="identity-block-space mx-auto mt-14 max-w-4xl text-center text-lg leading-relaxed text-slate-700 md:text-[1.25rem]">
+                Transformamos la asesoría estratégica integrando innovación, humanidad y sostenibilidad, asegurando que
+                las organizaciones no solo alcancen sus objetivos, sino que lo hagan impactando positivamente a sus
+                comunidades y entorno.
+              </p>
+              <p className="identity-block-space font-tho-title mx-auto mt-5 max-w-4xl text-center text-[1.55rem] text-slate-900 md:text-[2rem]">
+                Nuestra promesa es diseñar soluciones estratégicas y exitosas.
+              </p>
+
+              <div className="identity-block-space mt-16 grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]">
                 <div>
-                  <p className="mb-3 text-center text-xs uppercase tracking-[0.14em] text-slate-500">Arrastra o toca para girar</p>
+                  <p className="mb-4 text-center text-xs uppercase tracking-[0.14em] text-slate-500">Arrastra o toca para girar</p>
                   <div className="identity-cube-wrap">
                     <div
                       className="identity-cube"
@@ -181,7 +212,7 @@ export default function QuienesPage() {
                       onPointerMove={(event) => {
                         if (!dragState) return;
                         const delta = event.clientX - dragState.startX;
-                        setCubeAngle(dragState.startAngle + delta * 0.45);
+                        setCubeAngle(dragState.startAngle + delta * 0.3);
                       }}
                       onPointerUp={() => {
                         const snapped = Math.round(cubeAngle / 120) * 120;
@@ -208,10 +239,9 @@ export default function QuienesPage() {
                   </div>
                 </div>
 
-                <div className="rounded-3xl border border-slate-200/80 bg-white/82 p-7 backdrop-blur-sm">
+                <div>
                   <h3 className={`text-3xl font-semibold ${selectedValue.color}`}>{selectedValue.title}</h3>
                   <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">{selectedValue.description}</p>
-
                   <div className="mt-6 flex gap-2">
                     {IDENTITY_VALUES.map((item, idx) => (
                       <button
@@ -229,51 +259,52 @@ export default function QuienesPage() {
                 </div>
               </div>
             </section>
+          </div>
+        </section>
 
-            <section className="mx-auto max-w-6xl px-4 py-16 md:py-20">
-              <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
-                <div className="max-w-3xl">
-                  <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">Nuestra ética</h2>
-                  <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
-                  <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-700 md:text-lg">
-                    <p>Nuestra ética no es decorativa. Es operativa.</p>
-                    <p>Decimos lo que otros prefieren suavizar.</p>
-                    <p>No maquillamos diagnósticos para incomodar menos.</p>
-                    <p>No sostenemos estrategias que sabemos que no funcionan.</p>
-                    <p>Si trabajamos juntos, lo hacemos con claridad.</p>
-                    <p>
-                      <a href="/etica" className="text-slate-800 underline decoration-slate-400 underline-offset-4 hover:text-slate-950">
-                        → Ver Código de Ética
-                      </a>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex justify-center md:justify-end">
-                  <svg viewBox="0 0 280 280" className="h-[240px] w-[240px]" aria-hidden>
-                    <defs>
-                      <path id="thoCompassTextPath" d="M 140,140 m -88,0 a 88,88 0 1,1 176,0 a 88,88 0 1,1 -176,0" />
-                    </defs>
-                    <circle cx="140" cy="140" r="118" fill="#ff4f3e" opacity="0.96" />
-                    <circle cx="132" cy="132" r="94" fill="#fff" />
-                    <text fill="#ef7f35" fontSize="26" fontWeight="700" letterSpacing="3">
-                      <textPath href="#thoCompassTextPath">COLABORACIÓN • </textPath>
-                    </text>
-                    <text x="132" y="160" textAnchor="middle" fontSize="106" fill="#ff4f3e" fontWeight="800">O</text>
-                  </svg>
-                </div>
+        <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
+          <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
+            <div className="max-w-3xl">
+              <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">Nuestra ética</h2>
+              <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
+              <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-700 md:text-lg">
+                <p>Nuestra ética no es decorativa. Es operativa.</p>
+                <p>Decimos lo que otros prefieren suavizar.</p>
+                <p>No maquillamos diagnósticos para incomodar menos.</p>
+                <p>No sostenemos estrategias que sabemos que no funcionan.</p>
+                <p>Si trabajamos juntos, lo hacemos con claridad.</p>
+                <p>
+                  <a href="/etica" className="text-slate-800 underline decoration-slate-400 underline-offset-4 hover:text-slate-950">
+                    → Ver Código de Ética
+                  </a>
+                </p>
               </div>
-            </section>
+            </div>
 
-            <section className="mx-auto max-w-6xl px-4 pb-20" data-reveal>
-              <div className="md:ml-auto md:max-w-[62%] md:text-right">
-                <p className="text-lg text-slate-800 md:text-xl">Detrás de cada organización hay personas.</p>
-                <p className="mt-2 text-lg text-slate-800 md:text-xl">Detrás de cada conflicto hay estructuras.</p>
-                <p className="mt-2 text-lg text-slate-800 md:text-xl">Detrás de cada estrategia hay decisiones éticas.</p>
-                <p className="mt-6 text-base font-medium text-slate-800 md:text-lg">No trabajamos sobre las organizaciones.</p>
-                <p className="text-base font-medium text-slate-800 md:text-lg">Trabajamos con ellas.</p>
-              </div>
-            </section>
+            <div className="flex justify-center md:justify-end">
+              <svg viewBox="0 0 280 280" className="h-[250px] w-[250px]" aria-hidden>
+                <circle cx="140" cy="140" r="118" fill="#ff4f3e" opacity="0.96" />
+                <circle cx="140" cy="140" r="88" fill="#fff" />
+                <circle cx="140" cy="140" r="70" fill="none" stroke="#ef7f35" strokeWidth="3" strokeDasharray="6 8" />
+                <path d="M140 58 L156 140 L140 222 L124 140 Z" fill="#ff4f3e" opacity="0.9" />
+                <path d="M140 84 L150 140 L140 196 L130 140 Z" fill="#fff" />
+                <circle cx="140" cy="140" r="11" fill="#ff4f3e" />
+                <text x="140" y="33" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">N</text>
+                <text x="247" y="146" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">E</text>
+                <text x="140" y="258" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">S</text>
+                <text x="32" y="146" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">W</text>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-4 pb-28 pt-10 md:pb-36 md:pt-16" data-reveal>
+          <div className="md:ml-auto md:max-w-[62%] md:text-right">
+            <p className="text-lg text-slate-800 md:text-xl">Detrás de cada organización hay personas.</p>
+            <p className="mt-2 text-lg text-slate-800 md:text-xl">Detrás de cada conflicto hay estructuras.</p>
+            <p className="mt-2 text-lg text-slate-800 md:text-xl">Detrás de cada estrategia hay decisiones éticas.</p>
+            <p className="mt-7 text-base font-medium text-slate-800 md:text-lg">No trabajamos sobre las organizaciones.</p>
+            <p className="text-base font-medium text-slate-800 md:text-lg">Trabajamos con ellas.</p>
           </div>
         </section>
       </main>
