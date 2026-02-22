@@ -7,7 +7,7 @@ type Item = { id: number; col: number; src: string };
 const items: Item[] = Array.from({ length: 12 }, (_, i) => ({
   id: i,
   col: Math.floor(i / 4),
-  src: `https://assets.codepen.io/721952/${i}.jpg`,
+  src: `/accion/${String(i + 1).padStart(2, "0")}.png`,
 }));
 
 export function ActionGallery() {
