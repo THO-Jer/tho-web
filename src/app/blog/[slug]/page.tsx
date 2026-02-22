@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BlogContent, getToc } from "@/components/blog/BlogContent";
+import { BlogTocClient } from "@/components/blog/BlogTocClient";
 import { getPublishedPostBySlug, listPublishedPosts } from "@/lib/blogStore";
 
 const SITE = "https://tho-web.vercel.app";
@@ -60,8 +61,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     .filter((item) => item.slug !== post.slug)
     .map((item) => {
       const sharedTags = item.tags.filter((tag) => currentTags.has(tag.toLowerCase())).length;
-      const sameCategory = post.category && item.category && post.category.toLowerCase() === item.category.toLowerCase() ? 2 : 0;
-      const score = sharedTags * 3 + sameCategory;
+      const score = sharedTags * 3;
       return { item, score };
     })
     .sort((a, b) => b.score - a.score)
@@ -95,6 +95,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div className="max-w-3xl">
             <div className="text-xs text-slate-500">{post.minutes} min</div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">{post.title}</h1>
+            <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
             <p className="mt-4 text-slate-600">{post.excerpt}</p>
 
             {post.coverImage ? (
@@ -103,11 +104,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             ) : null}
 
-            {post.category ? (
-              <div className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
-                Categoría: {post.category}
-              </div>
-            ) : null}
 
             {post.tags.length ? (
               <div className="mt-4 flex flex-wrap gap-2">
@@ -130,12 +126,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             {relatedPosts.length ? (
               <section className="mt-10 border-t border-slate-200 pt-6">
                 <h2 className="text-xl font-semibold text-slate-900">También te puede interesar</h2>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="mt-4 flex flex-col gap-3">
                   {relatedPosts.map((related) => (
-                    <Link key={related.slug} href={`/blog/${related.slug}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white">
+                    <Link
+                      key={related.slug}
+                      href={`/blog/${related.slug}`}
+                      className="btn-unified-motion btn-hero-services rounded-xl bg-white p-4 transition"
+                    >
                       <div className="text-xs text-slate-500">{related.minutes} min</div>
-                      <div className="mt-1 text-sm font-semibold text-slate-900">{related.title}</div>
-                      <p className="mt-1 text-xs text-slate-600">{related.excerpt}</p>
+                      <div className="mt-1 text-base font-semibold text-slate-900">{related.title}</div>
+                      <p className="mt-1 text-sm text-slate-600">{related.excerpt}</p>
                     </Link>
                   ))}
                 </div>
@@ -145,18 +145,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {toc.length ? (
             <aside className="hidden lg:block">
-              <div className="sticky top-24 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Índice</div>
-                <ul className="mt-3 space-y-2">
-                  {toc.map((item) => (
-                    <li key={item.id} className={item.level === 3 ? "pl-4" : ""}>
-                      <a href={`#${item.id}`} className="text-sm text-slate-700 hover:text-slate-900">
-                        {item.text}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <BlogTocClient toc={toc} />
             </aside>
           ) : null}
         </div>
