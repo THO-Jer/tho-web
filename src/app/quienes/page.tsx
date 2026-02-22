@@ -235,31 +235,16 @@ export default function QuienesPage() {
                       }}
                     >
                       <div className="identity-cube-face identity-cube-face--humanidad">
-                        <div className="h-shape-grid">
-                          <span>H</span>
-                          <span>D</span>
-                          <span>U A N I A</span>
-                          <span>M</span>
-                          <span>D</span>
-                        </div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/brand/H_valor.svg" alt="" aria-hidden className="h-full w-full object-contain p-4" />
                       </div>
                       <div className="identity-cube-face identity-cube-face--colaboracion">
-                        <svg viewBox="0 0 220 220" className="h-full w-full" aria-hidden>
-                          <defs>
-                            <path id="colabPath" d="M 110,110 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0" />
-                          </defs>
-                          <text fill="white" fontSize="19" fontWeight="700" letterSpacing="2.3">
-                            <textPath href="#colabPath">COLABORACIÓN • COLABORACIÓN • </textPath>
-                          </text>
-                          <text x="110" y="132" textAnchor="middle" fill="white" fontSize="78" fontWeight="800">O</text>
-                        </svg>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/brand/O_valor.svg" alt="" aria-hidden className="h-full w-full object-contain p-4" />
                       </div>
                       <div className="identity-cube-face identity-cube-face--adaptabilidad">
-                        <div className="t-shape-grid">
-                          <span>A D A P T A</span>
-                          <span>B I L I</span>
-                          <span>D A D</span>
-                        </div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/brand/T_valor.svg" alt="" aria-hidden className="h-full w-full object-contain p-4" />
                       </div>
                     </div>
                   </div>
