@@ -57,8 +57,7 @@ export default async function HomePage() {
       {/* PROBLEMA — editorial integrado al flujo, sin "tarjeta maqueta" */}
       <section className="hero-transition-panel relative z-30 mt-20 bg-transparent md:mt-24">
         <div className="mx-auto max-w-5xl px-4 py-12 text-center md:py-16">
-          <div className="mx-auto h-px w-24 bg-slate-300/70" />
-          <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
+                    <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
             Sostenibilidad desintegrada.
             <br />
             Comunidad descontenta.
@@ -107,7 +106,7 @@ export default async function HomePage() {
                 </ul>
                 <a
                   href={`/servicios/${service.slug}`}
-                  className="btn-unified-motion btn-brand-neutral mt-6 inline-flex rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-bold text-slate-900"
+                  className="btn-unified-motion btn-hero-services mt-6 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-slate-900"
                 >
                   Conoce los niveles
                 </a>
@@ -120,32 +119,32 @@ export default async function HomePage() {
       <Section
         id="metodo"
         title="Cómo trabajamos"
-        subtitle="Un método que aguanta auditoría: claridad, puntos de control y foco en viabilidad. Si el caso lo amerita, escalamos sin perder control."
+        subtitle="Nuestro método está diseñado para ser adaptable y entregar valor en un entorno complejo y cambiante, garantizando viabilidad. La consultoría en The Human Org seguirá las siguientes etapas durante el proceso."
       >
         <MethodTimeline
           steps={[
             {
               n: "01",
-              title: "Lectura del sistema",
-              desc: "Mapeamos actores, riesgos, cultura y señales críticas del contexto.",
+              title: "Lectura del Sistema",
+              desc: "Mapeamos fuentes, levantamos datos y desarrollamos diagnósticos que evidencian riesgos, oportunidades y fundamentan el proceso.",
               tone: "com",
             },
             {
               n: "02",
-              title: "Diseño de estrategia",
-              desc: "Definimos decisiones, prioridades y hoja de ruta viable.",
+              title: "Diseño de Estrategia",
+              desc: "Co-diseñamos rutas, actividades, metas e indicadores para que tu organización sepa qué hacer para alcanzar sus objetivos.",
               tone: "esg",
             },
             {
               n: "03",
               title: "Implementación",
-              desc: "Acompañamos ejecución, coordinación y gobernanza en terreno.",
+              desc: "Acompañamos la ejecución de la Estrategia en terreno, ajustando en tiempo real y coordinando soluciones que agregan valor.",
               tone: "do",
             },
             {
               n: "04",
-              title: "Evaluación y aprendizaje",
-              desc: "Medimos resultados, ajustamos y reiniciamos el ciclo con evidencia.",
+              title: "Evaluación y Aprendizaje",
+              desc: "Reportamos resultados para evidenciar logros y desafíos, de manera que permita ajustar la Estrategia e iterar desde la evidencia para el próximo ciclo.",
               tone: "neutral",
             },
           ]}
