@@ -24,65 +24,58 @@ export function Header() {
             <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" priority />
           </div>
           <div className="leading-tight">
-            <div className="text-[12px] font-bold uppercase tracking-wide">The Human Org</div>
+            <div className="text-[12px] font-bold uppercase tracking-wide italic">The Human Org</div>
             <div className="text-[11px] font-bold tracking-wide text-slate-600">Consultoría estratégica · Concepción</div>
           </div>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
           <div className="group relative">
-            <button
-              className="btn-unified-motion btn-brand-accent btn-brand-accent-pink rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700"
-              type="button"
-            >
+            <button className="tho-nav-chip" type="button">
               Servicios
             </button>
-            <div className="pointer-events-none absolute left-0 top-full mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-md transition group-hover:pointer-events-auto group-hover:opacity-100">
-              {SERVICES.map((service) => (
-                <Link
-                  key={service.slug}
-                  href={`/servicios/${service.slug}`}
-                  className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
-                >
-                  {service.menuLabel}
-                </Link>
-              ))}
+            <div className="pointer-events-none absolute left-0 top-full z-30 w-72 pt-2 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+              <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
+                {SERVICES.map((service) => (
+                  <Link
+                    key={service.slug}
+                    href={`/servicios/${service.slug}`}
+                    className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                  >
+                    {service.menuLabel}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
           <div className="group relative">
-            <button
-              className="btn-unified-motion btn-brand-accent btn-brand-accent-orange rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700"
-              type="button"
-            >
+            <button className="tho-nav-chip" type="button">
               Nosotros
             </button>
-            <div className="pointer-events-none absolute left-0 top-full mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 opacity-0 shadow-md transition group-hover:pointer-events-auto group-hover:opacity-100">
-              {ABOUT_MENU.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
-                >
-                  {item.label}
-                </Link>
-              ))}
+            <div className="pointer-events-none absolute left-0 top-full z-30 w-64 pt-2 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+              <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
+                {ABOUT_MENU.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
-          <Link
-            href="/blog"
-            className={`btn-unified-motion btn-brand-accent btn-brand-accent-green rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide transition ${pathname.startsWith("/blog") ? "text-slate-950" : "text-slate-700"}`}
-          >
+          <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950" : "text-slate-700"}`}>
             Blog
           </Link>
         </nav>
 
         <div className="md:hidden flex items-center gap-2">
           <details className="group relative">
-            <summary className="list-none btn-unified-motion btn-brand-accent btn-brand-accent-pink cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700">
-              Servicios
-            </summary>
+            <summary className="list-none tho-nav-chip cursor-pointer">Servicios</summary>
             <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
               {SERVICES.map((service) => (
                 <Link
@@ -97,9 +90,7 @@ export function Header() {
           </details>
 
           <details className="group relative">
-            <summary className="list-none btn-unified-motion btn-brand-accent btn-brand-accent-orange cursor-pointer rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700">
-              Nosotros
-            </summary>
+            <summary className="list-none tho-nav-chip cursor-pointer">Nosotros</summary>
             <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
               {ABOUT_MENU.map((item) => (
                 <Link
