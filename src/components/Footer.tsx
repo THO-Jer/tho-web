@@ -6,9 +6,9 @@ export function Footer() {
     <footer className="border-t border-slate-200 bg-slate-950 text-slate-200">
       <div className="h-1 w-full bg-gradient-to-r from-tho-blue via-tho-pink to-tho-orange" />
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative h-10 w-10">
+        <div className="grid gap-8 md:grid-cols-[1.1fr_1fr_1fr_1fr]">
+          <div className="flex items-start gap-3">
+            <div className="relative mt-0.5 h-10 w-10 shrink-0">
               <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain" />
             </div>
             <div className="text-xs text-slate-300">
@@ -17,28 +17,50 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
-            <Link className="hover:text-white" href="/tickets">
-              Tickets
-            </Link>
-            <Link className="hover:text-white" href="/etica">
-              Código de Ética
-            </Link>
-            <Link className="hover:text-white" href="/quienes">
-              Quiénes somos
-            </Link>
-            <Link className="hover:text-white" href="/nuestra-experiencia">
-              Nuestra experiencia
-            </Link>
-            <Link className="hover:text-white" href="/blog">
-              Blog
-            </Link>
-            <Link className="hover:text-white" href="/studio">
-              Acceso editorial
-            </Link>
-            <a className="hover:text-white" href="mailto:hola@tho.cl">
-              hola@tho.cl
-            </a>
+          <div className="space-y-2 text-xs">
+            <div className="font-bold italic text-slate-100">Nuestros Servicios</div>
+            <div className="flex flex-col gap-1.5">
+              <Link className="hover:text-white" href="/servicios/sostenibilidad-corporativa">
+                Sostenibilidad Corporativa
+              </Link>
+              <Link className="hover:text-white" href="/servicios/relacionamiento-comunitario">
+                Relacionamiento Comunitario
+              </Link>
+              <Link className="hover:text-white" href="/servicios/desarrollo-organizacional">
+                Desarrollo Organizacional
+              </Link>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-xs">
+            <div className="font-bold italic text-slate-100">Nosotros</div>
+            <div className="flex flex-col gap-1.5">
+              <Link className="hover:text-white" href="/quienes">
+                Quiénes somos
+              </Link>
+              <Link className="hover:text-white" href="/etica">
+                Código de Ética
+              </Link>
+              <Link className="hover:text-white" href="/nuestra-experiencia">
+                Nuestra experiencia
+              </Link>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-xs">
+            <div aria-hidden className="h-4" />
+            <div className="flex flex-col gap-1.5">
+              <Link className="hover:text-white" href="/blog">
+                Blog
+              </Link>
+              <a className="hover:text-white" href="mailto:hola@tho.cl">
+                Contacto
+              </a>
+              <div aria-hidden className="h-4" />
+              <Link className="hover:text-white" href="/studio">
+                Interno
+              </Link>
+            </div>
           </div>
         </div>
 

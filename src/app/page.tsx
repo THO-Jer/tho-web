@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Section } from "@/components/Section";
@@ -77,7 +78,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="mx-auto mt-6 mb-2 h-[6px] w-36 rounded-sm brand-block-divider" aria-hidden />
+      <div className="mx-auto h-[6px] w-36 rounded-sm brand-block-divider" aria-hidden />
 
       <Section
         id="servicios"
@@ -177,38 +178,46 @@ export default async function HomePage() {
 
       <Section id="confian" title="Confían en nosotros">
         <TrustSlider />
+        <div className="mx-auto mt-10 h-[6px] w-36 rounded-sm brand-block-divider md:mt-12" aria-hidden />
       </Section>
 
-      <div className="mx-auto mt-2 mb-2 h-[6px] w-36 rounded-sm bg-white brand-block-divider" aria-hidden />
-
       <Section id="blog" title="Blog" subtitle="Análisis y reflexiones desde el terreno. Exploramos las tendencias que definen el presente y futuro de la estrategia organizacional y territorial.">
-        <div className="grid gap-4 md:grid-cols-3">
-          {posts.slice(0, 3).map((p) => (
-            <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
-              <div className="blog-card-inner relative h-full w-full">
-                <div
-                  className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-                  style={{
-                    backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.96) 100%), url(${p.coverImage || "/hero/4.png"})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
-                >
-                  <div className="text-xs text-slate-500">{p.minutes} min</div>
-                  <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
-                  <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
-                </div>
-                <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <a
-                    href={`/blog/${p.slug}`}
-                    className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
+        <div className="grid items-start gap-6 md:grid-cols-[250px_1fr] md:gap-8">
+          <Link
+            href="/blog"
+            className="btn-unified-motion btn-hero-services inline-flex w-fit rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
+          >
+            Ver todas las publicaciones
+          </Link>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            {posts.slice(0, 3).map((p) => (
+              <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
+                <div className="blog-card-inner relative h-full w-full">
+                  <div
+                    className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                    style={{
+                      backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.96) 100%), url(${p.coverImage || "/hero/4.png"})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
                   >
-                    Leer +
-                  </a>
+                    <div className="text-xs text-slate-500">{p.minutes} min</div>
+                    <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
+                    <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
+                  </div>
+                  <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <a
+                      href={`/blog/${p.slug}`}
+                      className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
+                    >
+                      Leer +
+                    </a>
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            ))}
+          </div>
         </div>
       </Section>
 
@@ -230,7 +239,7 @@ export default async function HomePage() {
               </a>
               <a
                 href="mailto:hola@tho.cl"
-                className="btn-unified-motion btn-brand-neutral inline-flex items-center justify-center rounded-2xl border border-black/60 bg-white/5 px-5 py-3 text-sm font-medium text-white"
+                className="btn-unified-motion btn-hero-services inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
               >
                 Escribir por mail
               </a>

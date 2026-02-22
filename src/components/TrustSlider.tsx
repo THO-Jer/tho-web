@@ -1,14 +1,15 @@
 import Image from "next/image";
 
 const logos = [
-  { src: "/confian/andes-industrial.svg", alt: "Andes Industrial" },
-  { src: "/confian/puerto-sur.svg", alt: "Puerto Sur" },
-  { src: "/confian/biobosque.svg", alt: "Biobosque" },
-  { src: "/confian/energia-pacifico.svg", alt: "Energía Pacífico" },
-  { src: "/confian/red-salud-sur.svg", alt: "Red Salud Sur" },
-  { src: "/confian/valle-limpio.svg", alt: "Valle Limpio" },
-  { src: "/confian/consorcio-austral.svg", alt: "Consorcio Austral" },
-  { src: "/confian/agroruta.svg", alt: "Agroruta" },
+  { src: "/confian/1.svg", alt: "Organización cliente 1" },
+  { src: "/confian/2.svg", alt: "Organización cliente 2" },
+  { src: "/confian/3.svg", alt: "Organización cliente 3" },
+  { src: "/confian/4.svg", alt: "Organización cliente 4" },
+  { src: "/confian/5.svg", alt: "Organización cliente 5" },
+  { src: "/confian/6.svg", alt: "Organización cliente 6" },
+  { src: "/confian/7.svg", alt: "Organización cliente 7" },
+  { src: "/confian/8.svg", alt: "Organización cliente 8" },
+  { src: "/confian/9.svg", alt: "Organización cliente 9" },
 ];
 
 export function TrustSlider() {
@@ -16,7 +17,7 @@ export function TrustSlider() {
 
   return (
     <div className="trust-slider overflow-hidden py-5">
-      <div className="trust-track flex w-max items-center gap-4 px-4 md:gap-6 md:px-6">
+      <div className="trust-track flex w-max items-center gap-2 px-3 md:gap-3 md:px-4">
         {marquee.map((logo, idx) => (
           <div key={`${logo.src}-${idx}`} className="trust-logo-slot relative h-[74px] w-[190px] shrink-0 md:h-[84px] md:w-[220px]">
             <Image src={logo.src} alt={logo.alt} fill className="trust-logo-card object-contain" />
