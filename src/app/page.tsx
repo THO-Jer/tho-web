@@ -19,14 +19,16 @@ export default async function HomePage() {
       <main id="contenido">
         <ResourcesModal autoOpen />
         {/* HERO — imagen de fondo (atenuada) + texto encima */}
-        <section className="relative overflow-visible bg-slate-950 text-white">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/hero/hands.png"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.72]"
-        />
-        <div className="pointer-events-none absolute inset-x-0 -bottom-24 top-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
+        <section className="relative overflow-visible text-white">
+        <div className="hero-media-fade pointer-events-none absolute inset-x-0 -bottom-28 top-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hero/hands.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.75]"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
+        </div>
 
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="flex justify-end">

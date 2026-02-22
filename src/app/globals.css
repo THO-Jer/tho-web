@@ -299,6 +299,12 @@ body {
   border-color: rgba(209,60,162,0.5);
 }
 
+.hero-media-fade {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 66%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 66%, transparent 100%);
+}
+
+
 .hero-transition-panel {
   color: #0f172a;
 }
