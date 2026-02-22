@@ -1,51 +1,37 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 
-const BACKGROUND_IMAGES = ["/accion/03.png", "/accion/06.png", "/accion/09.png", "/accion/11.png"] as const;
+const BACKGROUND_IMAGES = ["/ilustraciones/2.png", "/ilustraciones/6.png", "/ilustraciones/9.png", "/ilustraciones/12.png"] as const;
 
 const IDENTITY_VALUES = [
   {
+    key: "adaptabilidad",
+    title: "Adaptabilidad",
+    image: "/brand/T_valor.png",
+    description:
+      "El entorno cambia. Las organizaciones cambian. Las comunidades cambian. Ajustar no es debilidad; es resiliencia estratégica.",
+  },
+  {
     key: "humanidad",
     title: "Humanidad",
-    color: "text-tho-pink",
+    image: "/brand/H_valor.png",
     description:
       "Reconocemos que toda organización es un entramado de historias, expectativas y tensiones humanas. Diseñamos desde esa comprensión.",
   },
   {
     key: "colaboracion",
     title: "Colaboración",
-    color: "text-tho-orange",
+    image: "/brand/O_valor.png",
     description:
       "Creemos que las soluciones impuestas duran poco. Las soluciones construidas en conjunto transforman.",
   },
-  {
-    key: "adaptabilidad",
-    title: "Adaptabilidad",
-    color: "text-tho-green",
-    description:
-      "El entorno cambia. Las organizaciones cambian. Las comunidades cambian. Ajustar no es debilidad; es resiliencia estratégica.",
-  },
 ] as const;
 
-function normalizeIndex(angle: number) {
-  const idx = ((Math.round(-angle / 120) % 3) + 3) % 3;
-  return idx;
-}
-
-function splitFromPointer(clientX: number, rect: DOMRect) {
-  const raw = ((clientX - rect.left) / rect.width) * 100;
-  return Math.max(14, Math.min(86, raw));
-}
-
 export default function QuienesPage() {
-  const [thesisSplit, setThesisSplit] = useState(50);
-  const [cubeAngle, setCubeAngle] = useState(0);
-  const [activeValue, setActiveValue] = useState(0);
-  const [dragState, setDragState] = useState<{ startX: number; startAngle: number } | null>(null);
   const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
@@ -81,7 +67,6 @@ export default function QuienesPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const selectedValue = useMemo(() => IDENTITY_VALUES[activeValue], [activeValue]);
 
   return (
     <div className="min-h-screen bg-tho-bg">
@@ -131,13 +116,13 @@ export default function QuienesPage() {
             </section>
 
             <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
-              <div className="md:mr-[6%] md:ml-auto p-3 text-right md:max-w-[64%] md:p-0">
+              <div className="mx-auto p-3 md:max-w-[760px] md:p-0">
                 <p className="text-justify text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
-                <p className="mt-6 text-[1.02rem] text-slate-700">Cada integrante de THO aporta experiencia previa en:</p>
-                <ul className="mt-3 ml-auto grid max-w-[31rem] gap-2 text-left text-[1.02rem] text-slate-700">
+                <p className="mt-6 text-[1.02rem] text-slate-700 md:text-center">Cada integrante de THO aporta experiencia previa en:</p>
+                <ul className="mt-3 grid gap-2 text-left text-[1.02rem] text-slate-700 md:mx-auto md:max-w-[31rem]">
                   <li>• Diagnóstico e intervención organizacional</li>
                   <li>• Diseño de procesos participativos</li>
                   <li>• Análisis de impacto social</li>
@@ -160,44 +145,24 @@ export default function QuienesPage() {
                 comunidades y entorno. Esta mirada integra nuestra misión y visión en una misma dirección estratégica.
               </p>
 
-              <div
-                className="identity-block-space splitview skewed mt-10"
-                onMouseMove={(event) => {
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  setThesisSplit(splitFromPointer(event.clientX, rect));
-                }}
-                onTouchMove={(event) => {
-                  const touch = event.touches[0];
-                  if (!touch) return;
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  setThesisSplit(splitFromPointer(touch.clientX, rect));
-                }}
-              >
-                <div className="panel bottom" style={{ clipPath: `inset(0 0 0 ${thesisSplit}%)` }}>
-                  <div className="content">
-                    <div className="description">
-                      <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Visión</h3>
-                      <p className="mt-2 text-xs leading-relaxed text-white md:text-sm">
-                        Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica,
-                        por nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
-                      </p>
-                    </div>
-                  </div>
+              <div className="identity-block-space mt-10 grid gap-10 md:grid-cols-[1fr_auto_1fr] md:items-start md:gap-8">
+                <div className="text-left">
+                  <h3 className="text-[1.35rem] font-semibold text-slate-900 md:text-[1.7rem]">Misión</h3>
+                  <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">
+                    Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante intervenciones
+                    estratégicas técnicamente sólidas y humanamente sostenibles.
+                  </p>
                 </div>
 
-                <div className="panel top" style={{ clipPath: `inset(0 ${100 - thesisSplit}% 0 0)` }}>
-                  <div className="content">
-                    <div className="description">
-                      <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Misión</h3>
-                      <p className="mt-2 text-xs leading-relaxed text-white md:text-sm">
-                        Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante
-                        intervenciones estratégicas técnicamente sólidas y humanamente sostenibles.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <div className="hidden h-full w-px rounded-full bg-slate-300/70 md:block" aria-hidden />
 
-                <div className="handle brand-block-divider" style={{ left: `${thesisSplit}%` }} />
+                <div className="text-left">
+                  <h3 className="text-[1.35rem] font-semibold text-slate-900 md:text-[1.7rem]">Visión</h3>
+                  <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">
+                    Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica,
+                    por nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
+                  </p>
+                </div>
               </div>
 
               <p className="identity-block-space font-tho-title mt-10 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
@@ -211,90 +176,31 @@ export default function QuienesPage() {
                 articuladores de sentido y conducta en cada relación, intervención y proceso que acompañamos.
               </p>
 
-              <div className="identity-block-space mt-16 grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]">
-                <div>
-                  <p className="mb-4 text-center text-xs uppercase tracking-[0.14em] text-slate-500">Arrastra o toca para girar</p>
-                  <div className="identity-cube-wrap">
-                    <div
-                      className="identity-cube"
-                      style={{ transform: `rotateX(-12deg) rotateY(${cubeAngle}deg)` }}
-                      onPointerDown={(event) => {
-                        (event.currentTarget as HTMLDivElement).setPointerCapture(event.pointerId);
-                        setDragState({ startX: event.clientX, startAngle: cubeAngle });
-                      }}
-                      onPointerMove={(event) => {
-                        if (!dragState) return;
-                        const delta = event.clientX - dragState.startX;
-                        setCubeAngle(dragState.startAngle + delta * 0.3);
-                      }}
-                      onPointerUp={() => {
-                        const snapped = Math.round(cubeAngle / 120) * 120;
-                        setCubeAngle(snapped);
-                        setActiveValue(normalizeIndex(snapped));
-                        setDragState(null);
-                      }}
-                    >
-                      <div className="identity-cube-face identity-cube-face--humanidad">
-                        <div className="h-shape-grid">
-                          <span>H</span>
-                          <span>D</span>
-                          <span>U A N I A</span>
-                          <span>M</span>
-                          <span>D</span>
-                        </div>
-                      </div>
-                      <div className="identity-cube-face identity-cube-face--colaboracion">
-                        <svg viewBox="0 0 220 220" className="h-full w-full" aria-hidden>
-                          <defs>
-                            <path id="colabPath" d="M 110,110 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0" />
-                          </defs>
-                          <text fill="white" fontSize="19" fontWeight="700" letterSpacing="2.3">
-                            <textPath href="#colabPath">COLABORACIÓN • COLABORACIÓN • </textPath>
-                          </text>
-                          <text x="110" y="132" textAnchor="middle" fill="white" fontSize="78" fontWeight="800">O</text>
-                        </svg>
-                      </div>
-                      <div className="identity-cube-face identity-cube-face--adaptabilidad">
-                        <div className="t-shape-grid">
-                          <span>A D A P T A</span>
-                          <span>B I L I</span>
-                          <span>D A D</span>
-                        </div>
-                      </div>
+              <div className="identity-block-space mt-16 space-y-10">
+                {IDENTITY_VALUES.map((value) => (
+                  <article key={value.key} className="grid items-center gap-6 md:grid-cols-[150px_1fr] md:gap-10">
+                    <div className="mx-auto w-[120px] md:w-[150px]">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={value.image} alt={`Símbolo del valor ${value.title}`} className="h-auto w-full object-contain" />
                     </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className={`text-3xl font-semibold ${selectedValue.color}`}>{selectedValue.title}</h3>
-                  <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">{selectedValue.description}</p>
-                  <div className="mt-6 flex gap-2">
-                    {IDENTITY_VALUES.map((item, idx) => (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => {
-                          setActiveValue(idx);
-                          setCubeAngle(-idx * 120);
-                        }}
-                        className={`h-2.5 w-10 rounded-full ${idx === activeValue ? "bg-slate-700" : "bg-slate-300"}`}
-                        aria-label={`Ver valor ${item.title}`}
-                      />
-                    ))}
-                  </div>
-                </div>
+                    <div>
+                      <h3 className="text-3xl font-semibold text-slate-900">{value.title}</h3>
+                      <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">{value.description}</p>
+                    </div>
+                  </article>
+                ))}
               </div>
             </section>
           </div>
         </section>
 
-        <section className="relative mx-auto max-w-6xl overflow-hidden px-4 py-16 md:py-24">
+        <section className="relative mx-auto max-w-6xl overflow-visible px-4 py-16 md:py-24">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/brujula.svg"
             alt=""
             aria-hidden
-            className="quienes-compass-bg pointer-events-none absolute right-[-8%] top-[-6%]"
+            className="quienes-compass-bg pointer-events-none absolute right-[-4%] top-[-2%]"
             style={{ transform: `translate3d(0, ${scrollY * 0.045}px, 0)` }}
           />
 
