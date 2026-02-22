@@ -7,7 +7,14 @@ import { PILLAR_META } from "@/lib/brand";
 import MethodTimeline from "@/components/MethodTimeline";
 import { ActionGallery } from "@/components/ActionGallery";
 import { ResourcesModal } from "@/components/ResourcesModal";
+import { TrustSlider } from "@/components/TrustSlider";
 import { listPublishedPosts } from "@/lib/blogStore";
+
+function clampWords(text: string, maxWords = 22) {
+  const words = text.trim().split(/\s+/);
+  if (words.length <= maxWords) return text;
+  return `${words.slice(0, maxWords).join(" ")} (...)`;
+}
 
 export default async function HomePage() {
   const posts = await listPublishedPosts();
@@ -19,134 +26,64 @@ export default async function HomePage() {
       <main id="contenido">
         <ResourcesModal autoOpen />
         {/* HERO — imagen de fondo (atenuada) + texto encima */}
-        <section className="relative overflow-visible bg-slate-950 text-white">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/hero/hands.png"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.55]"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-zinc-900/68 via-zinc-900/44 to-zinc-900/14" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-900/36 via-transparent to-zinc-900/10" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-zinc-900/78" />
-        <div className="pointer-events-none absolute inset-x-0 -bottom-28 h-36 bg-gradient-to-b from-zinc-900/72 via-zinc-900/46 to-transparent" />
+        <section className="relative min-h-[78vh] overflow-visible text-white md:min-h-[88vh]">
+        <div className="hero-media-fade pointer-events-none absolute inset-x-0 -bottom-28 top-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/hero/hands.png"
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.75]"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
+        </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
-          <div className="flex justify-end">
+        <div className="relative mx-auto flex h-full min-h-[78vh] max-w-6xl items-end justify-end px-4 pb-20 pt-10 md:min-h-[88vh] md:pb-24 md:pt-14">
           <div className="max-w-2xl text-right">
-            <div className="flex items-center justify-end gap-3 text-xs tracking-wide text-white/70">
-              <span className="brand-block-divider h-[6px] w-36 rounded-sm" />
-              <span className="uppercase">Consultoría estratégica · Concepción</span>
+            <div className="text-xs uppercase tracking-wide text-white/75">
+              Consultoría estratégica · Concepción
             </div>
+            <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
 
-            <h1 className="font-tho-title mt-6 text-[3.2rem] font-normal leading-[0.94] md:text-[5.6rem]">
-              Viabilidad.
-              <br />
-              Rigor.
-              <br />
-              Territorio.
-            </h1>
-
-            <p className="mt-6 ml-auto max-w-xl text-base text-white/80 md:text-lg">
-              ESG, relacionamiento comunitario y desarrollo organizacional — integrado, accionable y con foco en
-              decisiones que se sostienen.
+            <p className="mt-5 ml-auto max-w-xl text-base text-white/82 md:text-lg">
+              Integramos ESG, relacionamiento comunitario y desarrollo organizacional para construir estrategias
+              accionables y decisiones que se sostienen en el tiempo.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
+            <div className="mt-6 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#servicios"
-                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
+                className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
               >
                 Ver servicios
               </a>
-              <a
-                href="https://bit.ly/bookTHO"
-                target="_blank"
-                rel="noreferrer"
-                className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-white/35 bg-white/5 px-5 py-3 text-sm font-bold text-white"
-              >
-                Agendar una conversación
-              </a>
             </div>
-          </div>
           </div>
         </div>
         </section>
 
       {/* PROBLEMA — editorial integrado al flujo, sin "tarjeta maqueta" */}
-      <section className="hero-transition-panel relative z-30 -mt-10 bg-transparent">
+      <section className="hero-transition-panel relative z-30 mt-20 bg-transparent md:mt-24">
         <div className="mx-auto max-w-5xl px-4 py-12 text-center md:py-16">
-          <div className="mx-auto h-px w-24 bg-slate-300/70" />
-          <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
-            Cuando la organización se desconecta del entorno, el costo llega igual.
+                    <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
+            Sostenibilidad desintegrada.
+            <br />
+            Comunidad descontenta.
+            <br />
+            Organización desalineada.
           </h2>
           <p className="mx-auto mt-6 max-w-3xl text-base text-slate-700 md:text-lg">
-            La pregunta no es si tendrás tensión. La pregunta es si tendrás método, evidencia y gobernanza para
-            sostener decisiones cuando aparezca.
+            No tienes que llegar ahí. En The Human Org te ayudamos a seguir elevando el estándar.
           </p>
         </div>
       </section>
 
-
-      <Section
-        id="experiencia"
-        tone="soft"
-        title="Se ve serio porque lo es"
-        subtitle="Trabajamos con equipos que no pueden fallar: decisiones con costo reputacional, social y financiero. Aportamos método, claridad y ejecución."
-      >
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
-            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Enfoque</div>
-            <p className="mt-2 text-sm text-slate-700">
-              Viabilidad primero: lo que proponemos debe funcionar con tu estructura, tu presión y tu contexto.
-            </p>
-          </div>
-          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
-            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Terreno</div>
-            <p className="mt-2 text-sm text-slate-700">
-              No asesoramos desde una planilla: leemos el sistema real, con actores reales, y con tiempos reales.
-            </p>
-          </div>
-          <div className="rounded-[2rem] bg-white p-7 ring-1 ring-slate-200/70">
-            <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Transferencia</div>
-            <p className="mt-2 text-sm text-slate-700">
-              Dejamos capacidades instaladas: herramientas, criterios y gobernanza para sostener el avance.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-10 rounded-[2.2rem] bg-white p-6 ring-1 ring-slate-200/70">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <div className="text-xs font-bold uppercase tracking-wide text-slate-600">Señales de rigor</div>
-              <p className="mt-1 text-sm text-slate-700">
-                Documentación clara, trazabilidad y entregables que se pueden defender en comité.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                "Matriz de riesgos",
-                "Mapa de actores",
-                "Hoja de ruta",
-                "Gobernanza & KPIs",
-              ].map((t) => (
-                <span
-                  key={t}
-                  className="rounded-full bg-slate-950/5 px-3 py-1 text-xs font-semibold text-slate-700"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Section>
+      <div className="mx-auto mt-6 mb-2 h-[6px] w-36 rounded-sm brand-block-divider" aria-hidden />
 
       <Section
         id="servicios"
         tone="soft"
         title="Nuestros servicios"
-        subtitle="Tres líneas estratégicas para resolver problemas críticos. Entra al servicio que más te duele hoy y escala desde ahí."
+        subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas: Sotenibilidad Corporativa, Relacionamiento Comunitario y Desarrollo Organizacional. Revisa los niveles de cada servicio para decidir si te acompañamos en una línea de trabajo o necesitas integrarlas."
       >
         <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
           {SERVICES.map((service) => {
@@ -164,7 +101,7 @@ export default async function HomePage() {
                   <span className={`h-2 w-2 rounded-full ${meta.accentDot}`} />
                   {service.menuLabel}
                 </div>
-                <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.2rem]">{service.navLabel}</h3>
+                <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.2rem]">{service.slug === "sostenibilidad-corporativa" ? "Hacia la reportabilidad integrada" : service.slug === "relacionamiento-comunitario" ? "Comunidades comprometidas" : "Una organización efectiva"}</h3>
                 <p className="mt-2 text-sm text-slate-800">{service.problem}</p>
                 <ul className="mt-4 grid gap-2 text-sm text-slate-800">
                   {service.teaser.map((item) => (
@@ -176,9 +113,9 @@ export default async function HomePage() {
                 </ul>
                 <a
                   href={`/servicios/${service.slug}`}
-                  className="btn-unified-motion btn-brand-neutral mt-6 inline-flex rounded-xl border border-slate-200 bg-white/90 px-4 py-2.5 text-sm font-bold text-slate-900"
+                  className="btn-unified-motion btn-hero-services mt-6 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-slate-900"
                 >
-                  Ver detalle del servicio
+                  Conoce los niveles
                 </a>
               </article>
             );
@@ -189,32 +126,32 @@ export default async function HomePage() {
       <Section
         id="metodo"
         title="Cómo trabajamos"
-        subtitle="Un método que aguanta auditoría: claridad, puntos de control y foco en viabilidad. Si el caso lo amerita, escalamos sin perder control."
+        subtitle="Nuestro método está diseñado para ser adaptable y entregar valor en un entorno complejo y cambiante, garantizando viabilidad. La consultoría en The Human Org seguirá las siguientes etapas durante el proceso."
       >
         <MethodTimeline
           steps={[
             {
               n: "01",
-              title: "Lectura del sistema",
-              desc: "Mapeamos actores, riesgos, cultura y señales críticas del contexto.",
+              title: "Lectura del Sistema",
+              desc: "Mapeamos fuentes, levantamos datos y desarrollamos diagnósticos que evidencian riesgos, oportunidades y fundamentan el proceso.",
               tone: "com",
             },
             {
               n: "02",
-              title: "Diseño de estrategia",
-              desc: "Definimos decisiones, prioridades y hoja de ruta viable.",
+              title: "Diseño de Estrategia",
+              desc: "Co-diseñamos rutas, actividades, metas e indicadores para que tu organización sepa qué hacer para alcanzar sus objetivos.",
               tone: "esg",
             },
             {
               n: "03",
               title: "Implementación",
-              desc: "Acompañamos ejecución, coordinación y gobernanza en terreno.",
+              desc: "Acompañamos la ejecución de la Estrategia en terreno, ajustando en tiempo real y coordinando soluciones que agregan valor.",
               tone: "do",
             },
             {
               n: "04",
-              title: "Evaluación y aprendizaje",
-              desc: "Medimos resultados, ajustamos y reiniciamos el ciclo con evidencia.",
+              title: "Evaluación y Aprendizaje",
+              desc: "Reportamos resultados para evidenciar logros y desafíos, de manera que permita ajustar la Estrategia e iterar desde la evidencia para el próximo ciclo.",
               tone: "neutral",
             },
           ]}
@@ -237,20 +174,40 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <Section id="blog" title="Blog" subtitle="Desde el territorio: análisis y tendencias (placeholder).">
+
+      <Section id="confian" title="Confían en nosotros">
+        <TrustSlider />
+      </Section>
+
+      <div className="mx-auto mt-2 mb-2 h-[6px] w-36 rounded-sm bg-white brand-block-divider" aria-hidden />
+
+      <Section id="blog" title="Blog" subtitle="Análisis y reflexiones desde el terreno. Exploramos las tendencias que definen el presente y futuro de la estrategia organizacional y territorial.">
         <div className="grid gap-4 md:grid-cols-3">
           {posts.slice(0, 3).map((p) => (
-            <div key={p.slug} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="text-xs text-slate-500">{p.minutes} min</div>
-              <div className="mt-2 text-base font-semibold">{p.title}</div>
-              <p className="mt-2 text-sm text-slate-600">{p.excerpt}</p>
-              <a
-                href={`/blog/${p.slug}`}
-                className="btn-unified-motion btn-brand-neutral mt-5 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
-              >
-                Leer
-              </a>
-            </div>
+            <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
+              <div className="blog-card-inner relative h-full w-full">
+                <div
+                  className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.96) 100%), url(${p.coverImage || "/hero/4.png"})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  <div className="text-xs text-slate-500">{p.minutes} min</div>
+                  <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
+                  <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
+                </div>
+                <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <a
+                    href={`/blog/${p.slug}`}
+                    className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
+                  >
+                    Leer +
+                  </a>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
       </Section>

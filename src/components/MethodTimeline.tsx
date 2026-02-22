@@ -45,15 +45,11 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
     <div className="method-arc-shell relative -mb-32 overflow-visible pb-2 pt-1 md:-mb-44 md:pb-0">
       {current ? (
         <div className="relative z-40 mx-auto mb-3 max-w-5xl px-1 md:mb-2">
-          <div className="method-hover-panel grid gap-3 rounded-[1.7rem] p-3 md:grid-cols-[1fr_260px] md:p-4">
+          <div className="method-hover-panel rounded-[1.7rem] p-3 md:p-4">
             <div>
               <div className="text-[11px] font-bold uppercase tracking-[0.17em] text-slate-500">Etapa activa {current.n}</div>
               <h3 className="mt-1 text-xl font-semibold text-slate-900 md:text-2xl">{current.title}</h3>
-              <p className="mt-2 max-w-2xl text-sm text-slate-700 md:text-base">{current.desc}</p>
-            </div>
-            <div className="rounded-2xl bg-slate-950/[0.03] px-4 py-3 ring-1 ring-slate-200/60">
-              <div className="text-[11px] font-bold uppercase tracking-[0.15em] text-slate-500">Iteración continua</div>
-              <p className="mt-1 text-sm text-slate-700">Cada etapa deja evidencia. Ajustamos rápido y volvemos al sistema con mejor información.</p>
+              <p className="mt-2 max-w-3xl text-sm text-slate-700 md:text-base">{current.desc}</p>
             </div>
           </div>
         </div>
@@ -69,7 +65,7 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
                 <path
                   key={step.n}
                   id={`method-text-arc-${i}`}
-                  d={textArcPath(cfg.cx, cfg.cy, (cfg.rOuter + cfg.rInner) / 2 + 6, start + 8, end - 8)}
+                  d={textArcPath(cfg.cx, cfg.cy, (cfg.rOuter + cfg.rInner) / 2 + 8, start + 2, end - 2)}
                 />
               );
             })}
@@ -95,7 +91,7 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
                 }}
               >
                 <path d={d} fill={fill} stroke="rgba(255,255,255,0.92)" strokeWidth="6" />
-                <text fontSize="18" fontWeight="700" fill="#0f172a" letterSpacing="0.01em">
+                <text fontSize="21" fontWeight="800" fill="#0f172a" letterSpacing="0.005em">
                   <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle">
                     {step.title}
                   </textPath>
