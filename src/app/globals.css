@@ -630,3 +630,252 @@ body {
     background: linear-gradient(90deg, rgba(21, 21, 21, 0.94), rgba(21, 21, 21, 0));
   }
 }
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+.quienes-bg-image {
+  position: absolute;
+  overflow: hidden;
+  border: 0;
+  opacity: 0.15;
+  filter: grayscale(0.98) saturate(0.46) contrast(0.9);
+  box-shadow: 0 24px 54px -42px rgba(15, 23, 42, 0.5);
+  mask-image: radial-gradient(circle at center, #000 46%, rgba(0,0,0,0.66) 62%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, #000 46%, rgba(0,0,0,0.66) 62%, transparent 100%);
+  will-change: transform;
+}
+
+.quienes-bg-image img {
+  width: 100%;
+  height: 100%;
+}
+
+.quienes-bg-image-1 {
+  top: 2%;
+  right: -4%;
+  width: min(35vw, 560px);
+  aspect-ratio: 4 / 5;
+}
+
+.quienes-bg-image-2 {
+  top: 24%;
+  left: -5%;
+  width: min(33vw, 520px);
+  aspect-ratio: 4 / 5;
+}
+
+.quienes-bg-image-3 {
+  top: 52%;
+  right: -5%;
+  width: min(34vw, 540px);
+  aspect-ratio: 4 / 5;
+}
+
+.quienes-bg-image-4 {
+  top: 77%;
+  left: -4%;
+  width: min(31vw, 500px);
+  aspect-ratio: 4 / 5;
+}
+
+.identity-section .splitview {
+  position: relative;
+  width: 100%;
+  min-height: clamp(230px, 28vw, 340px);
+  overflow: hidden;
+  border-radius: 1.2rem;
+}
+
+.identity-section .panel {
+  position: absolute;
+  width: 100%;
+  min-height: clamp(230px, 28vw, 340px);
+  overflow: hidden;
+}
+
+.identity-section .panel .content {
+  position: absolute;
+  width: 100%;
+  min-height: clamp(230px, 28vw, 340px);
+  color: #fff;
+}
+
+.identity-section .panel .description {
+  width: min(34vw, 360px);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: left;
+}
+
+.identity-section .bottom {
+  background: linear-gradient(140deg, rgba(51,65,85,0.88), rgba(30,41,59,0.75));
+  z-index: 1;
+  backdrop-filter: blur(2px);
+}
+
+.identity-section .bottom .description {
+  right: 7%;
+}
+
+.identity-section .top {
+  background: linear-gradient(140deg, rgba(209,60,162,0.68), rgba(30,113,184,0.68));
+  z-index: 2;
+}
+
+.identity-section .top .description {
+  left: 7%;
+}
+
+.identity-section .handle {
+  height: 100%;
+  position: absolute;
+  display: block;
+  background: linear-gradient(180deg, rgba(253,171,0,0.92), rgba(250,127,51,0.86));
+  width: 4px;
+  top: 0;
+  z-index: 3;
+}
+
+.identity-section .skewed .handle {
+  top: 50%;
+  transform: rotate(24deg) translateY(-50%);
+  height: 180%;
+  transform-origin: top;
+}
+
+.identity-section .skewed .top {
+  transform: skew(-24deg);
+  margin-left: -1000px;
+}
+
+.identity-section .skewed .top .content {
+  transform: skew(24deg);
+  margin-left: 1000px;
+}
+
+.identity-section .split-range {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.identity-block-space {
+  margin-top: 2.8rem;
+}
+
+.identity-cube-wrap {
+  perspective: 900px;
+  display: grid;
+  place-items: center;
+  min-height: 300px;
+}
+
+.identity-cube {
+  width: 220px;
+  height: 220px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: grab;
+}
+
+.identity-cube:active {
+  cursor: grabbing;
+}
+
+.identity-cube-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.3rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 1rem;
+  color: #fff;
+  box-shadow: 0 18px 42px -26px rgba(15, 23, 42, 0.35);
+}
+
+.identity-cube-face span {
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+}
+
+.identity-cube-face small {
+  margin-top: 0.45rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.identity-cube-face--humanidad {
+  transform: rotateY(0deg) translateZ(120px);
+  background: linear-gradient(160deg, rgba(209,60,162,0.86), rgba(209,60,162,0.7));
+}
+
+.identity-cube-face--humanidad span {
+  font-size: 7rem;
+}
+
+.identity-cube-face--colaboracion {
+  transform: rotateY(120deg) translateZ(120px);
+  background: linear-gradient(160deg, rgba(250,127,51,0.92), rgba(239,93,64,0.88));
+}
+
+.identity-cube-face--colaboracion span {
+  font-size: 7.2rem;
+}
+
+.identity-cube-face--adaptabilidad {
+  transform: rotateY(240deg) translateZ(120px);
+  background: linear-gradient(160deg, rgba(147,191,36,0.9), rgba(126,170,23,0.88));
+}
+
+.identity-cube-face--adaptabilidad span {
+  font-size: 3rem;
+}
+
+@media (max-width: 900px) {
+  .identity-section .splitview,
+  .identity-section .panel,
+  .identity-section .panel .content {
+    min-height: 58vw;
+  }
+
+  .identity-section .panel .description {
+    width: 38%;
+  }
+
+  .identity-cube {
+    width: 180px;
+    height: 180px;
+  }
+
+  .identity-cube-face--humanidad {
+    transform: rotateY(0deg) translateZ(95px);
+  }
+
+  .identity-cube-face--colaboracion {
+    transform: rotateY(120deg) translateZ(95px);
+  }
+
+  .identity-cube-face--adaptabilidad {
+    transform: rotateY(240deg) translateZ(95px);
+  }
+
+  .quienes-bg-image {
+    opacity: 0.1;
+  }
+}

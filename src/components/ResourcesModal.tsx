@@ -1,11 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { LeadMagnet } from "@/components/LeadMagnet";
 
+const RESOURCES_MODAL_SEEN_KEY = "tho_resources_modal_seen";
+
 export function ResourcesModal(props?: { autoOpen?: boolean }) {
-  const [open, setOpen] = useState(Boolean(props?.autoOpen));
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!props?.autoOpen) return;
+
+    const seen = window.localStorage.getItem(RESOURCES_MODAL_SEEN_KEY);
+    if (seen) return;
+
+    window.localStorage.setItem(RESOURCES_MODAL_SEEN_KEY, "1");
+
+    const timeoutId = window.setTimeout(() => {
+      setOpen(true);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [props?.autoOpen]);
 
   return (
     <>

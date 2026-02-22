@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 
+const RESOURCE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
+
 export function LeadMagnet() {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
-  const manualPdfUrl = "/downloads/manual-diversidad-v1.pdf";
-  const manualPreviewUrl = `${manualPdfUrl}#page=1&view=FitH`;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,40 +34,57 @@ export function LeadMagnet() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-        <div className="text-xs font-medium text-slate-500">Manual descargable</div>
-        <h3 className="mt-2 text-lg font-semibold">Manual de Gestión de la Diversidad (v1)</h3>
-        <p className="mt-2 text-sm text-slate-600">
-          Una guía práctica para pasar de la declaración de principios a la gestión real.
-        </p>
-        <button
-          onClick={() => setOpen(true)}
-          className="btn-unified-motion btn-brand-accent btn-brand-accent-pink mt-4 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-800"
-        >
-          Descargar manual
-        </button>
+    <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
+        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-4 py-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Recurso de orientación</p>
+            <p className="text-sm font-medium text-slate-700">Manual de Gestión de la Diversidad · Vista previa</p>
+          </div>
+          <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500">Página 1</span>
+        </div>
+
+        <div className="bg-slate-100 p-4">
+          <div className="mx-auto aspect-[1/1.414] w-full max-w-[540px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+            <iframe
+              title="Vista previa de la primera página del manual"
+              src={`${RESOURCE_FILE_URL}#toolbar=0&navpanes=0&scrollbar=0&page=1&zoom=page-fit`}
+              className="h-full w-full"
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <div className="text-xs font-medium text-slate-500">Cómo usarlo</div>
-        <ul className="mt-3 list-disc pl-5 text-sm text-slate-600">
-          <li>Marco conceptual claro y aplicable</li>
-          <li>Checklist para diagnóstico inicial</li>
-          <li>Errores comunes y cómo evitarlos</li>
-        </ul>
-        <p className="mt-4 text-xs text-slate-500">
-          Después agregaremos recursos específicos por servicio.
+      <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(160deg,#ffffff_0%,#f8fafc_44%,#f1f5f9_100%)] p-6 shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Manual descargable</p>
+        <h3 className="mt-2 text-[1.4rem] font-semibold leading-tight text-slate-900">Un recurso para orientar criterios y decisiones</h3>
+        <p className="mt-3 text-sm leading-relaxed text-slate-600">
+          Diseñado para equipos que necesitan ordenar conversaciones, priorizar acciones y tomar decisiones con mayor claridad en temas de diversidad.
         </p>
+
+        <ul className="mt-5 grid gap-2 text-sm text-slate-600">
+          <li>• Marco conceptual claro y aplicable</li>
+          <li>• Checklist para diagnóstico inicial</li>
+          <li>• Errores frecuentes y cómo evitarlos</li>
+        </ul>
+
+        <button
+          onClick={() => setOpen(true)}
+          className="btn-unified-motion btn-brand-accent btn-brand-accent-pink mt-6 w-full rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-800"
+        >
+          Quiero acceder al recurso
+        </button>
+
+        <p className="mt-3 text-xs text-slate-500">Para habilitar el acceso, necesitamos tus datos de contacto.</p>
       </div>
 
       {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
-          <div className="w-full max-w-4xl rounded-2xl bg-white p-6 shadow-xl">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-sm font-semibold">Descarga por email</div>
-                <p className="mt-1 text-sm text-slate-600">Te enviamos el link. Sin spam.</p>
+                <div className="text-sm font-semibold text-slate-900">Recibir acceso al recurso</div>
+                <p className="mt-1 text-sm text-slate-600">Completa tus datos y te habilitamos el acceso al documento.</p>
               </div>
               <button
                 onClick={() => setOpen(false)}
@@ -77,58 +94,47 @@ export function LeadMagnet() {
               </button>
             </div>
 
-            <div className="mt-4 grid gap-5 md:grid-cols-[1fr_1.1fr]">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Vista previa (página 1)</div>
-                <iframe
-                  src={manualPreviewUrl}
-                  title="Vista previa del Manual de Gestión de la Diversidad"
-                  className="h-[380px] w-full rounded-lg border border-slate-200 bg-white"
-                />
-              </div>
+            <form onSubmit={onSubmit} className="mt-4 grid gap-3">
+              <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
 
-              <form onSubmit={onSubmit} className="grid gap-3">
-                <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
+              <label className="grid gap-1">
+                <span className="text-xs text-slate-500">Nombre</span>
+                <input name="name" required className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+              </label>
 
-                <label className="grid gap-1">
-                  <span className="text-xs text-slate-500">Nombre</span>
-                  <input
-                    name="name"
-                    required
-                    className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
-                  />
-                </label>
+              <label className="grid gap-1">
+                <span className="text-xs text-slate-500">Email</span>
+                <input name="email" type="email" required className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+              </label>
 
-                <label className="grid gap-1">
-                  <span className="text-xs text-slate-500">Email</span>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
-                  />
-                </label>
+              <label className="grid gap-1">
+                <span className="text-xs text-slate-500">Empresa</span>
+                <input name="company" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
+              </label>
 
-                <label className="grid gap-1">
-                  <span className="text-xs text-slate-500">Empresa</span>
-                  <input name="company" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-                </label>
+              <button
+                disabled={status === "sending"}
+                className="btn-unified-motion btn-brand-neutral mt-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
+              >
+                {status === "sending" ? "Enviando…" : "Continuar"}
+              </button>
 
-                <button
-                  disabled={status === "sending"}
-                  className="btn-unified-motion btn-brand-neutral mt-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
-                >
-                  {status === "sending" ? "Enviando…" : "Enviar"}
-                </button>
+              {status === "ok" ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                  <p className="text-sm text-emerald-800">Gracias. Ya puedes abrir el recurso.</p>
+                  <a
+                    href={RESOURCE_FILE_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-flex text-sm font-semibold text-emerald-900 underline underline-offset-2"
+                  >
+                    Abrir recurso
+                  </a>
+                </div>
+              ) : null}
 
-                {status === "ok" ? (
-                  <p className="text-sm text-slate-600">
-                    Listo. Te llegará el link (por ahora queda registrado y nos llega a hola@tho.cl; activamos envío automático al enchufar proveedor).
-                  </p>
-                ) : null}
-                {status === "error" ? <p className="text-sm text-slate-600">Algo falló. Intenta de nuevo.</p> : null}
-              </form>
-            </div>
+              {status === "error" ? <p className="text-sm text-slate-600">Algo falló. Intenta de nuevo.</p> : null}
+            </form>
           </div>
         </div>
       ) : null}
