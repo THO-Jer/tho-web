@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BlogContent, getToc } from "@/components/blog/BlogContent";
+import { BlogTocClient } from "@/components/blog/BlogTocClient";
 import { getPublishedPostBySlug, listPublishedPosts } from "@/lib/blogStore";
 
 const SITE = "https://tho-web.vercel.app";
@@ -124,14 +125,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {relatedPosts.length ? (
               <section className="mt-10 border-t border-slate-200 pt-6">
-                <span className="inline-flex rounded-full border border-transparent bg-[linear-gradient(95deg,var(--tho-pink)_0%,var(--tho-blue)_25%,var(--tho-orange)_50%,var(--tho-yellow)_75%,var(--tho-green)_100%)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-sm">Otras lecturas</span>
-                <h2 className="mt-3 text-xl font-semibold text-slate-900">También te puede interesar</h2>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <h2 className="text-xl font-semibold text-slate-900">También te puede interesar</h2>
+                <div className="mt-4 flex flex-col gap-3">
                   {relatedPosts.map((related) => (
-                    <Link key={related.slug} href={`/blog/${related.slug}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white">
+                    <Link
+                      key={related.slug}
+                      href={`/blog/${related.slug}`}
+                      className="btn-unified-motion btn-hero-services rounded-xl bg-white p-4 transition"
+                    >
                       <div className="text-xs text-slate-500">{related.minutes} min</div>
-                      <div className="mt-1 text-sm font-semibold text-slate-900">{related.title}</div>
-                      <p className="mt-1 text-xs text-slate-600">{related.excerpt}</p>
+                      <div className="mt-1 text-base font-semibold text-slate-900">{related.title}</div>
+                      <p className="mt-1 text-sm text-slate-600">{related.excerpt}</p>
                     </Link>
                   ))}
                 </div>
@@ -141,18 +145,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {toc.length ? (
             <aside className="hidden lg:block">
-              <div className="sticky top-24 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Índice</div>
-                <ul className="mt-3 space-y-2">
-                  {toc.map((item) => (
-                    <li key={item.id} className={item.level === 3 ? "pl-4" : ""}>
-                      <a href={`#${item.id}`} className="text-sm text-slate-700 hover:text-slate-900">
-                        {item.text}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <BlogTocClient toc={toc} />
             </aside>
           ) : null}
         </div>
