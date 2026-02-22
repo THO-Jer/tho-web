@@ -24,12 +24,9 @@ export default async function HomePage() {
         <img
           src="/hero/hands.png"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.55]"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.72]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-l from-zinc-900/68 via-zinc-900/44 to-zinc-900/14" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-900/36 via-transparent to-zinc-900/10" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-zinc-900/78" />
-        <div className="pointer-events-none absolute inset-x-0 -bottom-28 h-36 bg-gradient-to-b from-zinc-900/72 via-zinc-900/46 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 -bottom-24 top-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
 
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="flex justify-end">
