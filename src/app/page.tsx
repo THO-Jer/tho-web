@@ -77,7 +77,7 @@ export default async function HomePage() {
         id="servicios"
         tone="soft"
         title="Nuestros servicios"
-        subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas. Estamos preparados para agregar valor a tu organización sea que trabajemos una línea o integrando diferentes servicios."
+        subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas: Sotenibilidad Corporativa, Relacionamiento Comunitario y Desarrollo Organizacional. Revisa los niveles de cada servicio para decidir si te acompañamos en una línea de trabajo o necesitas integrarlas."
       >
         <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
           {SERVICES.map((service) => {
