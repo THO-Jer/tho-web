@@ -36,6 +36,11 @@ function normalizeIndex(angle: number) {
   return idx;
 }
 
+function splitFromPointer(clientX: number, rect: DOMRect) {
+  const raw = ((clientX - rect.left) / rect.width) * 100;
+  return Math.max(14, Math.min(86, raw));
+}
+
 export default function QuienesPage() {
   const [thesisSplit, setThesisSplit] = useState(50);
   const [cubeAngle, setCubeAngle] = useState(0);
@@ -126,13 +131,13 @@ export default function QuienesPage() {
             </section>
 
             <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
-              <div className="ml-auto p-3 text-right md:max-w-[72%] md:p-0">
+              <div className="md:mr-[6%] md:ml-auto p-3 text-right md:max-w-[64%] md:p-0">
                 <p className="text-justify text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
                 <p className="mt-6 text-[1.02rem] text-slate-700">Cada integrante de THO aporta experiencia previa en:</p>
-                <ul className="mt-3 ml-auto grid max-w-[32rem] gap-2 text-left text-[1.02rem] text-slate-700">
+                <ul className="mt-3 ml-auto grid max-w-[31rem] gap-2 text-left text-[1.02rem] text-slate-700">
                   <li>• Diagnóstico e intervención organizacional</li>
                   <li>• Diseño de procesos participativos</li>
                   <li>• Análisis de impacto social</li>
@@ -149,18 +154,30 @@ export default function QuienesPage() {
               <h2 className="text-center font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.6rem]">Nuestra identidad</h2>
               <div className="mx-auto mt-5 h-[6px] w-36 rounded-sm brand-block-divider" />
 
-              <p className="identity-block-space mx-auto mt-14 max-w-4xl text-center text-lg leading-relaxed text-slate-700 md:text-[1.25rem]">
+              <p className="identity-block-space mx-auto mt-14 max-w-4xl text-justify text-lg leading-relaxed text-slate-700 md:text-[1.22rem]">
                 Transformamos la asesoría estratégica integrando innovación, humanidad y sostenibilidad, asegurando que
                 las organizaciones no solo alcancen sus objetivos, sino que lo hagan impactando positivamente a sus
                 comunidades y entorno. Esta mirada integra nuestra misión y visión en una misma dirección estratégica.
               </p>
 
-              <div className="identity-block-space splitview skewed mt-10 rounded-3xl">
-                <div className="panel bottom">
+              <div
+                className="identity-block-space splitview skewed mt-10"
+                onMouseMove={(event) => {
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  setThesisSplit(splitFromPointer(event.clientX, rect));
+                }}
+                onTouchMove={(event) => {
+                  const touch = event.touches[0];
+                  if (!touch) return;
+                  const rect = event.currentTarget.getBoundingClientRect();
+                  setThesisSplit(splitFromPointer(touch.clientX, rect));
+                }}
+              >
+                <div className="panel bottom" style={{ clipPath: `inset(0 0 0 ${thesisSplit}%)` }}>
                   <div className="content">
                     <div className="description">
                       <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Visión</h3>
-                      <p className="mt-2 text-xs leading-relaxed text-white/90 md:text-sm">
+                      <p className="mt-2 text-xs leading-relaxed text-white md:text-sm">
                         Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica,
                         por nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
                       </p>
@@ -168,11 +185,11 @@ export default function QuienesPage() {
                   </div>
                 </div>
 
-                <div className="panel top" style={{ width: `calc(${thesisSplit}% + 1000px)` }}>
+                <div className="panel top" style={{ clipPath: `inset(0 ${100 - thesisSplit}% 0 0)` }}>
                   <div className="content">
                     <div className="description">
                       <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Misión</h3>
-                      <p className="mt-2 text-xs leading-relaxed text-white/90 md:text-sm">
+                      <p className="mt-2 text-xs leading-relaxed text-white md:text-sm">
                         Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante
                         intervenciones estratégicas técnicamente sólidas y humanamente sostenibles.
                       </p>
@@ -180,24 +197,18 @@ export default function QuienesPage() {
                   </div>
                 </div>
 
-                <div className="handle" style={{ left: `${thesisSplit}%` }} />
-                <input
-                  type="range"
-                  min={20}
-                  max={80}
-                  value={thesisSplit}
-                  onChange={(event) => setThesisSplit(Number(event.target.value))}
-                  className="split-range"
-                  aria-label="Comparar misión y visión"
-                />
+                <div className="handle brand-block-divider" style={{ left: `${thesisSplit}%` }} />
               </div>
 
-              <p className="identity-block-space font-tho-title mx-auto mt-8 max-w-4xl text-center text-[1.55rem] text-slate-900 md:text-[2rem]">
-                Nuestra promesa es diseñar soluciones estratégicas y exitosas.
+              <p className="identity-block-space font-tho-title mt-10 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
+                Nuestra promesa es diseñar
+                <br />
+                soluciones estratégicas y exitosas.
               </p>
-              <p className="identity-block-space mx-auto mt-3 max-w-4xl text-center text-base leading-relaxed text-slate-700 md:text-lg">
-                Nuestros valores no son solo conceptos: son articuladores de sentido y conducta en cada decisión,
-                relación y proceso que impulsamos.
+              <p className="identity-block-space mt-4 max-w-4xl text-justify text-base leading-relaxed text-slate-700 md:text-lg">
+                Desde esta promesa, la identidad se vuelve práctica: misión, visión y experiencia se entrelazan en
+                criterios que orientan decisiones concretas. Por eso, nuestros valores no son solo conceptos, sino
+                articuladores de sentido y conducta en cada relación, intervención y proceso que acompañamos.
               </p>
 
               <div className="identity-block-space mt-16 grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]">
@@ -224,18 +235,31 @@ export default function QuienesPage() {
                       }}
                     >
                       <div className="identity-cube-face identity-cube-face--humanidad">
-                        <span>H</span>
-                        <small>HUMANIDAD</small>
+                        <div className="h-shape-grid">
+                          <span>H</span>
+                          <span>D</span>
+                          <span>U A N I A</span>
+                          <span>M</span>
+                          <span>D</span>
+                        </div>
                       </div>
                       <div className="identity-cube-face identity-cube-face--colaboracion">
-                        <span>O</span>
-                        <small>COLABORACIÓN</small>
+                        <svg viewBox="0 0 220 220" className="h-full w-full" aria-hidden>
+                          <defs>
+                            <path id="colabPath" d="M 110,110 m -68,0 a 68,68 0 1,1 136,0 a 68,68 0 1,1 -136,0" />
+                          </defs>
+                          <text fill="white" fontSize="19" fontWeight="700" letterSpacing="2.3">
+                            <textPath href="#colabPath">COLABORACIÓN • COLABORACIÓN • </textPath>
+                          </text>
+                          <text x="110" y="132" textAnchor="middle" fill="white" fontSize="78" fontWeight="800">O</text>
+                        </svg>
                       </div>
                       <div className="identity-cube-face identity-cube-face--adaptabilidad">
-                        <span>ADAP
-                        <br />TA
-                        <br />BILI
-                        <br />DAD</span>
+                        <div className="t-shape-grid">
+                          <span>A D A P T A</span>
+                          <span>B I L I</span>
+                          <span>D A D</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -264,7 +288,16 @@ export default function QuienesPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <section className="relative mx-auto max-w-6xl overflow-hidden px-4 py-16 md:py-24">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brujula.svg"
+            alt=""
+            aria-hidden
+            className="quienes-compass-bg pointer-events-none absolute right-[-8%] top-[-6%]"
+            style={{ transform: `translate3d(0, ${scrollY * 0.045}px, 0)` }}
+          />
+
           <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
             <div className="max-w-3xl">
               <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">Nuestra ética</h2>
@@ -283,24 +316,11 @@ export default function QuienesPage() {
               </div>
             </div>
 
-            <div className="flex justify-center md:justify-end">
-              <svg viewBox="0 0 280 280" className="h-[250px] w-[250px]" aria-hidden>
-                <circle cx="140" cy="140" r="118" fill="#ff4f3e" opacity="0.96" />
-                <circle cx="140" cy="140" r="88" fill="#fff" />
-                <circle cx="140" cy="140" r="70" fill="none" stroke="#ef7f35" strokeWidth="3" strokeDasharray="6 8" />
-                <path d="M140 58 L156 140 L140 222 L124 140 Z" fill="#ff4f3e" opacity="0.9" />
-                <path d="M140 84 L150 140 L140 196 L130 140 Z" fill="#fff" />
-                <circle cx="140" cy="140" r="11" fill="#ff4f3e" />
-                <text x="140" y="33" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">N</text>
-                <text x="247" y="146" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">E</text>
-                <text x="140" y="258" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">S</text>
-                <text x="32" y="146" textAnchor="middle" fill="#ef7f35" fontSize="16" fontWeight="700">W</text>
-              </svg>
-            </div>
+            <div className="hidden md:block" aria-hidden />
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 pb-28 pt-10 md:pb-36 md:pt-16" data-reveal>
+        <section className="mx-auto max-w-6xl px-4 pb-36 pt-14 md:pb-44 md:pt-24" data-reveal>
           <div className="md:ml-auto md:max-w-[62%] md:text-right">
             <p className="text-lg text-slate-800 md:text-xl">Detrás de cada organización hay personas.</p>
             <p className="mt-2 text-lg text-slate-800 md:text-xl">Detrás de cada conflicto hay estructuras.</p>
