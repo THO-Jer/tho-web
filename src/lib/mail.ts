@@ -1,25 +1,34 @@
-import { Resend } from "resend";
-
 export type Mail = { to: string; subject: string; text: string };
+
+const RESEND_API_URL = "https://api.resend.com/emails";
 
 export async function sendMail(mail: Mail) {
   const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.MAIL_FROM;
-  const toDefault = process.env.MAIL_TO;
+  const from = process.env.MAIL_FROM || "THO Web <noreply@tho.cl>";
 
-  if (!apiKey) throw new Error("Missing RESEND_API_KEY");
-  if (!from) throw new Error("Missing MAIL_FROM");
-  const to = mail.to || toDefault;
-  if (!to) throw new Error("Missing MAIL_TO or mail.to");
+  if (!apiKey) {
+    console.log("[MAIL STUB]", mail.subject, "->", mail.to);
+    return { ok: true, stub: true };
+  }
 
-  const resend = new Resend(apiKey);
-
-  const result = await resend.emails.send({
-    from,
-    to,
-    subject: mail.subject,
-    text: mail.text,
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [mail.to],
+      subject: mail.subject,
+      text: mail.text,
+    }),
   });
 
-  return result;
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Resend error (${response.status}): ${err}`);
+  }
+
+  return { ok: true, provider: "resend" };
 }

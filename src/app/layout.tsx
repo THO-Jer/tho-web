@@ -29,8 +29,8 @@ export const metadata: Metadata = {
     "Consultoría boutique en desarrollo organizacional, relacionamiento comunitario y sostenibilidad corporativa. Rigor, viabilidad y acompañamiento en terreno.",
   applicationName: "The Human Org",
   icons: {
-    icon: [{ url: "/icon.png", type: "image/png" }],
-    apple: [{ url: "/apple-touch-icon.png", type: "image/png" }],
+    icon: [{ url: "/icon", type: "image/png" }],
+    apple: [{ url: "/apple-icon", type: "image/png" }],
   },
   openGraph: {
     type: "website",
@@ -72,7 +72,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script
           id="ld-org"
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }}
         />
         {children}

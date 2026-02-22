@@ -11,7 +11,7 @@ export default function TicketsPage() {
         <div className="mx-auto max-w-6xl px-4 py-14">
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Tickets estratégicos</h1>
           <p className="mt-3 max-w-2xl text-slate-600">
-            Puertas de entrada claras. Duración estimada: 2 a 3 meses. Sin precios públicos.
+            Puertas de entrada claras para activar decisiones con evidencia. Sin precios públicos.
           </p>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             {TICKETS.map((t) => (

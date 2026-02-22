@@ -19,8 +19,6 @@ export default function TicketDetailPage({ params }: { params: { slug: string } 
             <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wide ${meta.softBg} ${meta.softBorder} ${meta.ink}`}>
               <span className={`h-1.5 w-1.5 rounded-full ${meta.accentDot}`} />
               {meta.label}
-              <span className="opacity-60">·</span>
-              <span className="font-semibold normal-case tracking-normal">{ticket.duration}</span>
             </div>
 
             <h1 className="font-tho-title mt-5 text-3xl font-normal md:text-4xl">{ticket.name}</h1>
