@@ -25,10 +25,9 @@ export default async function BlogPage() {
 
           <div className="relative mx-auto flex h-full min-h-[52vh] max-w-6xl items-end justify-end px-4 pb-14 pt-8 md:min-h-[60vh] md:pb-16 md:pt-12">
             <div className="max-w-2xl text-right">
-              <div className="text-xs uppercase tracking-wide text-white/75">Blog The Human Org</div>
               <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
               <h1 className="mt-4 font-tho-title text-[3rem] leading-[0.95] text-white md:text-[4.4rem]">Blog</h1>
-              <p className="mt-4 ml-auto max-w-xl text-base text-white/85 md:text-lg">Análisis aplicados para decisiones complejas: DO, comunidad y sostenibilidad.</p>
+              <p className="mt-4 ml-auto max-w-xl text-justify text-base text-white/85 md:text-lg">Reflexiones, análisis y discusiones de nuestra consultora aplicadas a realidades complejas y contextos cambiantes en gestión de la sostenibilidad, gestión de stakeholders, gestión de equipos y más.</p>
             </div>
           </div>
         </section>
