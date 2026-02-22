@@ -690,9 +690,9 @@ body {
 
 .identity-section .splitview {
   position: relative;
-  width: min(100%, 940px);
+  width: min(100%, 720px);
   margin-inline: auto;
-  min-height: clamp(210px, 24vw, 290px);
+  min-height: clamp(190px, 20vw, 250px);
   overflow: hidden;
 }
 
@@ -709,11 +709,27 @@ body {
 }
 
 .identity-section .panel .description {
-  width: min(34vw, 320px);
+  width: min(26vw, 220px);
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   text-align: left;
+}
+
+.identity-section .panel .description {
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.85rem;
+  backdrop-filter: blur(2px);
+}
+
+.identity-section .bottom .description {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.identity-section .top .description {
+  color: #ffffff;
+  background: rgba(15, 23, 42, 0.78);
 }
 
 .identity-section .bottom {
@@ -722,7 +738,7 @@ body {
 }
 
 .identity-section .bottom .description {
-  right: 6%;
+  right: 12%;
 }
 
 .identity-section .top {
@@ -731,14 +747,14 @@ body {
 }
 
 .identity-section .top .description {
-  left: 6%;
+  left: 12%;
 }
 
 .identity-section .handle {
   height: 100%;
   position: absolute;
   display: block;
-  width: 5px;
+  width: 6px;
   top: 0;
   z-index: 3;
 }
@@ -835,7 +851,7 @@ body {
   .identity-section .splitview,
   .identity-section .panel,
   .identity-section .panel .content {
-    min-height: 52vw;
+    min-height: 46vw;
   }
 
   .identity-section .panel .description {
@@ -864,3 +880,12 @@ body {
   }
 }
 
+
+
+.quienes-compass-bg {
+  width: min(46vw, 520px);
+  opacity: 0.12;
+  filter: grayscale(0.95) saturate(0.52) contrast(0.9);
+  mask-image: radial-gradient(circle at center, #000 48%, rgba(0,0,0,0.62) 64%, transparent 100%);
+  -webkit-mask-image: radial-gradient(circle at center, #000 48%, rgba(0,0,0,0.62) 64%, transparent 100%);
+}

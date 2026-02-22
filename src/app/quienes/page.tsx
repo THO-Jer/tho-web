@@ -288,7 +288,16 @@ export default function QuienesPage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
+        <section className="relative mx-auto max-w-6xl overflow-hidden px-4 py-16 md:py-24">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/brujula.svg"
+            alt=""
+            aria-hidden
+            className="quienes-compass-bg pointer-events-none absolute right-[-8%] top-[-6%]"
+            style={{ transform: `translate3d(0, ${scrollY * 0.045}px, 0)` }}
+          />
+
           <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
             <div className="max-w-3xl">
               <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">Nuestra ética</h2>
@@ -307,10 +316,7 @@ export default function QuienesPage() {
               </div>
             </div>
 
-            <div className="flex justify-center md:justify-end">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brujula.svg" alt="Brújula ilustrada" className="h-[250px] w-[250px] object-contain" />
-            </div>
+            <div className="hidden md:block" aria-hidden />
           </div>
         </section>
 
