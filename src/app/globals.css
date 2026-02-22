@@ -524,6 +524,12 @@ body {
 }
 
 
+.trust-slider {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .trust-track {
   animation: trust-marquee 46s linear infinite;
 }

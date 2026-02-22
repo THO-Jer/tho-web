@@ -15,7 +15,7 @@ export function TrustSlider() {
   const marquee = [...logos, ...logos];
 
   return (
-    <div className="trust-slider overflow-hidden rounded-[1.8rem] border border-slate-200/70 bg-white/65 py-5">
+    <div className="trust-slider overflow-hidden py-5">
       <div className="trust-track flex w-max items-center gap-4 px-4 md:gap-6 md:px-6">
         {marquee.map((logo, idx) => (
           <div key={`${logo.src}-${idx}`} className="trust-logo-card relative h-[74px] w-[190px] shrink-0 md:h-[84px] md:w-[220px]">

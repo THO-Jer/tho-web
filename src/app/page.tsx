@@ -169,9 +169,11 @@ export default async function HomePage() {
       </section>
 
 
-      <Section id="confian" title="Confían en nosotros" subtitle="Organizaciones con las que hemos construido procesos estratégicos en sostenibilidad, territorio y desarrollo organizacional.">
+      <Section id="confian" title="Confían en nosotros">
         <TrustSlider />
       </Section>
+
+      <div className="mx-auto mt-2 mb-2 h-[6px] w-36 rounded-sm brand-block-divider" aria-hidden />
 
       <Section id="blog" title="Blog" subtitle="Desde el territorio: análisis y tendencias (placeholder).">
         <div className="grid gap-4 md:grid-cols-3">
