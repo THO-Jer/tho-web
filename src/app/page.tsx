@@ -33,23 +33,12 @@ export default async function HomePage() {
         <div className="relative mx-auto max-w-6xl px-4 py-16 md:py-24">
           <div className="flex justify-end">
           <div className="max-w-2xl text-right">
-            <div className="flex items-center justify-end gap-3 text-xs tracking-wide text-white/70">
+            <div className="mt-16 flex items-center justify-end gap-3 text-xs tracking-wide text-white/70 md:mt-24">
               <span className="brand-block-divider h-[6px] w-36 rounded-sm" />
               <span className="uppercase">Consultoría estratégica · Concepción</span>
             </div>
 
-            <h1 className="font-tho-title mt-6 text-[3.2rem] font-normal leading-[0.94] md:text-[5.6rem]">
-              Fortalece tu organización,
-              <br />
-              conecta con tu entorno
-            </h1>
-
-            <p className="mt-6 ml-auto max-w-xl text-base text-white/80 md:text-lg">
-              Integramos ESG, relacionamiento comunitario y desarrollo organizacional para construir estrategias
-              accionables y decisiones que se sostienen en el tiempo.
-            </p>
-
-            <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
+            <div className="mt-6 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#servicios"
                 className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
