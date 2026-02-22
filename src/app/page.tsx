@@ -10,6 +10,12 @@ import { ResourcesModal } from "@/components/ResourcesModal";
 import { TrustSlider } from "@/components/TrustSlider";
 import { listPublishedPosts } from "@/lib/blogStore";
 
+function clampWords(text: string, maxWords = 22) {
+  const words = text.trim().split(/\s+/);
+  if (words.length <= maxWords) return text;
+  return `${words.slice(0, maxWords).join(" ")} (...)`;
+}
+
 export default async function HomePage() {
   const posts = await listPublishedPosts();
 
@@ -173,22 +179,35 @@ export default async function HomePage() {
         <TrustSlider />
       </Section>
 
-      <div className="mx-auto mt-2 mb-2 h-[6px] w-36 rounded-sm brand-block-divider" aria-hidden />
+      <div className="mx-auto mt-2 mb-2 h-[6px] w-36 rounded-sm bg-white brand-block-divider" aria-hidden />
 
-      <Section id="blog" title="Blog" subtitle="Desde el territorio: análisis y tendencias (placeholder).">
+      <Section id="blog" title="Blog" subtitle="Análisis y reflexiones desde el terreno. Exploramos las tendencias que definen el presente y futuro de la estrategia organizacional y territorial.">
         <div className="grid gap-4 md:grid-cols-3">
           {posts.slice(0, 3).map((p) => (
-            <div key={p.slug} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="text-xs text-slate-500">{p.minutes} min</div>
-              <div className="mt-2 text-base font-semibold">{p.title}</div>
-              <p className="mt-2 text-sm text-slate-600">{p.excerpt}</p>
-              <a
-                href={`/blog/${p.slug}`}
-                className="btn-unified-motion btn-brand-neutral mt-5 inline-flex rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
-              >
-                Leer
-              </a>
-            </div>
+            <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
+              <div className="blog-card-inner relative h-full w-full">
+                <div
+                  className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                  style={{
+                    backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.96) 100%), url(${p.coverImage || "/hero/4.png"})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  <div className="text-xs text-slate-500">{p.minutes} min</div>
+                  <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
+                  <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
+                </div>
+                <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <a
+                    href={`/blog/${p.slug}`}
+                    className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
+                  >
+                    Leer +
+                  </a>
+                </div>
+              </div>
+            </article>
           ))}
         </div>
       </Section>

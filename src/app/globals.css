@@ -538,6 +538,10 @@ body {
   animation-play-state: paused;
 }
 
+.trust-logo-slot {
+  display: block;
+}
+
 .trust-logo-card {
   filter: grayscale(1) saturate(0.75);
   opacity: 0.78;
@@ -559,6 +563,32 @@ body {
   .trust-track {
     animation: none;
   }
+}
+
+
+.blog-card-inner {
+  transform-style: preserve-3d;
+  transition: transform 0.65s ease;
+}
+
+.blog-card-flip:hover .blog-card-inner {
+  transform: rotateY(180deg);
+}
+
+.blog-card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
+.blog-card-front {
+  display: block;
+}
+
+.blog-card-back {
+  display: grid;
+  place-items: center;
+  transform: rotateY(180deg);
 }
 
 .method-arc-shell {
