@@ -631,33 +631,6 @@ body {
   }
 }
 
-.who-image-frame {
-  position: relative;
-  overflow: hidden;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(148, 163, 184, 0.36);
-  background: linear-gradient(150deg, rgba(255,255,255,0.7) 0%, rgba(226,232,240,0.5) 100%);
-  box-shadow: 0 18px 36px -28px rgba(15, 23, 42, 0.6);
-}
-
-.who-image-frame img {
-  filter: saturate(0.74) contrast(0.93) brightness(0.92);
-  transition: transform 0.45s ease, filter 0.45s ease;
-}
-
-.who-image-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, rgba(255,255,255,0.34), rgba(15,23,42,0.14));
-  pointer-events: none;
-}
-
-.who-image-frame:hover img {
-  transform: scale(1.03);
-  filter: saturate(0.82) contrast(0.96) brightness(0.95);
-}
-
 [data-reveal] {
   opacity: 0;
   transform: translateY(22px);
@@ -688,5 +661,54 @@ body {
 @media (min-width: 768px) {
   .quienes-ethics-panel {
     padding: 2.6rem;
+  }
+}
+
+.quienes-bg-image {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 1.4rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  opacity: 0.17;
+  filter: grayscale(0.9) saturate(0.58) contrast(0.9);
+  box-shadow: 0 20px 42px -36px rgba(15, 23, 42, 0.55);
+}
+
+.quienes-bg-image img {
+  width: 100%;
+  height: 100%;
+}
+
+.quienes-bg-image-1 {
+  top: 8%;
+  right: 4%;
+  width: min(24vw, 340px);
+  aspect-ratio: 4 / 5;
+}
+
+.quienes-bg-image-2 {
+  top: 28%;
+  left: 2%;
+  width: min(22vw, 300px);
+  aspect-ratio: 4 / 5;
+}
+
+.quienes-bg-image-3 {
+  top: 56%;
+  right: 7%;
+  width: min(23vw, 330px);
+  aspect-ratio: 4 / 5;
+}
+
+.quienes-bg-image-4 {
+  top: 78%;
+  left: 6%;
+  width: min(20vw, 280px);
+  aspect-ratio: 4 / 5;
+}
+
+@media (max-width: 900px) {
+  .quienes-bg-image {
+    opacity: 0.11;
   }
 }
