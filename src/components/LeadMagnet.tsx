@@ -39,6 +39,26 @@ export function LeadMagnet() {
         <p className="mt-2 text-sm text-slate-600">
           Una guía práctica para pasar de la declaración de principios a la gestión real.
         </p>
+
+        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div className="flex items-center justify-between border-b border-slate-200 px-3 py-2 text-xs text-slate-500">
+            <span>Vista previa</span>
+            <a
+              href="/downloads/manual-diversidad-v1.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="font-semibold text-slate-700 underline underline-offset-2"
+            >
+              Abrir PDF
+            </a>
+          </div>
+          <iframe
+            title="Vista previa del Manual de Gestión de la Diversidad"
+            src="/downloads/manual-diversidad-v1.pdf#toolbar=0&navpanes=0&scrollbar=0&page=1"
+            className="h-56 w-full bg-white"
+          />
+        </div>
+
         <button
           onClick={() => setOpen(true)}
           className="btn-unified-motion btn-brand-accent btn-brand-accent-pink mt-4 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-800"
