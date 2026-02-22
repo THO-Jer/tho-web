@@ -13,7 +13,6 @@ type BlogPost = {
   content: string;
   minutes: number;
   tags: string[];
-  category?: string;
   status: "draft" | "published";
   publishedAt: string | null;
   updatedAt: string;
@@ -30,7 +29,6 @@ type FormState = {
   content: string;
   minutes: string;
   tags: string;
-  category: string;
   publishedAt: string;
   status: "draft" | "published";
   coverImage: string;
@@ -54,7 +52,6 @@ const EMPTY_FORM: FormState = {
   content: "",
   minutes: "5",
   tags: "",
-  category: "",
   publishedAt: "",
   status: "published",
   coverImage: "",
@@ -73,7 +70,6 @@ function toFormState(post: BlogPost): FormState {
     content: post.content,
     minutes: String(post.minutes),
     tags: post.tags.join(", "),
-    category: post.category ?? "",
     publishedAt: post.publishedAt ? post.publishedAt.slice(0, 16) : "",
     status: post.status,
     coverImage: post.coverImage ?? "",
@@ -228,7 +224,6 @@ export default function BlogStudioPage() {
       .slice(0, 4);
   }, [posts, form, editingSlug]);
 
-  const categoryOptions = useMemo(() => Array.from(new Set(posts.map((post) => post.category).filter(Boolean))) as string[], [posts]);
 
   const canSubmit = useMemo(() => Boolean(authenticated && form.title && form.excerpt && form.content), [authenticated, form]);
 
@@ -434,7 +429,6 @@ export default function BlogStudioPage() {
       content: form.content,
       minutes: Number(form.minutes),
       tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
-      category: form.category.trim(),
       publishedAt: form.publishedAt ? new Date(form.publishedAt).toISOString() : null,
       status: form.status,
       coverImage: form.coverImage,
@@ -586,13 +580,6 @@ export default function BlogStudioPage() {
                 </div>
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Texto alternativo de portada" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
 
-                <div className="grid gap-3 md:grid-cols-2">
-                  <select className="rounded-lg border border-slate-300 px-3 py-2" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                    <option value="">Categoría (sin categoría)</option>
-                    {categoryOptions.map((item) => (<option key={item} value={item}>{item}</option>))}
-                  </select>
-                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Nueva categoría (opcional)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-                </div>
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
                 <label className="text-xs text-slate-600">Fecha de publicación
                   <input type="datetime-local" className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} />

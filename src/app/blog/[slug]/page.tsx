@@ -60,8 +60,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     .filter((item) => item.slug !== post.slug)
     .map((item) => {
       const sharedTags = item.tags.filter((tag) => currentTags.has(tag.toLowerCase())).length;
-      const sameCategory = post.category && item.category && post.category.toLowerCase() === item.category.toLowerCase() ? 2 : 0;
-      const score = sharedTags * 3 + sameCategory;
+      const score = sharedTags * 3;
       return { item, score };
     })
     .sort((a, b) => b.score - a.score)
@@ -95,6 +94,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           <div className="max-w-3xl">
             <div className="text-xs text-slate-500">{post.minutes} min</div>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">{post.title}</h1>
+            <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
             <p className="mt-4 text-slate-600">{post.excerpt}</p>
 
             {post.coverImage ? (
@@ -103,11 +103,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             ) : null}
 
-            {post.category ? (
-              <div className="mt-3 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
-                Categoría: {post.category}
-              </div>
-            ) : null}
 
             {post.tags.length ? (
               <div className="mt-4 flex flex-wrap gap-2">
@@ -129,7 +124,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
             {relatedPosts.length ? (
               <section className="mt-10 border-t border-slate-200 pt-6">
-                <h2 className="text-xl font-semibold text-slate-900">También te puede interesar</h2>
+                <span className="inline-flex rounded-full border border-transparent bg-[linear-gradient(95deg,var(--tho-pink)_0%,var(--tho-blue)_25%,var(--tho-orange)_50%,var(--tho-yellow)_75%,var(--tho-green)_100%)] px-3 py-1 text-xs font-bold uppercase tracking-wide text-white shadow-sm">Otras lecturas</span>
+                <h2 className="mt-3 text-xl font-semibold text-slate-900">También te puede interesar</h2>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   {relatedPosts.map((related) => (
                     <Link key={related.slug} href={`/blog/${related.slug}`} className="rounded-xl border border-slate-200 bg-slate-50 p-3 transition hover:bg-white">
