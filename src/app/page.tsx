@@ -9,6 +9,7 @@ import MethodTimeline from "@/components/MethodTimeline";
 import { ActionGallery } from "@/components/ActionGallery";
 import { ResourcesModal } from "@/components/ResourcesModal";
 import { TrustSlider } from "@/components/TrustSlider";
+import { SocialFloat } from "@/components/SocialFloat";
 import { listPublishedPosts } from "@/lib/blogStore";
 
 function clampWords(text: string, maxWords = 22) {
@@ -23,6 +24,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen">
       <Header />
+      <SocialFloat />
 
       <main id="contenido">
         <ResourcesModal autoOpen />
@@ -227,7 +229,11 @@ export default async function HomePage() {
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
               ¿Hablamos de lo que realmente importa?
             </h2>
-            <p className="mt-4 text-slate-200">Agenda una conversación estratégica o deja tus datos. Sin spam. Sin humo.</p>
+            <p className="mt-4 text-slate-200">
+              <strong>¿Quieres fortalecer tus estrategias?</strong>
+              <br />
+              Déjanos tu contacto o agenda una reunión para evaluar una consultoría en Sostenibilidad, Relacionamiento Comunitario o Desarrollo Organizacional.
+            </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <a
                 href="https://bit.ly/bookTHO"
