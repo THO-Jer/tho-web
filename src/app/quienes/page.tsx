@@ -127,18 +127,18 @@ export default function QuienesPage() {
 
             <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
               <div className="ml-auto p-3 text-right md:max-w-[72%] md:p-0">
-                <p className="text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
+                <p className="text-justify text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
                 <p className="mt-6 text-[1.02rem] text-slate-700">Cada integrante de THO aporta experiencia previa en:</p>
-                <ul className="mt-3 grid gap-2 text-[1.02rem] text-slate-700">
-                  <li>- Diagnóstico e intervención organizacional</li>
-                  <li>- Diseño de procesos participativos</li>
-                  <li>- Análisis de impacto social</li>
-                  <li>- Gestión estratégica en entornos complejos</li>
+                <ul className="mt-3 ml-auto grid max-w-[32rem] gap-2 text-left text-[1.02rem] text-slate-700">
+                  <li>• Diagnóstico e intervención organizacional</li>
+                  <li>• Diseño de procesos participativos</li>
+                  <li>• Análisis de impacto social</li>
+                  <li>• Gestión estratégica en entornos complejos</li>
                 </ul>
-                <p className="mt-6 text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
+                <p className="mt-6 text-justify text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
                   En The Human Org reconocemos estas trayectorias y sabemos que la expertise que cada uno trae profundiza
                   el propósito de la consultora.
                 </p>
@@ -149,16 +149,20 @@ export default function QuienesPage() {
               <h2 className="text-center font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.6rem]">Nuestra identidad</h2>
               <div className="mx-auto mt-5 h-[6px] w-36 rounded-sm brand-block-divider" />
 
-              <div className="identity-block-space splitview skewed mt-12 rounded-3xl">
+              <p className="identity-block-space mx-auto mt-14 max-w-4xl text-center text-lg leading-relaxed text-slate-700 md:text-[1.25rem]">
+                Transformamos la asesoría estratégica integrando innovación, humanidad y sostenibilidad, asegurando que
+                las organizaciones no solo alcancen sus objetivos, sino que lo hagan impactando positivamente a sus
+                comunidades y entorno. Esta mirada integra nuestra misión y visión en una misma dirección estratégica.
+              </p>
+
+              <div className="identity-block-space splitview skewed mt-10 rounded-3xl">
                 <div className="panel bottom">
                   <div className="content">
                     <div className="description">
-                      <h3 className="text-[2rem] font-semibold text-white md:text-[2.4rem]">Visión</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-white/90 md:text-base">
+                      <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Visión</h3>
+                      <p className="mt-2 text-xs leading-relaxed text-white/90 md:text-sm">
                         Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica,
-                        por nuestro compromiso inquebrantable con la ética, la innovación y la humanización,
-                        potenciando así el bienestar de las comunidades y el crecimiento sostenible de las organizaciones
-                        que servimos.
+                        por nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
                       </p>
                     </div>
                   </div>
@@ -167,11 +171,10 @@ export default function QuienesPage() {
                 <div className="panel top" style={{ width: `calc(${thesisSplit}% + 1000px)` }}>
                   <div className="content">
                     <div className="description">
-                      <h3 className="text-[2rem] font-semibold text-white md:text-[2.4rem]">Misión</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-white/90 md:text-base">
+                      <h3 className="text-[1.35rem] font-semibold text-white md:text-[1.7rem]">Misión</h3>
+                      <p className="mt-2 text-xs leading-relaxed text-white/90 md:text-sm">
                         Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante
-                        intervenciones estratégicas técnicamente sólidas y humanamente sostenibles, asegurando que cada
-                        proyecto fortalezca tanto a la organización como a su entorno.
+                        intervenciones estratégicas técnicamente sólidas y humanamente sostenibles.
                       </p>
                     </div>
                   </div>
@@ -189,13 +192,12 @@ export default function QuienesPage() {
                 />
               </div>
 
-              <p className="identity-block-space mx-auto mt-14 max-w-4xl text-center text-lg leading-relaxed text-slate-700 md:text-[1.25rem]">
-                Transformamos la asesoría estratégica integrando innovación, humanidad y sostenibilidad, asegurando que
-                las organizaciones no solo alcancen sus objetivos, sino que lo hagan impactando positivamente a sus
-                comunidades y entorno.
-              </p>
-              <p className="identity-block-space font-tho-title mx-auto mt-5 max-w-4xl text-center text-[1.55rem] text-slate-900 md:text-[2rem]">
+              <p className="identity-block-space font-tho-title mx-auto mt-8 max-w-4xl text-center text-[1.55rem] text-slate-900 md:text-[2rem]">
                 Nuestra promesa es diseñar soluciones estratégicas y exitosas.
+              </p>
+              <p className="identity-block-space mx-auto mt-3 max-w-4xl text-center text-base leading-relaxed text-slate-700 md:text-lg">
+                Nuestros valores no son solo conceptos: son articuladores de sentido y conducta en cada decisión,
+                relación y proceso que impulsamos.
               </p>
 
               <div className="identity-block-space mt-16 grid items-center gap-12 md:grid-cols-[0.9fr_1.1fr]">
