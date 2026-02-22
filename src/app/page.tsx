@@ -19,7 +19,7 @@ export default async function HomePage() {
       <main id="contenido">
         <ResourcesModal autoOpen />
         {/* HERO — imagen de fondo (atenuada) + texto encima */}
-        <section className="relative overflow-visible text-white">
+        <section className="relative min-h-[78vh] overflow-visible text-white md:min-h-[88vh]">
         <div className="hero-media-fade pointer-events-none absolute inset-x-0 -bottom-28 top-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -30,10 +30,9 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 py-24 md:py-36">
-          <div className="flex justify-end">
+        <div className="relative mx-auto flex h-full min-h-[78vh] max-w-6xl items-end justify-end px-4 pb-20 pt-10 md:min-h-[88vh] md:pb-24 md:pt-14">
           <div className="max-w-2xl text-right">
-            <div className="mt-24 text-xs uppercase tracking-wide text-white/75 md:mt-40">
+            <div className="text-xs uppercase tracking-wide text-white/75">
               Consultoría estratégica · Concepción
             </div>
             <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
@@ -51,7 +50,6 @@ export default async function HomePage() {
                 Ver servicios
               </a>
             </div>
-          </div>
           </div>
         </div>
         </section>
