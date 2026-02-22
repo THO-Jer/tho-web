@@ -74,6 +74,30 @@ body {
   opacity: 0;
 }
 
+
+.tho-nav-chip {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  background: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(51 65 85);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.tho-nav-chip:hover,
+.tho-nav-chip:focus-visible {
+  border-color: rgb(226 232 240);
+  background: #fff;
+  color: rgb(15 23 42);
+  box-shadow: none;
+  outline: none;
+}
+
 /* Base compartida de dinamismo para botones */
 .btn-unified-motion {
   position: relative;
