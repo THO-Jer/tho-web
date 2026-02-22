@@ -40,16 +40,14 @@ export default async function HomePage() {
             </div>
 
             <h1 className="font-tho-title mt-6 text-[3.2rem] font-normal leading-[0.94] md:text-[5.6rem]">
-              Viabilidad.
+              Fortalece tu organización,
               <br />
-              Rigor.
-              <br />
-              Territorio.
+              conecta con tu entorno
             </h1>
 
             <p className="mt-6 ml-auto max-w-xl text-base text-white/80 md:text-lg">
-              ESG, relacionamiento comunitario y desarrollo organizacional — integrado, accionable y con foco en
-              decisiones que se sostienen.
+              Integramos ESG, relacionamiento comunitario y desarrollo organizacional para construir estrategias
+              accionables y decisiones que se sostienen en el tiempo.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
