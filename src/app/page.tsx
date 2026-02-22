@@ -52,17 +52,9 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#servicios"
-                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
+                className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
               >
                 Ver servicios
-              </a>
-              <a
-                href="https://bit.ly/bookTHO"
-                target="_blank"
-                rel="noreferrer"
-                className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-white/35 bg-white/5 px-5 py-3 text-sm font-bold text-white"
-              >
-                Agendar una conversación
               </a>
             </div>
           </div>
@@ -75,11 +67,14 @@ export default async function HomePage() {
         <div className="mx-auto max-w-5xl px-4 py-12 text-center md:py-16">
           <div className="mx-auto h-px w-24 bg-slate-300/70" />
           <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
-            Cuando la organización se desconecta del entorno, el costo llega igual.
+            Sostenibilidad desintegrada.
+            <br />
+            Comunidad descontenta.
+            <br />
+            Organización desalineada.
           </h2>
           <p className="mx-auto mt-6 max-w-3xl text-base text-slate-700 md:text-lg">
-            La pregunta no es si tendrás tensión. La pregunta es si tendrás método, evidencia y gobernanza para
-            sostener decisiones cuando aparezca.
+            No tienes que llegar ahí. En The Human Org te ayudamos a seguir elevando el estándar.
           </p>
         </div>
       </section>

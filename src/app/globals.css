@@ -137,6 +137,28 @@ body {
   transition: transform 0.35s ease, box-shadow 0.35s ease, color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease;
 }
 
+
+.btn-hero-services {
+  position: relative;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(100deg, var(--tho-pink), var(--tho-blue), var(--tho-orange), var(--tho-yellow), var(--tho-green), var(--tho-pink)) border-box;
+  background-size: 100% 100%, 240% 100%;
+  transition: border-color 0.35s ease, background-position 0.35s ease;
+}
+
+.btn-hero-services:hover,
+.btn-hero-services:focus-visible {
+  background-position: 0 0, 100% 0;
+  animation: tho-brand-border-flow 2.8s linear infinite;
+}
+
+@keyframes tho-brand-border-flow {
+  0% { background-position: 0 0, 0% 0; }
+  100% { background-position: 0 0, 200% 0; }
+}
+
 .btn-brand-neutral::before {
   content: "";
   position: absolute;
