@@ -34,7 +34,7 @@ export function LeadMagnet() {
   }
 
   return (
-    <div className="lead-magnet-shell grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+    <div className="lead-magnet-shell grid gap-4">
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
         <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-4 py-3">
           <div>
@@ -44,20 +44,21 @@ export function LeadMagnet() {
           <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500">Página 1</span>
         </div>
 
-        <div className="bg-slate-100 p-4">
-          <div className="mx-auto aspect-[1/1.414] w-full max-w-[540px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+        <div className="bg-slate-100 p-3 md:p-4">
+          <div className="mx-auto aspect-[1/1.414] w-full max-w-[340px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg md:max-w-[400px]">
             <iframe
               title="Vista previa de la primera página del manual"
-              src={`${RESOURCE_FILE_URL}#toolbar=0&navpanes=0&scrollbar=0&page=1&zoom=page-fit`}
+              src={`${RESOURCE_FILE_URL}#toolbar=0&navpanes=0&scrollbar=0&page=1&view=FitH&zoom=page-width`}
               className="h-full w-full"
+              scrolling="no"
             />
           </div>
         </div>
       </div>
 
-      <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(160deg,#ffffff_0%,#f8fafc_44%,#f1f5f9_100%)] p-6 shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
+      <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(160deg,#ffffff_0%,#f8fafc_44%,#f1f5f9_100%)] p-5 shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Manual descargable</p>
-        <h3 className="mt-2 text-[1.4rem] font-semibold leading-tight text-slate-900">Un recurso para orientar criterios y decisiones</h3>
+        <h3 className="mt-2 text-[1.2rem] font-semibold leading-tight text-slate-900 md:text-[1.3rem]">Un recurso para orientar criterios y decisiones</h3>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
           Diseñado para equipos que necesitan ordenar conversaciones, priorizar acciones y tomar decisiones con mayor claridad en temas de diversidad.
         </p>

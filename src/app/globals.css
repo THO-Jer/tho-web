@@ -716,6 +716,23 @@ body {
     border-color: rgba(148, 163, 184, 0.35) !important;
   }
 
+  .lead-magnet-shell input,
+  .lead-magnet-shell textarea {
+    background-color: #18181b;
+    color: #f8fafc;
+    border-color: rgba(148, 163, 184, 0.35);
+  }
+
+  .lead-magnet-shell input::placeholder,
+  .lead-magnet-shell textarea::placeholder {
+    color: #94a3b8;
+  }
+
+  .lead-magnet-shell .text-emerald-800,
+  .lead-magnet-shell .text-emerald-900 {
+    color: #d1fae5 !important;
+  }
+
   .lead-magnet-shell iframe {
     background: #111827;
   }
