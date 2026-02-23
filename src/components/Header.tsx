@@ -74,6 +74,10 @@ export function Header() {
         </nav>
 
         <div className="order-3 flex w-full items-center justify-end gap-2 md:hidden">
+          <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950" : "text-slate-700"}`}>
+            Blog
+          </Link>
+
           <details className="group relative">
             <summary className="list-none tho-nav-chip cursor-pointer">Servicios</summary>
             <div className="absolute right-0 z-50 mt-2 w-[min(18rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-2 shadow-md">

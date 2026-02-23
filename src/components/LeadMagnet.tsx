@@ -36,7 +36,7 @@ export function LeadMagnet() {
     <div className="lead-capture-shell rounded-3xl p-4 md:p-6">
       <div className="lead-capture-grid grid gap-5 md:grid-cols-[1.15fr_0.85fr] md:gap-7">
         <section>
-          <p className="lead-capture-kicker text-xs font-semibold uppercase tracking-[0.14em]">Lead magnet</p>
+          <p className="lead-capture-kicker text-xs font-semibold uppercase tracking-[0.14em]">Recurso recomendado</p>
           <h3 className="lead-capture-title mt-2 text-[1.65rem] font-bold leading-tight md:text-[2rem]">
             Descarga el Manual de Gestión de la Diversidad
           </h3>
@@ -72,7 +72,7 @@ export function LeadMagnet() {
               disabled={status === "sending"}
               className="lead-capture-cta mt-1 rounded-lg px-4 py-2.5 text-sm font-semibold uppercase tracking-wide disabled:opacity-70"
             >
-              {status === "sending" ? "Enviando..." : "Descargar ebook"}
+              {status === "sending" ? "Enviando..." : "Descargar manual"}
             </button>
 
             {status === "ok" ? (
