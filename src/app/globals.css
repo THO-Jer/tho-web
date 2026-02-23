@@ -406,6 +406,19 @@ body {
     color: #f8fafc !important;
   }
 
+  .btn-hero-services {
+    background:
+      linear-gradient(#1f1f1f, #1f1f1f) padding-box,
+      linear-gradient(100deg, var(--tho-pink), var(--tho-blue), var(--tho-orange), var(--tho-yellow), var(--tho-green), var(--tho-pink)) border-box;
+    color: #f8fafc !important;
+    border-color: transparent;
+  }
+
+  .btn-hero-services:hover,
+  .btn-hero-services:focus-visible {
+    color: #ffffff !important;
+  }
+
   .btn-brand-neutral:hover,
   .btn-brand-neutral:focus-visible {
     color: #f8fafc;
