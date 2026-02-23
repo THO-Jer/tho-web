@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { BrandLoader } from "@/components/BrandLoader";
 
 const modules = [
   {
@@ -119,17 +120,17 @@ export default function StudioIndexPage() {
   }
 
   return (
-    <div className="min-h-screen bg-tho-bg">
+    <div className="studio-shell min-h-screen bg-tho-bg">
       <Header />
       <main className="border-t border-slate-200">
         <section className="mx-auto max-w-6xl px-4 py-14">
-          <h1 className="font-tho-title text-5xl text-slate-950">THO Studio</h1>
+          <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">THO Studio</h1>
           <p className="mt-3 max-w-3xl text-slate-700">
             Acceso interno centralizado. Inicia sesión una vez y luego puedes operar cualquier módulo del Studio.
           </p>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
-            {checking ? <p className="text-sm text-slate-600">Verificando sesión...</p> : null}
+            {checking ? <BrandLoader message="Verificando acceso al Studio..." /> : null}
 
             {!checking && !email ? (
               <div>

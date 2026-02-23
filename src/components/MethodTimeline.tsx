@@ -91,7 +91,7 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
                 }}
               >
                 <path d={d} fill={fill} stroke="rgba(255,255,255,0.92)" strokeWidth="6" />
-                <text fontSize="21" fontWeight="800" fill="#0f172a" letterSpacing="0.005em">
+                <text className="method-arc-label" fontSize="21" fontWeight="800" fill="currentColor" letterSpacing="0.005em">
                   <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle">
                     {step.title}
                   </textPath>
@@ -102,7 +102,7 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
         </svg>
 
         <div className="pointer-events-none absolute left-1/2 top-[63%] z-30 h-24 w-56 -translate-x-1/2 -translate-y-1/2 md:h-36 md:w-[22rem]">
-          <div className="absolute inset-0 rounded-full bg-white/65 blur-xl" />
+          <div className="method-logo-glow absolute inset-0 rounded-full" />
           <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" />
           <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" />
         </div>
