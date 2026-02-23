@@ -82,7 +82,7 @@ export default function QuienesPage() {
         <section className="relative min-h-[58vh] overflow-visible text-white md:min-h-[68vh]" data-reveal>
           <div className="hero-media-fade pointer-events-none absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/hero/4.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-[0.76]" />
+            <img src="/hero/4.png" alt="" className="absolute inset-0 h-full w-full object-cover object-[24%_center] opacity-[0.76] md:object-center" />
             <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.12)_0%,rgba(15,23,42,0.42)_54%,rgba(15,23,42,0.75)_100%)]" />
           </div>
 
@@ -193,9 +193,9 @@ export default function QuienesPage() {
                   <article key={value.key} className="grid gap-5 md:grid-cols-[130px_1fr] md:items-center md:gap-8">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={value.icon} alt="" aria-hidden className="mx-auto h-24 w-24 object-contain md:h-28 md:w-28" />
-                    <div className="md:mr-36 lg:mr-52 xl:mr-64">
+                    <div className="mx-auto text-center md:mr-36 md:text-left lg:mr-52 xl:mr-64">
                       <h3 className={`text-2xl font-semibold ${value.color}`}>{value.title}</h3>
-                      <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">{value.description}</p>
+                      <p className="mt-3 text-center text-base leading-relaxed text-slate-700 md:text-left md:text-lg">{value.description}</p>
                     </div>
                   </article>
                 ))}

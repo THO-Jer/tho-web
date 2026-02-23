@@ -288,6 +288,14 @@ body {
   scroll-behavior: smooth;
 }
 
+@media (max-width: 767px) {
+  .services-gallery {
+    position: relative;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  }
+}
+
 .services-gallery::-webkit-scrollbar {
   height: 8px;
 }
@@ -594,7 +602,7 @@ body {
 
 @media (prefers-color-scheme: dark) {
   .tho-action-fade {
-    background: radial-gradient(circle at center, transparent 42%, rgba(21, 21, 21, 0.78) 100%);
+    background: radial-gradient(circle at center, transparent 52%, rgba(21, 21, 21, 0.34) 100%);
   }
 }
 
