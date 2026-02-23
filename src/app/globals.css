@@ -420,7 +420,40 @@ body {
   .logo-dark { opacity: 1; }
 
   .hero-transition-panel {
-    color: #0f172a !important;
+    color: #e2e8f0 !important;
+  }
+
+  .hero-transition-panel h2,
+  .hero-transition-panel .text-slate-950,
+  .hero-transition-panel .text-slate-900 {
+    color: #f8fafc !important;
+  }
+
+  .hero-transition-panel .text-slate-700,
+  .hero-transition-panel .text-slate-600 {
+    color: #cbd5e1 !important;
+  }
+
+  .studio-shell .bg-white,
+  .studio-shell [class*="bg-white"],
+  .studio-shell [class*="bg-slate-50"] {
+    background-color: #202020 !important;
+  }
+
+  .studio-shell .text-slate-900,
+  .studio-shell .text-slate-950 {
+    color: #f8fafc !important;
+  }
+
+  .studio-shell .text-slate-700,
+  .studio-shell .text-slate-600,
+  .studio-shell .text-slate-500 {
+    color: #cbd5e1 !important;
+  }
+
+  .studio-shell .border-slate-300,
+  .studio-shell .border-slate-200 {
+    border-color: rgba(148, 163, 184, 0.35) !important;
   }
 
   .service-pill-contrast {

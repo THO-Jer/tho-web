@@ -109,7 +109,7 @@ export default function BlogStudioIndexPage() {
   }
 
   return (
-    <main className="min-h-screen bg-tho-bg px-4 py-10">
+    <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

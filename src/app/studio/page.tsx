@@ -119,7 +119,7 @@ export default function StudioIndexPage() {
   }
 
   return (
-    <div className="min-h-screen bg-tho-bg">
+    <div className="studio-shell min-h-screen bg-tho-bg">
       <Header />
       <main className="border-t border-slate-200">
         <section className="mx-auto max-w-6xl px-4 py-14">
