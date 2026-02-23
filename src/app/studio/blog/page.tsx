@@ -105,7 +105,7 @@ export default function BlogStudioIndexPage() {
   );
 
   if (checkingAuth) {
-    return <main className="min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
+    return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
   }
 
   return (
@@ -151,9 +151,9 @@ export default function BlogStudioIndexPage() {
                   <div>
                     <div className="text-xs font-semibold uppercase text-slate-500">{post.status === "published" ? "Publicado" : "Borrador"}</div>
                     <h3 className="text-lg font-semibold text-slate-900">{post.title}</h3>
-                    <p className="text-xs text-slate-600">/{post.slug} · {post.minutes} min · Editado: {new Date(post.updatedAt).toLocaleString()}</p>
+                    <p className="break-all text-xs text-slate-600">/{post.slug} · {post.minutes} min · Editado: {new Date(post.updatedAt).toLocaleString()}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">Ver</a>
                     <Link href={`/studio/blog/editor?slug=${encodeURIComponent(post.slug)}`} className="rounded-md border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">Editar</Link>
                     <button type="button" onClick={() => onDelete(post.slug)} className="rounded-md border border-rose-200 px-3 py-1.5 text-xs text-rose-700 hover:bg-rose-50" disabled={loading}>Borrar</button>

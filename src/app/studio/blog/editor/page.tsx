@@ -499,7 +499,7 @@ export default function BlogStudioPage() {
   }
 
   if (checkingAuth) {
-    return <main className="min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
+    return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
   }
 
   return (

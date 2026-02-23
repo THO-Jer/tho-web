@@ -76,7 +76,7 @@ export function Header() {
         <div className="order-3 flex w-full items-center justify-end gap-2 md:hidden">
           <details className="group relative">
             <summary className="list-none tho-nav-chip cursor-pointer">Servicios</summary>
-            <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
+            <div className="absolute right-0 z-50 mt-2 w-[min(18rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
               {SERVICES.map((service) => (
                 <Link
                   key={`mobile-${service.slug}`}
@@ -91,7 +91,7 @@ export function Header() {
 
           <details className="group relative">
             <summary className="list-none tho-nav-chip cursor-pointer">Nosotros</summary>
-            <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
+            <div className="absolute right-0 z-50 mt-2 w-[min(18rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-2 shadow-md">
               {ABOUT_MENU.map((item) => (
                 <Link
                   key={`mobile-${item.href}`}
