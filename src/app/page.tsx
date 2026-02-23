@@ -197,7 +197,7 @@ export default async function HomePage() {
               <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
                 <div className="blog-card-inner relative h-full w-full">
                   <div
-                    className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                    className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card"
                     style={{
                       backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.96) 100%), url(${p.coverImage || "/hero/4.png"})`,
                       backgroundSize: "cover",
@@ -208,7 +208,7 @@ export default async function HomePage() {
                     <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
                     <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
                   </div>
-                  <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card">
                     <a
                       href={`/blog/${p.slug}`}
                       className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900"

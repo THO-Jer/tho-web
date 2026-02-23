@@ -4,6 +4,7 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { BrandLoader } from "@/components/BrandLoader";
 import { BlogContent, getToc } from "@/components/blog/BlogContent";
 
 type BlogPost = {
@@ -499,7 +500,11 @@ export default function BlogStudioPage() {
   }
 
   if (checkingAuth) {
-    return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
+    return (
+      <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">
+        <BrandLoader message="Cargando editor de contenidos..." />
+      </main>
+    );
   }
 
   return (

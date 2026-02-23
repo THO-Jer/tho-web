@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { BrandLoader } from "@/components/BrandLoader";
+
 type BlogPost = {
   slug: string;
   title: string;
@@ -105,7 +107,11 @@ export default function BlogStudioIndexPage() {
   );
 
   if (checkingAuth) {
-    return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
+    return (
+      <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">
+        <BrandLoader message="Cargando Studio Blog..." />
+      </main>
+    );
   }
 
   return (
