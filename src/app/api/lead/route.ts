@@ -1,43 +1,108 @@
 import { NextResponse } from "next/server";
 
-import { CRMRequestError, pushToCRM } from "@/lib/crm";
+import { CRMRequestError, type LeadPayload, pushToCRM } from "@/lib/crm";
 import { sendMail } from "@/lib/mail";
+
+function clean(value: unknown) {
+  return String(value || "").trim();
+}
+
+function optional(value: unknown) {
+  const v = clean(value);
+  return v || undefined;
+}
+
+function toPayload(body: Record<string, unknown>): LeadPayload {
+  return {
+    type: body.type as "contact" | "lead_magnet" | "brochure_download",
+    name: clean(body.name),
+    email: clean(body.email),
+    phone: optional(body.phone),
+    company: optional(body.company),
+    message: optional(body.message),
+    ticket: optional(body.ticket),
+    pageUrl: optional(body.pageUrl),
+    utm: (body.utm as Record<string, string | undefined>) || {},
+    source: optional(body.source),
+    resourceId: optional(body.resourceId),
+    resourceName: optional(body.resourceName),
+    serviceSlug: optional(body.serviceSlug),
+    serviceName: optional(body.serviceName),
+    levelId: optional(body.levelId),
+    levelName: optional(body.levelName),
+    eventLabel: optional(body.eventLabel),
+  };
+}
+
+function leadTypeLabel(type: LeadPayload["type"]) {
+  if (type === "lead_magnet") return "Lead magnet";
+  if (type === "brochure_download") return "Descarga de brochure";
+  return "Formulario web";
+}
+
+function buildMail(payload: LeadPayload) {
+  const context = [
+    payload.eventLabel,
+    payload.resourceName,
+    payload.serviceName,
+    payload.levelName,
+    payload.ticket,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const subjectSuffix = context ? ` (${context})` : "";
+
+  const lines = [
+    "Nuevo lead capturado",
+    "",
+    `Tipo: ${leadTypeLabel(payload.type)}`,
+    `Evento: ${payload.eventLabel || "-"}`,
+    `Nombre: ${payload.name || "-"}`,
+    `Email: ${payload.email || "-"}`,
+    `Empresa: ${payload.company || "-"}`,
+    `Teléfono: ${payload.phone || "-"}`,
+    `Mensaje: ${payload.message || "-"}`,
+    "",
+    "Contexto de origen",
+    `Source: ${payload.source || "-"}`,
+    `Resource ID: ${payload.resourceId || "-"}`,
+    `Resource Name: ${payload.resourceName || "-"}`,
+    `Service Slug: ${payload.serviceSlug || "-"}`,
+    `Service Name: ${payload.serviceName || "-"}`,
+    `Level ID: ${payload.levelId || "-"}`,
+    `Level Name: ${payload.levelName || "-"}`,
+    `Ticket: ${payload.ticket || "-"}`,
+    `URL: ${payload.pageUrl || "-"}`,
+    "",
+    `UTM: ${JSON.stringify(payload.utm || {}, null, 2)}`,
+  ];
+
+  return {
+    subject: `Nuevo lead — ${leadTypeLabel(payload.type)}${subjectSuffix}`,
+    text: lines.join("\n"),
+  };
+}
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = (await req.json()) as Record<string, unknown>;
 
-    // Honeypot anti-spam
     if (body.hp) return NextResponse.json({ ok: true });
 
-    const payload = {
-      type: body.type as "contact" | "lead_magnet" | "brochure_download",
-      name: String(body.name || "").trim(),
-      email: String(body.email || "").trim(),
-      phone: String(body.phone || "").trim() || undefined,
-      company: String(body.company || "").trim() || undefined,
-      message: String(body.message || "").trim() || undefined,
-      ticket: String(body.ticket || "").trim() || undefined,
-      pageUrl: String(body.pageUrl || "").trim() || undefined,
-      utm: body.utm || {},
-    };
+    const payload = toPayload(body);
 
-    if (!payload.name || !payload.email) {
+    if (!payload.name || !payload.email || !payload.type) {
       return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
     }
 
-    const mailSubject =
-      payload.type === "lead_magnet"
-        ? "Nuevo lead — Lead magnet (Manual Diversidad)"
-        : payload.type === "brochure_download"
-          ? "Nuevo lead — Descarga de brochure"
-          : "Nuevo lead — Formulario web";
+    const mail = buildMail(payload);
 
     const [mailResult, crmResult] = await Promise.allSettled([
       sendMail({
         to: "hola@tho.cl",
-        subject: mailSubject,
-        text: JSON.stringify(payload, null, 2),
+        subject: mail.subject,
+        text: mail.text,
       }),
       pushToCRM(payload),
     ]);

@@ -8,6 +8,14 @@ export type LeadPayload = {
   ticket?: string;
   pageUrl?: string;
   utm?: Record<string, string | undefined>;
+  source?: string;
+  resourceId?: string;
+  resourceName?: string;
+  serviceSlug?: string;
+  serviceName?: string;
+  levelId?: string;
+  levelName?: string;
+  eventLabel?: string;
 };
 
 type CRMResult = {

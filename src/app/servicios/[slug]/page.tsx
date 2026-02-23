@@ -73,7 +73,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
                 {level.cta ? (
                   <BrochureLeadForm
+                    serviceSlug={service.slug}
                     serviceName={service.navLabel}
+                    levelId={level.id}
                     levelName={level.name}
                     hint={level.cta.hint}
                     buttonLabel={level.cta.label}

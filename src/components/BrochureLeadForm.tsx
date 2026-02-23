@@ -3,7 +3,9 @@
 import { useState } from "react";
 
 export function BrochureLeadForm(props: {
+  serviceSlug: string;
   serviceName: string;
+  levelId: string;
   levelName: string;
   buttonLabel: string;
   hint?: string;
@@ -17,6 +19,14 @@ export function BrochureLeadForm(props: {
 
     const payload = {
       type: "brochure_download",
+      eventLabel: "service_brochure_download",
+      source: "service_detail_level_card",
+      resourceId: `brochure-${props.serviceSlug}-${props.levelId}`,
+      resourceName: `Brochure ${props.serviceName} · ${props.levelName}`,
+      serviceSlug: props.serviceSlug,
+      serviceName: props.serviceName,
+      levelId: props.levelId,
+      levelName: props.levelName,
       name: String(form.get("name") || ""),
       email: String(form.get("email") || ""),
       company: String(form.get("company") || ""),

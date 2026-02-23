@@ -14,6 +14,10 @@ export function LeadMagnet() {
 
     const payload = {
       type: "lead_magnet",
+      eventLabel: "manual_diversidad_download",
+      source: "resources_modal",
+      resourceId: "manual-diversidad-v1",
+      resourceName: "Manual de Gestión de la Diversidad",
       name: String(form.get("name") || ""),
       email: String(form.get("email") || ""),
       company: String(form.get("company") || ""),
