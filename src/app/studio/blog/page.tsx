@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
+import { BrandLoader } from "@/components/BrandLoader";
+
 type BlogPost = {
   slug: string;
   title: string;
@@ -105,15 +107,19 @@ export default function BlogStudioIndexPage() {
   );
 
   if (checkingAuth) {
-    return <main className="min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">Verificando sesión del Studio...</main>;
+    return (
+      <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10 text-sm text-slate-600">
+        <BrandLoader message="Cargando Studio Blog..." />
+      </main>
+    );
   }
 
   return (
-    <main className="min-h-screen bg-tho-bg px-4 py-10">
+    <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-tho-title text-5xl text-slate-950">Studio Blog</h1>
+            <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Studio Blog</h1>
             <p className="mt-2 text-sm text-slate-600">Entraste como {email || "editor"}. Gestiona entradas y abre el asistente de redacción.</p>
           </div>
           <div className="flex gap-2">
@@ -151,9 +157,9 @@ export default function BlogStudioIndexPage() {
                   <div>
                     <div className="text-xs font-semibold uppercase text-slate-500">{post.status === "published" ? "Publicado" : "Borrador"}</div>
                     <h3 className="text-lg font-semibold text-slate-900">{post.title}</h3>
-                    <p className="text-xs text-slate-600">/{post.slug} · {post.minutes} min · Editado: {new Date(post.updatedAt).toLocaleString()}</p>
+                    <p className="break-all text-xs text-slate-600">/{post.slug} · {post.minutes} min · Editado: {new Date(post.updatedAt).toLocaleString()}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">Ver</a>
                     <Link href={`/studio/blog/editor?slug=${encodeURIComponent(post.slug)}`} className="rounded-md border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">Editar</Link>
                     <button type="button" onClick={() => onDelete(post.slug)} className="rounded-md border border-rose-200 px-3 py-1.5 text-xs text-rose-700 hover:bg-rose-50" disabled={loading}>Borrar</button>

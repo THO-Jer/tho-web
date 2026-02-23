@@ -5,9 +5,7 @@ import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 
-const BACKGROUND_IMAGES = ["/accion/03.png", "/accion/06.png", "/accion/09.png", "/accion/11.png"] as const;
-
-const GHOST_ILLUSTRATIONS = [
+const BACKGROUND_IMAGES = [
   "/ilustraciones/2.png",
   "/ilustraciones/5.png",
   "/ilustraciones/8.png",
@@ -15,6 +13,14 @@ const GHOST_ILLUSTRATIONS = [
 ] as const;
 
 const IDENTITY_VALUES = [
+  {
+    key: "adaptabilidad",
+    title: "Adaptabilidad",
+    color: "text-tho-green",
+    icon: "/brand/T_valor.svg",
+    description:
+      "El entorno cambia. Las organizaciones cambian. Las comunidades cambian. Ajustar no es debilidad; es resiliencia estratégica.",
+  },
   {
     key: "humanidad",
     title: "Humanidad",
@@ -30,14 +36,6 @@ const IDENTITY_VALUES = [
     icon: "/brand/O_valor.svg",
     description:
       "Creemos que las soluciones impuestas duran poco. Las soluciones construidas en conjunto transforman.",
-  },
-  {
-    key: "adaptabilidad",
-    title: "Adaptabilidad",
-    color: "text-tho-green",
-    icon: "/brand/T_valor.svg",
-    description:
-      "El entorno cambia. Las organizaciones cambian. Las comunidades cambian. Ajustar no es debilidad; es resiliencia estratégica.",
   },
 ] as const;
 
@@ -84,7 +82,7 @@ export default function QuienesPage() {
         <section className="relative min-h-[58vh] overflow-visible text-white md:min-h-[68vh]" data-reveal>
           <div className="hero-media-fade pointer-events-none absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/hero/4.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-[0.76]" />
+            <img src="/hero/4.png" alt="" className="absolute inset-0 h-full w-full object-cover object-[24%_center] opacity-[0.76] md:object-center" />
             <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.12)_0%,rgba(15,23,42,0.42)_54%,rgba(15,23,42,0.75)_100%)]" />
           </div>
 
@@ -113,15 +111,6 @@ export default function QuienesPage() {
             ))}
           </div>
 
-          <div className="pointer-events-none absolute inset-0">
-            {GHOST_ILLUSTRATIONS.map((imagePath, idx) => (
-              <figure key={imagePath} className={`quienes-ghost quienes-ghost-${idx + 1}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imagePath} alt="" className="h-full w-full object-contain" />
-              </figure>
-            ))}
-          </div>
-
           <div className="relative z-10">
             <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
               <div data-reveal>
@@ -134,8 +123,8 @@ export default function QuienesPage() {
             </section>
 
             <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
-              <div className="mx-auto max-w-[48rem] p-3 md:p-0">
-                <p className="text-justify text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
+              <div className="mx-auto max-w-[48rem] p-3 md:pr-12 md:pl-0 lg:pr-20">
+                <p className="text-justify text-lg leading-relaxed text-slate-700 md:pr-8 md:text-[1.28rem] lg:pr-14">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
@@ -180,11 +169,19 @@ export default function QuienesPage() {
                 </div>
               </div>
 
-              <p className="identity-block-space font-tho-title mt-12 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
-                Nuestra promesa es diseñar
-                <br />
-                soluciones estratégicas y exitosas.
-              </p>
+              <div className="identity-block-space mt-12 flex flex-col items-start gap-4 sm:flex-row sm:items-center md:gap-6">
+                <p className="font-tho-title max-w-3xl text-justify text-[2.05rem] leading-[1.02] text-slate-900 md:text-[2.7rem]">
+                  Nuestra promesa es diseñar
+                  <br />
+                  soluciones estratégicas y exitosas.
+                </p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/ilustraciones/6.png"
+                  alt="Ilustración de apoyo"
+                  className="h-16 w-16 shrink-0 object-contain md:h-20 md:w-20"
+                />
+              </div>
               <p className="identity-block-space mt-4 max-w-4xl text-justify text-base leading-relaxed text-slate-700 md:text-lg">
                 Desde esta promesa, la identidad se vuelve práctica: misión, visión y experiencia se entrelazan en
                 criterios que orientan decisiones concretas. Por eso, nuestros valores no son solo conceptos, sino
@@ -196,9 +193,9 @@ export default function QuienesPage() {
                   <article key={value.key} className="grid gap-5 md:grid-cols-[130px_1fr] md:items-center md:gap-8">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={value.icon} alt="" aria-hidden className="mx-auto h-24 w-24 object-contain md:h-28 md:w-28" />
-                    <div className="md:mr-28 lg:mr-40">
+                    <div className="mx-auto text-center md:mr-36 md:text-left lg:mr-52 xl:mr-64">
                       <h3 className={`text-2xl font-semibold ${value.color}`}>{value.title}</h3>
-                      <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">{value.description}</p>
+                      <p className="mt-3 text-center text-base leading-relaxed text-slate-700 md:text-left md:text-lg">{value.description}</p>
                     </div>
                   </article>
                 ))}
@@ -207,18 +204,18 @@ export default function QuienesPage() {
           </div>
         </section>
 
-        <section className="relative mx-auto max-w-6xl overflow-hidden px-4 py-16 md:py-24">
+        <section className="relative mx-auto max-w-6xl border-0 bg-transparent px-4 py-16 shadow-none md:min-h-[34rem] md:py-24">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/brujula.svg"
             alt=""
             aria-hidden
-            className="quienes-compass-bg pointer-events-none absolute right-[-12%] top-[-20%]"
-            style={{ transform: `translate3d(0, ${scrollY * 0.045}px, 0)` }}
+            className="quienes-compass-bg pointer-events-none absolute right-[2%] top-[68%] z-0 hidden md:block"
+            style={{ transform: `translate3d(0, ${scrollY * 0.03}px, 0)` }}
           />
 
-          <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
-            <div className="max-w-3xl">
+          <div className="relative z-10 grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
+            <div className="max-w-3xl border-0 bg-transparent shadow-none">
               <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">Nuestra ética</h2>
               <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
               <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-700 md:text-lg">

@@ -55,7 +55,7 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar por título o tag"
-          className="min-w-[260px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          className="w-full min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm sm:min-w-[260px]"
         />
         {(query || selectedTag) ? (
           <button

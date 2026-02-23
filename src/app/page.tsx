@@ -35,7 +35,7 @@ export default async function HomePage() {
           <img
             src="/hero/hands.png"
             alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-[0.75]"
+            className="absolute inset-0 h-full w-full object-cover object-[52%_36%] opacity-[0.75] md:object-center"
           />
           <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
         </div>
@@ -52,7 +52,7 @@ export default async function HomePage() {
               accionables y decisiones que se sostienen en el tiempo.
             </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:ml-auto sm:flex-row sm:justify-end">
+            <div className="mt-6 flex flex-col items-end gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               <a
                 href="#servicios"
                 className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
@@ -88,6 +88,9 @@ export default async function HomePage() {
         title="Nuestros servicios"
         subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas: Sotenibilidad Corporativa, Relacionamiento Comunitario y Desarrollo Organizacional. Revisa los niveles de cada servicio para decidir si te acompañamos en una línea de trabajo o necesitas integrarlas."
       >
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-600 md:hidden">
+          Desliza para ver más servicios →
+        </p>
         <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
           {SERVICES.map((service) => {
             const meta = PILLAR_META[service.pillar];
@@ -197,18 +200,16 @@ export default async function HomePage() {
               <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
                 <div className="blog-card-inner relative h-full w-full">
                   <div
-                    className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                    className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card"
                     style={{
-                      backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.96) 100%), url(${p.coverImage || "/hero/4.png"})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
+                      ["--blog-cover-image" as string]: `url(${p.coverImage || "/hero/4.png"})`,
                     }}
                   >
                     <div className="text-xs text-slate-500">{p.minutes} min</div>
                     <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
                     <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
                   </div>
-                  <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                  <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card">
                     <a
                       href={`/blog/${p.slug}`}
                       className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
@@ -234,7 +235,7 @@ export default async function HomePage() {
               <br />
               Déjanos tu contacto o agenda una reunión para evaluar una consultoría en Sostenibilidad, Relacionamiento Comunitario o Desarrollo Organizacional.
             </p>
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row">
               <a
                 href="https://bit.ly/bookTHO"
                 target="_blank"

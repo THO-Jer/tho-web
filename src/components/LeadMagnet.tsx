@@ -5,7 +5,6 @@ import { useState } from "react";
 const RESOURCE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
 
 export function LeadMagnet() {
-  const [open, setOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -34,110 +33,73 @@ export function LeadMagnet() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
-      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
-        <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-4 py-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Recurso de orientación</p>
-            <p className="text-sm font-medium text-slate-700">Manual de Gestión de la Diversidad · Vista previa</p>
-          </div>
-          <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500">Página 1</span>
-        </div>
+    <div className="lead-capture-shell rounded-3xl p-4 md:p-6">
+      <div className="lead-capture-grid grid gap-5 md:grid-cols-[1.15fr_0.85fr] md:gap-7">
+        <section>
+          <p className="lead-capture-kicker text-xs font-semibold uppercase tracking-[0.14em]">Recurso recomendado</p>
+          <h3 className="lead-capture-title mt-2 text-[1.65rem] font-bold leading-tight md:text-[2rem]">
+            Descarga el Manual de Gestión de la Diversidad
+          </h3>
+          <p className="lead-capture-subtitle mt-2 text-sm leading-relaxed md:text-base">
+            Obtén el recurso en PDF con marco conceptual, checklist inicial y errores frecuentes para decidir con criterio.
+          </p>
 
-        <div className="bg-slate-100 p-4">
-          <div className="mx-auto aspect-[1/1.414] w-full max-w-[540px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
-            <iframe
-              title="Vista previa de la primera página del manual"
-              src={`${RESOURCE_FILE_URL}#toolbar=0&navpanes=0&scrollbar=0&page=1&zoom=page-fit`}
-              className="h-full w-full"
+          <form onSubmit={onSubmit} className="mt-5 grid gap-2.5 md:mt-6">
+            <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
+
+            <input
+              name="name"
+              required
+              placeholder="Nombre"
+              className="lead-capture-input rounded-lg px-3.5 py-2.5 text-sm"
             />
-          </div>
-        </div>
-      </div>
 
-      <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(160deg,#ffffff_0%,#f8fafc_44%,#f1f5f9_100%)] p-6 shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Manual descargable</p>
-        <h3 className="mt-2 text-[1.4rem] font-semibold leading-tight text-slate-900">Un recurso para orientar criterios y decisiones</h3>
-        <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          Diseñado para equipos que necesitan ordenar conversaciones, priorizar acciones y tomar decisiones con mayor claridad en temas de diversidad.
-        </p>
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="Email"
+              className="lead-capture-input rounded-lg px-3.5 py-2.5 text-sm"
+            />
 
-        <ul className="mt-5 grid gap-2 text-sm text-slate-600">
-          <li>• Marco conceptual claro y aplicable</li>
-          <li>• Checklist para diagnóstico inicial</li>
-          <li>• Errores frecuentes y cómo evitarlos</li>
-        </ul>
+            <input
+              name="company"
+              placeholder="Empresa"
+              className="lead-capture-input rounded-lg px-3.5 py-2.5 text-sm"
+            />
 
-        <button
-          onClick={() => setOpen(true)}
-          className="btn-unified-motion btn-brand-accent btn-brand-accent-pink mt-6 w-full rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-800"
-        >
-          Quiero acceder al recurso
-        </button>
+            <button
+              disabled={status === "sending"}
+              className="lead-capture-cta mt-1 rounded-lg px-4 py-2.5 text-sm font-semibold uppercase tracking-wide disabled:opacity-70"
+            >
+              {status === "sending" ? "Enviando..." : "Descargar manual"}
+            </button>
 
-        <p className="mt-3 text-xs text-slate-500">Para habilitar el acceso, necesitamos tus datos de contacto.</p>
-      </div>
-
-      {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="text-sm font-semibold text-slate-900">Recibir acceso al recurso</div>
-                <p className="mt-1 text-sm text-slate-600">Completa tus datos y te habilitamos el acceso al documento.</p>
+            {status === "ok" ? (
+              <div className="lead-capture-success mt-2 rounded-lg p-3 text-sm">
+                <p>¡Listo! Ya puedes abrir el recurso.</p>
+                <a href={RESOURCE_FILE_URL} target="_blank" rel="noreferrer" className="mt-1 inline-flex underline underline-offset-2">
+                  Abrir PDF
+                </a>
               </div>
-              <button
-                onClick={() => setOpen(false)}
-                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900"
-              >
-                Cerrar
-              </button>
+            ) : null}
+
+            {status === "error" ? <p className="lead-capture-error mt-1 text-sm">Algo falló. Intenta de nuevo.</p> : null}
+          </form>
+        </section>
+
+        <aside className="lead-book-wrap flex items-center justify-center">
+          <div className="lead-book-mock">
+            <div className="lead-book-spine" />
+            <div className="lead-book-face">
+              <p className="lead-book-top">THO · EBOOK</p>
+              <p className="lead-book-main">Manual 101</p>
+              <p className="lead-book-title">Gestión de la Diversidad</p>
+              <p className="lead-book-copy">Checklist + guía práctica para equipos.</p>
             </div>
-
-            <form onSubmit={onSubmit} className="mt-4 grid gap-3">
-              <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
-
-              <label className="grid gap-1">
-                <span className="text-xs text-slate-500">Nombre</span>
-                <input name="name" required className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              </label>
-
-              <label className="grid gap-1">
-                <span className="text-xs text-slate-500">Email</span>
-                <input name="email" type="email" required className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              </label>
-
-              <label className="grid gap-1">
-                <span className="text-xs text-slate-500">Empresa</span>
-                <input name="company" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              </label>
-
-              <button
-                disabled={status === "sending"}
-                className="btn-unified-motion btn-brand-neutral mt-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-900 disabled:opacity-60"
-              >
-                {status === "sending" ? "Enviando…" : "Continuar"}
-              </button>
-
-              {status === "ok" ? (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-                  <p className="text-sm text-emerald-800">Gracias. Ya puedes abrir el recurso.</p>
-                  <a
-                    href={RESOURCE_FILE_URL}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 inline-flex text-sm font-semibold text-emerald-900 underline underline-offset-2"
-                  >
-                    Abrir recurso
-                  </a>
-                </div>
-              ) : null}
-
-              {status === "error" ? <p className="text-sm text-slate-600">Algo falló. Intenta de nuevo.</p> : null}
-            </form>
           </div>
-        </div>
-      ) : null}
+        </aside>
+      </div>
     </div>
   );
 }

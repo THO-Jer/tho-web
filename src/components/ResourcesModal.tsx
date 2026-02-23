@@ -37,17 +37,16 @@ export function ResourcesModal(props?: { autoOpen?: boolean }) {
       ) : null}
 
       {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
-          <div className="max-h-[92vh] w-full max-w-5xl overflow-auto rounded-3xl border border-slate-200 bg-tho-bg p-6">
+        <div className="resource-modal-shell fixed inset-0 z-50 grid place-items-center bg-slate-950/70 p-4 backdrop-blur-sm">
+          <div className="max-h-[88vh] w-full max-w-3xl overflow-auto rounded-3xl border border-tho-blue/30 bg-tho-bg p-4 shadow-2xl shadow-tho-blue/10 md:p-5">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h3 className="font-tho-title text-[2.1rem] text-slate-950">Recursos prácticos</h3>
-                <p className="text-sm text-slate-700">Descarga el manual y empieza a estructurar decisiones con criterio.</p>
+                <p className="text-sm text-slate-700">Llévate el manual y estructura decisiones con el enfoque THO.</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
               >
                 Cerrar
               </button>
