@@ -91,7 +91,7 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
                 }}
               >
                 <path d={d} fill={fill} stroke="rgba(255,255,255,0.92)" strokeWidth="6" />
-                <text fontSize="21" fontWeight="800" fill="#0f172a" letterSpacing="0.005em">
+                <text className="method-arc-label" fontSize="21" fontWeight="800" fill="currentColor" letterSpacing="0.005em">
                   <textPath href={`#method-text-arc-${i}`} startOffset="50%" textAnchor="middle">
                     {step.title}
                   </textPath>

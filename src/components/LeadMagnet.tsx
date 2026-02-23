@@ -34,7 +34,7 @@ export function LeadMagnet() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">
+    <div className="lead-magnet-shell grid gap-5 lg:grid-cols-[1.4fr_1fr]">
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
         <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-4 py-3">
           <div>
@@ -79,7 +79,7 @@ export function LeadMagnet() {
       </div>
 
       {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm">
+        <div className="lead-magnet-shell fixed inset-0 z-50 grid place-items-center bg-black/45 p-4 backdrop-blur-sm">
           <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
             <div className="flex items-start justify-between gap-4">
               <div>

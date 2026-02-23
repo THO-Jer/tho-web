@@ -37,7 +37,7 @@ export function ResourcesModal(props?: { autoOpen?: boolean }) {
       ) : null}
 
       {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
+        <div className="resource-modal-shell fixed inset-0 z-50 grid place-items-center bg-black/50 p-4">
           <div className="max-h-[92vh] w-full max-w-5xl overflow-auto rounded-3xl border border-slate-200 bg-tho-bg p-6">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>

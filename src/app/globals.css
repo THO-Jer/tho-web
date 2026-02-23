@@ -654,6 +654,14 @@ body {
   backdrop-filter: none;
 }
 
+.method-arc-label {
+  color: #0f172a;
+}
+
+.lead-magnet-shell {
+  color: inherit;
+}
+
 @media (prefers-color-scheme: dark) {
   .method-arc-fade-top {
     background: linear-gradient(180deg, rgba(21, 21, 21, 0.94), rgba(21, 21, 21, 0));
@@ -661,6 +669,41 @@ body {
 
   .method-arc-fade-sides {
     background: linear-gradient(90deg, rgba(21, 21, 21, 0.94), rgba(21, 21, 21, 0));
+  }
+
+  .method-arc-label {
+    color: #f8fafc;
+  }
+
+  .resource-modal-shell .bg-tho-bg {
+    background-color: #1f1f1f !important;
+  }
+
+  .lead-magnet-shell .bg-white,
+  .lead-magnet-shell [class*="bg-white"],
+  .lead-magnet-shell [class*="bg-slate-50"],
+  .lead-magnet-shell [class*="bg-slate-100"] {
+    background-color: #202020 !important;
+  }
+
+  .lead-magnet-shell .text-slate-900,
+  .lead-magnet-shell .text-slate-950 {
+    color: #f8fafc !important;
+  }
+
+  .lead-magnet-shell .text-slate-700,
+  .lead-magnet-shell .text-slate-600,
+  .lead-magnet-shell .text-slate-500 {
+    color: #cbd5e1 !important;
+  }
+
+  .lead-magnet-shell .border-slate-200,
+  .lead-magnet-shell .border-slate-300 {
+    border-color: rgba(148, 163, 184, 0.35) !important;
+  }
+
+  .lead-magnet-shell iframe {
+    background: #111827;
   }
 }
 
