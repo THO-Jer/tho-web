@@ -199,9 +199,7 @@ export default async function HomePage() {
                   <div
                     className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card"
                     style={{
-                      backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.90) 0%, rgba(255,255,255,0.96) 100%), url(${p.coverImage || "/hero/4.png"})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
+                      ["--blog-cover-image" as string]: `url(${p.coverImage || "/hero/4.png"})`,
                     }}
                   >
                     <div className="text-xs text-slate-500">{p.minutes} min</div>
