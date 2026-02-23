@@ -416,6 +416,30 @@ body {
     background: linear-gradient(120deg, #252525, #3b3b3b 55%, #666666);
   }
 
+  .main-header .tho-nav-chip {
+    border-color: rgba(148, 163, 184, 0.35);
+    background: #1f1f1f;
+    color: #cbd5e1;
+    transition: background-color 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+  }
+
+  .main-header .tho-nav-chip:hover,
+  .main-header .tho-nav-chip:focus-visible {
+    background: #27272a;
+    color: #f8fafc;
+    border-color: rgba(148, 163, 184, 0.5);
+  }
+
+  .main-header .main-nav-menu-link {
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .main-header .main-nav-menu-link:hover,
+  .main-header .main-nav-menu-link:focus-visible {
+    background: rgba(148, 163, 184, 0.14) !important;
+    color: #f8fafc !important;
+  }
+
   .logo-light { opacity: 0; }
   .logo-dark { opacity: 1; }
 

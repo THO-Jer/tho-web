@@ -16,7 +16,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur">
+    <header className="main-header sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-3 px-4 py-3 md:flex-nowrap md:gap-y-0">
         <Link href="/" className="flex min-w-0 flex-1 items-center gap-3 md:flex-none">
           <div className="relative h-9 w-32">
@@ -40,7 +40,7 @@ export function Header() {
                   <Link
                     key={service.slug}
                     href={`/servicios/${service.slug}`}
-                    className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                    className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
                   >
                     {service.menuLabel}
                   </Link>
@@ -59,7 +59,7 @@ export function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                    className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
                   >
                     {item.label}
                   </Link>
@@ -81,7 +81,7 @@ export function Header() {
                 <Link
                   key={`mobile-${service.slug}`}
                   href={`/servicios/${service.slug}`}
-                  className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                  className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
                 >
                   {service.menuLabel}
                 </Link>
@@ -96,7 +96,7 @@ export function Header() {
                 <Link
                   key={`mobile-${item.href}`}
                   href={item.href}
-                  className="block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                  className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
                 >
                   {item.label}
                 </Link>
