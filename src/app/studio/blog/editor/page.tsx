@@ -507,7 +507,7 @@ export default function BlogStudioPage() {
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-tho-title text-5xl text-slate-950">Asistente de Redacción</h1>
+            <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Asistente de Redacción</h1>
             <p className="mt-2 text-sm text-slate-600">Sesión heredada desde /studio. Todo lo que edites aquí usa ese acceso común.</p>
           </div>
           <Link href="/studio/blog" className="rounded-lg border border-slate-300 px-3 py-2 text-xs">Volver al listado</Link>

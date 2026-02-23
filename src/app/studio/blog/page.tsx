@@ -113,7 +113,7 @@ export default function BlogStudioIndexPage() {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="font-tho-title text-5xl text-slate-950">Studio Blog</h1>
+            <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Studio Blog</h1>
             <p className="mt-2 text-sm text-slate-600">Entraste como {email || "editor"}. Gestiona entradas y abre el asistente de redacción.</p>
           </div>
           <div className="flex gap-2">

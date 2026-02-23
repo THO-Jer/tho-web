@@ -123,7 +123,7 @@ export default function StudioIndexPage() {
       <Header />
       <main className="border-t border-slate-200">
         <section className="mx-auto max-w-6xl px-4 py-14">
-          <h1 className="font-tho-title text-5xl text-slate-950">THO Studio</h1>
+          <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">THO Studio</h1>
           <p className="mt-3 max-w-3xl text-slate-700">
             Acceso interno centralizado. Inicia sesión una vez y luego puedes operar cualquier módulo del Studio.
           </p>
