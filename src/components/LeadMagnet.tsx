@@ -34,33 +34,36 @@ export function LeadMagnet() {
   }
 
   return (
-    <div className="lead-magnet-shell grid gap-4">
+    <div className="lead-magnet-shell grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
         <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-4 py-3">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">Recurso de orientación</p>
-            <p className="text-sm font-medium text-slate-700">Manual de Gestión de la Diversidad · Vista previa</p>
-          </div>
+          <p className="text-sm font-medium text-slate-700">Vista previa (solo primera página)</p>
           <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500">Página 1</span>
         </div>
 
         <div className="bg-slate-100 p-3 md:p-4">
-          <div className="mx-auto aspect-[1/1.414] w-full max-w-[340px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg md:max-w-[400px]">
-            <iframe
-              title="Vista previa de la primera página del manual"
-              src={`${RESOURCE_FILE_URL}#toolbar=0&navpanes=0&scrollbar=0&page=1&view=FitH&zoom=page-width`}
-              className="h-full w-full"
-              scrolling="no"
-            />
+          <div className="mx-auto aspect-[1/1.414] w-full max-w-[280px] rounded-2xl border border-slate-200 bg-white p-4 shadow-lg md:max-w-[340px]">
+            <div className="h-full rounded-xl border border-slate-200 bg-[linear-gradient(180deg,#ffffff,#f8fafc)] p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">Manual · Primera página</p>
+              <p className="mt-2 text-sm font-semibold text-slate-900">Gestión de la Diversidad</p>
+              <div className="mt-4 space-y-2">
+                <div className="h-2 rounded bg-slate-200" />
+                <div className="h-2 w-[92%] rounded bg-slate-200" />
+                <div className="h-2 w-[84%] rounded bg-slate-200" />
+              </div>
+              <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-2">
+                <p className="text-[11px] text-slate-600">Incluye checklist y errores frecuentes para tomar decisiones con criterio.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="rounded-3xl border border-slate-200 bg-[linear-gradient(160deg,#ffffff_0%,#f8fafc_44%,#f1f5f9_100%)] p-5 shadow-[0_24px_70px_-40px_rgba(15,23,42,0.35)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Manual descargable</p>
-        <h3 className="mt-2 text-[1.2rem] font-semibold leading-tight text-slate-900 md:text-[1.3rem]">Un recurso para orientar criterios y decisiones</h3>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Lead magnet descargable</p>
+        <h3 className="mt-2 text-[1.2rem] font-semibold leading-tight text-slate-900 md:text-[1.3rem]">Descarga el Manual de Gestión de la Diversidad</h3>
         <p className="mt-3 text-sm leading-relaxed text-slate-600">
-          Diseñado para equipos que necesitan ordenar conversaciones, priorizar acciones y tomar decisiones con mayor claridad en temas de diversidad.
+          Recurso práctico para equipos que necesitan ordenar conversaciones, priorizar acciones y tomar decisiones con mayor claridad.
         </p>
 
         <ul className="mt-5 grid gap-2 text-sm text-slate-600">
@@ -71,9 +74,9 @@ export function LeadMagnet() {
 
         <button
           onClick={() => setOpen(true)}
-          className="btn-unified-motion btn-brand-accent btn-brand-accent-pink mt-6 w-full rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-800"
+          className="btn-unified-motion btn-brand-accent btn-brand-accent-pink mt-6 w-full rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800"
         >
-          Quiero acceder al recurso
+          Descargar lead magnet
         </button>
 
         <p className="mt-3 text-xs text-slate-500">Para habilitar el acceso, necesitamos tus datos de contacto.</p>
