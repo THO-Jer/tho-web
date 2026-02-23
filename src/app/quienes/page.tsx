@@ -5,29 +5,39 @@ import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 
-const BACKGROUND_IMAGES = ["/ilustraciones/2.png", "/ilustraciones/6.png", "/ilustraciones/9.png", "/ilustraciones/12.png"] as const;
+const BACKGROUND_IMAGES = ["/accion/03.png", "/accion/06.png", "/accion/09.png", "/accion/11.png"] as const;
+
+const GHOST_ILLUSTRATIONS = [
+  "/ilustraciones/2.png",
+  "/ilustraciones/5.png",
+  "/ilustraciones/8.png",
+  "/ilustraciones/10.png",
+] as const;
 
 const IDENTITY_VALUES = [
   {
-    key: "adaptabilidad",
-    title: "Adaptabilidad",
-    image: "/brand/T_valor.png",
-    description:
-      "El entorno cambia. Las organizaciones cambian. Las comunidades cambian. Ajustar no es debilidad; es resiliencia estratégica.",
-  },
-  {
     key: "humanidad",
     title: "Humanidad",
-    image: "/brand/H_valor.png",
+    color: "text-tho-pink",
+    icon: "/brand/H_valor.svg",
     description:
       "Reconocemos que toda organización es un entramado de historias, expectativas y tensiones humanas. Diseñamos desde esa comprensión.",
   },
   {
     key: "colaboracion",
     title: "Colaboración",
-    image: "/brand/O_valor.png",
+    color: "text-tho-orange",
+    icon: "/brand/O_valor.svg",
     description:
       "Creemos que las soluciones impuestas duran poco. Las soluciones construidas en conjunto transforman.",
+  },
+  {
+    key: "adaptabilidad",
+    title: "Adaptabilidad",
+    color: "text-tho-green",
+    icon: "/brand/T_valor.svg",
+    description:
+      "El entorno cambia. Las organizaciones cambian. Las comunidades cambian. Ajustar no es debilidad; es resiliencia estratégica.",
   },
 ] as const;
 
@@ -67,7 +77,6 @@ export default function QuienesPage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-
   return (
     <div className="min-h-screen bg-tho-bg">
       <Header />
@@ -104,6 +113,15 @@ export default function QuienesPage() {
             ))}
           </div>
 
+          <div className="pointer-events-none absolute inset-0">
+            {GHOST_ILLUSTRATIONS.map((imagePath, idx) => (
+              <figure key={imagePath} className={`quienes-ghost quienes-ghost-${idx + 1}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imagePath} alt="" className="h-full w-full object-contain" />
+              </figure>
+            ))}
+          </div>
+
           <div className="relative z-10">
             <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
               <div data-reveal>
@@ -116,19 +134,19 @@ export default function QuienesPage() {
             </section>
 
             <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
-              <div className="mx-auto p-3 md:max-w-[760px] md:p-0">
+              <div className="mx-auto max-w-[48rem] p-3 md:p-0">
                 <p className="text-justify text-lg leading-relaxed text-slate-700 md:text-[1.28rem]">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
-                <p className="mt-6 text-[1.02rem] text-slate-700 md:text-center">Cada integrante de THO aporta experiencia previa en:</p>
-                <ul className="mt-3 grid gap-2 text-left text-[1.02rem] text-slate-700 md:mx-auto md:max-w-[31rem]">
+                <p className="mt-6 text-[1.02rem] text-slate-700">Cada integrante de THO aporta experiencia previa en:</p>
+                <ul className="mt-3 grid max-w-[34rem] gap-2 text-left text-[1.02rem] text-slate-700">
                   <li>• Diagnóstico e intervención organizacional</li>
                   <li>• Diseño de procesos participativos</li>
                   <li>• Análisis de impacto social</li>
                   <li>• Gestión estratégica en entornos complejos</li>
                 </ul>
-                <p className="mt-6 text-justify text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
+                <p className="mt-6 max-w-[44rem] text-justify text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
                   En The Human Org reconocemos estas trayectorias y sabemos que la expertise que cada uno trae profundiza
                   el propósito de la consultora.
                 </p>
@@ -145,27 +163,24 @@ export default function QuienesPage() {
                 comunidades y entorno. Esta mirada integra nuestra misión y visión en una misma dirección estratégica.
               </p>
 
-              <div className="identity-block-space mt-10 grid gap-10 md:grid-cols-[1fr_auto_1fr] md:items-start md:gap-8">
-                <div className="text-left">
-                  <h3 className="text-[1.35rem] font-semibold text-slate-900 md:text-[1.7rem]">Misión</h3>
-                  <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">
+              <div className="identity-block-space mx-auto mt-12 grid max-w-5xl gap-8 md:grid-cols-2 md:gap-10">
+                <div className="pr-0 md:pr-8">
+                  <h3 className="text-[1.4rem] font-semibold text-slate-900 md:text-[1.7rem]">Misión</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">
                     Inspirar y acompañar procesos de transformación organizacional y comunitaria mediante intervenciones
                     estratégicas técnicamente sólidas y humanamente sostenibles.
                   </p>
                 </div>
-
-                <div className="hidden h-full w-px rounded-full bg-slate-300/70 md:block" aria-hidden />
-
-                <div className="text-left">
-                  <h3 className="text-[1.35rem] font-semibold text-slate-900 md:text-[1.7rem]">Visión</h3>
-                  <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">
-                    Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica,
-                    por nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
+                <div className="border-l border-slate-200 pl-6 md:pl-10">
+                  <h3 className="text-[1.4rem] font-semibold text-slate-900 md:text-[1.7rem]">Visión</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700 md:text-base">
+                    Ser reconocidos como líderes y agentes de cambio en la industria de la asesoría en Latinoamérica, por
+                    nuestro compromiso inquebrantable con la ética, la innovación y la humanización.
                   </p>
                 </div>
               </div>
 
-              <p className="identity-block-space font-tho-title mt-10 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
+              <p className="identity-block-space font-tho-title mt-12 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
                 Nuestra promesa es diseñar
                 <br />
                 soluciones estratégicas y exitosas.
@@ -176,16 +191,14 @@ export default function QuienesPage() {
                 articuladores de sentido y conducta en cada relación, intervención y proceso que acompañamos.
               </p>
 
-              <div className="identity-block-space mt-16 space-y-10">
+              <div className="identity-block-space mt-14 space-y-10 md:space-y-12">
                 {IDENTITY_VALUES.map((value) => (
-                  <article key={value.key} className="grid items-center gap-6 md:grid-cols-[150px_1fr] md:gap-10">
-                    <div className="mx-auto w-[120px] md:w-[150px]">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={value.image} alt={`Símbolo del valor ${value.title}`} className="h-auto w-full object-contain" />
-                    </div>
-                    <div>
-                      <h3 className="text-3xl font-semibold text-slate-900">{value.title}</h3>
-                      <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">{value.description}</p>
+                  <article key={value.key} className="grid gap-5 md:grid-cols-[130px_1fr] md:items-center md:gap-8">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={value.icon} alt="" aria-hidden className="mx-auto h-24 w-24 object-contain md:h-28 md:w-28" />
+                    <div className="md:mr-28 lg:mr-40">
+                      <h3 className={`text-2xl font-semibold ${value.color}`}>{value.title}</h3>
+                      <p className="mt-3 text-base leading-relaxed text-slate-700 md:text-lg">{value.description}</p>
                     </div>
                   </article>
                 ))}
@@ -194,13 +207,13 @@ export default function QuienesPage() {
           </div>
         </section>
 
-        <section className="relative mx-auto max-w-6xl overflow-visible px-4 py-16 md:py-24">
+        <section className="relative mx-auto max-w-6xl overflow-hidden px-4 py-16 md:py-24">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/brujula.svg"
             alt=""
             aria-hidden
-            className="quienes-compass-bg pointer-events-none absolute right-[-4%] top-[-2%]"
+            className="quienes-compass-bg pointer-events-none absolute right-[-12%] top-[-20%]"
             style={{ transform: `translate3d(0, ${scrollY * 0.045}px, 0)` }}
           />
 

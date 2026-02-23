@@ -647,7 +647,7 @@ body {
   position: absolute;
   overflow: hidden;
   border: 0;
-  opacity: 0.06;
+  opacity: 0.15;
   filter: grayscale(0.98) saturate(0.46) contrast(0.9);
   box-shadow: 0 24px 54px -42px rgba(15, 23, 42, 0.5);
   mask-image: radial-gradient(circle at center, #000 46%, rgba(0,0,0,0.66) 62%, transparent 100%);
@@ -692,16 +692,49 @@ body {
   margin-top: 2.8rem;
 }
 
+.quienes-ghost {
+  position: absolute;
+  opacity: 0.055;
+  filter: grayscale(1) saturate(0.2);
+}
+
+.quienes-ghost-1 {
+  top: 12%;
+  right: 7%;
+  width: min(20vw, 250px);
+}
+
+.quienes-ghost-2 {
+  top: 39%;
+  left: 10%;
+  width: min(22vw, 280px);
+}
+
+.quienes-ghost-3 {
+  top: 64%;
+  right: 16%;
+  width: min(19vw, 240px);
+}
+
+.quienes-ghost-4 {
+  top: 84%;
+  left: 12%;
+  width: min(21vw, 270px);
+}
+
 @media (max-width: 900px) {
   .quienes-bg-image {
-    opacity: 0.07;
+    opacity: 0.1;
+  }
+
+  .quienes-ghost {
+    opacity: 0.04;
   }
 }
 
 
-
 .quienes-compass-bg {
-  width: min(52vw, 620px);
+  width: min(64vw, 760px);
   opacity: 0.1;
-  filter: grayscale(0.95) saturate(0.52) contrast(0.92);
+  filter: grayscale(0.95) saturate(0.52) contrast(0.9);
 }
