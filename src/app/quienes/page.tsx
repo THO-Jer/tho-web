@@ -10,7 +10,6 @@ const BACKGROUND_IMAGES = [
   "/ilustraciones/5.png",
   "/ilustraciones/8.png",
   "/ilustraciones/10.png",
-  "/ilustraciones/12.png",
 ] as const;
 
 const IDENTITY_VALUES = [
@@ -211,8 +210,8 @@ export default function QuienesPage() {
             src="/brujula.svg"
             alt=""
             aria-hidden
-            className="quienes-compass-bg pointer-events-none absolute right-[2%] top-1/2 z-0 hidden -translate-y-1/2 md:block"
-            style={{ transform: `translate3d(0, calc(-50% + ${scrollY * 0.03}px), 0)` }}
+            className="quienes-compass-bg pointer-events-none absolute right-[2%] top-[68%] z-0 hidden md:block"
+            style={{ transform: `translate3d(0, ${scrollY * 0.03}px, 0)` }}
           />
 
           <div className="relative z-10 grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
