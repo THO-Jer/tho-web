@@ -704,7 +704,7 @@ body {
 
 
 .quienes-compass-bg {
-  width: min(64vw, 760px);
+  width: min(52vw, 620px);
   opacity: 0.1;
   filter: grayscale(0.95) saturate(0.52) contrast(0.9);
 }

@@ -170,11 +170,19 @@ export default function QuienesPage() {
                 </div>
               </div>
 
-              <p className="identity-block-space font-tho-title mt-12 max-w-3xl text-justify text-[1.75rem] leading-[1.04] text-slate-900 md:text-[2.2rem]">
-                Nuestra promesa es diseñar
-                <br />
-                soluciones estratégicas y exitosas.
-              </p>
+              <div className="identity-block-space mt-12 flex flex-col items-start gap-4 sm:flex-row sm:items-center md:gap-6">
+                <p className="font-tho-title max-w-3xl text-justify text-[2.05rem] leading-[1.02] text-slate-900 md:text-[2.7rem]">
+                  Nuestra promesa es diseñar
+                  <br />
+                  soluciones estratégicas y exitosas.
+                </p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/ilustraciones/6.png"
+                  alt="Ilustración de apoyo"
+                  className="h-16 w-16 shrink-0 object-contain md:h-20 md:w-20"
+                />
+              </div>
               <p className="identity-block-space mt-4 max-w-4xl text-justify text-base leading-relaxed text-slate-700 md:text-lg">
                 Desde esta promesa, la identidad se vuelve práctica: misión, visión y experiencia se entrelazan en
                 criterios que orientan decisiones concretas. Por eso, nuestros valores no son solo conceptos, sino
@@ -197,18 +205,18 @@ export default function QuienesPage() {
           </div>
         </section>
 
-        <section className="relative mx-auto max-w-6xl overflow-hidden px-4 py-16 md:py-24">
+        <section className="relative mx-auto max-w-6xl border-0 bg-transparent px-4 py-16 shadow-none md:min-h-[34rem] md:py-24">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/brujula.svg"
             alt=""
             aria-hidden
-            className="quienes-compass-bg pointer-events-none absolute right-[-12%] top-[-20%]"
-            style={{ transform: `translate3d(0, ${scrollY * 0.045}px, 0)` }}
+            className="quienes-compass-bg pointer-events-none absolute right-[2%] top-1/2 z-0 hidden -translate-y-1/2 md:block"
+            style={{ transform: `translate3d(0, calc(-50% + ${scrollY * 0.03}px), 0)` }}
           />
 
-          <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
-            <div className="max-w-3xl">
+          <div className="relative z-10 grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
+            <div className="max-w-3xl border-0 bg-transparent shadow-none">
               <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">Nuestra ética</h2>
               <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
               <div className="mt-6 space-y-4 text-base leading-relaxed text-slate-700 md:text-lg">
