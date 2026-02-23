@@ -91,12 +91,12 @@ export function LeadMagnet() {
         <aside className="lead-book-wrap flex items-center justify-center">
           <div className="lead-book-mock">
             <div className="lead-book-spine" />
-            <div className="lead-book-face">
-              <p className="lead-book-top">THO · EBOOK</p>
-              <p className="lead-book-main">Manual 101</p>
-              <p className="lead-book-title">Gestión de la Diversidad</p>
-              <p className="lead-book-copy">Checklist + guía práctica para equipos.</p>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/downloads/portada-manual-01.png"
+              alt="Portada del Manual de Gestión de la Diversidad"
+              className="lead-book-face"
+            />
           </div>
         </aside>
       </div>

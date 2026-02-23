@@ -776,11 +776,13 @@ body {
 }
 
 .lead-book-face {
+  display: block;
   height: 100%;
+  width: 100%;
+  object-fit: cover;
   border-radius: 0.7rem;
   border: 1px solid rgba(148, 163, 184, 0.45);
-  background: linear-gradient(165deg, #121a23 0%, #1f2937 50%, #101317 100%);
-  padding: 1rem 0.85rem;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.35);
 }
 
 .lead-book-spine {
@@ -863,26 +865,11 @@ body {
     color: #b91c1c;
   }
 
-  .lead-book-face {
-    border-color: color-mix(in oklab, var(--tho-blue) 26%, #cbd5e1);
-    background: linear-gradient(165deg, #ffffff 0%, color-mix(in oklab, var(--tho-yellow) 12%, #f8fafc) 52%, color-mix(in oklab, var(--tho-blue) 16%, #e2e8f0) 100%);
-  }
 
   .lead-book-spine {
     background: linear-gradient(180deg, color-mix(in oklab, var(--tho-pink) 20%, #f1f5f9), color-mix(in oklab, var(--tho-blue) 25%, #cbd5e1));
   }
 
-  .lead-book-main {
-    color: #0f172a;
-  }
-
-  .lead-book-title {
-    color: #334155;
-  }
-
-  .lead-book-copy {
-    color: #334155;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
