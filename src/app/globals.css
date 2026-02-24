@@ -1083,9 +1083,17 @@ body {
   color: unset;
 }
 
+.nuestra-experiencia-page .exp-main .font-tho-title,
+.nuestra-experiencia-page .exp-main .exp-nav-counter,
+.nuestra-experiencia-page .exp-main .exp-nav-body,
+.nuestra-experiencia-page .exp-main .exp-section p,
+.nuestra-experiencia-page .exp-main .exp-nav-item a {
+  color: #fff !important;
+}
+
 #pre-tho.exp-section {
-  min-height: 82vh;
-  padding-top: clamp(1.4rem, 4vh, 2.8rem);
+  min-height: 72vh;
+  padding-top: clamp(1rem, 3vh, 2rem);
 }
 
 
@@ -1102,20 +1110,20 @@ body {
 
 
 .exp-nav-wrapper {
-  position: fixed;
+  position: sticky;
   z-index: 40;
   left: 0;
-  top: 86px;
-  height: calc(100vh - 86px);
-  padding: 30px;
+  top: 92px;
+  height: calc(100vh - 92px);
+  padding: 20px 30px;
   display: flex;
   flex-flow: column nowrap;
-  justify-content: flex-end;
+  justify-content: flex-start;
   pointer-events: none;
 }
 
 .exp-nav-list {
-  margin: 0 0 56px 30px;
+  margin: 0 0 0 30px;
   list-style: none;
   padding: 0;
   border-radius: 0;
@@ -1215,7 +1223,7 @@ body {
 }
 
 .exp-nav-item.active .exp-nav-body {
-  max-height: 520px;
+  max-height: 420px;
   opacity: 1;
 }
 
