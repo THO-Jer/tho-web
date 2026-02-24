@@ -1111,7 +1111,9 @@ body {
 }
 
 .exp-nav-counter {
-  font-size: 24px;
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.1;
   transition: all 0.15s ease-out;
 }
 
@@ -1119,7 +1121,7 @@ body {
   font-size: 32px;
   font-weight: 300;
   margin: 0 0 0.25em;
-  width: min(300px, 75vw);
+  width: min(360px, 75vw);
   max-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -1129,7 +1131,7 @@ body {
 .exp-nav-body {
   font-weight: 100;
   font-size: 18px;
-  width: min(300px, 75vw);
+  width: min(360px, 75vw);
   max-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -1148,7 +1150,7 @@ body {
 }
 
 .exp-nav-item.active .exp-nav-counter {
-  font-size: 48px;
+  font-size: 2.2rem;
 }
 
 .exp-nav-item.active .exp-nav-title {
@@ -1157,7 +1159,7 @@ body {
 }
 
 .exp-nav-item.active .exp-nav-body {
-  max-height: 130px;
+  max-height: 420px;
   opacity: 1;
 }
 
@@ -1197,8 +1199,9 @@ body {
     font-size: 1.1rem;
     border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: 999px;
-    width: 2.2rem;
+    min-width: 4.8rem;
     height: 2.2rem;
+    padding: 0 0.65rem;
     display: grid;
     place-items: center;
   }

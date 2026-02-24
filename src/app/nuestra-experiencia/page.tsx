@@ -7,10 +7,8 @@ import { Footer } from "@/components/Footer";
 
 type ExperienceSection = {
   id: string;
-  counter: string;
-  navTitle: string;
-  middleTitle: string;
   year: string;
+  title: string;
   body: string[];
   bgClass: string;
   textClass?: string;
@@ -19,10 +17,8 @@ type ExperienceSection = {
 const SECTIONS: ExperienceSection[] = [
   {
     id: "pre-tho",
-    counter: "01",
-    navTitle: "Pre THO",
-    middleTitle: "Pre THO",
     year: "Pre-2023",
+    title: "Pre THO",
     bgClass: "exp-section-white",
     textClass: "text-slate-900",
     body: [
@@ -37,10 +33,8 @@ const SECTIONS: ExperienceSection[] = [
   },
   {
     id: "fundacion",
-    counter: "02",
-    navTitle: "Fundación y primer gran contrato",
-    middleTitle: "Fundación y primer gran contrato",
     year: "2023",
+    title: "Fundación y primer gran contrato",
     bgClass: "exp-section-red",
     body: [
       "En julio de 2023 iniciamos operaciones formales.",
@@ -51,10 +45,8 @@ const SECTIONS: ExperienceSection[] = [
   },
   {
     id: "metodo-red",
-    counter: "03",
-    navTitle: "Método y red",
-    middleTitle: "Método y red",
     year: "2024",
+    title: "Método y red",
     bgClass: "exp-section-blue",
     body: [
       "El segundo año no fue de expansión. Fue de consolidación.",
@@ -67,10 +59,8 @@ const SECTIONS: ExperienceSection[] = [
   },
   {
     id: "profundizacion",
-    counter: "04",
-    navTitle: "Profundización y profesionalización",
-    middleTitle: "Profundización y profesionalización",
     year: "2025",
+    title: "Profundización y profesionalización",
     bgClass: "exp-section-orange",
     body: [
       "El tercer año fue de madurez.",
@@ -84,10 +74,8 @@ const SECTIONS: ExperienceSection[] = [
   },
   {
     id: "consolidacion",
-    counter: "05",
-    navTitle: "Camino a la consolidación",
-    middleTitle: "Camino a la consolidación",
     year: "2026",
+    title: "Camino a la consolidación",
     bgClass: "exp-section-violet",
     body: [
       "Hoy consolidamos una identidad.",
@@ -133,9 +121,8 @@ export default function NuestraExperienciaPage() {
               return (
                 <li key={section.id} className={`exp-nav-item ${active ? "active" : ""}`}>
                   <a href={`#${section.id}`}>
-                    <div className="exp-nav-counter">{section.counter}</div>
-                    <h2 className="exp-nav-title">{section.navTitle}</h2>
-                    <p className="exp-nav-body">{section.year}</p>
+                    <div className="exp-nav-counter">{section.year}</div>
+                    <p className="exp-nav-body whitespace-pre-line">{section.body.join("\n\n")}</p>
                   </a>
                 </li>
               );
@@ -150,14 +137,14 @@ export default function NuestraExperienciaPage() {
               id={section.id}
               className={`exp-section ${section.bgClass} ${section.textClass || "text-white"}`}
             >
-              <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 md:grid-cols-[0.8fr_1.2fr] md:px-14">
-                <h1 className="font-tho-title text-[2.2rem] leading-[1.02] md:text-[4rem]">{section.middleTitle}</h1>
-
+              <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 md:grid-cols-[1.2fr_0.8fr] md:px-14">
+                <div className="hidden md:block" aria-hidden />
                 <div>
-                  <p className="text-3xl font-semibold md:text-5xl">{section.year}</p>
-                  <div className="mt-5 grid gap-3 text-sm leading-relaxed md:text-lg">
+                  <h1 className="font-tho-title text-[2.3rem] leading-[1.02] md:text-[4.4rem]">{section.title}</h1>
+                  <div className="mt-4 grid gap-2 text-sm leading-relaxed md:hidden">
+                    <p className="text-xl font-semibold">{section.year}</p>
                     {section.body.map((paragraph) => (
-                      <p key={paragraph}>{paragraph}</p>
+                      <p key={`${section.id}-${paragraph}`}>{paragraph}</p>
                     ))}
                   </div>
                 </div>
