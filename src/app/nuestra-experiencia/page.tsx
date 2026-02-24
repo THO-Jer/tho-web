@@ -64,9 +64,9 @@ const SECTIONS: ExperienceSection[] = [
       "Ese hito marcó el inicio de una práctica continua y de largo plazo.",
     ],
     assets: [
-      { src: "/confian/1.svg", alt: "Logo confianza", top: "14%", left: "80%", width: "8.2rem" },
-      { src: "/confian/4.svg", alt: "Logo confianza", top: "45%", left: "58%", width: "9rem" },
-      { src: "/confian/9.svg", alt: "Logo confianza", top: "70%", left: "82%", width: "8rem" },
+      { src: "/confian/9.svg", alt: "Logo confianza", top: "32%", left: "82%", width: "8rem" },
+      { src: "/confian/4.svg", alt: "Logo confianza", top: "78%", left: "58%", width: "9rem" },
+      { src: "/confian/1.svg", alt: "Logo confianza", top: "90%", left: "80%", width: "8.2rem" },
     ],
   },
   {
@@ -127,6 +127,7 @@ const SECTIONS: ExperienceSection[] = [
 
 export default function NuestraExperienciaPage() {
   const [activeId, setActiveId] = useState(SECTIONS[0].id);
+  const [scrollY, setScrollY] = useState(0);
 
   const observerOptions = useMemo(
     () => ({
@@ -136,6 +137,22 @@ export default function NuestraExperienciaPage() {
     }),
     []
   );
+
+
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setScrollY(window.scrollY || 0));
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver((entries) => {
@@ -158,7 +175,7 @@ export default function NuestraExperienciaPage() {
             {SECTIONS.map((section) => {
               const active = section.id === activeId;
               return (
-                <li key={section.id} className={`exp-nav-item ${active ? "active" : ""}`}>
+                <li key={section.id} className={`exp-nav-item exp-reveal ${active ? "active is-visible" : ""}`}>
                   <a href={`#${section.id}`}>
                     <div className="exp-nav-counter">{section.year}</div>
                     <p className="exp-nav-body whitespace-pre-line">{section.body.join("\n\n")}</p>
@@ -173,7 +190,7 @@ export default function NuestraExperienciaPage() {
           {SECTIONS.map((section) => {
             const active = section.id === activeId;
             return (
-              <section key={section.id} id={section.id} className={`exp-section ${section.bgClass} ${section.textClass}`}>
+              <section key={section.id} id={section.id} className={`exp-section ${section.bgClass} ${section.textClass} ${active ? "is-active" : ""}`}>
                 <div className="exp-section-overlay" aria-hidden>
                   {section.assets.map((asset) => {
                     const seed = jitterSeed(`${section.id}-${asset.src}`);
@@ -183,13 +200,14 @@ export default function NuestraExperienciaPage() {
                         key={`${section.id}-${asset.src}`}
                         src={asset.src}
                         alt={asset.alt}
-                        className={`exp-float-media ${active ? "is-visible" : ""}`}
+                        className={`exp-float-media exp-reveal ${active ? "is-visible" : ""}`}
                         style={{
                           top: asset.top,
                           left: asset.left,
                           width: asset.width,
-                          transform: `rotate(${(seed % 9) - 4}deg)`,
-                          animationDelay: `${(seed % 7) * 0.25}s`,
+                          transform: `translateY(${Math.sin((scrollY + seed * 11) / (58 + (seed % 5) * 12)) * (8 + (seed % 3) * 4)}px) rotate(${(seed % 9) - 4}deg)`,
+                          transitionDelay: `${(seed % 6) * 0.1}s`,
+                          animationDuration: `${3 + (seed % 5) * 0.8}s`,
                         }}
                       />
                     );
@@ -199,8 +217,8 @@ export default function NuestraExperienciaPage() {
                 <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 md:grid-cols-[1.2fr_0.8fr] md:px-14">
                   <div className="hidden md:block" aria-hidden />
                   <div>
-                    <h1 className="font-tho-title text-[2.8rem] leading-[1.01] md:text-[5.2rem]">{section.title}</h1>
-                    <div className="mt-4 grid gap-2 text-base leading-relaxed md:hidden">
+                    <h1 className={`font-tho-title exp-reveal text-[2.8rem] leading-[1.01] md:text-[5.2rem] ${active ? "is-visible" : ""}`}>{section.title}</h1>
+                    <div className={`mt-4 grid gap-2 text-base leading-relaxed md:hidden exp-reveal ${active ? "is-visible" : ""}`}>
                       <p className="text-2xl font-semibold">{section.year}</p>
                       {section.body.map((paragraph) => (
                         <p key={`${section.id}-${paragraph}`}>{paragraph}</p>
