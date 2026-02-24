@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BrochureLeadForm } from "@/components/BrochureLeadForm";
+import { SostenibilidadServiceView } from "@/components/SostenibilidadServiceView";
 import { getServiceBySlug, SERVICES } from "@/content/services";
 import { TICKETS } from "@/content/tickets";
 import { PILLAR_META } from "@/lib/brand";
@@ -21,6 +22,16 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const related = SERVICES.filter((item) => item.slug !== service.slug);
   const leadTicket = TICKETS.find((ticket) => ticket.slug === service.leadTicketSlug);
   const meta = PILLAR_META[service.pillar];
+
+  if (service.slug === "sostenibilidad-corporativa") {
+    return (
+      <div className="min-h-screen bg-tho-bg">
+        <Header />
+        <SostenibilidadServiceView />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-tho-bg">

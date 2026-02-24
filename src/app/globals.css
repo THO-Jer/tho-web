@@ -1308,3 +1308,44 @@ body {
     place-items: center;
   }
 }
+
+.esg-page {
+  scroll-behavior: smooth;
+}
+
+.esg-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: esg-fade-up 0.7s ease forwards;
+}
+
+.esg-reveal[data-reveal-id="esg-hero-copy"] { animation-delay: 0.08s; }
+.esg-reveal[data-reveal-id="esg-hero-cta"] { animation-delay: 0.18s; }
+.esg-reveal[data-reveal-id="esg-statement"] { animation-delay: 0.1s; }
+.esg-reveal[data-reveal-id="esg-context"] { animation-delay: 0.12s; }
+.esg-reveal[data-reveal-id="esg-levels"] { animation-delay: 0.14s; }
+.esg-reveal[data-reveal-id="esg-ticket"] { animation-delay: 0.12s; }
+.esg-reveal[data-reveal-id="esg-contact"] { animation-delay: 0.1s; }
+
+@keyframes esg-fade-up {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.esg-title-line {
+  height: 1px;
+  width: min(140px, 32vw);
+  background: linear-gradient(90deg, #0f172a, rgba(15, 23, 42, 0));
+}
+
+.esg-level-card {
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.esg-level-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(15, 23, 42, 0.25);
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
