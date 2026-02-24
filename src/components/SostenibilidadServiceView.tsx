@@ -8,15 +8,7 @@ const BROCHURE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
 
 function useRevealItems() {
   return useMemo(
-    () => [
-      "esg-hero-copy",
-      "esg-hero-cta",
-      "esg-statement",
-      "esg-context",
-      "esg-levels",
-      "esg-ticket",
-      "esg-contact",
-    ],
+    () => ["esg-hero-copy", "esg-hero-cta", "esg-statement", "esg-context", "esg-levels", "esg-faq", "esg-contact"],
     []
   );
 }
@@ -25,7 +17,6 @@ export function SostenibilidadServiceView() {
   const [open, setOpen] = useState(false);
   const [brochureStatus, setBrochureStatus] = useState<FormStatus>("idle");
   const [contactStatus, setContactStatus] = useState<FormStatus>("idle");
-
   const revealItems = useRevealItems();
 
   async function onBrochureSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -36,7 +27,7 @@ export function SostenibilidadServiceView() {
     const payload = {
       type: "brochure_download",
       eventLabel: "flash_audit_esg_brochure_download",
-      source: "esg_ticket_reveal_modal",
+      source: "esg_level_card_modal",
       resourceId: "flash-audit-esg-brochure",
       resourceName: "Brochure Flash Audit ESG",
       serviceSlug: "sostenibilidad-corporativa",
@@ -58,12 +49,9 @@ export function SostenibilidadServiceView() {
       body: JSON.stringify(payload),
     });
 
-    if (!res.ok) {
-      setBrochureStatus("error");
-      return;
-    }
-
+    if (!res.ok) return setBrochureStatus("error");
     setBrochureStatus("ok");
+
     const link = document.createElement("a");
     link.href = BROCHURE_FILE_URL;
     link.download = "brochure-flash-audit-esg.pdf";
@@ -110,7 +98,7 @@ export function SostenibilidadServiceView() {
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero/2.png" alt="Equipo evaluando riesgos y estrategia" className="absolute inset-0 h-full w-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/65 via-slate-950/25 to-slate-950/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/62 via-slate-950/30 to-slate-950/08" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white" />
 
         <div className="relative mx-auto flex min-h-[84vh] max-w-6xl items-end px-4 pb-16 pt-24 md:pb-24">
@@ -125,16 +113,18 @@ export function SostenibilidadServiceView() {
                 Te ayudamos a traducir presión regulatoria, expectativas de inversionistas y escrutinio público en decisiones estratégicas claras, medibles y ejecutables.
               </p>
             </div>
-            <a href="#esg-contacto" className="esg-reveal is-visible mt-7 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900 transition hover:-translate-y-0.5" data-reveal-id={revealItems[1]}>
-              ¿Quieres cotizar?
+            <a href="#esg-contacto" className="btn-hero-services esg-reveal is-visible mt-7 inline-flex rounded-xl bg-tho-green px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 dark:bg-tho-yellow dark:text-slate-900" data-reveal-id={revealItems[1]}>
+              ¡Danos detalles!
             </a>
           </div>
         </div>
       </section>
 
       <section className="esg-statement mx-auto max-w-5xl px-4 py-24 text-center">
-        <h2 className="esg-reveal is-visible font-tho-title text-[2.2rem] leading-[1.05] text-slate-900 md:text-[4rem]" data-reveal-id={revealItems[2]}>
-          Cumplir no es lo mismo que gestionar riesgos.
+        <h2 className="esg-reveal is-visible font-tho-title text-[2.6rem] leading-[1.02] text-tho-green md:text-[4.8rem]" data-reveal-id={revealItems[2]}>
+          Cumplir no es lo
+          <br />
+          mismo que gestionar riesgos.
         </h2>
       </section>
 
@@ -144,28 +134,30 @@ export function SostenibilidadServiceView() {
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Qué está cambiando</p>
             <div className="esg-title-line mt-3 mb-6" />
             <p className="text-base leading-relaxed text-slate-700 md:text-lg">
-              La conversación ESG dejó de ser reputacional y se volvió estratégica: hoy la doble materialidad obliga a mirar impacto financiero e impacto externo al mismo tiempo.
+              La conversación ESG dejó de ser reputacional y se volvió estratégica: hoy la <strong className="text-[#0f4e2f]">doble materialidad</strong> obliga a mirar impacto financiero e impacto externo al mismo tiempo.
             </p>
             <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
-              Inversionistas y directorios piden trazabilidad real, no solo narrativa. Lo que antes era voluntario ahora condiciona decisiones de capital, continuidad y riesgo.
+              <strong className="text-[#0f4e2f]">Inversionistas</strong> y directorios piden <strong className="text-[#0f4e2f]">trazabilidad</strong> real, no solo narrativa. Lo que antes era voluntario ahora condiciona decisiones de capital, continuidad y riesgo.
             </p>
             <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
-              Además, el escrutinio público es más rápido y más exigente: si la organización no está alineada internamente, cualquier promesa externa se vuelve vulnerable.
+              Además, el <strong className="text-[#0f4e2f]">escrutinio público</strong> es más rápido y más exigente: si la organización no está alineada internamente, cualquier promesa externa se vuelve vulnerable.
             </p>
           </div>
 
-          <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-7">
-            <h3 className="font-tho-title text-[1.8rem] leading-[1.06] text-slate-900 md:text-[2.3rem]">
+          <aside className="relative overflow-hidden rounded-2xl border border-emerald-900/20 bg-emerald-700 p-6 text-white md:p-7">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/ilustraciones/7.png" alt="Ilustración de acompañamiento" className="pointer-events-none absolute -right-4 -bottom-4 w-28 opacity-30" />
+            <h3 className="font-tho-title text-[1.8rem] leading-[1.06] text-white md:text-[2.3rem]">
               El riesgo no es no tener ESG.
               <br />
               El riesgo es practicarlo superficialmente.
             </h3>
-            <ul className="mt-5 space-y-2 text-sm text-slate-700 md:text-base">
+            <ul className="mt-5 space-y-2 text-sm text-white/95 md:text-base">
               <li>• Greenwashing.</li>
               <li>• Compliance theater.</li>
               <li>• Desalineación interna.</li>
             </ul>
-            <p className="mt-5 text-sm font-semibold text-slate-900 md:text-base">Evitarlo requiere método, no discurso.</p>
+            <p className="mt-5 text-sm font-semibold text-white md:text-base">Evitarlo requiere método, no discurso.</p>
           </aside>
         </div>
       </section>
@@ -175,28 +167,25 @@ export function SostenibilidadServiceView() {
           <h3 className="font-tho-title text-[2.1rem] text-slate-900 md:text-[3.2rem]">Niveles de intervención</h3>
           <div className="esg-title-line mt-3 mb-8" />
 
-          <div className="grid gap-5 md:grid-cols-3">
-            <article className="esg-level-card rounded-2xl border border-slate-200 bg-white p-6">
-              <h4 className="text-xl font-semibold text-slate-900">Diagnóstico Estratégico ESG</h4>
-              <p className="mt-2 text-sm text-slate-600">Para organizaciones que necesitan claridad antes de diseñar una estrategia completa.</p>
+          <div className="esg-level-grid grid gap-5 md:grid-cols-3">
+            <article className="esg-level-card esg-level-card--start relative rounded-2xl border p-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-3 top-3 w-12 opacity-55" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-tho-green">Punto de partida recomendado</p>
+              <h4 className="mt-2 text-xl font-semibold text-slate-900">Flash Audit ESG</h4>
+              <p className="mt-2 text-sm text-slate-700">Revisión estratégica focalizada para organizaciones que necesitan claridad inmediata.</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
-                <li>• Identificación de riesgos críticos.</li>
-                <li>• Análisis preliminar de doble materialidad.</li>
-                <li>• Evaluación de brechas.</li>
-                <li>• Mapa de prioridades.</li>
+                <li>• Diagnóstico express de materialidad.</li>
+                <li>• Identificación de riesgos reputacionales y regulatorios.</li>
+                <li>• Recomendaciones inmediatas.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-slate-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
-                  <li>✓ Informe ejecutivo.</li>
-                  <li>✓ Matriz de riesgos priorizados.</li>
-                  <li>✓ Recomendaciones a 90 días.</li>
-                </ul>
-              </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Permite priorizar antes de invertir en grande.</p>
+              <p className="mt-4 text-sm font-semibold text-slate-900">Duración estimada: 3–4 semanas.</p>
+              <button type="button" onClick={() => { setOpen(true); setBrochureStatus("idle"); }} className="mt-5 inline-flex rounded-xl bg-tho-green px-4 py-2.5 text-sm font-semibold text-white">
+                Descargar brochure
+              </button>
             </article>
 
-            <article className="esg-level-card rounded-2xl border border-slate-200 bg-white p-6">
+            <article className="esg-level-card rounded-2xl border p-6">
               <h4 className="text-xl font-semibold text-slate-900">Hoja de Ruta y Gobernanza</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
                 <li>• Profundización de materialidad.</li>
@@ -204,7 +193,7 @@ export function SostenibilidadServiceView() {
                 <li>• Indicadores y métricas.</li>
                 <li>• Plan de implementación.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-slate-50 p-4">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-tho-green/20">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
                   <li>✓ Hoja de Ruta ESG.</li>
@@ -215,7 +204,7 @@ export function SostenibilidadServiceView() {
               <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-2xl border border-slate-200 bg-white p-6">
+            <article className="esg-level-card rounded-2xl border p-6">
               <h4 className="text-xl font-semibold text-slate-900">Implementación y Consolidación</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
                 <li>• Acompañamiento en ejecución.</li>
@@ -223,7 +212,7 @@ export function SostenibilidadServiceView() {
                 <li>• Seguimiento de indicadores.</li>
                 <li>• Ajustes estratégicos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-slate-50 p-4">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-tho-green/20">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
                   <li>✓ Sistema operativo ESG.</li>
@@ -238,63 +227,44 @@ export function SostenibilidadServiceView() {
       </section>
 
       <section className="bg-slate-50 px-4 py-20">
-        <div className="esg-reveal is-visible mx-auto max-w-3xl text-center" data-reveal-id={revealItems[5]}>
-          <h3 className="font-tho-title text-[2.2rem] text-slate-900 md:text-[3.6rem]">¿Partimos por el principio?</h3>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-slate-700 md:text-lg">
-            No todas las organizaciones necesitan una intervención extensa desde el día uno. A veces lo primero es claridad estratégica.
-          </p>
+        <div className="esg-reveal is-visible mx-auto max-w-4xl" data-reveal-id={revealItems[5]}>
+          <h3 className="font-tho-title text-center text-[2.2rem] text-slate-900 md:text-[3.4rem]">¿Qué implica partir por un Flash Audit ESG?</h3>
+          <div className="esg-title-line mx-auto mt-3 mb-8" />
 
-          <div className="mx-auto mt-8 max-w-[700px] rounded-2xl border border-slate-200 bg-white p-7 text-left shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
-            <h4 className="text-2xl font-semibold text-slate-900">Flash Audit ESG</h4>
-            <p className="mt-2 text-sm text-slate-700 md:text-base">
-              Revisión estratégica focalizada para identificar riesgos críticos y brechas prioritarias.
-            </p>
-
-            <ul className="mt-4 space-y-2 text-sm text-slate-700 md:text-base">
-              <li>• Diagnóstico express de materialidad.</li>
-              <li>• Identificación de riesgos reputacionales y regulatorios.</li>
-              <li>• Recomendaciones inmediatas.</li>
-            </ul>
-
-            <p className="mt-4 text-sm font-semibold text-slate-900 md:text-base">Duración estimada: 3–4 semanas.</p>
-            <p className="mt-4 text-sm text-slate-700 md:text-base">
-              No es una versión reducida del servicio. Es un instrumento estratégico para decidir con información.
-            </p>
-
-            <button
-              type="button"
-              onClick={() => {
-                setOpen(true);
-                setBrochureStatus("idle");
-              }}
-              className="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-            >
-              Descargar brochure
-            </button>
+          <div className="grid gap-4">
+            <details className="rounded-xl border border-slate-200 bg-white p-5">
+              <summary className="cursor-pointer text-base font-semibold text-slate-900">¿Cuándo conviene partir por aquí?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-700">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
+            </details>
+            <details className="rounded-xl border border-slate-200 bg-white p-5">
+              <summary className="cursor-pointer text-base font-semibold text-slate-900">¿Qué decisión habilita?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-700">Te permite decidir con evidencia si avanzar a una hoja de ruta integral o focalizar recursos en brechas críticas de corto plazo.</p>
+            </details>
+            <details className="rounded-xl border border-slate-200 bg-white p-5">
+              <summary className="cursor-pointer text-base font-semibold text-slate-900">¿Qué NO es?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-700">No es una versión “ligera” del servicio completo: es un instrumento estratégico para reducir incertidumbre y ordenar la conversación ejecutiva.</p>
+            </details>
           </div>
         </div>
       </section>
 
       <section id="esg-contacto" className="bg-white px-4 py-20">
         <div className="esg-reveal is-visible mx-auto max-w-3xl" data-reveal-id={revealItems[6]}>
-          <h3 className="font-tho-title text-[2.2rem] text-slate-900 md:text-[3.4rem]">Conversemos si hace sentido.</h3>
+          <h3 className="font-tho-title text-[2.2rem] text-slate-900 md:text-[3.2rem]">¿Comenzamos?</h3>
           <div className="esg-title-line mt-3 mb-7" />
 
-          <form onSubmit={onContactSubmit} className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-6">
+          <form onSubmit={onContactSubmit} className="grid gap-3 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800">
             <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
-            <input name="name" required placeholder="Nombre" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <input name="role" placeholder="Cargo" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <input name="organization" placeholder="Organización" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <input name="email" type="email" required placeholder="Email" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <textarea name="message" rows={4} placeholder="Mensaje" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-            <button
-              disabled={contactStatus === "sending"}
-              className="mt-2 inline-flex w-fit rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60"
-            >
+            <input name="name" required placeholder="Nombre" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
+            <input name="role" placeholder="Cargo" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
+            <input name="organization" placeholder="Organización" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
+            <input name="email" type="email" required placeholder="Email" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
+            <textarea name="message" rows={4} placeholder="Mensaje" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
+            <button disabled={contactStatus === "sending"} className="mt-2 inline-flex w-fit rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 disabled:opacity-60">
               {contactStatus === "sending" ? "Enviando..." : "Enviar solicitud"}
             </button>
-            {contactStatus === "ok" ? <p className="text-sm text-emerald-700">Gracias, te contactaremos pronto.</p> : null}
-            {contactStatus === "error" ? <p className="text-sm text-rose-600">No pudimos enviar, intenta nuevamente.</p> : null}
+            {contactStatus === "ok" ? <p className="text-sm text-emerald-300">Gracias, te contactaremos pronto.</p> : null}
+            {contactStatus === "error" ? <p className="text-sm text-rose-300">No pudimos enviar, intenta nuevamente.</p> : null}
           </form>
         </div>
       </section>
@@ -304,11 +274,8 @@ export function SostenibilidadServiceView() {
           <div className="w-full max-w-lg rounded-2xl bg-white p-6">
             <div className="flex items-center justify-between gap-4">
               <h4 className="text-xl font-semibold text-slate-900">Descargar brochure</h4>
-              <button type="button" onClick={() => setOpen(false)} className="rounded-lg border border-slate-200 px-3 py-1 text-sm">
-                Cerrar
-              </button>
+              <button type="button" onClick={() => setOpen(false)} className="rounded-lg border border-slate-200 px-3 py-1 text-sm">Cerrar</button>
             </div>
-
             <form onSubmit={onBrochureSubmit} className="mt-4 grid gap-3">
               <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
               <input name="name" required placeholder="Nombre" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
@@ -319,7 +286,6 @@ export function SostenibilidadServiceView() {
                 {brochureStatus === "sending" ? "Enviando..." : "Descargar brochure"}
               </button>
             </form>
-
             {brochureStatus === "ok" ? <p className="mt-3 text-sm text-emerald-700">Descarga iniciada. También registramos tu solicitud.</p> : null}
             {brochureStatus === "error" ? <p className="mt-3 text-sm text-rose-600">No pudimos procesar tu solicitud, intenta de nuevo.</p> : null}
           </div>
