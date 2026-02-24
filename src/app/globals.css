@@ -1324,7 +1324,7 @@ body {
 .esg-reveal[data-reveal-id="esg-statement"] { animation-delay: 0.1s; }
 .esg-reveal[data-reveal-id="esg-context"] { animation-delay: 0.12s; }
 .esg-reveal[data-reveal-id="esg-levels"] { animation-delay: 0.14s; }
-.esg-reveal[data-reveal-id="esg-ticket"] { animation-delay: 0.12s; }
+.esg-reveal[data-reveal-id="esg-faq"] { animation-delay: 0.12s; }
 .esg-reveal[data-reveal-id="esg-contact"] { animation-delay: 0.1s; }
 
 @keyframes esg-fade-up {
@@ -1348,4 +1348,16 @@ body {
   transform: translateY(-2px);
   border-color: rgba(15, 23, 42, 0.25);
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
+
+.dark .esg-title-line {
+  background: linear-gradient(90deg, rgba(167, 243, 208, 0.95), rgba(167, 243, 208, 0));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esg-reveal {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }

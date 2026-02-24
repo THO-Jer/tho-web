@@ -94,15 +94,16 @@ export function SostenibilidadServiceView() {
   }
 
   return (
-    <main className="esg-page bg-white text-slate-900">
+    <main className="esg-page bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero/2.png" alt="Equipo evaluando riesgos y estrategia" className="absolute inset-0 h-full w-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/62 via-slate-950/30 to-slate-950/08" />
-        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/55 to-emerald-950/45" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_28%,rgba(16,185,129,0.28),transparent_48%)]" />
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white dark:to-slate-950" />
 
         <div className="relative mx-auto flex min-h-[84vh] max-w-6xl items-end px-4 pb-16 pt-24 md:pb-24">
-          <div className="max-w-3xl text-white">
+          <div className="max-w-3xl rounded-3xl border border-white/20 bg-white/8 p-8 text-white shadow-2xl backdrop-blur-sm md:p-10">
             <div className="esg-reveal is-visible" data-reveal-id={revealItems[0]}>
               <h1 className="font-tho-title text-[2.5rem] leading-[1.02] md:text-[4.8rem]">
                 No es ESG.
@@ -113,7 +114,7 @@ export function SostenibilidadServiceView() {
                 Te ayudamos a traducir presión regulatoria, expectativas de inversionistas y escrutinio público en decisiones estratégicas claras, medibles y ejecutables.
               </p>
             </div>
-            <a href="#esg-contacto" className="btn-hero-services esg-reveal is-visible mt-7 inline-flex rounded-xl bg-tho-green px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 dark:bg-tho-yellow dark:text-slate-900" data-reveal-id={revealItems[1]}>
+            <a href="#esg-contacto" className="btn-hero-services esg-reveal is-visible mt-7 inline-flex rounded-xl bg-tho-green px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/40 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-emerald-900/45 dark:bg-tho-yellow dark:text-slate-900" data-reveal-id={revealItems[1]}>
               ¡Danos detalles!
             </a>
           </div>
@@ -121,7 +122,7 @@ export function SostenibilidadServiceView() {
       </section>
 
       <section className="esg-statement mx-auto max-w-5xl px-4 py-24 text-center">
-        <h2 className="esg-reveal is-visible font-tho-title text-[2.6rem] leading-[1.02] text-tho-green md:text-[4.8rem]" data-reveal-id={revealItems[2]}>
+        <h2 className="esg-reveal is-visible font-tho-title text-[2.6rem] leading-[1.02] text-tho-green md:text-[4.8rem] dark:text-emerald-300" data-reveal-id={revealItems[2]}>
           Cumplir no es lo
           <br />
           mismo que gestionar riesgos.
@@ -131,20 +132,20 @@ export function SostenibilidadServiceView() {
       <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <div className="esg-reveal is-visible grid gap-8 md:grid-cols-[1.2fr_0.8fr]" data-reveal-id={revealItems[3]}>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">Qué está cambiando</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Qué está cambiando</p>
             <div className="esg-title-line mt-3 mb-6" />
-            <p className="text-base leading-relaxed text-slate-700 md:text-lg">
-              La conversación ESG dejó de ser reputacional y se volvió estratégica: hoy la <strong className="text-[#0f4e2f]">doble materialidad</strong> obliga a mirar impacto financiero e impacto externo al mismo tiempo.
+            <p className="text-base leading-relaxed text-slate-700 md:text-lg dark:text-slate-300">
+              La conversación ESG dejó de ser reputacional y se volvió estratégica: hoy la <strong className="text-[#0f4e2f] dark:text-emerald-300">doble materialidad</strong> obliga a mirar impacto financiero e impacto externo al mismo tiempo.
             </p>
-            <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
-              <strong className="text-[#0f4e2f]">Inversionistas</strong> y directorios piden <strong className="text-[#0f4e2f]">trazabilidad</strong> real, no solo narrativa. Lo que antes era voluntario ahora condiciona decisiones de capital, continuidad y riesgo.
+            <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg dark:text-slate-300">
+              <strong className="text-[#0f4e2f] dark:text-emerald-300">Inversionistas</strong> y directorios piden <strong className="text-[#0f4e2f] dark:text-emerald-300">trazabilidad</strong> real, no solo narrativa. Lo que antes era voluntario ahora condiciona decisiones de capital, continuidad y riesgo.
             </p>
-            <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg">
-              Además, el <strong className="text-[#0f4e2f]">escrutinio público</strong> es más rápido y más exigente: si la organización no está alineada internamente, cualquier promesa externa se vuelve vulnerable.
+            <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg dark:text-slate-300">
+              Además, el <strong className="text-[#0f4e2f] dark:text-emerald-300">escrutinio público</strong> es más rápido y más exigente: si la organización no está alineada internamente, cualquier promesa externa se vuelve vulnerable.
             </p>
           </div>
 
-          <aside className="relative overflow-hidden rounded-2xl border border-emerald-900/20 bg-emerald-700 p-6 text-white md:p-7">
+          <aside className="relative overflow-hidden rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-700 via-emerald-700 to-emerald-900 p-6 text-white shadow-xl shadow-emerald-900/25 md:p-7 dark:border-emerald-400/20 dark:from-emerald-900 dark:via-emerald-800 dark:to-slate-900">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/ilustraciones/7.png" alt="Ilustración de acompañamiento" className="pointer-events-none absolute -right-4 -bottom-4 w-28 opacity-30" />
             <h3 className="font-tho-title text-[1.8rem] leading-[1.06] text-white md:text-[2.3rem]">
@@ -164,103 +165,103 @@ export function SostenibilidadServiceView() {
 
       <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
         <div className="esg-reveal is-visible" data-reveal-id={revealItems[4]}>
-          <h3 className="font-tho-title text-[2.1rem] text-slate-900 md:text-[3.2rem]">Niveles de intervención</h3>
+          <h3 className="font-tho-title text-[2.1rem] text-slate-900 md:text-[3.2rem] dark:text-slate-100">Niveles de intervención</h3>
           <div className="esg-title-line mt-3 mb-8" />
 
           <div className="esg-level-grid grid gap-5 md:grid-cols-3">
-            <article className="esg-level-card esg-level-card--start relative rounded-2xl border p-6">
+            <article className="esg-level-card esg-level-card--start relative rounded-3xl border border-emerald-200/70 bg-gradient-to-b from-white to-emerald-50/40 p-6 shadow-lg shadow-emerald-900/10 dark:border-emerald-400/20 dark:from-slate-900 dark:to-emerald-950/20">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-3 top-3 w-12 opacity-55" />
               <p className="text-xs font-semibold uppercase tracking-wide text-tho-green">Punto de partida recomendado</p>
-              <h4 className="mt-2 text-xl font-semibold text-slate-900">Flash Audit ESG</h4>
-              <p className="mt-2 text-sm text-slate-700">Revisión estratégica focalizada para organizaciones que necesitan claridad inmediata.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <h4 className="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">Flash Audit ESG</h4>
+              <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">Revisión estratégica focalizada para organizaciones que necesitan claridad inmediata.</p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-300">
                 <li>• Diagnóstico express de materialidad.</li>
                 <li>• Identificación de riesgos reputacionales y regulatorios.</li>
                 <li>• Recomendaciones inmediatas.</li>
               </ul>
-              <p className="mt-4 text-sm font-semibold text-slate-900">Duración estimada: 3–4 semanas.</p>
-              <button type="button" onClick={() => { setOpen(true); setBrochureStatus("idle"); }} className="mt-5 inline-flex rounded-xl bg-tho-green px-4 py-2.5 text-sm font-semibold text-white">
+              <p className="mt-4 text-sm font-semibold text-slate-900 dark:text-slate-200">Duración estimada: 3–4 semanas.</p>
+              <button type="button" onClick={() => { setOpen(true); setBrochureStatus("idle"); }} className="mt-5 inline-flex rounded-xl bg-tho-green px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-900/30 transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-emerald-400 dark:text-slate-900">
                 Descargar brochure
               </button>
             </article>
 
-            <article className="esg-level-card rounded-2xl border p-6">
-              <h4 className="text-xl font-semibold text-slate-900">Hoja de Ruta y Gobernanza</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+            <article className="esg-level-card rounded-3xl border border-slate-200 bg-white/85 p-6 shadow-lg shadow-slate-900/5 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/70">
+              <h4 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Hoja de Ruta y Gobernanza</h4>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-300">
                 <li>• Profundización de materialidad.</li>
                 <li>• Diseño de gobernanza.</li>
                 <li>• Indicadores y métricas.</li>
                 <li>• Plan de implementación.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-tho-green/20">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/80 p-4 ring-1 ring-tho-green/20 dark:bg-slate-900 dark:ring-emerald-400/20">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-700 dark:text-slate-300">
                   <li>✓ Hoja de Ruta ESG.</li>
                   <li>✓ Marco de gobernanza.</li>
                   <li>✓ Sistema de seguimiento.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
+              <p className="mt-4 text-sm font-medium text-slate-800 dark:text-slate-200">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-2xl border p-6">
-              <h4 className="text-xl font-semibold text-slate-900">Implementación y Consolidación</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+            <article className="esg-level-card rounded-3xl border border-slate-200 bg-white/85 p-6 shadow-lg shadow-slate-900/5 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/70">
+              <h4 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Implementación y Consolidación</h4>
+              <ul className="mt-4 space-y-2 text-sm text-slate-700 dark:text-slate-300">
                 <li>• Acompañamiento en ejecución.</li>
                 <li>• Instalación de capacidades internas.</li>
                 <li>• Seguimiento de indicadores.</li>
                 <li>• Ajustes estratégicos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-tho-green/20">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/80 p-4 ring-1 ring-tho-green/20 dark:bg-slate-900 dark:ring-emerald-400/20">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-700 dark:text-slate-300">
                   <li>✓ Sistema operativo ESG.</li>
                   <li>✓ Evaluaciones periódicas.</li>
                   <li>✓ Mejora continua.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Convierte la estrategia en práctica real.</p>
+              <p className="mt-4 text-sm font-medium text-slate-800 dark:text-slate-200">Convierte la estrategia en práctica real.</p>
             </article>
           </div>
         </div>
       </section>
 
-      <section className="bg-slate-50 px-4 py-20">
+      <section className="bg-slate-50 px-4 py-20 dark:bg-slate-900/70">
         <div className="esg-reveal is-visible mx-auto max-w-4xl" data-reveal-id={revealItems[5]}>
-          <h3 className="font-tho-title text-center text-[2.2rem] text-slate-900 md:text-[3.4rem]">¿Qué implica partir por un Flash Audit ESG?</h3>
+          <h3 className="font-tho-title text-center text-[2.2rem] text-slate-900 md:text-[3.4rem] dark:text-slate-100">¿Qué implica partir por un Flash Audit ESG?</h3>
           <div className="esg-title-line mx-auto mt-3 mb-8" />
 
           <div className="grid gap-4">
-            <details className="rounded-xl border border-slate-200 bg-white p-5">
-              <summary className="cursor-pointer text-base font-semibold text-slate-900">¿Cuándo conviene partir por aquí?</summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
+            <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+              <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cuándo conviene partir por aquí?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
             </details>
-            <details className="rounded-xl border border-slate-200 bg-white p-5">
-              <summary className="cursor-pointer text-base font-semibold text-slate-900">¿Qué decisión habilita?</summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700">Te permite decidir con evidencia si avanzar a una hoja de ruta integral o focalizar recursos en brechas críticas de corto plazo.</p>
+            <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+              <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué decisión habilita?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Te permite decidir con evidencia si avanzar a una hoja de ruta integral o focalizar recursos en brechas críticas de corto plazo.</p>
             </details>
-            <details className="rounded-xl border border-slate-200 bg-white p-5">
-              <summary className="cursor-pointer text-base font-semibold text-slate-900">¿Qué NO es?</summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700">No es una versión “ligera” del servicio completo: es un instrumento estratégico para reducir incertidumbre y ordenar la conversación ejecutiva.</p>
+            <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+              <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué NO es?</summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">No es una versión “ligera” del servicio completo: es un instrumento estratégico para reducir incertidumbre y ordenar la conversación ejecutiva.</p>
             </details>
           </div>
         </div>
       </section>
 
-      <section id="esg-contacto" className="bg-white px-4 py-20">
+      <section id="esg-contacto" className="bg-white px-4 py-20 dark:bg-slate-950">
         <div className="esg-reveal is-visible mx-auto max-w-3xl" data-reveal-id={revealItems[6]}>
-          <h3 className="font-tho-title text-[2.2rem] text-slate-900 md:text-[3.2rem]">¿Comenzamos?</h3>
+          <h3 className="font-tho-title text-[2.2rem] text-slate-900 md:text-[3.2rem] dark:text-slate-100">¿Comenzamos?</h3>
           <div className="esg-title-line mt-3 mb-7" />
 
-          <form onSubmit={onContactSubmit} className="grid gap-3 rounded-2xl bg-slate-900 p-6 ring-1 ring-slate-800">
+          <form onSubmit={onContactSubmit} className="grid gap-3 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 shadow-2xl shadow-slate-900/30 ring-1 ring-slate-700 dark:from-slate-900 dark:to-slate-900">
             <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
             <input name="name" required placeholder="Nombre" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
             <input name="role" placeholder="Cargo" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
             <input name="organization" placeholder="Organización" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
             <input name="email" type="email" required placeholder="Email" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
             <textarea name="message" rows={4} placeholder="Mensaje" className="rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/50 ring-1 ring-white/15" />
-            <button disabled={contactStatus === "sending"} className="mt-2 inline-flex w-fit rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 disabled:opacity-60">
+            <button disabled={contactStatus === "sending"} className="mt-2 inline-flex w-fit rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-md shadow-slate-950/30 transition hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-60">
               {contactStatus === "sending" ? "Enviando..." : "Enviar solicitud"}
             </button>
             {contactStatus === "ok" ? <p className="text-sm text-emerald-300">Gracias, te contactaremos pronto.</p> : null}
@@ -270,19 +271,19 @@ export function SostenibilidadServiceView() {
       </section>
 
       {open ? (
-        <div className="fixed inset-0 z-[90] grid place-items-center bg-slate-900/60 px-4" role="dialog" aria-modal="true">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6">
+        <div className="fixed inset-0 z-[90] grid place-items-center bg-slate-900/70 px-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
             <div className="flex items-center justify-between gap-4">
-              <h4 className="text-xl font-semibold text-slate-900">Descargar brochure</h4>
-              <button type="button" onClick={() => setOpen(false)} className="rounded-lg border border-slate-200 px-3 py-1 text-sm">Cerrar</button>
+              <h4 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Descargar brochure</h4>
+              <button type="button" onClick={() => setOpen(false)} className="rounded-lg border border-slate-200 px-3 py-1 text-sm dark:border-slate-600 dark:text-slate-200">Cerrar</button>
             </div>
             <form onSubmit={onBrochureSubmit} className="mt-4 grid gap-3">
               <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
-              <input name="name" required placeholder="Nombre" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              <input name="role" placeholder="Cargo" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              <input name="organization" required placeholder="Organización" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              <input name="email" type="email" required placeholder="Email" className="rounded-xl border border-slate-200 px-4 py-3 text-sm" />
-              <button disabled={brochureStatus === "sending"} className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60">
+              <input name="name" required placeholder="Nombre" className="rounded-xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+              <input name="role" placeholder="Cargo" className="rounded-xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+              <input name="organization" required placeholder="Organización" className="rounded-xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+              <input name="email" type="email" required placeholder="Email" className="rounded-xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
+              <button disabled={brochureStatus === "sending"} className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60 dark:bg-emerald-400 dark:text-slate-900">
                 {brochureStatus === "sending" ? "Enviando..." : "Descargar brochure"}
               </button>
             </form>
