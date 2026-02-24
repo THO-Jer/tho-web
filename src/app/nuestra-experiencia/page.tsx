@@ -46,9 +46,9 @@ const SECTIONS: ExperienceSection[] = [
       "THO nace desde esa acumulación.",
     ],
     assets: [
-      { src: "/ilustraciones/1.png", alt: "Ilustración", top: "12%", left: "56%", width: "10rem" },
-      { src: "/ilustraciones/6.png", alt: "Ilustración", top: "62%", left: "78%", width: "9rem" },
-      { src: "/ilustraciones/9.png", alt: "Ilustración", top: "28%", left: "82%", width: "8rem" },
+      { src: "/ilustraciones/1.png", alt: "Ilustración", top: "8%", left: "80%", width: "9.4rem" },
+      { src: "/ilustraciones/6.png", alt: "Ilustración", top: "70%", left: "76%", width: "8.8rem" },
+      { src: "/ilustraciones/9.png", alt: "Ilustración", top: "34%", left: "88%", width: "7.8rem" },
     ],
   },
   {
@@ -64,9 +64,9 @@ const SECTIONS: ExperienceSection[] = [
       "Ese hito marcó el inicio de una práctica continua y de largo plazo.",
     ],
     assets: [
-      { src: "/confian/9.svg", alt: "Logo confianza", top: "32%", left: "82%", width: "8rem" },
-      { src: "/confian/4.svg", alt: "Logo confianza", top: "78%", left: "58%", width: "9rem" },
-      { src: "/confian/1.svg", alt: "Logo confianza", top: "90%", left: "80%", width: "8.2rem" },
+      { src: "/confian/9.svg", alt: "Logo confianza", top: "18%", left: "86%", width: "8rem" },
+      { src: "/confian/4.svg", alt: "Logo confianza", top: "82%", left: "74%", width: "8.7rem" },
+      { src: "/confian/1.svg", alt: "Logo confianza", top: "90%", left: "88%", width: "7.9rem" },
     ],
   },
   {
@@ -74,7 +74,7 @@ const SECTIONS: ExperienceSection[] = [
     year: "2024",
     title: "Método y red",
     bgClass: "exp-section-orange",
-    textClass: "text-slate-950",
+    textClass: "text-white",
     body: [
       "El segundo año no fue de expansión. Fue de consolidación.",
       "Estructuramos un método anual de relacionamiento comunitario.",
@@ -84,9 +84,9 @@ const SECTIONS: ExperienceSection[] = [
       "THO dejó de ser una consultora joven. Comenzó a tener método.",
     ],
     assets: [
-      { src: "/confian/2.svg", alt: "Logo confianza", top: "12%", left: "60%", width: "8.4rem" },
-      { src: "/confian/3.svg", alt: "Logo confianza", top: "50%", left: "82%", width: "8rem" },
-      { src: "/confian/8.svg", alt: "Logo confianza", top: "72%", left: "66%", width: "8.8rem" },
+      { src: "/confian/2.svg", alt: "Logo confianza", top: "10%", left: "78%", width: "8.4rem" },
+      { src: "/confian/3.svg", alt: "Logo confianza", top: "44%", left: "88%", width: "8rem" },
+      { src: "/confian/8.svg", alt: "Logo confianza", top: "78%", left: "80%", width: "8.8rem" },
     ],
   },
   {
@@ -94,7 +94,7 @@ const SECTIONS: ExperienceSection[] = [
     year: "2025",
     title: "Profundización y profesionalización",
     bgClass: "exp-section-yellow",
-    textClass: "text-slate-950",
+    textClass: "text-white",
     body: [
       "El tercer año fue de madurez.",
       "Ejecución sostenida de estrategias comunitarias.",
@@ -105,9 +105,9 @@ const SECTIONS: ExperienceSection[] = [
       "La experiencia dejó de medirse en proyectos. Comenzó a medirse en profundidad.",
     ],
     assets: [
-      { src: "/confian/4.svg", alt: "Logo confianza", top: "12%", left: "78%", width: "8.2rem" },
-      { src: "/confian/5.svg", alt: "Logo confianza", top: "48%", left: "58%", width: "8.6rem" },
-      { src: "/confian/6.svg", alt: "Logo confianza", top: "80%", left: "82%", width: "8rem" },
+      { src: "/confian/4.svg", alt: "Logo confianza", top: "12%", left: "84%", width: "8.2rem" },
+      { src: "/confian/5.svg", alt: "Logo confianza", top: "48%", left: "90%", width: "8.1rem" },
+      { src: "/confian/6.svg", alt: "Logo confianza", top: "82%", left: "78%", width: "8rem" },
     ],
   },
   {
@@ -115,13 +115,13 @@ const SECTIONS: ExperienceSection[] = [
     year: "2026",
     title: "Camino a la consolidación",
     bgClass: "exp-section-green",
-    textClass: "text-slate-950",
+    textClass: "text-white",
     body: [
       "Hoy consolidamos una identidad.",
       "No buscamos volumen. Buscamos coherencia.",
       "No buscamos clientes para ejecutar tareas. Buscamos organizaciones dispuestas a transformarse.",
     ],
-    assets: [{ src: "/confian/7.svg", alt: "Logo confianza", top: "10%", left: "74%", width: "8.4rem" }],
+    assets: [{ src: "/confian/7.svg", alt: "Logo confianza", top: "8%", left: "84%", width: "8.4rem" }],
   },
 ];
 
@@ -175,7 +175,7 @@ export default function NuestraExperienciaPage() {
             {SECTIONS.map((section) => {
               const active = section.id === activeId;
               return (
-                <li key={section.id} className={`exp-nav-item exp-reveal ${active ? "active is-visible" : ""}`}>
+                <li key={section.id} className={`exp-nav-item exp-reveal is-visible ${active ? "active" : ""}`}>
                   <a href={`#${section.id}`}>
                     <div className="exp-nav-counter">{section.year}</div>
                     <p className="exp-nav-body whitespace-pre-line">{section.body.join("\n\n")}</p>
