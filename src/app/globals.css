@@ -1083,6 +1083,11 @@ body {
   color: unset;
 }
 
+.nuestra-experiencia-page .main-header .btn-tho-hover-gradient,
+.nuestra-experiencia-page .main-header .btn-tho-hover-gradient span {
+  color: #fff !important;
+}
+
 .nuestra-experiencia-page .exp-main .font-tho-title,
 .nuestra-experiencia-page .exp-main .exp-nav-counter,
 .nuestra-experiencia-page .exp-main .exp-nav-body,
