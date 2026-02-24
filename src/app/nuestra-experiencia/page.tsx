@@ -8,48 +8,92 @@ import { Footer } from "@/components/Footer";
 type ExperienceSection = {
   id: string;
   counter: string;
-  title: string;
-  body: string;
+  navTitle: string;
+  middleTitle: string;
+  year: string;
+  body: string[];
   bgClass: string;
   textClass?: string;
 };
 
 const SECTIONS: ExperienceSection[] = [
   {
-    id: "origen",
+    id: "pre-tho",
     counter: "01",
-    title: "Origen en terreno",
-    body: "Nacimos en Concepción acompañando organizaciones con presión social, reputacional y operativa.",
+    navTitle: "Pre THO",
+    middleTitle: "Pre THO",
+    year: "Pre-2023",
     bgClass: "exp-section-white",
     textClass: "text-slate-900",
+    body: [
+      "Antes de fundar THO, ya trabajábamos en:",
+      "Diagnósticos organizacionales en contextos complejos",
+      "Diseño de procesos participativos",
+      "Gestión de cambio y cultura organizacional",
+      "Análisis de impacto social y reputación",
+      "Aprendimos algo clave: sin coherencia interna, ninguna estrategia externa funciona.",
+      "THO nace desde esa acumulación.",
+    ],
   },
   {
-    id: "diagnostico",
+    id: "fundacion",
     counter: "02",
-    title: "Diagnóstico sin filtro",
-    body: "Leemos riesgos, actores y brechas internas para priorizar con datos y no con intuición aislada.",
+    navTitle: "Fundación y primer gran contrato",
+    middleTitle: "Fundación y primer gran contrato",
+    year: "2023",
     bgClass: "exp-section-red",
+    body: [
+      "En julio de 2023 iniciamos operaciones formales.",
+      "Algunos proyectos comenzaron por el relato público. Pero en todos los casos, el trabajo terminó siendo estructural.",
+      "Hacia fines de ese año, firmamos nuestro primer contrato sostenido con la Cámara Chilena de la Construcción Concepción, acompañando procesos de relacionamiento comunitario y fortalecimiento estratégico.",
+      "Ese hito marcó el inicio de una práctica continua y de largo plazo.",
+    ],
   },
   {
-    id: "estrategia",
+    id: "metodo-red",
     counter: "03",
-    title: "Estrategia defendible",
-    body: "Convertimos hallazgos en rutas de acción claras para directorio, equipos y operación territorial.",
+    navTitle: "Método y red",
+    middleTitle: "Método y red",
+    year: "2024",
     bgClass: "exp-section-blue",
+    body: [
+      "El segundo año no fue de expansión. Fue de consolidación.",
+      "Estructuramos un método anual de relacionamiento comunitario.",
+      "Formalizamos herramientas como la Hoja de Ruta Comunitaria y el mapeo de actores.",
+      "Profundizamos la evaluación de impacto social.",
+      "Nos vinculamos formalmente con la red IAP2 Latinoamérica en participación pública.",
+      "THO dejó de ser una consultora joven. Comenzó a tener método.",
+    ],
   },
   {
-    id: "implementacion",
+    id: "profundizacion",
     counter: "04",
-    title: "Implementación acompañada",
-    body: "No dejamos un documento: acompañamos la ejecución y ajustamos en tiempo real donde ocurre el cambio.",
+    navTitle: "Profundización y profesionalización",
+    middleTitle: "Profundización y profesionalización",
+    year: "2025",
     bgClass: "exp-section-orange",
+    body: [
+      "El tercer año fue de madurez.",
+      "Ejecución sostenida de estrategias comunitarias.",
+      "Consolidación de programas territoriales.",
+      "Formación avanzada del director para convertirse en trainer oficial IAP2.",
+      "Entrenamiento a equipos y círculos internos en liderazgo y participación.",
+      "Incorporación de nuevos clientes que buscan coherencia entre organización, comunidad y relato público.",
+      "La experiencia dejó de medirse en proyectos. Comenzó a medirse en profundidad.",
+    ],
   },
   {
-    id: "capacidad",
+    id: "consolidacion",
     counter: "05",
-    title: "Capacidad instalada",
-    body: "El resultado esperado es autonomía interna: decisiones más sólidas y equipos capaces de sostener avances.",
+    navTitle: "Camino a la consolidación",
+    middleTitle: "Camino a la consolidación",
+    year: "2026",
     bgClass: "exp-section-violet",
+    body: [
+      "Hoy consolidamos una identidad.",
+      "No buscamos volumen. Buscamos coherencia.",
+      "No buscamos clientes para ejecutar tareas. Buscamos organizaciones dispuestas a transformarse.",
+    ],
   },
 ];
 
@@ -90,8 +134,8 @@ export default function NuestraExperienciaPage() {
                 <li key={section.id} className={`exp-nav-item ${active ? "active" : ""}`}>
                   <a href={`#${section.id}`}>
                     <div className="exp-nav-counter">{section.counter}</div>
-                    <h2 className="exp-nav-title">{section.title}</h2>
-                    <p className="exp-nav-body">{section.body}</p>
+                    <h2 className="exp-nav-title">{section.navTitle}</h2>
+                    <p className="exp-nav-body">{section.year}</p>
                   </a>
                 </li>
               );
@@ -106,10 +150,17 @@ export default function NuestraExperienciaPage() {
               id={section.id}
               className={`exp-section ${section.bgClass} ${section.textClass || "text-white"}`}
             >
-              <div className="mx-auto w-full max-w-4xl px-6 text-center md:px-10">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] opacity-80">Etapa {section.counter}</p>
-                <h1 className="font-tho-title mt-3 text-[2.6rem] md:text-[4.2rem]">{section.title}</h1>
-                <p className="mx-auto mt-4 max-w-2xl text-base md:text-xl">{section.body}</p>
+              <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 md:grid-cols-[0.8fr_1.2fr] md:px-14">
+                <h1 className="font-tho-title text-[2.2rem] leading-[1.02] md:text-[4rem]">{section.middleTitle}</h1>
+
+                <div>
+                  <p className="text-3xl font-semibold md:text-5xl">{section.year}</p>
+                  <div className="mt-5 grid gap-3 text-sm leading-relaxed md:text-lg">
+                    {section.body.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
+                </div>
               </div>
             </section>
           ))}
