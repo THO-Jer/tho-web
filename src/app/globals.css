@@ -1056,6 +1056,7 @@ body {
 
 .exp-main {
   position: relative;
+  background: #d13ca2;
 }
 
 .exp-wrapper {
@@ -1077,13 +1078,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: var(--exp-bg, #d13ca2);
 }
 
-.exp-section-pink { background: var(--tho-pink); }
-.exp-section-blue { background: var(--tho-blue); }
-.exp-section-orange { background: var(--tho-orange); }
-.exp-section-yellow { background: var(--tho-yellow); }
-.exp-section-green { background: var(--tho-green); }
 
 .exp-nav-wrapper {
   position: sticky;
