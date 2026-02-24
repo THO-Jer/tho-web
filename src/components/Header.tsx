@@ -114,7 +114,7 @@ export function Header() {
             href="https://bit.ly/bookTHO"
             target="_blank"
             rel="noreferrer"
-            className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white"
+            className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-900"
           >
             <span className="relative z-10 sm:hidden">Agendar</span>
             <span className="relative z-10 hidden sm:inline">Agendar conversación</span>
