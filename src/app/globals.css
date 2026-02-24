@@ -140,6 +140,7 @@ body {
 
 .btn-hero-services {
   position: relative;
+  will-change: background-position;
   border: 1px solid transparent;
   background:
     linear-gradient(#ffffff, #ffffff) padding-box,
@@ -151,7 +152,6 @@ body {
 .btn-hero-services:hover,
 .btn-hero-services:focus-visible {
   background-position: 0 0, 100% 0;
-  animation: tho-brand-border-flow 2.8s linear infinite;
 }
 
 @keyframes tho-brand-border-flow {
@@ -1340,28 +1340,6 @@ body {
   background: linear-gradient(90deg, #0f172a, rgba(15, 23, 42, 0));
 }
 
-.esg-statement-lens::before {
-  content: "";
-  position: absolute;
-  inset: -20% auto auto 50%;
-  width: min(720px, 88vw);
-  height: 360px;
-  transform: translateX(-50%);
-  background:
-    radial-gradient(ellipse at center, rgba(147, 191, 36, 0.26) 0%, rgba(30, 185, 129, 0.12) 36%, rgba(255,255,255,0) 74%);
-  pointer-events: none;
-  animation: esg-lens-drift 10s ease-in-out infinite;
-}
-
-.dark .esg-statement-lens::before {
-  background:
-    radial-gradient(ellipse at center, rgba(52, 211, 153, 0.26) 0%, rgba(147, 191, 36, 0.12) 36%, rgba(2,6,23,0) 74%);
-}
-
-@keyframes esg-lens-drift {
-  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.82; }
-  50% { transform: translateX(-48%) translateY(14px); opacity: 1; }
-}
 
 .esg-levels-gallery {
   isolation: isolate;
@@ -1383,6 +1361,10 @@ body {
     0 20px 40px rgba(6, 95, 70, 0.23),
     inset 0 1px 0 rgba(255,255,255,0.65),
     0 0 0 1px rgba(147, 191, 36, 0.24);
+}
+
+.esg-risk-glass img {
+  transition: transform 0.2s linear;
 }
 
 .esg-risk-glass::before {
