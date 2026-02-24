@@ -1066,10 +1066,28 @@ body {
   position: relative;
 }
 
-.exp-main,
-.exp-main * {
-  color: inherit;
+.exp-main {
+  color: #fff;
 }
+
+.exp-main .exp-nav-item a,
+.exp-main .exp-nav-counter,
+.exp-main .exp-nav-body,
+.exp-main .font-tho-title,
+.exp-main .exp-section p {
+  color: #fff;
+}
+
+.nuestra-experiencia-page .main-header,
+.nuestra-experiencia-page .main-header * {
+  color: unset;
+}
+
+#pre-tho.exp-section {
+  min-height: 82vh;
+  padding-top: clamp(1.4rem, 4vh, 2.8rem);
+}
+
 
 .exp-section {
   min-height: 100vh;

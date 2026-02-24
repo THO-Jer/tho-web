@@ -171,7 +171,7 @@ export default function NuestraExperienciaPage() {
   }, [observerOptions]);
 
   return (
-    <div className="exp-wrapper min-h-screen">
+    <div className="nuestra-experiencia-page exp-wrapper min-h-screen">
       <Header />
       <main id="contenido" className="exp-main relative">
         <aside className="exp-nav-wrapper" aria-label="Navegación de experiencia">
