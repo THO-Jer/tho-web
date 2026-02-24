@@ -199,9 +199,9 @@ export default function NuestraExperienciaPage() {
                 <div className="mx-auto grid w-full max-w-6xl gap-8 px-6 md:grid-cols-[1.2fr_0.8fr] md:px-14">
                   <div className="hidden md:block" aria-hidden />
                   <div>
-                    <h1 className="font-tho-title text-[2.3rem] leading-[1.02] md:text-[4.4rem]">{section.title}</h1>
-                    <div className="mt-4 grid gap-2 text-sm leading-relaxed md:hidden">
-                      <p className="text-xl font-semibold">{section.year}</p>
+                    <h1 className="font-tho-title text-[2.8rem] leading-[1.01] md:text-[5.2rem]">{section.title}</h1>
+                    <div className="mt-4 grid gap-2 text-base leading-relaxed md:hidden">
+                      <p className="text-2xl font-semibold">{section.year}</p>
                       {section.body.map((paragraph) => (
                         <p key={`${section.id}-${paragraph}`}>{paragraph}</p>
                       ))}

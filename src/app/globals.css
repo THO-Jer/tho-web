@@ -1074,10 +1074,10 @@ body {
 .exp-nav-list {
   margin: 0 0 100px 30px;
   list-style: none;
-  padding: 1rem 1rem 0.65rem;
-  border-radius: 1rem;
-  background: rgba(15, 23, 42, 0.58);
-  backdrop-filter: blur(5px);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
   pointer-events: auto;
 }
 
@@ -1114,8 +1114,8 @@ body {
 }
 
 .exp-nav-counter {
-  font-size: 1.55rem;
-  font-weight: 500;
+  font-size: 2.1rem;
+  font-weight: 600;
   line-height: 1.1;
   transition: all 0.15s ease-out;
 }
@@ -1133,9 +1133,9 @@ body {
 
 .exp-nav-body {
   font-weight: 100;
-  font-size: 0.8rem;
-  line-height: 1.35;
-  width: min(280px, 65vw);
+  font-size: 1rem;
+  line-height: 1.45;
+  width: min(420px, 78vw);
   max-height: 0;
   overflow: hidden;
   opacity: 0;
@@ -1154,7 +1154,7 @@ body {
 }
 
 .exp-nav-item.active .exp-nav-counter {
-  font-size: 2.2rem;
+  font-size: 2.9rem;
 }
 
 .exp-nav-item.active .exp-nav-title {
@@ -1163,7 +1163,7 @@ body {
 }
 
 .exp-nav-item.active .exp-nav-body {
-  max-height: 360px;
+  max-height: 520px;
   opacity: 1;
 }
 
@@ -1212,8 +1212,8 @@ body {
     height: auto;
     top: 68px;
     padding: 0.75rem 1rem;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(6px);
+    background: transparent;
+    backdrop-filter: none;
   }
 
   .exp-nav-list {
@@ -1241,7 +1241,7 @@ body {
 
   .exp-nav-counter,
   .exp-nav-item.active .exp-nav-counter {
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     border: 1px solid rgba(255, 255, 255, 0.55);
     border-radius: 999px;
     min-width: 4.8rem;
