@@ -1057,12 +1057,12 @@ body {
 .exp-main {
   position: relative;
   background: #d13ca2;
+  color: #fff;
 }
 
 .exp-wrapper {
   min-height: 100vh;
   font-weight: 300;
-  color: #fff;
   position: relative;
 }
 
@@ -1077,13 +1077,14 @@ body {
   font-weight: 100;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: clamp(2.5rem, 7vh, 5.5rem);
   background: var(--exp-bg, #d13ca2);
 }
 
 
 .exp-nav-wrapper {
-  position: sticky;
+  position: fixed;
   z-index: 40;
   left: 0;
   top: 86px;
