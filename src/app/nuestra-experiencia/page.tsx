@@ -18,7 +18,7 @@ type ExperienceSection = {
   year: string;
   title: string;
   body: string[];
-  bgClass: string;
+  bgColor: string;
   textClass: string;
   assets: OverlayAsset[];
 };
@@ -34,7 +34,7 @@ const SECTIONS: ExperienceSection[] = [
     id: "pre-tho",
     year: "Pre-2023",
     title: "Pre THO",
-    bgClass: "exp-section-pink",
+    bgColor: "var(--tho-pink)",
     textClass: "text-white",
     body: [
       "Antes de fundar THO, ya trabajábamos en:",
@@ -55,7 +55,7 @@ const SECTIONS: ExperienceSection[] = [
     id: "fundacion",
     year: "2023",
     title: "Fundación y primer gran contrato",
-    bgClass: "exp-section-blue",
+    bgColor: "var(--tho-blue)",
     textClass: "text-white",
     body: [
       "En julio de 2023 iniciamos operaciones formales.",
@@ -65,15 +65,15 @@ const SECTIONS: ExperienceSection[] = [
     ],
     assets: [
       { src: "/confian/9.svg", alt: "Logo confianza", top: "18%", left: "86%", width: "8rem" },
-      { src: "/confian/4.svg", alt: "Logo confianza", top: "82%", left: "74%", width: "8.7rem" },
-      { src: "/confian/1.svg", alt: "Logo confianza", top: "90%", left: "88%", width: "7.9rem" },
+      { src: "/confian/4.svg", alt: "Logo confianza", top: "70%", left: "72%", width: "8.7rem" },
+      { src: "/confian/1.svg", alt: "Logo confianza", top: "76%", left: "88%", width: "7.9rem" },
     ],
   },
   {
     id: "metodo-red",
     year: "2024",
     title: "Método y red",
-    bgClass: "exp-section-orange",
+    bgColor: "var(--tho-orange)",
     textClass: "text-white",
     body: [
       "El segundo año no fue de expansión. Fue de consolidación.",
@@ -93,7 +93,7 @@ const SECTIONS: ExperienceSection[] = [
     id: "profundizacion",
     year: "2025",
     title: "Profundización y profesionalización",
-    bgClass: "exp-section-yellow",
+    bgColor: "var(--tho-yellow)",
     textClass: "text-white",
     body: [
       "El tercer año fue de madurez.",
@@ -114,7 +114,7 @@ const SECTIONS: ExperienceSection[] = [
     id: "consolidacion",
     year: "2026",
     title: "Camino a la consolidación",
-    bgClass: "exp-section-green",
+    bgColor: "var(--tho-green)",
     textClass: "text-white",
     body: [
       "Hoy consolidamos una identidad.",
@@ -132,8 +132,8 @@ export default function NuestraExperienciaPage() {
   const observerOptions = useMemo(
     () => ({
       root: null,
-      rootMargin: "-35% 0px -35% 0px",
-      threshold: 0.01,
+      rootMargin: "0px",
+      threshold: 0.55,
     }),
     []
   );
@@ -143,7 +143,11 @@ export default function NuestraExperienciaPage() {
     let raf = 0;
     const onScroll = () => {
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setScrollY(window.scrollY || 0));
+      raf = requestAnimationFrame(() => {
+        const y = window.scrollY || 0;
+        setScrollY(y);
+        if (y < 120) setActiveId(SECTIONS[0].id);
+      });
     };
 
     onScroll();
@@ -169,7 +173,7 @@ export default function NuestraExperienciaPage() {
   return (
     <div className="exp-wrapper min-h-screen">
       <Header />
-      <main id="contenido" className="relative">
+      <main id="contenido" className="exp-main relative">
         <aside className="exp-nav-wrapper" aria-label="Navegación de experiencia">
           <ol className="exp-nav-list">
             {SECTIONS.map((section) => {
@@ -190,7 +194,7 @@ export default function NuestraExperienciaPage() {
           {SECTIONS.map((section) => {
             const active = section.id === activeId;
             return (
-              <section key={section.id} id={section.id} className={`exp-section ${section.bgClass} ${section.textClass} ${active ? "is-active" : ""}`}>
+              <section key={section.id} id={section.id} style={{ backgroundColor: section.bgColor }} className={`exp-section ${section.textClass} ${active ? "is-active" : ""}`}>
                 <div className="exp-section-overlay" aria-hidden>
                   {section.assets.map((asset) => {
                     const seed = jitterSeed(`${section.id}-${asset.src}`);

@@ -1046,6 +1046,16 @@ body {
 .exp-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+  animation: exp-fade-in 0.75s ease both;
+}
+
+@keyframes exp-fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.exp-main {
+  position: relative;
 }
 
 .exp-wrapper {
@@ -1055,7 +1065,8 @@ body {
   position: relative;
 }
 
-.exp-wrapper * {
+.exp-main,
+.exp-main * {
   color: inherit;
 }
 
