@@ -225,7 +225,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
           <aside className="esg-risk-glass relative rounded-[2rem] border border-white/35 bg-white/25 p-7 text-slate-900 shadow-2xl shadow-emerald-950/20 ring-1 ring-white/40 backdrop-blur-xl dark:border-white/15 dark:bg-white/8 dark:text-white dark:ring-white/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/hero/7.png"
+              src="//ilustraciones/7.png"
               alt="Ilustración de acompañamiento"
               className="pointer-events-none absolute -right-10 -top-12 w-44 opacity-100 md:w-48"
               style={{ transform: `translateY(${riskParallax}px)` }}
@@ -253,7 +253,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
           <div className="esg-level-grid esg-levels-gallery grid gap-5 md:grid-cols-3">
             <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#9ac94f] bg-[linear-gradient(160deg,#f7fbe8_0%,#eef7d4_55%,#e5f2c1_100%)] p-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/hero/7.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-4 top-4 w-14 opacity-95" />
+              <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-4 top-4 w-14 opacity-95" />
               <p className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white">● Punto de partida recomendado</p>
               <h4 className="mt-4 text-3xl font-black leading-[1.02] text-slate-900">Flash Audit ESG</h4>
               <p className="mt-3 text-sm text-slate-700">Revisión estratégica focalizada para organizaciones que necesitan claridad inmediata.</p>
