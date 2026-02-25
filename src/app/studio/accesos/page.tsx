@@ -14,6 +14,14 @@ type AuthorizedUser = {
   permissions: { canBlog: boolean; canCrm: boolean; canIncidents: boolean };
   updatedAt: string;
 };
+type AccessRequest = {
+  id: string;
+  email: string;
+  provider: "google" | "azure" | "any" | "unknown";
+  status: "pending" | "approved" | "rejected";
+  requestedAt: string;
+  resolvedAt?: string;
+};
 
 export default function StudioAccesosPage() {
   const router = useRouter();
@@ -22,6 +30,7 @@ export default function StudioAccesosPage() {
   const [blocked, setBlocked] = useState<string[]>([]);
   const [logs, setLogs] = useState<LoginLog[]>([]);
   const [authorized, setAuthorized] = useState<AuthorizedUser[]>([]);
+  const [requests, setRequests] = useState<AccessRequest[]>([]);
   const [emailInput, setEmailInput] = useState("");
   const [grantProvider, setGrantProvider] = useState<"google" | "azure" | "any">("google");
   const [grantBlog, setGrantBlog] = useState(true);
@@ -39,6 +48,7 @@ export default function StudioAccesosPage() {
       setBlocked(data.blockedEmails || []);
       setLogs(data.logs || []);
       setAuthorized(data.authorizedUsers || []);
+      setRequests(data.accessRequests || []);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error cargando datos.");
     } finally {
@@ -60,7 +70,7 @@ export default function StudioAccesosPage() {
       .finally(() => setChecking(false));
   }, [router]);
 
-  async function onAction(action: "block" | "unblock" | "grant" | "revoke", email: string) {
+  async function onAction(action: "block" | "unblock" | "grant" | "revoke" | "approve_request" | "reject_request", email: string, requestId?: string) {
     setLoading(true);
     setMessage("");
     try {
@@ -71,6 +81,7 @@ export default function StudioAccesosPage() {
         body: JSON.stringify({
           action,
           email,
+          requestId,
           provider: grantProvider,
           permissions: {
             canBlog: grantBlog,
@@ -84,10 +95,15 @@ export default function StudioAccesosPage() {
 
       if (data.blockedEmails) setBlocked(data.blockedEmails);
       if (data.authorizedUsers) setAuthorized(data.authorizedUsers);
+      if (data.accessRequests) setRequests(data.accessRequests);
 
       if (action === "grant") {
         setMessage("Correo autorizado/actualizado.");
         setEmailInput("");
+      } else if (action === "approve_request") {
+        setMessage("Solicitud aprobada y permisos asignados.");
+      } else if (action === "reject_request") {
+        setMessage("Solicitud rechazada.");
       } else if (action === "revoke") {
         setMessage("Autorización eliminada.");
       } else if (action === "block") {
@@ -160,6 +176,42 @@ export default function StudioAccesosPage() {
               </div>
             ))}
             {!authorized.length ? <p className="text-sm text-slate-500">No hay correos autorizados (excepto superadmins).</p> : null}
+          </div>
+        </section>
+
+        <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+          <h2 className="text-lg font-semibold text-slate-900">Solicitudes de acceso ({requests.filter((r) => r.status === "pending").length} pendientes)</h2>
+          <div className="mt-3 grid gap-2">
+            {requests.map((req) => (
+              <div key={req.id} className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <strong>{req.email}</strong> · proveedor detectado: {req.provider}
+                    <div className="text-xs text-slate-500">
+                      Estado: {req.status} · solicitado: {new Date(req.requestedAt).toLocaleString()}
+                      {req.resolvedAt ? ` · resuelto: ${new Date(req.resolvedAt).toLocaleString()}` : ""}
+                    </div>
+                  </div>
+                  {req.status === "pending" ? (
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEmailInput(req.email);
+                          setGrantProvider(req.provider === "unknown" ? "google" : req.provider);
+                          onAction("approve_request", req.email, req.id);
+                        }}
+                        className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
+                      >
+                        Aprobar + permisos actuales
+                      </button>
+                      <button type="button" onClick={() => onAction("reject_request", req.email, req.id)} className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">Rechazar</button>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+            {!requests.length ? <p className="text-sm text-slate-500">No hay solicitudes registradas.</p> : null}
           </div>
         </section>
 

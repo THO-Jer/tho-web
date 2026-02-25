@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
-import { logStudioLogin } from "@/lib/studioAccessStore";
+import { getUserFromToken, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
+import { createAccessRequest, logStudioLogin } from "@/lib/studioAccessStore";
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +49,16 @@ export async function POST(req: NextRequest) {
     if (!token) return NextResponse.json({ error: "Token OAuth faltante." }, { status: 400 });
 
     const valid = await validateSupabaseAccessToken(token);
-    if (!valid) return NextResponse.json({ error: "No autorizado para Studio." }, { status: 403 });
+    if (!valid) {
+      const tokenUser = await getUserFromToken(token);
+      if (tokenUser?.email) {
+        await createAccessRequest({ email: tokenUser.email, provider: tokenUser.provider });
+      }
+      return NextResponse.json({
+        error: "Tu acceso aún no está autorizado. Se envió una solicitud al superadmin.",
+        requestCreated: Boolean(tokenUser?.email),
+      }, { status: 403 });
+    }
 
     await logStudioLogin({
       at: new Date().toISOString(),

@@ -20,7 +20,7 @@ function getSupabaseEnv() {
 
 function normalizeProvider(provider: string) {
   const p = provider.trim().toLowerCase();
-  if (p === "azure") return "azure";
+  if (["azure", "azuread", "microsoft", "aad"].includes(p)) return "azure";
   if (p === "google") return "google";
   return "unknown";
 }
@@ -39,7 +39,7 @@ export function isStudioSuperAdmin(email: string) {
   return configured.includes(normalized);
 }
 
-async function getUserFromToken(token: string): Promise<TokenUser | null> {
+export async function getUserFromToken(token: string): Promise<TokenUser | null> {
   const { url, anon } = getSupabaseEnv();
   if (!url || !anon || !token) return null;
 
@@ -53,11 +53,17 @@ async function getUserFromToken(token: string): Promise<TokenUser | null> {
 
   if (!res.ok) return null;
 
-  const user = (await res.json()) as { email?: string; app_metadata?: { provider?: string } };
+  const user = (await res.json()) as {
+    email?: string;
+    app_metadata?: { provider?: string };
+    identities?: Array<{ provider?: string }>;
+  };
+
   const email = user.email?.trim().toLowerCase();
   if (!email) return null;
 
-  return { email, provider: normalizeProvider(user.app_metadata?.provider || "") };
+  const providerRaw = user.app_metadata?.provider || user.identities?.[0]?.provider || "";
+  return { email, provider: normalizeProvider(providerRaw) };
 }
 
 export async function getStudioPermissions(email: string, provider: string): Promise<SessionPermissions | null> {
@@ -123,6 +129,5 @@ export async function readSession(req: NextRequest) {
 export async function isAdminAuthorized(req: NextRequest) {
   return Boolean(await readSession(req));
 }
-
 
 export { SESSION_COOKIE };

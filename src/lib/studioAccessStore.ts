@@ -26,10 +26,20 @@ export type StudioAuthorizedUser = {
   updatedAt: string;
 };
 
+export type StudioAccessRequest = {
+  id: string;
+  email: string;
+  provider: StudioUserProvider | "unknown";
+  status: "pending" | "approved" | "rejected";
+  requestedAt: string;
+  resolvedAt?: string;
+};
+
 type AccessControlState = {
   blockedEmails: string[];
   loginLogs: StudioLoginLog[];
   authorizedUsers: StudioAuthorizedUser[];
+  accessRequests: StudioAccessRequest[];
 };
 
 const ACCESS_PATH = getWritableDataPath("studio", "access-control.json");
@@ -46,7 +56,7 @@ async function ensureStore() {
   try {
     await fs.access(ACCESS_PATH);
   } catch {
-    const initial: AccessControlState = { blockedEmails: [], loginLogs: [], authorizedUsers: [] };
+    const initial: AccessControlState = { blockedEmails: [], loginLogs: [], authorizedUsers: [], accessRequests: [] };
     await fs.writeFile(ACCESS_PATH, `${JSON.stringify(initial, null, 2)}\n`, "utf8");
   }
 }
@@ -98,6 +108,18 @@ async function readState(): Promise<AccessControlState> {
             updatedAt: String(row.updatedAt || new Date().toISOString()),
           }))
           .filter((row) => row.email)
+      : [],
+    accessRequests: Array.isArray(parsed.accessRequests)
+      ? parsed.accessRequests
+          .map((row) => ({
+            id: String(row.id || ""),
+            email: normalizeEmail(String(row.email || "")),
+            provider: normalizeProvider(row.provider) as StudioUserProvider | "unknown",
+            status: (["pending", "approved", "rejected"].includes(String(row.status)) ? String(row.status) : "pending") as "pending" | "approved" | "rejected",
+            requestedAt: String(row.requestedAt || new Date().toISOString()),
+            resolvedAt: row.resolvedAt ? String(row.resolvedAt) : undefined,
+          }))
+          .filter((row) => row.id && row.email)
       : [],
   };
 }
@@ -207,6 +229,45 @@ export async function getAuthorizedUser(email: string) {
   if (!normalized) return null;
   const users = await listAuthorizedUsers();
   return users.find((row) => row.email === normalized) || null;
+}
+
+
+export async function listAccessRequests() {
+  const state = await readState();
+  return [...state.accessRequests].sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
+}
+
+export async function createAccessRequest(input: { email: string; provider: string }) {
+  const email = normalizeEmail(input.email);
+  if (!email || !email.includes("@")) throw new Error("Email inválido para solicitud.");
+
+  const state = await readState();
+  const existingPending = state.accessRequests.find((r) => r.email === email && r.status === "pending");
+  if (existingPending) return existingPending;
+
+  const req: StudioAccessRequest = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    email,
+    provider: normalizeProvider(input.provider) as StudioUserProvider | "unknown",
+    status: "pending",
+    requestedAt: new Date().toISOString(),
+  };
+  state.accessRequests.unshift(req);
+  await writeState(state);
+  return req;
+}
+
+export async function resolveAccessRequest(id: string, status: "approved" | "rejected") {
+  const state = await readState();
+  const idx = state.accessRequests.findIndex((r) => r.id === id);
+  if (idx < 0) throw new Error("Solicitud no encontrada.");
+  state.accessRequests[idx] = {
+    ...state.accessRequests[idx],
+    status,
+    resolvedAt: new Date().toISOString(),
+  };
+  await writeState(state);
+  return state.accessRequests[idx];
 }
 
 export { DEFAULT_PERMISSIONS };

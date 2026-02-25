@@ -3,9 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { readSession } from "@/lib/adminAuth";
 import {
   blockEmail,
+  listAccessRequests,
   listAuthorizedUsers,
   listBlockedEmails,
   listStudioLoginLogs,
+  resolveAccessRequest,
   removeAuthorizedUser,
   StudioUserProvider,
   unblockEmail,
@@ -19,12 +21,13 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   if (!session.canManageAccess) return NextResponse.json({ error: "Solo superadmin puede gestionar accesos." }, { status: 403 });
 
-  const [blockedEmails, logs, authorizedUsers] = await Promise.all([
+  const [blockedEmails, logs, authorizedUsers, accessRequests] = await Promise.all([
     listBlockedEmails(),
     listStudioLoginLogs(250),
     listAuthorizedUsers(),
+    listAccessRequests(),
   ]);
-  return NextResponse.json({ blockedEmails, logs, authorizedUsers });
+  return NextResponse.json({ blockedEmails, logs, authorizedUsers, accessRequests });
 }
 
 export async function POST(req: NextRequest) {
@@ -63,6 +66,32 @@ export async function POST(req: NextRequest) {
         },
       });
       return NextResponse.json({ ok: true, authorizedUsers });
+    }
+
+    if (action === "approve_request") {
+      const requestId = String(payload.requestId || "").trim();
+      if (!requestId) return NextResponse.json({ error: "requestId es obligatorio." }, { status: 400 });
+
+      await resolveAccessRequest(requestId, "approved");
+      const authorizedUsers = await upsertAuthorizedUser({
+        email,
+        provider: (payload.provider || "google") as StudioUserProvider,
+        active: payload.active !== false,
+        permissions: {
+          canBlog: Boolean(payload.permissions?.canBlog),
+          canCrm: Boolean(payload.permissions?.canCrm),
+          canIncidents: Boolean(payload.permissions?.canIncidents),
+        },
+      });
+      const accessRequests = await listAccessRequests();
+      return NextResponse.json({ ok: true, authorizedUsers, accessRequests });
+    }
+
+    if (action === "reject_request") {
+      const requestId = String(payload.requestId || "").trim();
+      if (!requestId) return NextResponse.json({ error: "requestId es obligatorio." }, { status: 400 });
+      const resolved = await resolveAccessRequest(requestId, "rejected");
+      return NextResponse.json({ ok: true, request: resolved, accessRequests: await listAccessRequests() });
     }
 
     if (action === "revoke") {
