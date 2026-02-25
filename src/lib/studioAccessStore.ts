@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
+import { getWritableDataPath } from "@/lib/storagePaths";
+
 export type StudioLoginLog = {
   at: string;
   email: string;
@@ -30,7 +32,7 @@ type AccessControlState = {
   authorizedUsers: StudioAuthorizedUser[];
 };
 
-const ACCESS_PATH = path.join(process.cwd(), "data", "studio", "access-control.json");
+const ACCESS_PATH = getWritableDataPath("studio", "access-control.json");
 const MAX_LOGS = 1000;
 
 const DEFAULT_PERMISSIONS: StudioUserPermissions = {

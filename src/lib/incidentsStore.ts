@@ -2,6 +2,8 @@ import crypto from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
+import { getWritableDataPath } from "@/lib/storagePaths";
+
 export type IncidentStatus = "Recibido" | "En revisión" | "Derivado" | "Cerrado";
 export type IncidentType = "Acoso laboral" | "Acoso sexual" | "Maltrato" | "Conflicto ético" | "Otro";
 export type UrgencyLevel = "Bajo" | "Medio" | "Alto";
@@ -36,7 +38,7 @@ export type InternalIncident = {
   ip_hash?: string;
 };
 
-const INCIDENTS_PATH = path.join(process.cwd(), "data", "incidents", "incidents.json");
+const INCIDENTS_PATH = getWritableDataPath("incidents", "incidents.json");
 const STATUS_SLA_DAYS: Record<IncidentStatus, number> = {
   "Recibido": 3,
   "En revisión": 8,
