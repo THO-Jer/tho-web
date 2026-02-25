@@ -649,6 +649,48 @@ body {
 }
 
 
+@media (max-width: 1024px) {
+  .service-feature-card {
+    padding: 1.25rem;
+  }
+
+  .services-gallery:hover .service-feature-card,
+  .services-gallery .service-feature-card:hover {
+    filter: none;
+    transform: none;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+  }
+
+  .esg-levels-gallery:hover .esg-level-card,
+  .esg-levels-gallery:hover .esg-level-card:hover {
+    filter: none;
+    transform: none;
+  }
+
+  .tho-action-boxes {
+    height: 520px;
+    transform: rotateX(10deg) rotateY(-10deg) rotateZ(7deg);
+  }
+
+  .blog-card-flip:hover .blog-card-inner {
+    transform: none;
+  }
+}
+
+@media (hover: none) {
+  .blog-card-face {
+    position: relative;
+    inset: auto;
+    backface-visibility: visible;
+  }
+
+  .blog-card-back {
+    display: none;
+    transform: none;
+  }
+}
+
+
 .blog-card-inner {
   transform-style: preserve-3d;
   transition: transform 0.65s ease;
