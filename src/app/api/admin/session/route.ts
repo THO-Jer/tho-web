@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUserFromToken, isStudioSuperAdmin, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
+import {
+  getStudioPermissionsLocal,
+  getUserFromToken,
+  isStudioSuperAdmin,
+  LOCAL_SESSION_COOKIE,
+  readSession,
+  SESSION_COOKIE,
+  validateSupabaseAccessToken,
+} from "@/lib/adminAuth";
 import { createAccessRequest, isBlockedEmail, logStudioLogin } from "@/lib/studioAccessStore";
 
 export const dynamic = "force-dynamic";
@@ -38,11 +46,54 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = (await req.json()) as { action?: string; accessToken?: string };
-    const action = payload.action;
+    const payload = (await req.json()) as { action?: string; accessToken?: string; email?: string };
+    const action = String(payload.action || "").trim();
+
+    if (action === "local_login") {
+      const email = String(payload.email || "").trim().toLowerCase();
+      if (!email || !email.includes("@")) {
+        return NextResponse.json({ error: "Email inválido." }, { status: 400 });
+      }
+
+      const permissions = await getStudioPermissionsLocal(email);
+      if (!permissions) {
+        if (isStudioSuperAdmin(email) && await isBlockedEmail(email)) {
+          return NextResponse.json({ ok: false, error: "Tu correo superadmin está bloqueado en Control de Accesos.", reason: "superadmin_blocked" });
+        }
+        return NextResponse.json({ ok: false, error: "Correo no autorizado. Debe habilitarse desde Control de Accesos.", reason: "local_not_authorized" });
+      }
+
+      await logStudioLogin({
+        at: new Date().toISOString(),
+        email,
+        provider: "local",
+        ip: getSourceIp(req),
+      });
+
+      const response = NextResponse.json({
+        ok: true,
+        email,
+        provider: "local",
+        canManageAccess: permissions.canManageAccess,
+        permissions: {
+          canBlog: permissions.canBlog,
+          canCrm: permissions.canCrm,
+          canIncidents: permissions.canIncidents,
+        },
+      });
+      response.cookies.set(LOCAL_SESSION_COOKIE, email, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 12,
+      });
+      response.cookies.set(SESSION_COOKIE, "", { httpOnly: true, path: "/", expires: new Date(0) });
+      return response;
+    }
 
     if (action !== "oauth_login") {
-      return NextResponse.json({ error: "Acción no válida. Usa OAuth." }, { status: 400 });
+      return NextResponse.json({ error: "Acción no válida. Usa OAuth o local_login." }, { status: 400 });
     }
 
     const token = (payload.accessToken || "").trim();
@@ -65,7 +116,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({
           ok: false,
-          error: "Tu correo es superadmin, pero este ingreso no vino por Microsoft. Entra con el botón ‘Ingresar con Microsoft’.",
+          error: "Tu correo es superadmin, pero este ingreso no vino por Microsoft. Entra con el botón ‘Ingresar con Microsoft’ o usa ingreso local por correo.",
           requestCreated: false,
           reason: "superadmin_requires_microsoft",
           detectedProvider: tokenUser.provider,
@@ -109,6 +160,7 @@ export async function POST(req: NextRequest) {
       path: "/",
       maxAge: 60 * 60 * 12,
     });
+    response.cookies.set(LOCAL_SESSION_COOKIE, "", { httpOnly: true, path: "/", expires: new Date(0) });
     return response;
   } catch (error) {
     return NextResponse.json(
@@ -121,5 +173,6 @@ export async function POST(req: NextRequest) {
 export async function DELETE() {
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE, "", { httpOnly: true, path: "/", expires: new Date(0) });
+  response.cookies.set(LOCAL_SESSION_COOKIE, "", { httpOnly: true, path: "/", expires: new Date(0) });
   return response;
 }

@@ -3,6 +3,9 @@ import { NextRequest } from "next/server";
 import { getAuthorizedUser, isBlockedEmail, StudioUserPermissions } from "@/lib/studioAccessStore";
 
 const SESSION_COOKIE = "blog_admin_session";
+const LOCAL_SESSION_COOKIE = "studio_local_session";
+
+const LOCAL_PROVIDER = "local";
 
 type TokenUser = { email: string; provider: string };
 
@@ -77,7 +80,7 @@ export async function getStudioPermissions(email: string, provider: string): Pro
 
   const superAdmin = isStudioSuperAdmin(normalized);
   if (superAdmin) {
-    if (provider !== "azure") return null; // superadmins obligatoriamente Microsoft
+    if (provider !== "azure") return null; // superadmins obligatoriamente Microsoft para OAuth
     return {
       canBlog: true,
       canCrm: true,
@@ -90,6 +93,31 @@ export async function getStudioPermissions(email: string, provider: string): Pro
   const allowedUser = await getAuthorizedUser(normalized);
   if (!allowedUser || !allowedUser.active) return null;
   if (!isProviderMatch(allowedUser.provider, provider)) return null;
+
+  return {
+    ...allowedUser.permissions,
+    canManageAccess: false,
+    isSuperAdmin: false,
+  };
+}
+
+export async function getStudioPermissionsLocal(email: string): Promise<SessionPermissions | null> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return null;
+  if (await isBlockedEmail(normalized)) return null;
+
+  if (isStudioSuperAdmin(normalized)) {
+    return {
+      canBlog: true,
+      canCrm: true,
+      canIncidents: true,
+      canManageAccess: true,
+      isSuperAdmin: true,
+    };
+  }
+
+  const allowedUser = await getAuthorizedUser(normalized);
+  if (!allowedUser || !allowedUser.active) return null;
 
   return {
     ...allowedUser.permissions,
@@ -113,6 +141,19 @@ export async function validateSupabaseAccessToken(token: string) {
 }
 
 export async function readSession(req: NextRequest) {
+  const localEmail = req.cookies.get(LOCAL_SESSION_COOKIE)?.value?.trim().toLowerCase() || "";
+  if (localEmail) {
+    const localPermissions = await getStudioPermissionsLocal(localEmail);
+    if (localPermissions) {
+      return {
+        email: localEmail,
+        provider: LOCAL_PROVIDER,
+        token: null,
+        ...localPermissions,
+      };
+    }
+  }
+
   const authHeader = req.headers.get("authorization") || "";
   const headerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
   const cookieToken = req.cookies.get(SESSION_COOKIE)?.value || "";
@@ -134,4 +175,4 @@ export async function isAdminAuthorized(req: NextRequest) {
   return Boolean(await readSession(req));
 }
 
-export { SESSION_COOKIE };
+export { LOCAL_SESSION_COOKIE, SESSION_COOKIE };
