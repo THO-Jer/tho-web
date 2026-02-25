@@ -17,8 +17,8 @@ export function Header() {
 
   return (
     <header className="main-header sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-3 px-4 py-3 md:flex-nowrap md:gap-y-0">
-        <Link href="/" className="flex min-w-0 flex-1 items-center gap-3 md:flex-none">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-3 px-4 py-3 lg:flex-nowrap lg:gap-y-0">
+        <Link href="/" className="flex min-w-0 flex-1 items-center gap-3 lg:flex-none">
           <div className="relative h-9 w-32">
             <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" priority />
             <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" priority />
@@ -29,7 +29,7 @@ export function Header() {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           <div className="group relative">
             <button className="tho-nav-chip" type="button">
               Servicios
@@ -73,7 +73,7 @@ export function Header() {
           </Link>
         </nav>
 
-        <div className="order-3 flex w-full items-center justify-end gap-2 md:hidden">
+        <div className="order-3 flex w-full items-center justify-end gap-2 lg:hidden">
           <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950" : "text-slate-700"}`}>
             Blog
           </Link>
@@ -109,7 +109,7 @@ export function Header() {
           </details>
         </div>
 
-        <div className="order-2 flex items-center gap-2 md:order-none">
+        <div className="order-2 flex items-center gap-2 lg:order-none">
           <a
             href="https://bit.ly/bookTHO"
             target="_blank"

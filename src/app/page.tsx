@@ -29,7 +29,7 @@ export default async function HomePage() {
       <main id="contenido">
         <ResourcesModal autoOpen />
         {/* HERO — imagen de fondo (atenuada) + texto encima */}
-        <section className="relative min-h-[78vh] overflow-visible text-white md:min-h-[88vh]">
+        <section className="relative min-h-[72vh] overflow-visible text-white md:min-h-[80vh] lg:min-h-[88vh]">
         <div className="hero-media-fade pointer-events-none absolute inset-x-0 -bottom-28 top-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -40,7 +40,7 @@ export default async function HomePage() {
           <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
         </div>
 
-        <div className="relative mx-auto flex h-full min-h-[78vh] max-w-6xl items-end justify-end px-4 pb-20 pt-10 md:min-h-[88vh] md:pb-24 md:pt-14">
+        <div className="relative mx-auto flex h-full min-h-[72vh] max-w-6xl items-end justify-end px-4 pb-16 pt-8 md:min-h-[80vh] md:pb-20 md:pt-12 lg:min-h-[88vh] lg:pb-24 lg:pt-14">
           <div className="max-w-2xl text-right">
             <div className="text-xs uppercase tracking-wide text-white/75">
               Consultoría estratégica · Concepción
@@ -65,9 +65,9 @@ export default async function HomePage() {
         </section>
 
       {/* PROBLEMA — editorial integrado al flujo, sin "tarjeta maqueta" */}
-      <section className="hero-transition-panel relative z-30 mt-20 bg-transparent md:mt-24">
+      <section className="hero-transition-panel relative z-30 mt-14 bg-transparent md:mt-20 lg:mt-24">
         <div className="mx-auto max-w-5xl px-4 py-12 text-center md:py-16">
-                    <h2 className="font-tho-title mt-6 text-[3rem] font-normal text-slate-950 md:text-[5.2rem]">
+                    <h2 className="font-tho-title mt-6 text-[2.45rem] font-normal text-slate-950 md:text-[3.7rem] lg:text-[5.2rem]">
             Sostenibilidad desintegrada.
             <br />
             Comunidad descontenta.
@@ -91,7 +91,7 @@ export default async function HomePage() {
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-600 md:hidden">
           Desliza para ver más servicios →
         </p>
-        <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-3 md:overflow-visible">
+        <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 md:grid md:grid-cols-2 lg:grid-cols-3 md:overflow-visible">
           {SERVICES.map((service) => {
             const meta = PILLAR_META[service.pillar];
             const cardTone =
@@ -102,12 +102,12 @@ export default async function HomePage() {
                   : "service-feature-card--pink";
 
             return (
-              <article key={service.slug} className={`service-feature-card ${cardTone} min-w-[88vw] snap-center md:min-w-0`}>
+              <article key={service.slug} className={`service-feature-card ${cardTone} min-w-[86vw] sm:min-w-[72vw] md:min-w-0 snap-center`}>
                 <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
                   <span className={`h-2 w-2 rounded-full ${meta.accentDot}`} />
                   {service.menuLabel}
                 </div>
-                <h3 className="mt-4 text-[2rem] font-bold text-slate-900 md:text-[2.2rem]">{service.slug === "sostenibilidad-corporativa" ? "Hacia la reportabilidad integrada" : service.slug === "relacionamiento-comunitario" ? "Comunidades comprometidas" : "Una organización efectiva"}</h3>
+                <h3 className="mt-4 text-[1.8rem] font-bold text-slate-900 md:text-[2rem] lg:text-[2.2rem]">{service.slug === "sostenibilidad-corporativa" ? "Hacia la reportabilidad integrada" : service.slug === "relacionamiento-comunitario" ? "Comunidades comprometidas" : "Una organización efectiva"}</h3>
                 <p className="mt-2 text-sm text-slate-800">{service.problem}</p>
                 <ul className="mt-4 grid gap-2 text-sm text-slate-800">
                   {service.teaser.map((item) => (
@@ -165,9 +165,9 @@ export default async function HomePage() {
       </Section>
 
       <section id="accion" className="relative z-30 border-t border-slate-200/70 bg-tho-bg pt-10 md:pt-14">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 md:grid-cols-[0.9fr_1.1fr] md:py-16">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 lg:grid-cols-[0.9fr_1.1fr] md:py-16">
           <div>
-            <h2 className="font-tho-title text-[3rem] text-slate-950 md:text-[4.2rem]">THO en Acción</h2>
+            <h2 className="font-tho-title text-[2.4rem] text-slate-950 md:text-[3.3rem] lg:text-[4.2rem]">THO en Acción</h2>
             <p className="mt-3 text-sm text-slate-700 md:text-base">
               Lo que ves aquí es terreno real: procesos, facilitación, sesiones ejecutivas y acompañamiento en momentos críticos.
               Diseñamos con evidencia, ejecutamos con equipos y dejamos capacidad instalada.
@@ -187,7 +187,7 @@ export default async function HomePage() {
       </Section>
 
       <Section id="blog" title="Blog" subtitle="Análisis y reflexiones desde el terreno. Exploramos las tendencias que definen el presente y futuro de la estrategia organizacional y territorial.">
-        <div className="grid items-start gap-6 md:grid-cols-[250px_1fr] md:gap-8">
+        <div className="grid items-start gap-6 lg:grid-cols-[250px_1fr] md:gap-8">
           <Link
             href="/blog"
             className="btn-unified-motion btn-hero-services inline-flex w-fit rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
@@ -195,7 +195,7 @@ export default async function HomePage() {
             Ver todas las publicaciones
           </Link>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {posts.slice(0, 3).map((p) => (
               <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
                 <div className="blog-card-inner relative h-full w-full">
@@ -225,9 +225,9 @@ export default async function HomePage() {
       </Section>
 
       <section className="border-t border-slate-200 bg-slate-900 text-white" id="contacto">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-2">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+            <h2 className="text-3xl font-semibold tracking-tight lg:text-4xl">
               ¿Hablamos de lo que realmente importa?
             </h2>
             <p className="mt-4 text-slate-200">
