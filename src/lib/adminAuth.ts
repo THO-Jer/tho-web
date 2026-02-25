@@ -2,36 +2,20 @@ import { NextRequest } from "next/server";
 
 import { getAuthorizedUser, isBlockedEmail, StudioUserPermissions } from "@/lib/studioAccessStore";
 
-const SESSION_COOKIE = "blog_admin_session";
 const LOCAL_SESSION_COOKIE = "studio_local_session";
 
 const LOCAL_PROVIDER = "local";
 
-type TokenUser = { email: string; provider: string };
+type SessionData = {
+  email: string;
+  provider: string;
+  token: null;
+} & SessionPermissions;
 
 export type SessionPermissions = StudioUserPermissions & {
   canManageAccess: boolean;
   isSuperAdmin: boolean;
 };
-
-function getSupabaseEnv() {
-  const rawUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_SUPABASE_PUBLIC_URL;
-  const url = rawUrl?.trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
-  const anon = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_SUPABASE_ANON_KEY;
-  return { url, anon };
-}
-
-function normalizeProvider(provider: string) {
-  const p = provider.trim().toLowerCase();
-  if (["azure", "azuread", "microsoft", "aad"].includes(p)) return "azure";
-  if (p === "google") return "google";
-  return "unknown";
-}
-
-function isProviderMatch(required: string, provider: string) {
-  if (!required || required === "any") return true;
-  return required === provider;
-}
 
 export function isStudioSuperAdmin(email: string) {
   const normalized = email.trim().toLowerCase();
@@ -40,65 +24,6 @@ export function isStudioSuperAdmin(email: string) {
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean);
   return configured.includes(normalized);
-}
-
-export async function getUserFromToken(token: string): Promise<TokenUser | null> {
-  const { url, anon } = getSupabaseEnv();
-  if (!url || !anon || !token) return null;
-
-  const res = await fetch(`${url}/auth/v1/user`, {
-    headers: {
-      apikey: anon,
-      Authorization: `Bearer ${token}`,
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) return null;
-
-  const user = (await res.json()) as {
-    email?: string;
-    app_metadata?: { provider?: string };
-    identities?: Array<{ provider?: string }>;
-  };
-
-  const email = user.email?.trim().toLowerCase();
-  if (!email) return null;
-
-  const identityProvider = Array.isArray(user.identities)
-    ? user.identities.map((row) => String(row?.provider || "")).find((value) => normalizeProvider(value) !== "unknown") || user.identities[0]?.provider
-    : "";
-
-  const providerRaw = user.app_metadata?.provider || identityProvider || "";
-  return { email, provider: normalizeProvider(providerRaw) };
-}
-
-export async function getStudioPermissions(email: string, provider: string): Promise<SessionPermissions | null> {
-  const normalized = email.trim().toLowerCase();
-  if (!normalized) return null;
-  if (await isBlockedEmail(normalized)) return null;
-
-  const superAdmin = isStudioSuperAdmin(normalized);
-  if (superAdmin) {
-    if (provider !== "azure") return null; // superadmins obligatoriamente Microsoft para OAuth
-    return {
-      canBlog: true,
-      canCrm: true,
-      canIncidents: true,
-      canManageAccess: true,
-      isSuperAdmin: true,
-    };
-  }
-
-  const allowedUser = await getAuthorizedUser(normalized);
-  if (!allowedUser || !allowedUser.active) return null;
-  if (!isProviderMatch(allowedUser.provider, provider)) return null;
-
-  return {
-    ...allowedUser.permissions,
-    canManageAccess: false,
-    isSuperAdmin: false,
-  };
 }
 
 export async function getStudioPermissionsLocal(email: string): Promise<SessionPermissions | null> {
@@ -126,48 +51,18 @@ export async function getStudioPermissionsLocal(email: string): Promise<SessionP
   };
 }
 
-export async function validateSupabaseAccessToken(token: string) {
-  const user = await getUserFromToken(token);
-  if (!user) return null;
-
-  const permissions = await getStudioPermissions(user.email, user.provider);
-  if (!permissions) return null;
-
-  return {
-    email: user.email,
-    provider: user.provider,
-    permissions,
-  };
-}
-
-export async function readSession(req: NextRequest) {
+export async function readSession(req: NextRequest): Promise<SessionData | null> {
   const localEmail = req.cookies.get(LOCAL_SESSION_COOKIE)?.value?.trim().toLowerCase() || "";
-  if (localEmail) {
-    const localPermissions = await getStudioPermissionsLocal(localEmail);
-    if (localPermissions) {
-      return {
-        email: localEmail,
-        provider: LOCAL_PROVIDER,
-        token: null,
-        ...localPermissions,
-      };
-    }
-  }
+  if (!localEmail) return null;
 
-  const authHeader = req.headers.get("authorization") || "";
-  const headerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : "";
-  const cookieToken = req.cookies.get(SESSION_COOKIE)?.value || "";
-  const token = headerToken || cookieToken;
-  if (!token) return null;
-
-  const valid = await validateSupabaseAccessToken(token);
-  if (!valid) return null;
+  const localPermissions = await getStudioPermissionsLocal(localEmail);
+  if (!localPermissions) return null;
 
   return {
-    email: valid.email,
-    provider: valid.provider,
-    token,
-    ...valid.permissions,
+    email: localEmail,
+    provider: LOCAL_PROVIDER,
+    token: null,
+    ...localPermissions,
   };
 }
 
@@ -175,4 +70,4 @@ export async function isAdminAuthorized(req: NextRequest) {
   return Boolean(await readSession(req));
 }
 
-export { LOCAL_SESSION_COOKIE, SESSION_COOKIE };
+export { LOCAL_SESSION_COOKIE };

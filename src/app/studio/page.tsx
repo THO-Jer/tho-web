@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -53,25 +53,11 @@ export default function StudioIndexPage() {
   const [email, setEmail] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const [message, setMessage] = useState("");
-  const [oauthBaseUrl, setOauthBaseUrl] = useState("");
   const [canManageAccess, setCanManageAccess] = useState(false);
   const [permissions, setPermissions] = useState<StudioPermissions | null>(null);
   const [localEmail, setLocalEmail] = useState("");
-  const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-
-  const redirectTo = useMemo(() => {
-    if (typeof window === "undefined") return "";
-    return `${window.location.origin}/studio`;
-  }, []);
 
   useEffect(() => {
-    const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get("access_token");
-    const hashError = params.get("error_description") || params.get("error");
-    const queryParams = new URLSearchParams(window.location.search);
-    const queryError = queryParams.get("error_description") || queryParams.get("error");
-
     const verifySession = async () => {
       const res = await fetch("/api/admin/session", { credentials: "include" });
       const data = await res.json();
@@ -83,65 +69,17 @@ export default function StudioIndexPage() {
         setPermissions(null);
       }
       setCanManageAccess(Boolean(data.canManageAccess));
-      if (typeof data.oauthBaseUrl === "string") {
-        setOauthBaseUrl(data.oauthBaseUrl);
-      }
     };
 
-    const run = async () => {
-      setChecking(true);
-      try {
-        if (hashError || queryError) {
-          throw new Error(decodeURIComponent(hashError || queryError || "OAuth error"));
-        }
-
-        if (accessToken) {
-          const res = await fetch("/api/admin/session", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ action: "oauth_login", accessToken }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "No se pudo completar login.");
-          if (data.ok === false) {
-            setMessage(data.error || "No autorizado.");
-          } else {
-            setMessage(data.requestCreated ? "Solicitud enviada a superadmin." : "Sesión iniciada correctamente.");
-          }
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
-
-        await verifySession();
-      } catch (error) {
-        setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión.");
-      } finally {
-        setChecking(false);
-      }
-    };
-
-    run();
+    verifySession()
+      .catch(() => setMessage("No se pudo verificar sesión."))
+      .finally(() => setChecking(false));
   }, []);
-
-  function onOAuthLogin(provider: "azure" | "google") {
-    const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
-    if (!supabaseUrl) {
-      setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth.");
-      return;
-    }
-
-    const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
-    authUrl.searchParams.set("provider", provider);
-    authUrl.searchParams.set("redirect_to", redirectTo);
-    authUrl.searchParams.set("scopes", "openid profile email");
-    authUrl.searchParams.set("prompt", "select_account");
-    window.location.href = authUrl.toString();
-  }
 
   async function onLocalLogin() {
     try {
-      const email = localEmail.trim().toLowerCase();
-      if (!email || !email.includes("@")) {
+      const normalizedEmail = localEmail.trim().toLowerCase();
+      if (!normalizedEmail || !normalizedEmail.includes("@")) {
         setMessage("Ingresa un correo válido.");
         return;
       }
@@ -150,7 +88,7 @@ export default function StudioIndexPage() {
         method: "POST",
         headers: { "content-type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ action: "local_login", email }),
+        body: JSON.stringify({ action: "local_login", email: normalizedEmail }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo iniciar sesión local.");
@@ -160,7 +98,7 @@ export default function StudioIndexPage() {
         return;
       }
 
-      setMessage("Sesión local iniciada correctamente.");
+      setMessage("Sesión iniciada correctamente.");
       setLocalEmail("");
       setEmail(data.email ?? null);
       setPermissions(data.permissions ?? null);
@@ -174,6 +112,7 @@ export default function StudioIndexPage() {
     await fetch("/api/admin/session", { method: "DELETE", credentials: "include" });
     setEmail(null);
     setPermissions(null);
+    setCanManageAccess(false);
     setMessage("Sesión cerrada.");
   }
 
@@ -184,7 +123,7 @@ export default function StudioIndexPage() {
         <section className="mx-auto max-w-6xl px-4 py-14">
           <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">THO Studio</h1>
           <p className="mt-3 max-w-3xl text-slate-700">
-            Puedes entrar con OAuth (Microsoft/Google) o con ingreso local por correo autorizado desde Control de Accesos.
+            Acceso controlado por correo autorizado desde el módulo Control de Accesos.
           </p>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
@@ -192,15 +131,7 @@ export default function StudioIndexPage() {
 
             {!checking && !email ? (
               <div>
-                <p className="text-sm text-slate-700">Puedes ingresar con OAuth o con correo local autorizado.</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <button onClick={() => onOAuthLogin("azure")} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">
-                    Ingresar con Microsoft
-                  </button>
-                  <button onClick={() => onOAuthLogin("google")} className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700" type="button">
-                    Ingresar con Google
-                  </button>
-                </div>
+                <p className="text-sm text-slate-700">Ingresa con tu correo autorizado.</p>
                 <div className="mt-4 grid gap-2 sm:max-w-lg sm:grid-cols-[1fr_auto]">
                   <input
                     type="email"
@@ -210,7 +141,7 @@ export default function StudioIndexPage() {
                     className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
                   />
                   <button onClick={() => onLocalLogin()} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700" type="button">
-                    Ingreso local por correo
+                    Ingresar
                   </button>
                 </div>
               </div>
