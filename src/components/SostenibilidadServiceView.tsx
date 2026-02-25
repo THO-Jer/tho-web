@@ -225,7 +225,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
           <aside className="esg-risk-glass relative rounded-[2rem] border border-white/35 bg-white/25 p-7 text-slate-900 shadow-2xl shadow-emerald-950/20 ring-1 ring-white/40 backdrop-blur-xl dark:border-white/15 dark:bg-white/8 dark:text-white dark:ring-white/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="//ilustraciones/7.png"
+              src="/ilustraciones/7.png"
               alt="Ilustración de acompañamiento"
               className="pointer-events-none absolute -right-10 -top-12 w-44 opacity-100 md:w-48"
               style={{ transform: `translateY(${riskParallax}px)` }}
