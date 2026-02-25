@@ -12,16 +12,16 @@ type RelatedPost = {
   tags: string[];
 };
 
-const BROCHURE_FILE_URL = "/downloads/brochure-esg-v1.pdf";
+const BROCHURE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
 
 function useRevealItems() {
   return useMemo(
-    () => ["esg-hero-copy", "esg-hero-cta", "esg-statement", "esg-context", "esg-levels", "esg-faq", "esg-contact"],
+    () => ["rel-hero-copy", "rel-hero-cta", "rel-statement", "rel-context", "rel-levels", "rel-faq", "rel-contact"],
     []
   );
 }
 
-export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?: RelatedPost[] }) {
+export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts?: RelatedPost[] }) {
   const [open, setOpen] = useState(false);
   const [brochureStatus, setBrochureStatus] = useState<FormStatus>("idle");
   const [contactStatus, setContactStatus] = useState<FormStatus>("idle");
@@ -48,24 +48,24 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
 
     if (levelChecks.alreadyExecuting && score >= 3) {
       return {
-        level: "Nivel sugerido: Implementación y Consolidación",
+        level: "Nivel sugerido: Implementación y Seguimiento",
         hint: "Ya existe trabajo en marcha; conviene fortalecer ejecución, seguimiento y mejora continua.",
-        tone: "text-emerald-800 dark:text-emerald-300",
+        tone: "text-orange-800 dark:text-orange-300",
       };
     }
 
     if (score >= 3 || levelChecks.governanceGaps) {
       return {
-        level: "Nivel sugerido: Hoja de Ruta y Gobernanza",
-        hint: "Necesitas ordenar priorización, definir gobierno ESG e instalar métricas de seguimiento.",
-        tone: "text-emerald-800 dark:text-emerald-300",
+        level: "Nivel sugerido: Estrategia Territorial y Gobernanza",
+        hint: "Necesitas ordenar priorización, definir gobernanza territorial e instalar métricas de seguimiento.",
+        tone: "text-orange-800 dark:text-orange-300",
       };
     }
 
     return {
-      level: "Nivel sugerido: Flash Audit ESG",
+      level: "Nivel sugerido: Mapa de Riesgos Socioambientales",
       hint: "Punto de entrada ideal para claridad rápida y definición de prioridades inmediatas.",
-      tone: "text-emerald-800 dark:text-emerald-300",
+      tone: "text-orange-800 dark:text-orange-300",
     };
   }, [levelChecks]);
 
@@ -86,14 +86,14 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
 
     const payload = {
       type: "brochure_download",
-      eventLabel: "flash_audit_esg_brochure_download",
-      source: "esg_level_card_modal",
-      resourceId: "flash-audit-esg-brochure",
-      resourceName: "Brochure Flash Audit ESG",
-      serviceSlug: "sostenibilidad-corporativa",
-      serviceName: "Sostenibilidad Corporativa",
-      levelId: "ticket-flash-audit-esg",
-      levelName: "Flash Audit ESG",
+      eventLabel: "mapa_riesgos_socioambientales_brochure_download",
+      source: "relacionamiento_level_card_modal",
+      resourceId: "mapa-riesgos-socioambientales-brochure",
+      resourceName: "Brochure Mapa de Riesgos Socioambientales",
+      serviceSlug: "relacionamiento-comunitario",
+      serviceName: "Relacionamiento Comunitario",
+      levelId: "ticket-mapa-riesgos-socioambientales",
+      levelName: "Mapa de Riesgos Socioambientales",
       name: String(form.get("name") || ""),
       email: String(form.get("email") || ""),
       company: String(form.get("organization") || ""),
@@ -114,7 +114,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
 
     const link = document.createElement("a");
     link.href = BROCHURE_FILE_URL;
-    link.download = "brochure-flash-audit-esg.pdf";
+    link.download = "brochure-mapa-riesgos-socioambientales.pdf";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -128,12 +128,12 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
 
     const payload = {
       type: "contact",
-      eventLabel: "esg_service_contact_form",
-      source: "sostenibilidad_service_footer_form",
-      resourceId: "service-sostenibilidad-contact",
-      resourceName: "Formulario servicio sostenibilidad",
-      serviceSlug: "sostenibilidad-corporativa",
-      serviceName: "Sostenibilidad Corporativa",
+      eventLabel: "relacionamiento_service_contact_form",
+      source: "relacionamiento_service_footer_form",
+      resourceId: "service-relacionamiento-contact",
+      resourceName: "Formulario servicio relacionamiento comunitario",
+      serviceSlug: "relacionamiento-comunitario",
+      serviceName: "Relacionamiento Comunitario",
       name: String(form.get("name") || ""),
       email: String(form.get("email") || ""),
       company: String(form.get("organization") || ""),
@@ -157,9 +157,9 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
     <main className="esg-page bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hero/8.png" alt="Equipo evaluando riesgos y estrategia" className="absolute inset-0 h-full w-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/62 via-slate-900/42 to-emerald-900/40" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_82%,rgba(163,230,53,0.34),rgba(16,185,129,0.14)_34%,transparent_62%)]" />
+        <img src="/hero/4.png" alt="Equipo de proyecto y comunidades dialogando en territorio" className="absolute inset-0 h-full w-full object-cover object-center" />
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-900/62 via-slate-900/42 to-orange-900/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_82%,rgba(251,146,60,0.34),rgba(249,115,22,0.14)_34%,transparent_62%)]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white dark:to-slate-950" />
 
         <div className="relative mx-auto flex min-h-[84vh] max-w-6xl items-end px-4 pb-16 pt-24 md:pb-24">
@@ -168,17 +168,17 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
               <h1 className="font-tho-title text-[2.7rem] leading-[0.98] md:text-[5rem]">
                 Servicio de
                 <br />
-                Sostenibilidad
+                Relacionamiento
                 <br />
-                Corporativa
+                Comunitario
               </h1>
               <div className="brand-block-divider mt-4 h-[6px] w-36 rounded-sm" />
               <p className="mt-5 max-w-[700px] text-base text-white/90 md:text-lg">
-                Te ayudamos a traducir presión regulatoria, expectativas de inversionistas y escrutinio público en decisiones estratégicas claras, medibles y ejecutables.
+                Te ayudamos a traducir la complejidad territorial y social en decisiones estratégicas claras, medibles y ejecutables para proteger la continuidad operacional.
               </p>
             </div>
             <a
-              href="#esg-contacto"
+              href="#relacionamiento-contacto"
               className="btn-unified-motion btn-hero-services esg-reveal is-visible relative z-10 mt-7 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900 hover:text-slate-900"
               data-reveal-id={revealItems[1]}
             >
@@ -194,17 +194,17 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Qué está cambiando</p>
             <div className="brand-block-divider mt-3 mb-6 h-[6px] w-36 rounded-sm" />
             <p className="text-base leading-relaxed text-slate-700 md:text-lg dark:text-slate-300">
-              La conversación ESG dejó de ser reputacional y se volvió estratégica: hoy la <strong className="text-[#0f4e2f] dark:text-emerald-300">doble materialidad</strong> obliga a mirar impacto financiero e impacto externo al mismo tiempo.
+              La conversación territorial dejó de ser reactiva y se volvió estratégica: hoy los proyectos necesitan integrar desde el inicio a comunidades, actores críticos y riesgos socioambientales.
             </p>
             <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg dark:text-slate-300">
-              <strong className="text-[#0f4e2f] dark:text-emerald-300">Inversionistas</strong> y directorios piden <strong className="text-[#0f4e2f] dark:text-emerald-300">trazabilidad</strong> real, no solo narrativa.
+              <strong className="text-[#9a3412] dark:text-orange-300">Equipos operacionales</strong>, gerencias y directorios piden <strong className="text-[#9a3412] dark:text-orange-300">trazabilidad</strong> real de compromisos con comunidades, no solo narrativa.
             </p>
             <p className="mt-4 text-base leading-relaxed text-slate-700 md:text-lg dark:text-slate-300">
-              Además, el <strong className="text-[#0f4e2f] dark:text-emerald-300">escrutinio público</strong> es más rápido y más exigente: si la organización no está alineada internamente, cualquier promesa externa se vuelve vulnerable.
+              Además, el <strong className="text-[#9a3412] dark:text-orange-300">contexto local</strong> cambia rápido: si la organización no coordina mensaje, operación y decisiones, cualquier compromiso territorial se vuelve frágil.
             </p>
           </div>
 
-          <aside className="esg-risk-glass relative rounded-[2rem] border border-white/35 bg-white/25 p-7 text-slate-900 shadow-2xl shadow-emerald-950/20 ring-1 ring-white/40 backdrop-blur-xl dark:border-white/15 dark:bg-white/8 dark:text-white dark:ring-white/10">
+          <aside className="esg-risk-glass relative rounded-[2rem] border border-white/35 bg-white/25 p-7 text-slate-900 shadow-2xl shadow-orange-950/20 ring-1 ring-white/40 backdrop-blur-xl dark:border-white/15 dark:bg-white/8 dark:text-white dark:ring-white/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/ilustraciones/7.png"
@@ -212,17 +212,17 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
               className="pointer-events-none absolute -right-10 -top-12 w-44 opacity-100 md:w-48"
               style={{ transform: `translateY(${riskParallax}px)` }}
             />
-            <h3 className="font-tho-title -mt-1 max-w-[84%] text-[2.35rem] leading-[0.95] text-emerald-950 md:-mr-8 md:text-[3.35rem] dark:text-emerald-100">
-              El riesgo no es no tener ESG.
+            <h3 className="font-tho-title -mt-1 max-w-[84%] text-[2.35rem] leading-[0.95] text-orange-950 md:-mr-8 md:text-[3.35rem] dark:text-orange-100">
+              El riesgo no es no tener presencia territorial.
               <br />
-              El riesgo es practicarlo superficialmente.
+              El riesgo es relacionarse tarde y sin estrategia.
             </h3>
             <ul className="mt-6 space-y-2 text-sm text-slate-800 md:text-base dark:text-slate-100">
-              <li>• Greenwashing.</li>
-              <li>• Compliance theater.</li>
-              <li>• Desalineación interna.</li>
+              <li>• Conflictividad social evitable.</li>
+              <li>• Pérdida de confianza comunitaria.</li>
+              <li>• Desalineación entre terreno y gestión interna.</li>
             </ul>
-            <p className="mt-5 text-sm font-semibold text-emerald-950 md:text-base dark:text-emerald-100">Evitarlo requiere método, no discurso.</p>
+            <p className="mt-5 text-sm font-semibold text-orange-950 md:text-base dark:text-orange-100">Evitarlo requiere método territorial, no improvisación.</p>
           </aside>
         </div>
       </section>
@@ -233,56 +233,56 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
           <div className="brand-block-divider mt-3 mb-8 h-[6px] w-36 rounded-sm" />
 
           <div className="esg-level-grid esg-levels-gallery grid gap-5 md:grid-cols-3">
-            <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#9ac94f] bg-[linear-gradient(160deg,#f7fbe8_0%,#eef7d4_55%,#e5f2c1_100%)] p-6">
+            <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#f59e0b] bg-[linear-gradient(160deg,#fff7ed_0%,#ffedd5_55%,#fed7aa_100%)] p-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-4 top-4 w-14 opacity-95" />
               <p className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white">● Punto de partida recomendado</p>
-              <h4 className="mt-4 text-3xl font-black leading-[1.02] text-slate-900">Flash Audit ESG</h4>
-              <p className="mt-3 text-sm text-slate-700">Revisión estratégica focalizada para organizaciones que necesitan claridad inmediata.</p>
+              <h4 className="mt-4 text-3xl font-black leading-[1.02] text-slate-900">Mapa de Riesgos Socioambientales</h4>
+              <p className="mt-3 text-sm text-slate-700">Diagnóstico estratégico inicial para organizaciones que necesitan claridad territorial inmediata.</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-800">
-                <li>• Diagnóstico express de materialidad.</li>
-                <li>• Identificación de riesgos reputacionales y regulatorios.</li>
-                <li>• Recomendaciones inmediatas.</li>
+                <li>• Mapeo inicial de actores y dinámicas territoriales.</li>
+                <li>• Identificación de riesgos sociales, reputacionales y operacionales.</li>
+                <li>• Recomendaciones tempranas de relacionamiento.</li>
               </ul>
               <button type="button" onClick={() => { setOpen(true); setBrochureStatus("idle"); }} className="btn-unified-motion btn-hero-services mt-5 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900">
                 Descargar brochure
               </button>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#88bc2b]/80 bg-[linear-gradient(160deg,#f7fcdc_0%,#eaf7bf_58%,#ddefa7_100%)] p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-800">Escala de profundidad estratégica</p>
-              <h4 className="mt-2 text-2xl font-black text-slate-900">Hoja de Ruta y Gobernanza</h4>
+            <article className="esg-level-card rounded-[2.1rem] border border-[#fb923c]/80 bg-[linear-gradient(160deg,#fff7ed_0%,#ffedd5_58%,#fdba74_100%)] p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-orange-800">Escala de profundidad estratégica</p>
+              <h4 className="mt-2 text-2xl font-black text-slate-900">Estrategia Territorial y Gobernanza</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
-                <li>• Profundización de materialidad.</li>
-                <li>• Diseño de gobernanza.</li>
-                <li>• Indicadores y métricas.</li>
-                <li>• Plan de implementación.</li>
+                <li>• Diseño de estrategia por segmentos de actores.</li>
+                <li>• Protocolos de coordinación y vocerías.</li>
+                <li>• Indicadores de gestión territorial.</li>
+                <li>• Plan de implementación con hitos críticos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
-                  <li>✓ Hoja de Ruta ESG.</li>
-                  <li>✓ Marco de gobernanza.</li>
-                  <li>✓ Sistema de seguimiento.</li>
+                  <li>✓ Hoja de ruta territorial.</li>
+                  <li>✓ Marco de gobernanza comunitaria.</li>
+                  <li>✓ Sistema de seguimiento de compromisos.</li>
                 </ul>
               </div>
               <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#6da71d]/85 bg-[linear-gradient(160deg,#f4fbd1_0%,#def0a7_58%,#cfe88d_100%)] p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-900">Escala de consolidación operativa</p>
-              <h4 className="mt-2 text-2xl font-black text-slate-900">Implementación y Consolidación</h4>
+            <article className="esg-level-card rounded-[2.1rem] border border-[#ea580c]/85 bg-[linear-gradient(160deg,#ffedd5_0%,#fdba74_58%,#fb923c_100%)] p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-orange-900">Escala de consolidación operativa</p>
+              <h4 className="mt-2 text-2xl font-black text-slate-900">Implementación y Seguimiento</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
-                <li>• Acompañamiento en ejecución.</li>
-                <li>• Instalación de capacidades internas.</li>
-                <li>• Seguimiento de indicadores.</li>
-                <li>• Ajustes estratégicos.</li>
+                <li>• Acompañamiento en terreno y mesa interna.</li>
+                <li>• Instalación de capacidades de relacionamiento.</li>
+                <li>• Monitoreo de señales tempranas y acuerdos.</li>
+                <li>• Ajustes tácticos según evolución territorial.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
-                  <li>✓ Sistema operativo ESG.</li>
-                  <li>✓ Evaluaciones periódicas.</li>
+                  <li>✓ Sistema operativo de relacionamiento.</li>
+                  <li>✓ Evaluaciones periódicas en territorio.</li>
                   <li>✓ Mejora continua.</li>
                 </ul>
               </div>
@@ -296,7 +296,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
         <div className="esg-reveal is-visible mx-auto max-w-6xl" data-reveal-id={revealItems[5]}>
           <div className="grid gap-5 md:grid-cols-[1fr_0.95fr] md:items-start">
             <div>
-              <h3 className="font-tho-title text-left text-[2.2rem] text-slate-900 md:text-[3.4rem] dark:text-slate-100">¿Qué implica partir por un Flash Audit ESG?</h3>
+              <h3 className="font-tho-title text-left text-[2.2rem] text-slate-900 md:text-[3.4rem] dark:text-slate-100">¿Qué implica partir por un Mapa de Riesgos Socioambientales?</h3>
               <div className="brand-block-divider mt-3 mb-8 h-[6px] w-36 rounded-sm" />
 
               <div className="grid gap-4">
@@ -324,32 +324,32 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
             </div>
 
             <aside className="relative md:-mt-4 md:-mr-4">
-              <div className="rounded-3xl border border-emerald-300/70 bg-[linear-gradient(160deg,#f8fce9_0%,#f0f8d9_65%,#e6f2c5_100%)] p-6 shadow-xl shadow-emerald-900/10 dark:border-emerald-400/30 dark:bg-[linear-gradient(160deg,rgba(15,23,42,0.96)_0%,rgba(20,83,45,0.7)_100%)]">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 dark:text-slate-300">Diagnóstico rápido</p>
+              <div className="rounded-3xl border border-orange-300/70 bg-[linear-gradient(160deg,#fff7ed_0%,#ffedd5_65%,#fdba74_100%)] p-6 shadow-xl shadow-orange-900/10 dark:border-orange-400/30 dark:bg-[linear-gradient(160deg,rgba(15,23,42,0.96)_0%,rgba(154,52,18,0.65)_100%)]">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 dark:text-slate-300">Diagnóstico territorial rápido</p>
                 <h4 className="mt-2 text-2xl font-black leading-[1.02] text-slate-900 dark:text-slate-100">¿Por cuál nivel conviene partir?</h4>
                 <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">Marca las condiciones que aplican hoy en tu organización y te sugerimos un punto de entrada.</p>
 
                 <div className="mt-5 grid gap-3">
                   {[
                     ["noMaterialityMap", "No tenemos mapa de materialidad validado."],
-                    ["investorPressure", "Hay presión de inversionistas/directorio por trazabilidad ESG."],
+                    ["investorPressure", "Hay presión por trazabilidad de compromisos territoriales y sociales."],
                     ["governanceGaps", "No existe gobernanza clara ni responsables definidos."],
                     ["shortDeadline", "Debemos mostrar avances concretos en menos de 90 días."],
                     ["alreadyExecuting", "Ya estamos ejecutando iniciativas pero falta coordinación."],
                   ].map(([key, label]) => (
-                    <label key={key} className="flex items-start gap-3 rounded-xl bg-white/70 px-3 py-2 text-sm text-slate-800 ring-1 ring-emerald-700/10 dark:bg-slate-900/60 dark:text-slate-100 dark:ring-white/10">
+                    <label key={key} className="flex items-start gap-3 rounded-xl bg-white/70 px-3 py-2 text-sm text-slate-800 ring-1 ring-orange-700/10 dark:bg-slate-900/60 dark:text-slate-100 dark:ring-white/10">
                       <input
                         type="checkbox"
                         checked={levelChecks[key as keyof typeof levelChecks]}
                         onChange={(e) => setLevelChecks((prev) => ({ ...prev, [key]: e.target.checked }))}
-                        className="mt-0.5 h-4 w-4 rounded border-slate-400 text-emerald-700 focus:ring-emerald-600"
+                        className="mt-0.5 h-4 w-4 rounded border-slate-400 text-orange-700 focus:ring-orange-600"
                       />
                       <span>{label}</span>
                     </label>
                   ))}
                 </div>
 
-                <div className="mt-5 rounded-2xl bg-white/80 p-4 ring-1 ring-emerald-700/20 dark:bg-slate-900/80 dark:ring-white/10">
+                <div className="mt-5 rounded-2xl bg-white/80 p-4 ring-1 ring-orange-700/20 dark:bg-slate-900/80 dark:ring-white/10">
                   <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Resultado sugerido</p>
                   <p className={`mt-1 text-base font-bold ${levelRecommendation.tone}`}>{levelRecommendation.level}</p>
                   <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{levelRecommendation.hint}</p>
@@ -368,7 +368,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
             <div className="grid gap-4 md:grid-cols-3">
               {relatedPosts.slice(0, 3).map((post) => (
                 <Link key={post.slug} href={`/blog/${post.slug}`} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-tho-green">Blog</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-orange-600">Blog</p>
                   <h4 className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">{post.title}</h4>
                   <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{post.excerpt}</p>
                   <p className="mt-4 text-xs font-semibold text-slate-500 dark:text-slate-400">{post.tags.slice(0, 2).join(" · ")}</p>
@@ -379,13 +379,13 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
         </section>
       ) : null}
 
-      <section id="esg-contacto" className="bg-white px-4 py-20 dark:bg-slate-950">
+      <section id="relacionamiento-contacto" className="bg-white px-4 py-20 dark:bg-slate-950">
         <div className="esg-reveal is-visible mx-auto max-w-6xl" data-reveal-id={revealItems[6]}>
           <div className="rounded-[2rem] bg-slate-950 px-6 py-10 text-white ring-1 ring-slate-800 md:px-8 md:py-12">
             <div className="grid gap-8 md:grid-cols-[0.95fr_1.05fr] md:items-start">
               <div>
                 <h3 className="font-tho-title text-[2.4rem] text-white md:text-[3.5rem]">¿Comenzamos?</h3>
-                <p className="mt-4 max-w-xl text-lg text-white/85">Conversemos sobre la prioridad ESG más crítica de tu organización y definamos el punto de entrada con mayor impacto.</p>
+                <p className="mt-4 max-w-xl text-lg text-white/85">Conversemos sobre la prioridad territorial más crítica de tu organización y definamos el punto de entrada con mayor impacto.</p>
               </div>
 
               <form onSubmit={onContactSubmit} className="grid gap-3 rounded-3xl bg-slate-900/70 p-5 ring-1 ring-white/10">
@@ -398,7 +398,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 <button disabled={contactStatus === "sending"} className="btn-unified-motion btn-hero-services mt-2 inline-flex w-full justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 disabled:opacity-60">
                   {contactStatus === "sending" ? "Enviando..." : "Enviar solicitud"}
                 </button>
-                {contactStatus === "ok" ? <p className="text-sm text-emerald-200">Gracias, te contactaremos pronto.</p> : null}
+                {contactStatus === "ok" ? <p className="text-sm text-orange-200">Gracias, te contactaremos pronto.</p> : null}
                 {contactStatus === "error" ? <p className="text-sm text-rose-200">No pudimos enviar, intenta nuevamente.</p> : null}
               </form>
             </div>
@@ -419,11 +419,11 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
               <input name="role" placeholder="Cargo" className="rounded-xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
               <input name="organization" required placeholder="Organización" className="rounded-xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
               <input name="email" type="email" required placeholder="Email" className="rounded-xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100" />
-              <button disabled={brochureStatus === "sending"} className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60 dark:bg-emerald-400 dark:text-slate-900">
+              <button disabled={brochureStatus === "sending"} className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white disabled:opacity-60 dark:bg-orange-400 dark:text-slate-900">
                 {brochureStatus === "sending" ? "Enviando..." : "Descargar brochure"}
               </button>
             </form>
-            {brochureStatus === "ok" ? <p className="mt-3 text-sm text-emerald-700">Descarga iniciada. También registramos tu solicitud.</p> : null}
+            {brochureStatus === "ok" ? <p className="mt-3 text-sm text-orange-700">Descarga iniciada. También registramos tu solicitud.</p> : null}
             {brochureStatus === "error" ? <p className="mt-3 text-sm text-rose-600">No pudimos procesar tu solicitud, intenta de nuevo.</p> : null}
           </div>
         </div>

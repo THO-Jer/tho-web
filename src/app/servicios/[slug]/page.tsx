@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BrochureLeadForm } from "@/components/BrochureLeadForm";
+import { RelacionamientoServiceView } from "@/components/RelacionamientoServiceView";
 import { SostenibilidadServiceView } from "@/components/SostenibilidadServiceView";
 import { getServiceBySlug, SERVICES } from "@/content/services";
 import { TICKETS } from "@/content/tickets";
@@ -38,6 +39,25 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       <div className="min-h-screen bg-tho-bg">
         <Header />
         <SostenibilidadServiceView relatedPosts={relatedPosts} />
+        <Footer />
+      </div>
+    );
+  }
+
+  if (service.slug === "relacionamiento-comunitario") {
+    const posts = await listPublishedPosts();
+    const relatedPosts = posts
+      .filter((post) => post.tags.some((tag) => {
+        const normalized = tag.toLowerCase().replace("#", "");
+        return normalized.includes("comunidad") || normalized.includes("social") || normalized.includes("territorio");
+      }))
+      .slice(0, 3)
+      .map((post) => ({ slug: post.slug, title: post.title, excerpt: post.excerpt, tags: post.tags }));
+
+    return (
+      <div className="min-h-screen bg-tho-bg">
+        <Header />
+        <RelacionamientoServiceView relatedPosts={relatedPosts} />
         <Footer />
       </div>
     );
