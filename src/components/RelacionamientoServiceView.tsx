@@ -175,7 +175,7 @@ export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts
     <main className="esg-page bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hero/7.png" alt="Equipo de proyecto y comunidades dialogando en territorio" className="absolute inset-0 h-full w-full object-cover object-center" loading="eager" decoding="async" />
+        <img src="/hero/8.png" alt="Equipo de proyecto y comunidades dialogando en territorio" className="absolute inset-0 h-full w-full object-cover object-center" loading="eager" decoding="async" />
         <div className="absolute inset-0 bg-gradient-to-b from-orange-900/62 via-slate-900/42 to-orange-900/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_82%,rgba(251,146,60,0.34),rgba(249,115,22,0.14)_34%,transparent_62%)]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white dark:to-slate-950" />
