@@ -4,9 +4,13 @@ import { notFound } from "next/navigation";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BrochureLeadForm } from "@/components/BrochureLeadForm";
+import { DesarrolloOrganizacionalServiceView } from "@/components/DesarrolloOrganizacionalServiceView";
+import { RelacionamientoServiceView } from "@/components/RelacionamientoServiceView";
+import { SostenibilidadServiceView } from "@/components/SostenibilidadServiceView";
 import { getServiceBySlug, SERVICES } from "@/content/services";
 import { TICKETS } from "@/content/tickets";
 import { PILLAR_META } from "@/lib/brand";
+import { listPublishedPosts } from "@/lib/blogStore";
 
 export function generateStaticParams() {
   return SERVICES.map((service) => ({ slug: service.slug }));
@@ -21,6 +25,63 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const related = SERVICES.filter((item) => item.slug !== service.slug);
   const leadTicket = TICKETS.find((ticket) => ticket.slug === service.leadTicketSlug);
   const meta = PILLAR_META[service.pillar];
+
+  if (service.slug === "sostenibilidad-corporativa") {
+    const posts = await listPublishedPosts();
+    const relatedPosts = posts
+      .filter((post) => post.tags.some((tag) => {
+        const normalized = tag.toLowerCase().replace("#", "");
+        return normalized.includes("esg") || normalized.includes("sostenibilidad");
+      }))
+      .slice(0, 3)
+      .map((post) => ({ slug: post.slug, title: post.title, excerpt: post.excerpt, tags: post.tags }));
+
+    return (
+      <div className="min-h-screen bg-tho-bg">
+        <Header />
+        <SostenibilidadServiceView relatedPosts={relatedPosts} />
+        <Footer />
+      </div>
+    );
+  }
+
+  if (service.slug === "relacionamiento-comunitario") {
+    const posts = await listPublishedPosts();
+    const relatedPosts = posts
+      .filter((post) => post.tags.some((tag) => {
+        const normalized = tag.toLowerCase().replace("#", "");
+        return normalized.includes("comunidad") || normalized.includes("social") || normalized.includes("territorio");
+      }))
+      .slice(0, 3)
+      .map((post) => ({ slug: post.slug, title: post.title, excerpt: post.excerpt, tags: post.tags }));
+
+    return (
+      <div className="min-h-screen bg-tho-bg">
+        <Header />
+        <RelacionamientoServiceView relatedPosts={relatedPosts} />
+        <Footer />
+      </div>
+    );
+  }
+
+  if (service.slug === "desarrollo-organizacional") {
+    const posts = await listPublishedPosts();
+    const relatedPosts = posts
+      .filter((post) => post.tags.some((tag) => {
+        const normalized = tag.toLowerCase().replace("#", "");
+        return normalized.includes("cultura") || normalized.includes("liderazgo") || normalized.includes("organizacional");
+      }))
+      .slice(0, 3)
+      .map((post) => ({ slug: post.slug, title: post.title, excerpt: post.excerpt, tags: post.tags }));
+
+    return (
+      <div className="min-h-screen bg-tho-bg">
+        <Header />
+        <DesarrolloOrganizacionalServiceView relatedPosts={relatedPosts} />
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-tho-bg">
@@ -73,7 +134,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
                 {level.cta ? (
                   <BrochureLeadForm
+                    serviceSlug={service.slug}
                     serviceName={service.navLabel}
+                    levelId={level.id}
                     levelName={level.name}
                     hint={level.cta.hint}
                     buttonLabel={level.cta.label}

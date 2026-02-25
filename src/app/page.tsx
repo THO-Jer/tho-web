@@ -35,7 +35,7 @@ export default async function HomePage() {
           <img
             src="/hero/hands.png"
             alt=""
-            className="absolute inset-0 h-full w-full object-cover object-[52%_36%] opacity-[0.75] md:object-center"
+            className="absolute inset-0 h-full w-full object-cover object-[20%_36%] opacity-[0.75] md:object-center"
           />
           <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
         </div>
