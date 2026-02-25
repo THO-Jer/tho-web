@@ -158,17 +158,21 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/hero/2.png" alt="Equipo evaluando riesgos y estrategia" className="absolute inset-0 h-full w-full object-cover object-center" />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/55 to-emerald-950/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/62 via-slate-900/42 to-emerald-900/40" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_82%,rgba(163,230,53,0.34),rgba(16,185,129,0.14)_34%,transparent_62%)]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white dark:to-slate-950" />
 
         <div className="relative mx-auto flex min-h-[84vh] max-w-6xl items-end px-4 pb-16 pt-24 md:pb-24">
           <div className="max-w-3xl text-white">
             <div className="esg-reveal is-visible" data-reveal-id={revealItems[0]}>
-              <h1 className="font-tho-title text-[2.5rem] leading-[1.02] md:text-[4.8rem]">
-                No es ESG.
+              <h1 className="font-tho-title text-[2.7rem] leading-[0.98] md:text-[5rem]">
+                Servicio de
                 <br />
-                Es riesgo (y oportunidad) medible.
+                Sostenibilidad
+                <br />
+                Corporativa
               </h1>
+              <div className="brand-block-divider mt-4 h-[6px] w-36 rounded-sm" />
               <p className="mt-5 max-w-[700px] text-base text-white/90 md:text-lg">
                 Te ayudamos a traducir presión regulatoria, expectativas de inversionistas y escrutinio público en decisiones estratégicas claras, medibles y ejecutables.
               </p>
@@ -182,14 +186,6 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
             </a>
           </div>
         </div>
-      </section>
-
-      <section className="esg-statement mx-auto max-w-6xl px-4 py-24 text-center md:py-28">
-        <h2 className="esg-reveal is-visible font-tho-title text-[3.4rem] leading-[0.98] text-slate-900 md:text-[6rem] dark:text-slate-100" data-reveal-id={revealItems[2]}>
-          Cumplir no es lo mismo
-          <br />
-          que gestionar riesgos.
-        </h2>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
@@ -248,14 +244,14 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 <li>• Identificación de riesgos reputacionales y regulatorios.</li>
                 <li>• Recomendaciones inmediatas.</li>
               </ul>
-              <p className="mt-4 text-sm font-semibold text-slate-900">Duración estimada: 3–4 semanas.</p>
               <button type="button" onClick={() => { setOpen(true); setBrochureStatus("idle"); }} className="btn-unified-motion btn-hero-services mt-5 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900">
                 Descargar brochure
               </button>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#9ac94f]/70 bg-[linear-gradient(160deg,#f9fcea_0%,#f1f8dc_60%,#e8f3cb_100%)] p-6">
-              <h4 className="text-2xl font-black text-slate-900">Hoja de Ruta y Gobernanza</h4>
+            <article className="esg-level-card rounded-[2.1rem] border border-[#88bc2b]/80 bg-[linear-gradient(160deg,#f7fcdc_0%,#eaf7bf_58%,#ddefa7_100%)] p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-800">Escala de profundidad estratégica</p>
+              <h4 className="mt-2 text-2xl font-black text-slate-900">Hoja de Ruta y Gobernanza</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
                 <li>• Profundización de materialidad.</li>
                 <li>• Diseño de gobernanza.</li>
@@ -273,8 +269,9 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
               <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#9ac94f]/70 bg-[linear-gradient(160deg,#f9fcea_0%,#f1f8dc_60%,#e8f3cb_100%)] p-6">
-              <h4 className="text-2xl font-black text-slate-900">Implementación y Consolidación</h4>
+            <article className="esg-level-card rounded-[2.1rem] border border-[#6da71d]/85 bg-[linear-gradient(160deg,#f4fbd1_0%,#def0a7_58%,#cfe88d_100%)] p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-900">Escala de consolidación operativa</p>
+              <h4 className="mt-2 text-2xl font-black text-slate-900">Implementación y Consolidación</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
                 <li>• Acompañamiento en ejecución.</li>
                 <li>• Instalación de capacidades internas.</li>
@@ -297,11 +294,12 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
 
       <section className="bg-slate-50 px-4 py-20 dark:bg-slate-900/70">
         <div className="esg-reveal is-visible mx-auto max-w-6xl" data-reveal-id={revealItems[5]}>
-          <h3 className="font-tho-title text-center text-[2.2rem] text-slate-900 md:text-[3.4rem] dark:text-slate-100">¿Qué implica partir por un Flash Audit ESG?</h3>
-          <div className="brand-block-divider mx-auto mt-3 mb-8 h-[6px] w-36 rounded-sm" />
-
           <div className="grid gap-5 md:grid-cols-[1fr_0.95fr] md:items-start">
-            <div className="grid gap-4">
+            <div>
+              <h3 className="font-tho-title text-left text-[2.2rem] text-slate-900 md:text-[3.4rem] dark:text-slate-100">¿Qué implica partir por un Flash Audit ESG?</h3>
+              <div className="brand-block-divider mt-3 mb-8 h-[6px] w-36 rounded-sm" />
+
+              <div className="grid gap-4">
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cuándo conviene partir por aquí?</summary>
                 <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
@@ -322,6 +320,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cómo se conecta con los siguientes niveles?</summary>
                 <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">El Flash Audit define prioridades y criterios de decisión. Desde ahí, se escala a gobernanza/roadmap o implementación según brechas y madurez.</p>
               </details>
+              </div>
             </div>
 
             <aside className="relative md:-mt-4 md:-mr-4">
