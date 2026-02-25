@@ -22,7 +22,8 @@ export default function CanalConfidencialPage() {
     setTrackingPin("");
 
     try {
-      const form = new FormData(e.currentTarget);
+      const formElement = e.currentTarget;
+      const form = new FormData(formElement);
       form.set("anonymous", anonymous ? "true" : "false");
 
       const res = await fetch("/api/incidents", {
@@ -34,7 +35,7 @@ export default function CanalConfidencialPage() {
       setSuccessCaseCode(data.case_code || "");
       setTrackingCode(data.tracking_code || "");
       setTrackingPin(data.tracking_pin || "");
-      e.currentTarget.reset();
+      formElement.reset();
       setAnonymous(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error enviando reporte.");

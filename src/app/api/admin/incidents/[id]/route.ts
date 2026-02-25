@@ -9,7 +9,7 @@ const VALID_STATUS: IncidentStatus[] = ["Recibido", "En revisión", "Derivado", 
 
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await readSession(req);
-  if (!session || !session.canIncidents) {
+  if (!session || !session.canIncidents || !session.canManageAccess) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 

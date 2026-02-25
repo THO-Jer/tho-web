@@ -4,6 +4,7 @@ import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 
 import { attachIncidentEvidence, createIncident, IncidentType } from "@/lib/incidentsStore";
+import { sendMail } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,55 @@ async function saveAttachment(file: File, caseCode: string) {
   return `/uploads/incidents/${safeCaseCode}/${filename}`;
 }
 
+function getNotificationRecipients() {
+  return String(process.env.INCIDENTS_NOTIFY_EMAILS || "")
+    .split(",")
+    .map((row) => row.trim().toLowerCase())
+    .filter((row) => row.includes("@"));
+}
+
+async function sendIncidentNotifications(input: {
+  caseCode: string;
+  type: IncidentType;
+  anonymous: boolean;
+  reporterEmail?: string;
+  trackingCode: string;
+  trackingPin: string;
+}) {
+  const recipients = getNotificationRecipients();
+
+  await Promise.all(
+    recipients.map((to) =>
+      sendMail({
+        to,
+        subject: `[Canal Confidencial] Nuevo caso ${input.caseCode}`,
+        text: [
+          "Se registró un nuevo reporte en Canal Confidencial.",
+          `Caso: ${input.caseCode}`,
+          `Tipo: ${input.type}`,
+          `Anónimo: ${input.anonymous ? "Sí" : "No"}`,
+          `Tracking: ${input.trackingCode}`,
+          "Revisa el detalle en THO Studio > Canal Confidencial.",
+        ].join("\n"),
+      })
+    )
+  );
+
+  if (!input.anonymous && input.reporterEmail) {
+    await sendMail({
+      to: input.reporterEmail,
+      subject: `[Canal Confidencial] Recibimos tu reporte (${input.caseCode})`,
+      text: [
+        "Gracias por reportar. Tu caso fue recibido.",
+        `Caso: ${input.caseCode}`,
+        `Código de seguimiento: ${input.trackingCode}`,
+        `PIN de seguimiento: ${input.trackingPin}`,
+        "Guarda estos datos para revisar el estado en /canal-confidencial/seguimiento.",
+      ].join("\n"),
+    });
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const form = await req.formData();
@@ -63,10 +113,24 @@ export async function POST(req: NextRequest) {
       sourceIp: getSourceIp(req),
     });
 
+    let incident = created.incident;
     const file = form.get("evidence_file");
     if (file instanceof File && file.size > 0) {
       const attachmentUrl = await saveAttachment(file, created.incident.case_code);
-      await attachIncidentEvidence(created.incident.case_code, attachmentUrl);
+      incident = await attachIncidentEvidence(created.incident.case_code, attachmentUrl);
+    }
+
+    try {
+      await sendIncidentNotifications({
+        caseCode: incident.case_code,
+        type,
+        anonymous: incident.anonymous,
+        reporterEmail: incident.reporter_email,
+        trackingCode: incident.tracking_code,
+        trackingPin: created.trackingPin,
+      });
+    } catch (mailError) {
+      console.error("[INCIDENTS_NOTIFY_ERROR]", mailError);
     }
 
     return NextResponse.json(

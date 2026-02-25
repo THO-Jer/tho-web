@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
-  if (!session || !session.canIncidents) {
+  if (!session || !session.canIncidents || !session.canManageAccess) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
