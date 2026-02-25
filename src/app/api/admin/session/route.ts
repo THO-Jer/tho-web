@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getUserFromToken, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
+import { getUserFromToken, isStudioSuperAdmin, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
 import { createAccessRequest, logStudioLogin } from "@/lib/studioAccessStore";
 
 export const dynamic = "force-dynamic";
@@ -51,9 +51,20 @@ export async function POST(req: NextRequest) {
     const valid = await validateSupabaseAccessToken(token);
     if (!valid) {
       const tokenUser = await getUserFromToken(token);
+
+      if (tokenUser?.email && isStudioSuperAdmin(tokenUser.email)) {
+        return NextResponse.json({
+          error: "Tu correo es superadmin, pero este ingreso no vino por Microsoft. Entra con el botón ‘Ingresar con Microsoft’.",
+          requestCreated: false,
+          reason: "superadmin_requires_microsoft",
+          detectedProvider: tokenUser.provider,
+        }, { status: 403 });
+      }
+
       if (tokenUser?.email) {
         await createAccessRequest({ email: tokenUser.email, provider: tokenUser.provider });
       }
+
       return NextResponse.json({
         error: "Tu acceso aún no está autorizado. Se envió una solicitud al superadmin.",
         requestCreated: Boolean(tokenUser?.email),
