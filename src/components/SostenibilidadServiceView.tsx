@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 type FormStatus = "idle" | "sending" | "ok" | "error";
 
@@ -12,7 +12,7 @@ type RelatedPost = {
   tags: string[];
 };
 
-const BROCHURE_FILE_URL = "/downloads/brochure-esg-v1.pdf";
+const BROCHURE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
 
 function useRevealItems() {
   return useMemo(
@@ -34,6 +34,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
     alreadyExecuting: false,
   });
   const revealItems = useRevealItems();
+  const dialogTitleId = useId();
 
   const levelRecommendation = useMemo(() => {
     const score = Object.values(levelChecks).filter(Boolean).length;
@@ -78,6 +79,23 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
 
   async function onBrochureSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -157,7 +175,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
     <main className="esg-page bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hero/8.png" alt="Equipo evaluando riesgos y estrategia" className="absolute inset-0 h-full w-full object-cover object-center" />
+        <img src="/hero/8.png" alt="Equipo evaluando riesgos y estrategia" className="absolute inset-0 h-full w-full object-cover object-center" loading="eager" decoding="async" />
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-900/62 via-slate-900/42 to-emerald-900/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_82%,rgba(163,230,53,0.34),rgba(16,185,129,0.14)_34%,transparent_62%)]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white dark:to-slate-950" />
@@ -398,8 +416,8 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 <button disabled={contactStatus === "sending"} className="btn-unified-motion btn-hero-services mt-2 inline-flex w-full justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 disabled:opacity-60">
                   {contactStatus === "sending" ? "Enviando..." : "Enviar solicitud"}
                 </button>
-                {contactStatus === "ok" ? <p className="text-sm text-emerald-200">Gracias, te contactaremos pronto.</p> : null}
-                {contactStatus === "error" ? <p className="text-sm text-rose-200">No pudimos enviar, intenta nuevamente.</p> : null}
+                {contactStatus === "ok" ? <p aria-live="polite" className="text-sm text-emerald-200">Gracias, te contactaremos pronto.</p> : null}
+                {contactStatus === "error" ? <p aria-live="polite" className="text-sm text-rose-200">No pudimos enviar, intenta nuevamente.</p> : null}
               </form>
             </div>
           </div>
@@ -407,10 +425,10 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
       </section>
 
       {open ? (
-        <div className="fixed inset-0 z-[90] grid place-items-center bg-slate-900/70 px-4 backdrop-blur-sm" role="dialog" aria-modal="true">
-          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+        <div className="fixed inset-0 z-[90] grid place-items-center bg-slate-900/70 px-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby={dialogTitleId} onClick={() => setOpen(false)}>
+          <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900" role="document" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between gap-4">
-              <h4 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Descargar brochure</h4>
+              <h4 id={dialogTitleId} className="text-xl font-semibold text-slate-900 dark:text-slate-100">Descargar brochure</h4>
               <button type="button" onClick={() => setOpen(false)} className="rounded-lg border border-slate-200 px-3 py-1 text-sm dark:border-slate-600 dark:text-slate-200">Cerrar</button>
             </div>
             <form onSubmit={onBrochureSubmit} className="mt-4 grid gap-3">
@@ -423,8 +441,8 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 {brochureStatus === "sending" ? "Enviando..." : "Descargar brochure"}
               </button>
             </form>
-            {brochureStatus === "ok" ? <p className="mt-3 text-sm text-emerald-700">Descarga iniciada. También registramos tu solicitud.</p> : null}
-            {brochureStatus === "error" ? <p className="mt-3 text-sm text-rose-600">No pudimos procesar tu solicitud, intenta de nuevo.</p> : null}
+            {brochureStatus === "ok" ? <p aria-live="polite" className="mt-3 text-sm text-emerald-700">Descarga iniciada. También registramos tu solicitud.</p> : null}
+            {brochureStatus === "error" ? <p aria-live="polite" className="mt-3 text-sm text-rose-600">No pudimos procesar tu solicitud, intenta de nuevo.</p> : null}
           </div>
         </div>
       ) : null}
