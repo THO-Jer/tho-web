@@ -54,11 +54,12 @@ export async function POST(req: NextRequest) {
 
       if (tokenUser?.email && isStudioSuperAdmin(tokenUser.email)) {
         return NextResponse.json({
+          ok: false,
           error: "Tu correo es superadmin, pero este ingreso no vino por Microsoft. Entra con el botón ‘Ingresar con Microsoft’.",
           requestCreated: false,
           reason: "superadmin_requires_microsoft",
           detectedProvider: tokenUser.provider,
-        }, { status: 403 });
+        });
       }
 
       if (tokenUser?.email) {
@@ -66,9 +67,11 @@ export async function POST(req: NextRequest) {
       }
 
       return NextResponse.json({
+        ok: false,
         error: "Tu acceso aún no está autorizado. Se envió una solicitud al superadmin.",
         requestCreated: Boolean(tokenUser?.email),
-      }, { status: 403 });
+        reason: "access_request_created",
+      });
     }
 
     await logStudioLogin({

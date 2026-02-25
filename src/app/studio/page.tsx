@@ -103,7 +103,11 @@ export default function StudioIndexPage() {
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || "No se pudo completar login.");
-          setMessage(data.requestCreated ? "Solicitud enviada a superadmin." : "Sesión iniciada correctamente.");
+          if (data.ok === false) {
+            setMessage(data.error || "No autorizado.");
+          } else {
+            setMessage(data.requestCreated ? "Solicitud enviada a superadmin." : "Sesión iniciada correctamente.");
+          }
           window.history.replaceState({}, document.title, window.location.pathname);
         }
 
