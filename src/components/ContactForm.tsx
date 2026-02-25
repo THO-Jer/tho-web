@@ -12,6 +12,10 @@ export function ContactForm(props: { ticket?: string }) {
 
     const payload = {
       type: "contact",
+      eventLabel: props.ticket ? "ticket_contact_form" : "general_contact_form",
+      source: props.ticket ? "ticket_detail_page" : "homepage_contact_section",
+      resourceId: props.ticket ? `ticket-${props.ticket}` : "contact-form",
+      resourceName: props.ticket ? `Consulta ticket ${props.ticket}` : "Formulario de contacto",
       name: String(form.get("name") || ""),
       email: String(form.get("email") || ""),
       phone: String(form.get("phone") || ""),
