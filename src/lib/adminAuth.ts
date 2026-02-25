@@ -62,7 +62,11 @@ export async function getUserFromToken(token: string): Promise<TokenUser | null>
   const email = user.email?.trim().toLowerCase();
   if (!email) return null;
 
-  const providerRaw = user.app_metadata?.provider || user.identities?.[0]?.provider || "";
+  const identityProvider = Array.isArray(user.identities)
+    ? user.identities.map((row) => String(row?.provider || "")).find((value) => normalizeProvider(value) !== "unknown") || user.identities[0]?.provider
+    : "";
+
+  const providerRaw = user.app_metadata?.provider || identityProvider || "";
   return { email, provider: normalizeProvider(providerRaw) };
 }
 

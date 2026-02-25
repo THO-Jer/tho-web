@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getUserFromToken, isStudioSuperAdmin, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
-import { createAccessRequest, logStudioLogin } from "@/lib/studioAccessStore";
+import { createAccessRequest, isBlockedEmail, logStudioLogin } from "@/lib/studioAccessStore";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +53,16 @@ export async function POST(req: NextRequest) {
       const tokenUser = await getUserFromToken(token);
 
       if (tokenUser?.email && isStudioSuperAdmin(tokenUser.email)) {
+        if (await isBlockedEmail(tokenUser.email)) {
+          return NextResponse.json({
+            ok: false,
+            error: "Tu correo superadmin está bloqueado en Control de Accesos. Desbloquéalo para entrar.",
+            requestCreated: false,
+            reason: "superadmin_blocked",
+            detectedProvider: tokenUser.provider,
+          });
+        }
+
         return NextResponse.json({
           ok: false,
           error: "Tu correo es superadmin, pero este ingreso no vino por Microsoft. Entra con el botón ‘Ingresar con Microsoft’.",
