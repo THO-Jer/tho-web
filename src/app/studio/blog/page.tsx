@@ -41,7 +41,7 @@ export default function BlogStudioIndexPage() {
     fetch("/api/admin/session", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        if (!data.authenticated) {
+        if (!data.authenticated || !data.permissions?.canBlog) {
           router.replace("/studio");
           return;
         }

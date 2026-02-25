@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { isAdminAuthorized, readSession } from "@/lib/adminAuth";
+import { readSession } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -204,7 +204,8 @@ async function listImageTree(rootDir: string, relativeDir = ""): Promise<RepoTre
 }
 
 export async function GET(req: NextRequest) {
-  if (!(await isAdminAuthorized(req))) {
+  const session = await readSession(req);
+  if (!session || !session.canBlog) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
@@ -216,7 +217,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Storage no configurado. Define SUPABASE_URL." }, { status: 500 });
     }
 
-    const session = await readSession(req);
     const apikey = service || anon;
     const bearer = service || session?.token;
     if (!apikey || !bearer) {
@@ -256,7 +256,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await isAdminAuthorized(req))) {
+  const session = await readSession(req);
+  if (!session || !session.canBlog) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
@@ -277,7 +278,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Storage no configurado. Define SUPABASE_URL." }, { status: 500 });
     }
 
-    const session = await readSession(req);
     const apikey = service || anon;
     const bearer = service || session?.token;
 

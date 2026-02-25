@@ -17,7 +17,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="grid gap-8 text-right md:grid-cols-3 md:gap-10">
+          <div className="grid gap-8 text-left sm:text-right md:grid-cols-2 lg:grid-cols-3 md:gap-10">
             <div className="space-y-2 text-xs">
               <div className="font-bold italic text-slate-100">Nuestros Servicios</div>
               <div className="flex flex-col gap-1.5">
@@ -66,7 +66,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-2 text-[11px] text-slate-400 md:flex-row md:items-center md:justify-between">
+        <div className="mt-8 flex flex-col gap-2 text-[11px] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <div>© {new Date().getFullYear()} The Human Org</div>
           <div className="text-slate-500">Humanidad · Colaboración · Adaptabilidad</div>
         </div>

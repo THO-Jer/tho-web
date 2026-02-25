@@ -1,105 +1,82 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { isAllowedEditorEmail, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
+import { readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
+import { logStudioLogin } from "@/lib/studioAccessStore";
 
 export const dynamic = "force-dynamic";
 
 function getSupabaseEnv() {
   const rawUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_SUPABASE_PUBLIC_URL;
   const url = rawUrl?.trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
-  const anon = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_SUPABASE_ANON_KEY;
-  return { url, anon };
+  return { url };
 }
 
+function getSourceIp(req: NextRequest) {
+  const forwarded = req.headers.get("x-forwarded-for") || "";
+  if (forwarded) return forwarded.split(",")[0]?.trim();
+  return req.headers.get("x-real-ip") || undefined;
+}
 
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
   const { url } = getSupabaseEnv();
-  return NextResponse.json({ authenticated: Boolean(session), email: session?.email ?? null, oauthBaseUrl: url ?? null });
+  return NextResponse.json({
+    authenticated: Boolean(session),
+    email: session?.email ?? null,
+    provider: session?.provider ?? null,
+    oauthBaseUrl: url ?? null,
+    canManageAccess: Boolean(session?.canManageAccess),
+    permissions: session
+      ? {
+          canBlog: session.canBlog,
+          canCrm: session.canCrm,
+          canIncidents: session.canIncidents,
+        }
+      : null,
+  });
 }
 
 export async function POST(req: NextRequest) {
-  const { url, anon } = getSupabaseEnv();
-  if (!url || !anon) {
-    return NextResponse.json({ error: "Supabase no configurado." }, { status: 500 });
-  }
-
   try {
-    const payload = (await req.json()) as {
-      action?: string;
-      email?: string;
-      otp?: string;
-      accessToken?: string;
-    };
+    const payload = (await req.json()) as { action?: string; accessToken?: string };
     const action = payload.action;
-    const email = (payload.email || "").trim().toLowerCase();
 
-    if (action === "oauth_login") {
-      const token = (payload.accessToken || "").trim();
-      if (!token) return NextResponse.json({ error: "Token OAuth faltante." }, { status: 400 });
-
-      const valid = await validateSupabaseAccessToken(token);
-      if (!valid) return NextResponse.json({ error: "No autorizado para Studio." }, { status: 403 });
-
-      const response = NextResponse.json({ ok: true, email: valid.email });
-      response.cookies.set(SESSION_COOKIE, token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 60 * 60 * 12,
-      });
-      return response;
+    if (action !== "oauth_login") {
+      return NextResponse.json({ error: "Acción no válida. Usa OAuth." }, { status: 400 });
     }
 
-    if (!email) return NextResponse.json({ error: "Debes enviar email." }, { status: 400 });
+    const token = (payload.accessToken || "").trim();
+    if (!token) return NextResponse.json({ error: "Token OAuth faltante." }, { status: 400 });
 
-    if (!(await isAllowedEditorEmail(email))) {
-      return NextResponse.json({ error: "Email sin permisos de edición." }, { status: 403 });
-    }
+    const valid = await validateSupabaseAccessToken(token);
+    if (!valid) return NextResponse.json({ error: "No autorizado para Studio." }, { status: 403 });
 
-    if (action === "send_otp") {
-      const otpRes = await fetch(`${url}/auth/v1/otp`, {
-        method: "POST",
-        headers: { "content-type": "application/json", apikey: anon },
-        body: JSON.stringify({ email, create_user: false }),
-      });
+    await logStudioLogin({
+      at: new Date().toISOString(),
+      email: valid.email,
+      provider: valid.provider,
+      ip: getSourceIp(req),
+    });
 
-      if (!otpRes.ok) {
-        const errorText = await otpRes.text();
-        return NextResponse.json({ error: `No se pudo enviar código: ${errorText}` }, { status: 400 });
-      }
-
-      return NextResponse.json({ ok: true, message: "Código enviado a tu correo." });
-    }
-
-    if (action === "verify_otp") {
-      const otp = (payload.otp || "").trim();
-      if (!otp) return NextResponse.json({ error: "Debes ingresar el código OTP." }, { status: 400 });
-
-      const verifyRes = await fetch(`${url}/auth/v1/verify`, {
-        method: "POST",
-        headers: { "content-type": "application/json", apikey: anon },
-        body: JSON.stringify({ email, token: otp, type: "email" }),
-      });
-
-      const verifyData = await verifyRes.json();
-      if (!verifyRes.ok || !verifyData?.access_token) {
-        return NextResponse.json({ error: "Código inválido o expirado." }, { status: 401 });
-      }
-
-      const response = NextResponse.json({ ok: true, email });
-      response.cookies.set(SESSION_COOKIE, verifyData.access_token as string, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        maxAge: 60 * 60 * 12,
-      });
-      return response;
-    }
-
-    return NextResponse.json({ error: "Acción no válida." }, { status: 400 });
+    const response = NextResponse.json({
+      ok: true,
+      email: valid.email,
+      provider: valid.provider,
+      canManageAccess: valid.permissions.canManageAccess,
+      permissions: {
+        canBlog: valid.permissions.canBlog,
+        canCrm: valid.permissions.canCrm,
+        canIncidents: valid.permissions.canIncidents,
+      },
+    });
+    response.cookies.set(SESSION_COOKIE, token, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 12,
+    });
+    return response;
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "No se pudo procesar autenticación." },

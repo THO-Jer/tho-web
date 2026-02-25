@@ -1,0 +1,96 @@
+"use client";
+
+import { useState } from "react";
+
+type Snapshot = {
+  case_code: string;
+  tracking_code: string;
+  status: string;
+  process_phase: string;
+  status_started_at: string;
+  status_max_days: number;
+  status_deadline_at: string;
+  legal_note: string;
+};
+
+export default function SeguimientoIncidentePage() {
+  const [trackingCode, setTrackingCode] = useState("");
+  const [pin, setPin] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSnapshot(null);
+
+    try {
+      const res = await fetch("/api/incidents/track", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ tracking_code: trackingCode.trim().toUpperCase(), pin: pin.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo consultar el caso.");
+      setSnapshot(data.incident || null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error consultando seguimiento.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="min-h-screen bg-tho-bg px-4 py-10">
+      <section className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Seguimiento de incidente</h1>
+        <p className="mt-3 text-sm text-slate-600">
+          Ingresa tu código de seguimiento y PIN para revisar únicamente estado y fase del proceso.
+        </p>
+
+        <form onSubmit={onSubmit} className="mt-6 grid gap-4">
+          <label className="grid gap-1">
+            <span className="text-xs font-semibold text-slate-600">Código de seguimiento</span>
+            <input
+              value={trackingCode}
+              onChange={(e) => setTrackingCode(e.target.value.toUpperCase())}
+              required
+              className="rounded-xl border border-slate-300 px-3 py-2 text-sm"
+              placeholder="SEG-XXXXXX"
+            />
+          </label>
+          <label className="grid gap-1">
+            <span className="text-xs font-semibold text-slate-600">PIN</span>
+            <input
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+              required
+              className="rounded-xl border border-slate-300 px-3 py-2 text-sm"
+              placeholder="******"
+            />
+          </label>
+
+          <button type="submit" disabled={loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+            {loading ? "Consultando..." : "Consultar estado"}
+          </button>
+        </form>
+
+        {snapshot ? (
+          <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+            <p><strong>Caso:</strong> {snapshot.case_code}</p>
+            <p><strong>Estado:</strong> {snapshot.status}</p>
+            <p><strong>Fase del proceso:</strong> {snapshot.process_phase}</p>
+            <p><strong>Estado vigente desde:</strong> {new Date(snapshot.status_started_at).toLocaleString()}</p>
+            <p><strong>Plazo máximo del estado:</strong> {snapshot.status_max_days} días</p>
+            <p><strong>Fecha límite referencial:</strong> {new Date(snapshot.status_deadline_at).toLocaleDateString()}</p>
+            <p className="mt-2 text-xs text-slate-500">{snapshot.legal_note}</p>
+          </div>
+        ) : null}
+
+        {error ? <p className="mt-4 text-sm text-rose-700">{error}</p> : null}
+      </section>
+    </main>
+  );
+}
