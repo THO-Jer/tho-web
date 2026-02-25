@@ -26,7 +26,48 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
   const [brochureStatus, setBrochureStatus] = useState<FormStatus>("idle");
   const [contactStatus, setContactStatus] = useState<FormStatus>("idle");
   const [riskParallax, setRiskParallax] = useState(0);
+  const [levelChecks, setLevelChecks] = useState({
+    noMaterialityMap: false,
+    investorPressure: false,
+    governanceGaps: false,
+    shortDeadline: false,
+    alreadyExecuting: false,
+  });
   const revealItems = useRevealItems();
+
+  const levelRecommendation = useMemo(() => {
+    const score = Object.values(levelChecks).filter(Boolean).length;
+
+    if (!score) {
+      return {
+        level: "Completa las casillas para una recomendación",
+        hint: "Marca 2 o más condiciones para sugerirte el mejor nivel de partida.",
+        tone: "text-slate-700 dark:text-slate-300",
+      };
+    }
+
+    if (levelChecks.alreadyExecuting && score >= 3) {
+      return {
+        level: "Nivel sugerido: Implementación y Consolidación",
+        hint: "Ya existe trabajo en marcha; conviene fortalecer ejecución, seguimiento y mejora continua.",
+        tone: "text-emerald-800 dark:text-emerald-300",
+      };
+    }
+
+    if (score >= 3 || levelChecks.governanceGaps) {
+      return {
+        level: "Nivel sugerido: Hoja de Ruta y Gobernanza",
+        hint: "Necesitas ordenar priorización, definir gobierno ESG e instalar métricas de seguimiento.",
+        tone: "text-emerald-800 dark:text-emerald-300",
+      };
+    }
+
+    return {
+      level: "Nivel sugerido: Flash Audit ESG",
+      hint: "Punto de entrada ideal para claridad rápida y definición de prioridades inmediatas.",
+      tone: "text-emerald-800 dark:text-emerald-300",
+    };
+  }, [levelChecks]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -255,23 +296,67 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
       </section>
 
       <section className="bg-slate-50 px-4 py-20 dark:bg-slate-900/70">
-        <div className="esg-reveal is-visible mx-auto max-w-4xl" data-reveal-id={revealItems[5]}>
+        <div className="esg-reveal is-visible mx-auto max-w-6xl" data-reveal-id={revealItems[5]}>
           <h3 className="font-tho-title text-center text-[2.2rem] text-slate-900 md:text-[3.4rem] dark:text-slate-100">¿Qué implica partir por un Flash Audit ESG?</h3>
           <div className="brand-block-divider mx-auto mt-3 mb-8 h-[6px] w-36 rounded-sm" />
 
-          <div className="grid gap-4">
-            <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
-              <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cuándo conviene partir por aquí?</summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
-            </details>
-            <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
-              <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué decisión habilita?</summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Te permite decidir con evidencia si avanzar a una hoja de ruta integral o focalizar recursos en brechas críticas de corto plazo.</p>
-            </details>
-            <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
-              <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué NO es?</summary>
-              <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">No es una versión “ligera” del servicio completo: es un instrumento estratégico para reducir incertidumbre y ordenar la conversación ejecutiva.</p>
-            </details>
+          <div className="grid gap-5 md:grid-cols-[1fr_0.95fr] md:items-start">
+            <div className="grid gap-4">
+              <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+                <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cuándo conviene partir por aquí?</summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
+              </details>
+              <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+                <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué decisión habilita?</summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Te permite decidir con evidencia si avanzar a una hoja de ruta integral o focalizar recursos en brechas críticas de corto plazo.</p>
+              </details>
+              <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+                <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué NO es?</summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">No es una versión “ligera” del servicio completo: es un instrumento estratégico para reducir incertidumbre y ordenar la conversación ejecutiva.</p>
+              </details>
+              <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+                <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué información necesito para iniciarlo?</summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Basta con entrevistas clave, información regulatoria relevante y los principales riesgos/iniciativas ya identificados por la organización.</p>
+              </details>
+              <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
+                <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cómo se conecta con los siguientes niveles?</summary>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">El Flash Audit define prioridades y criterios de decisión. Desde ahí, se escala a gobernanza/roadmap o implementación según brechas y madurez.</p>
+              </details>
+            </div>
+
+            <aside className="relative md:-mt-4 md:-mr-4">
+              <div className="rounded-3xl border border-emerald-300/70 bg-[linear-gradient(160deg,#f8fce9_0%,#f0f8d9_65%,#e6f2c5_100%)] p-6 shadow-xl shadow-emerald-900/10 dark:border-emerald-400/30 dark:bg-[linear-gradient(160deg,rgba(15,23,42,0.96)_0%,rgba(20,83,45,0.7)_100%)]">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 dark:text-slate-300">Diagnóstico rápido</p>
+                <h4 className="mt-2 text-2xl font-black leading-[1.02] text-slate-900 dark:text-slate-100">¿Por cuál nivel conviene partir?</h4>
+                <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">Marca las condiciones que aplican hoy en tu organización y te sugerimos un punto de entrada.</p>
+
+                <div className="mt-5 grid gap-3">
+                  {[
+                    ["noMaterialityMap", "No tenemos mapa de materialidad validado."],
+                    ["investorPressure", "Hay presión de inversionistas/directorio por trazabilidad ESG."],
+                    ["governanceGaps", "No existe gobernanza clara ni responsables definidos."],
+                    ["shortDeadline", "Debemos mostrar avances concretos en menos de 90 días."],
+                    ["alreadyExecuting", "Ya estamos ejecutando iniciativas pero falta coordinación."],
+                  ].map(([key, label]) => (
+                    <label key={key} className="flex items-start gap-3 rounded-xl bg-white/70 px-3 py-2 text-sm text-slate-800 ring-1 ring-emerald-700/10 dark:bg-slate-900/60 dark:text-slate-100 dark:ring-white/10">
+                      <input
+                        type="checkbox"
+                        checked={levelChecks[key as keyof typeof levelChecks]}
+                        onChange={(e) => setLevelChecks((prev) => ({ ...prev, [key]: e.target.checked }))}
+                        className="mt-0.5 h-4 w-4 rounded border-slate-400 text-emerald-700 focus:ring-emerald-600"
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+
+                <div className="mt-5 rounded-2xl bg-white/80 p-4 ring-1 ring-emerald-700/20 dark:bg-slate-900/80 dark:ring-white/10">
+                  <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Resultado sugerido</p>
+                  <p className={`mt-1 text-base font-bold ${levelRecommendation.tone}`}>{levelRecommendation.level}</p>
+                  <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{levelRecommendation.hint}</p>
+                </div>
+              </div>
+            </aside>
           </div>
         </div>
       </section>
