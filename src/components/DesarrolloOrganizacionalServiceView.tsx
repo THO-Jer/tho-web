@@ -12,7 +12,7 @@ type RelatedPost = {
   tags: string[];
 };
 
-const BROCHURE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
+const BROCHURE_FILE_URL = "/downloads/do-brochure-v1.pdf";
 
 function useRevealItems() {
   return useMemo(
@@ -175,7 +175,7 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
     <main className="esg-page bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/hero/5.png" alt="Equipo de liderazgo colaborando en una sesión de trabajo" className="absolute inset-0 h-full w-full object-cover object-center" loading="eager" decoding="async" />
+        <img src="/hero/3.png" alt="Equipo de liderazgo colaborando en una sesión de trabajo" className="absolute inset-0 h-full w-full object-cover object-center" loading="eager" decoding="async" />
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-900/62 via-slate-900/42 to-indigo-900/40" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_82%,rgba(129,140,248,0.34),rgba(99,102,241,0.18)_34%,transparent_62%)]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent to-white dark:to-slate-950" />

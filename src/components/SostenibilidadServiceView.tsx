@@ -12,7 +12,7 @@ type RelatedPost = {
   tags: string[];
 };
 
-const BROCHURE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
+const BROCHURE_FILE_URL = "/downloads/sc-brochure-v1.pdf";
 
 function useRevealItems() {
   return useMemo(
