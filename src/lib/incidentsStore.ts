@@ -404,6 +404,42 @@ export async function listIncidents() {
   return readStore();
 }
 
+export async function getIncidentById(id: string) {
+  const rows = await readStore();
+  return rows.find((row) => row.id === id) || null;
+}
+
+type IncidentUpdatePatch = {
+  status?: IncidentStatus;
+  process_phase?: string;
+  urgency_level?: UrgencyLevel;
+  director_notes?: string;
+  director_only_notes?: string;
+};
+
+function getActorEmail(actor: string) {
+  return actor.includes("@") ? actor : undefined;
+}
+
+function buildIncidentEvents(current: InternalIncident, patch: IncidentUpdatePatch) {
+  const events: Array<{ action: string; detail: string }> = [];
+  if (patch.status && patch.status !== current.status) {
+    events.push({ action: "UPDATE_STATUS", detail: `Estado: ${current.status} -> ${patch.status}` });
+  }
+  if (typeof patch.process_phase === "string" && patch.process_phase.trim() !== (current.process_phase || "")) {
+    events.push({ action: "UPDATE_PHASE", detail: `Fase: ${current.process_phase || "-"} -> ${patch.process_phase.trim()}` });
+  }
+  if (patch.urgency_level && patch.urgency_level !== current.urgency_level) {
+    events.push({ action: "UPDATE_URGENCY", detail: `Urgencia: ${current.urgency_level} -> ${patch.urgency_level}` });
+  }
+  if (typeof patch.director_only_notes === "string" && patch.director_only_notes.trim() !== (current.director_only_notes || "").trim()) {
+    events.push({ action: "UPDATE_RESPONSIBLE", detail: `Responsable comité: ${patch.director_only_notes.trim() || "sin asignar"}` });
+  }
+  if (typeof patch.director_notes === "string" && patch.director_notes.trim() !== (current.director_notes || "").trim()) {
+    events.push({ action: "ADD_COMMITTEE_NOTE", detail: "Actualiza notas internas del comité" });
+  }
+  return events;
+}
 
 async function appendIncidentEvent(input: { incidentId: string; actorKind: string; actorEmail?: string; actor: string; action: string; detail?: string; at?: string }) {
   const at = input.at || new Date().toISOString();
@@ -424,48 +460,92 @@ async function appendIncidentEvent(input: { incidentId: string; actorKind: strin
   }
 }
 
+export async function recordIncidentEvent(
+  id: string,
+  event: { action: string; detail?: string },
+  actor = "admin",
+  actorKind = "admin"
+) {
+  const rows = await readStore();
+  const idx = rows.findIndex((row) => row.id === id);
+  if (idx < 0) throw new Error("Caso no encontrado.");
+  const now = new Date().toISOString();
+
+  if (hasSupabaseStore()) {
+    await appendIncidentEvent({
+      incidentId: id,
+      actor,
+      actorKind,
+      actorEmail: getActorEmail(actor),
+      action: event.action,
+      detail: event.detail,
+      at: now,
+    });
+    const updatedRows = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ last_updated_at: now }),
+    })) as Array<Partial<InternalIncident>>;
+    return withDefaults(updatedRows[0] || rows[idx]);
+  }
+
+  rows[idx] = {
+    ...rows[idx],
+    last_updated_at: now,
+    audit_log: [
+      ...rows[idx].audit_log,
+      {
+        at: now,
+        actor_kind: actorKind,
+        actor_email: getActorEmail(actor),
+        actor,
+        action: event.action,
+        detail: event.detail,
+      },
+    ],
+  };
+  await writeStore(rows);
+  return rows[idx];
+}
+
 export async function updateIncidentById(
   id: string,
-  patch: { status?: IncidentStatus; director_notes?: string; director_only_notes?: string },
+  patch: IncidentUpdatePatch,
   actor = "director",
   actorKind = "admin"
 ) {
   if (hasSupabaseStore()) {
     const rows = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?select=*&id=eq.${encodeURIComponent(id)}&limit=1`)) as Array<Partial<InternalIncident>>;
-    const current = rows[0];
-    if (!current) throw new Error("Caso no encontrado.");
+    if (!rows[0]) throw new Error("Caso no encontrado.");
+    const current = withDefaults(rows[0]);
 
     const now = new Date().toISOString();
     const nextStatus = (patch.status || current.status || "Recibido") as IncidentStatus;
+    const nextPhase = typeof patch.process_phase === "string" && patch.process_phase.trim() ? patch.process_phase.trim() : current.process_phase || getPhaseFromStatus(nextStatus);
+    const nextUrgency = (patch.urgency_level || current.urgency_level || "Bajo") as UrgencyLevel;
+    const nextDirectorNotes = typeof patch.director_notes === "string" ? patch.director_notes : current.director_notes || "";
+    const nextResponsible = typeof patch.director_only_notes === "string" ? patch.director_only_notes : current.director_only_notes || "";
+
     const updatedRows = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
       method: "PATCH",
       body: JSON.stringify({
         status: nextStatus,
-        process_phase: getPhaseFromStatus(nextStatus),
-        director_notes: typeof patch.director_notes === "string" ? patch.director_notes : current.director_notes || "",
-        director_only_notes: typeof patch.director_only_notes === "string" ? patch.director_only_notes : current.director_only_notes || "",
+        process_phase: nextPhase,
+        urgency_level: nextUrgency,
+        director_notes: nextDirectorNotes,
+        director_only_notes: nextResponsible,
         last_updated_at: now,
       }),
     })) as Array<Partial<InternalIncident>>;
 
-    await appendIncidentEvent({
-      incidentId: id,
-      actorKind,
-      actorEmail: actor.includes("@") ? actor : undefined,
-      actor,
-      action: "UPDATE_STATUS",
-      detail: `Estado: ${current.status} -> ${nextStatus}` ,
-      at: now,
-    });
-
-    if (typeof patch.director_notes === "string") {
+    const events = buildIncidentEvents(current, { status: nextStatus, process_phase: nextPhase, urgency_level: nextUrgency, director_notes: nextDirectorNotes, director_only_notes: nextResponsible });
+    for (const event of events) {
       await appendIncidentEvent({
         incidentId: id,
         actorKind,
-        actorEmail: actor.includes("@") ? actor : undefined,
+        actorEmail: getActorEmail(actor),
         actor,
-        action: "ADD_NOTE",
-        detail: "Actualiza notas de gestión",
+        action: event.action,
+        detail: event.detail,
         at: now,
       });
     }
@@ -478,31 +558,38 @@ export async function updateIncidentById(
   if (idx < 0) throw new Error("Caso no encontrado.");
 
   const current = rows[idx];
-  const nextStatus = patch.status ?? current.status;
+  const nextStatus = (patch.status ?? current.status) as IncidentStatus;
+  const nextPhase = typeof patch.process_phase === "string" && patch.process_phase.trim() ? patch.process_phase.trim() : current.process_phase || getPhaseFromStatus(nextStatus);
+  const nextUrgency = (patch.urgency_level ?? current.urgency_level) as UrgencyLevel;
+  const nextDirectorNotes = typeof patch.director_notes === "string" ? patch.director_notes : current.director_notes;
+  const nextResponsible = typeof patch.director_only_notes === "string" ? patch.director_only_notes : current.director_only_notes;
   const now = new Date().toISOString();
-  const next: InternalIncident = {
+
+  const events = buildIncidentEvents(current, { status: nextStatus, process_phase: nextPhase, urgency_level: nextUrgency, director_notes: nextDirectorNotes, director_only_notes: nextResponsible });
+
+  rows[idx] = {
     ...current,
     status: nextStatus,
-    process_phase: getPhaseFromStatus(nextStatus),
-    director_notes: typeof patch.director_notes === "string" ? patch.director_notes : current.director_notes,
-    director_only_notes: typeof patch.director_only_notes === "string" ? patch.director_only_notes : current.director_only_notes,
+    process_phase: nextPhase,
+    urgency_level: nextUrgency,
+    director_notes: nextDirectorNotes,
+    director_only_notes: nextResponsible,
     last_updated_at: now,
     audit_log: [
       ...current.audit_log,
-      {
+      ...events.map((event) => ({
         at: now,
-        actor_kind: "director",
-        actor_email: actor.includes("@") ? actor : undefined,
+        actor_kind: actorKind,
+        actor_email: getActorEmail(actor),
         actor,
-        action: "UPDATE_STATUS",
-        detail: `Estado: ${current.status} -> ${nextStatus}`,
-      },
+        action: event.action,
+        detail: event.detail,
+      })),
     ],
   };
 
-  rows[idx] = next;
   await writeStore(rows);
-  return next;
+  return rows[idx];
 }
 
 

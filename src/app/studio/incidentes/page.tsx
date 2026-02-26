@@ -18,21 +18,31 @@ type Incident = {
   attachments?: string[];
   status: "Recibido" | "En revisión" | "Derivado" | "Cerrado";
   urgency_level: "Bajo" | "Medio" | "Alto";
+  process_phase: string;
   suggested_action: string;
   director_notes?: string;
+  director_only_notes?: string;
   created_at: string;
   last_updated_at: string;
-  audit_log: Array<{ at: string; actor: string; action: string; detail?: string }>;
+  audit_log: Array<{ at: string; actor: string; actor_email?: string; actor_kind?: string; action: string; detail?: string }>;
 };
 
 type SessionData = {
   authenticated: boolean;
-  canManageAccess?: boolean;
   role?: string;
   permissions?: { canIncidents?: boolean };
 };
 
+type TriageForm = {
+  status: Incident["status"];
+  process_phase: string;
+  urgency_level: Incident["urgency_level"];
+  director_only_notes: string;
+  director_notes: string;
+};
+
 const STATUSES: Incident["status"][] = ["Recibido", "En revisión", "Derivado", "Cerrado"];
+const URGENCIES: Incident["urgency_level"][] = ["Bajo", "Medio", "Alto"];
 
 function CollaboratorView() {
   return (
@@ -69,10 +79,11 @@ export default function StudioIncidentesPage() {
   const [activeId, setActiveId] = useState<string>("");
   const [message, setMessage] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [canManage, setCanManage] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
-  const [role, setRole] = useState("");
   const [newPin, setNewPin] = useState("");
+  const [requestInfoText, setRequestInfoText] = useState("");
+  const [triage, setTriage] = useState<TriageForm | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
@@ -82,15 +93,14 @@ export default function StudioIncidentesPage() {
           router.replace("/studio");
           return;
         }
-        setCanManage(Boolean(data.canManageAccess));
-        setRole(String(data.role || ""));
+        setIsSuperAdmin(String(data.role || "") === "superadmin");
       })
       .catch(() => router.replace("/studio"))
       .finally(() => setChecking(false));
   }, [router]);
 
   const loadIncidents = useCallback(async () => {
-    if (!canManage || previewMode) return;
+    if (!isSuperAdmin || previewMode) return;
 
     setLoading(true);
     setMessage("");
@@ -100,13 +110,24 @@ export default function StudioIncidentesPage() {
       if (!res.ok) throw new Error(data.error || "No se pudo cargar incidentes.");
       const rows = (data.incidents || []) as Incident[];
       setIncidents(rows);
-      setActiveId((prev) => prev || rows[0]?.id || "");
+      const nextId = activeId || rows[0]?.id || "";
+      setActiveId(nextId);
+      const focus = rows.find((item) => item.id === nextId) || rows[0];
+      if (focus) {
+        setTriage({
+          status: focus.status,
+          process_phase: focus.process_phase || "",
+          urgency_level: focus.urgency_level,
+          director_only_notes: focus.director_only_notes || "",
+          director_notes: focus.director_notes || "",
+        });
+      }
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Error cargando incidentes.");
     } finally {
       setLoading(false);
     }
-  }, [canManage, previewMode]);
+  }, [isSuperAdmin, previewMode, activeId]);
 
   useEffect(() => {
     if (checking) return;
@@ -120,23 +141,32 @@ export default function StudioIncidentesPage() {
 
   const active = visible.find((item) => item.id === activeId) || visible[0];
 
-  async function onSaveCase() {
-    if (!active || !canManage || previewMode) return;
+  useEffect(() => {
+    if (!active) return;
+    setTriage({
+      status: active.status,
+      process_phase: active.process_phase || "",
+      urgency_level: active.urgency_level,
+      director_only_notes: active.director_only_notes || "",
+      director_notes: active.director_notes || "",
+    });
+    setRequestInfoText("");
+  }, [active]);
+
+  async function saveTriage() {
+    if (!active || !isSuperAdmin || previewMode || !triage) return;
     setLoading(true);
     setMessage("");
     try {
-      const notes = (document.getElementById("director_notes") as HTMLTextAreaElement | null)?.value || "";
-      const status = (document.getElementById("director_status") as HTMLSelectElement | null)?.value || active.status;
-
       const res = await fetch(`/api/admin/incidents/${active.id}`, {
         method: "PATCH",
         credentials: "include",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ status, director_notes: notes }),
+        body: JSON.stringify(triage),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo guardar.");
-      setMessage("Caso actualizado.");
+      if (!res.ok) throw new Error(data.error || "No se pudo guardar triage.");
+      setMessage("Triage actualizado por comité.");
       await loadIncidents();
       setActiveId(active.id);
     } catch (err) {
@@ -146,9 +176,8 @@ export default function StudioIncidentesPage() {
     }
   }
 
-
-  async function onResetPin() {
-    if (!active || !canManage || previewMode) return;
+  async function runAction(action: "mark_atendible" | "mark_no_atendible" | "request_info" | "reset_pin") {
+    if (!active || !isSuperAdmin || previewMode) return;
     setLoading(true);
     setMessage("");
     setNewPin("");
@@ -157,15 +186,19 @@ export default function StudioIncidentesPage() {
         method: "POST",
         credentials: "include",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ action: "reset_pin" }),
+        body: JSON.stringify({ action, anonymous: active.anonymous, detail: requestInfoText.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo resetear PIN.");
-      setNewPin(String(data.tracking_pin || ""));
-      setMessage("PIN reseteado. Se muestra solo esta vez.");
+      if (!res.ok) throw new Error(data.error || "No se pudo ejecutar acción.");
+      if (action === "reset_pin") {
+        setNewPin(String(data.tracking_pin || ""));
+      }
+      setMessage("Acción de comité ejecutada correctamente.");
       await loadIncidents();
+      setActiveId(active.id);
+      if (action === "request_info") setRequestInfoText("");
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Error reseteando PIN.");
+      setMessage(err instanceof Error ? err.message : "Error ejecutando acción.");
     } finally {
       setLoading(false);
     }
@@ -173,7 +206,7 @@ export default function StudioIncidentesPage() {
 
   if (checking) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando Canal Confidencial..." /></main>;
 
-  const showDirectorPanel = canManage && !previewMode;
+  const showCommitteePanel = isSuperAdmin && !previewMode;
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -182,27 +215,27 @@ export default function StudioIncidentesPage() {
           <div>
             <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Canal Confidencial</h1>
             <p className="mt-2 text-sm text-slate-600">
-              {showDirectorPanel ? "Panel Director: gestión estratégica y trazabilidad de incidentes reportados." : "Vista colaborador: información, orientación y acceso al reporte/seguimiento."}
+              {showCommitteePanel ? "Acceso Comité (solo superadmins): triage, timeline y gestión interna de incidentes." : "Vista colaborador: información, orientación y acceso al reporte/seguimiento."}
             </p>
           </div>
           <div className="flex gap-2">
             <Link href="/studio" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver al Studio</Link>
             <Link href="/studio/canal-confidencial/reportar" target="_blank" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Abrir formulario público</Link>
-            {canManage ? (
+            {isSuperAdmin ? (
               <button
                 type="button"
                 className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50"
                 onClick={() => setPreviewMode((v) => !v)}
               >
-                {previewMode ? "Volver a vista director" : "Preview vista colaborador"}
+                {previewMode ? "Volver a Acceso Comité" : "Preview vista colaborador"}
               </button>
             ) : null}
           </div>
         </div>
 
-        {!showDirectorPanel ? <CollaboratorView /> : null}
+        {!showCommitteePanel ? <CollaboratorView /> : null}
 
-        {showDirectorPanel ? (
+        {showCommitteePanel ? (
           <div className="mt-6 grid gap-4 lg:grid-cols-[320px_1fr]">
             <section className="rounded-2xl border border-slate-200 bg-white p-4">
               <div className="flex items-center justify-between gap-2">
@@ -231,7 +264,7 @@ export default function StudioIncidentesPage() {
             </section>
 
             <section className="rounded-2xl border border-slate-200 bg-white p-5">
-              {!active ? <p className="text-sm text-slate-600">Selecciona un caso para ver detalle.</p> : (
+              {!active || !triage ? <p className="text-sm text-slate-600">Selecciona un caso para ver detalle.</p> : (
                 <div className="grid gap-4">
                   <div>
                     <h2 className="text-xl font-semibold text-slate-900">{active.case_code}</h2>
@@ -241,8 +274,6 @@ export default function StudioIncidentesPage() {
                   <div className="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 sm:grid-cols-2">
                     <div><strong>Tipo:</strong> {active.type}</div>
                     <div><strong>Fecha evento:</strong> {active.event_date}</div>
-                    <div><strong>Estado:</strong> {active.status}</div>
-                    <div><strong>Urgencia:</strong> {active.urgency_level}</div>
                     <div><strong>Anónimo:</strong> {active.anonymous ? "Sí" : "No"}</div>
                     <div><strong>Contacto:</strong> {active.reporter_email || "No informado"}</div>
                     <div><strong>Creado:</strong> {new Date(active.created_at).toLocaleString()}</div>
@@ -254,47 +285,62 @@ export default function StudioIncidentesPage() {
                     <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{active.description}</p>
                   </div>
 
-                  {role === "superadmin" ? (
-                    <div>
-                      <h3 className="text-sm font-semibold text-slate-800">Sugerencia automática (solo director)</h3>
-                      <p className="mt-1 text-sm text-slate-700">{active.suggested_action}</p>
-                    </div>
-                  ) : null}
-
-                  {active.attachments?.length ? (
-                    <div className="grid gap-2">
-                      {active.attachments.map((url, idx) => (
-                        <a key={`${url}-${idx}`} href={url} target="_blank" rel="noreferrer" className="inline-flex w-fit rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
-                          Ver evidencia adjunta {active.attachments && active.attachments.length > 1 ? `#${idx + 1}` : ""}
-                        </a>
-                      ))}
-                    </div>
-                  ) : null}
-
                   <div className="grid gap-2 sm:grid-cols-2">
                     <label className="grid gap-1">
-                      <span className="text-xs font-semibold text-slate-600">Estado director</span>
-                      <select id="director_status" defaultValue={active.status} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                      <span className="text-xs font-semibold text-slate-600">Estado</span>
+                      <select value={triage.status} onChange={(e) => setTriage((prev) => prev ? { ...prev, status: e.target.value as Incident["status"] } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
                         {STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
                       </select>
                     </label>
                     <label className="grid gap-1">
-                      <span className="text-xs font-semibold text-slate-600">Notas director</span>
-                      <textarea id="director_notes" defaultValue={active.director_notes || ""} rows={4} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                      <span className="text-xs font-semibold text-slate-600">Fase</span>
+                      <input value={triage.process_phase} onChange={(e) => setTriage((prev) => prev ? { ...prev, process_phase: e.target.value } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                    </label>
+                    <label className="grid gap-1">
+                      <span className="text-xs font-semibold text-slate-600">Urgencia</span>
+                      <select value={triage.urgency_level} onChange={(e) => setTriage((prev) => prev ? { ...prev, urgency_level: e.target.value as Incident["urgency_level"] } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                        {URGENCIES.map((urgency) => <option key={urgency} value={urgency}>{urgency}</option>)}
+                      </select>
+                    </label>
+                    <label className="grid gap-1">
+                      <span className="text-xs font-semibold text-slate-600">Responsable comité</span>
+                      <input value={triage.director_only_notes} onChange={(e) => setTriage((prev) => prev ? { ...prev, director_only_notes: e.target.value } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="nombre o correo" />
+                    </label>
+                    <label className="grid gap-1 sm:col-span-2">
+                      <span className="text-xs font-semibold text-slate-600">Notas internas del comité</span>
+                      <textarea value={triage.director_notes} onChange={(e) => setTriage((prev) => prev ? { ...prev, director_notes: e.target.value } : prev)} rows={4} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
                     </label>
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => onSaveCase()} disabled={loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-                      Guardar cambios
+                    <button type="button" onClick={saveTriage} disabled={loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                      Guardar triage
+                    </button>
+                    <button type="button" onClick={() => runAction("mark_atendible")} disabled={loading} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
+                      Marcar atendible
+                    </button>
+                    <button type="button" onClick={() => runAction("mark_no_atendible")} disabled={loading} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
+                      Marcar no atendible
+                    </button>
+                    <button type="button" onClick={() => runAction("reset_pin")} disabled={loading} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
+                      Resetear PIN
                     </button>
                     <button type="button" onClick={() => loadIncidents()} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50" disabled={loading}>
                       Recargar
                     </button>
-                    <button type="button" onClick={() => onResetPin()} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50" disabled={loading}>
-                      Resetear PIN
-                    </button>
                   </div>
+
+                  {!active.anonymous ? (
+                    <div className="rounded-xl border border-slate-200 p-3">
+                      <h3 className="text-sm font-semibold text-slate-800">Solicitar información adicional</h3>
+                      <textarea value={requestInfoText} onChange={(e) => setRequestInfoText(e.target.value)} rows={3} placeholder="Detalle de la información requerida" className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                      <button type="button" onClick={() => runAction("request_info")} disabled={loading} className="mt-2 rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
+                        Solicitar información adicional
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-500">Caso anónimo: no se puede solicitar información adicional por contacto directo.</p>
+                  )}
 
                   {message ? <p className="text-sm text-slate-600">{message}</p> : null}
 
@@ -304,12 +350,28 @@ export default function StudioIncidentesPage() {
                     </div>
                   ) : null}
 
+                  {active.attachments?.length ? (
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-800">Adjuntos</h3>
+                      <div className="mt-2 grid gap-2">
+                        {active.attachments.map((url, idx) => (
+                          <a key={`${url}-${idx}`} href={url} target="_blank" rel="noreferrer" className="inline-flex w-fit rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
+                            Ver adjunto {active.attachments && active.attachments.length > 1 ? `#${idx + 1}` : ""}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-800">Auditoría</h3>
+                    <h3 className="text-sm font-semibold text-slate-800">Timeline (incident_events)</h3>
                     <div className="mt-2 grid gap-2">
                       {active.audit_log.map((row, idx) => (
                         <div key={`${row.at}-${idx}`} className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700">
-                          <strong>{new Date(row.at).toLocaleString()}</strong> · {row.actor} · {row.action}{row.detail ? ` · ${row.detail}` : ""}
+                          <strong>{new Date(row.at).toLocaleString()}</strong> · {row.action} · {row.actor}
+                          {row.actor_email ? ` (${row.actor_email})` : ""}
+                          {row.actor_kind ? ` · ${row.actor_kind}` : ""}
+                          {row.detail ? ` · ${row.detail}` : ""}
                         </div>
                       ))}
                     </div>
