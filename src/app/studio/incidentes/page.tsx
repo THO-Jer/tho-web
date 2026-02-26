@@ -72,6 +72,7 @@ export default function StudioIncidentesPage() {
   const [canManage, setCanManage] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const [role, setRole] = useState("");
+  const [newPin, setNewPin] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
@@ -140,6 +141,31 @@ export default function StudioIncidentesPage() {
       setActiveId(active.id);
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Error actualizando caso.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+
+  async function onResetPin() {
+    if (!active || !canManage || previewMode) return;
+    setLoading(true);
+    setMessage("");
+    setNewPin("");
+    try {
+      const res = await fetch(`/api/admin/incidents/${active.id}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "reset_pin" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo resetear PIN.");
+      setNewPin(String(data.tracking_pin || ""));
+      setMessage("PIN reseteado. Se muestra solo esta vez.");
+      await loadIncidents();
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Error reseteando PIN.");
     } finally {
       setLoading(false);
     }
@@ -265,9 +291,18 @@ export default function StudioIncidentesPage() {
                     <button type="button" onClick={() => loadIncidents()} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50" disabled={loading}>
                       Recargar
                     </button>
+                    <button type="button" onClick={() => onResetPin()} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50" disabled={loading}>
+                      Resetear PIN
+                    </button>
                   </div>
 
                   {message ? <p className="text-sm text-slate-600">{message}</p> : null}
+
+                  {newPin ? (
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                      Nuevo PIN (mostrar una sola vez): <strong>{newPin}</strong>
+                    </div>
+                  ) : null}
 
                   <div>
                     <h3 className="text-sm font-semibold text-slate-800">Auditoría</h3>

@@ -166,7 +166,7 @@ async function ensureStore() {
 async function readStore(): Promise<InternalIncident[]> {
   if (hasSupabaseStore()) {
     const incidents = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?select=*&order=created_at.desc`)) as Array<Partial<InternalIncident>>;
-    const events = (await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}?select=incident_id,at,actor,action,detail&order=at.asc`)) as Array<Record<string, unknown>>;
+    const events = (await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}?select=incident_id,at,actor_kind,actor_email,actor,action,detail&order=at.asc`)) as Array<Record<string, unknown>>;
     const attachments = (await supabaseRequest(`/rest/v1/${INCIDENT_ATTACHMENTS_TABLE}?select=incident_id,url,created_at&order=created_at.desc`)) as Array<Record<string, unknown>>;
 
     const eventsByIncident = new Map<string, IncidentAudit[]>();
@@ -382,10 +382,31 @@ export async function listIncidents() {
   return readStore();
 }
 
+
+async function appendIncidentEvent(input: { incidentId: string; actorKind: string; actorEmail?: string; actor: string; action: string; detail?: string; at?: string }) {
+  const at = input.at || new Date().toISOString();
+  if (hasSupabaseStore()) {
+    await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
+      method: "POST",
+      body: JSON.stringify([{
+        incident_id: input.incidentId,
+        at,
+        actor_kind: input.actorKind,
+        actor_email: input.actorEmail || null,
+        actor: input.actor,
+        action: input.action,
+        detail: input.detail || null,
+      }]),
+    });
+    return;
+  }
+}
+
 export async function updateIncidentById(
   id: string,
   patch: { status?: IncidentStatus; director_notes?: string; director_only_notes?: string },
-  actor = "director"
+  actor = "director",
+  actorKind = "admin"
 ) {
   if (hasSupabaseStore()) {
     const rows = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?select=*&id=eq.${encodeURIComponent(id)}&limit=1`)) as Array<Partial<InternalIncident>>;
@@ -405,10 +426,27 @@ export async function updateIncidentById(
       }),
     })) as Array<Partial<InternalIncident>>;
 
-    await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
-      method: "POST",
-      body: JSON.stringify([{ incident_id: id, at: now, actor_kind: "director", actor_email: actor.includes("@") ? actor : null, actor, action: "Actualización de caso", detail: `Estado: ${current.status} -> ${nextStatus}` }]),
+    await appendIncidentEvent({
+      incidentId: id,
+      actorKind,
+      actorEmail: actor.includes("@") ? actor : undefined,
+      actor,
+      action: "UPDATE_STATUS",
+      detail: `Estado: ${current.status} -> ${nextStatus}` ,
+      at: now,
     });
+
+    if (typeof patch.director_notes === "string") {
+      await appendIncidentEvent({
+        incidentId: id,
+        actorKind,
+        actorEmail: actor.includes("@") ? actor : undefined,
+        actor,
+        action: "ADD_NOTE",
+        detail: "Actualiza notas de gestión",
+        at: now,
+      });
+    }
 
     return withDefaults(updatedRows[0]);
   }
@@ -434,7 +472,7 @@ export async function updateIncidentById(
         actor_kind: "director",
         actor_email: actor.includes("@") ? actor : undefined,
         actor,
-        action: "Actualización de caso",
+        action: "UPDATE_STATUS",
         detail: `Estado: ${current.status} -> ${nextStatus}`,
       },
     ],
@@ -443,6 +481,53 @@ export async function updateIncidentById(
   rows[idx] = next;
   await writeStore(rows);
   return next;
+}
+
+
+export async function resetIncidentTrackingPin(id: string, actor = "admin", actorKind = "admin") {
+  const newPin = generateTrackingPin();
+  const hash = pinHash(newPin);
+  const now = new Date().toISOString();
+
+  if (hasSupabaseStore()) {
+    const rows = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ tracking_pin_hash: hash, last_updated_at: now }),
+    })) as Array<Partial<InternalIncident>>;
+    if (!rows[0]) throw new Error("Caso no encontrado.");
+    await appendIncidentEvent({
+      incidentId: id,
+      actorKind,
+      actorEmail: actor.includes("@") ? actor : undefined,
+      actor,
+      action: "RESET_PIN",
+      detail: "Rotación manual de PIN por administración",
+      at: now,
+    });
+    return { incident: withDefaults(rows[0]), trackingPin: newPin };
+  }
+
+  const rows = await readStore();
+  const idx = rows.findIndex((row) => row.id === id);
+  if (idx < 0) throw new Error("Caso no encontrado.");
+  rows[idx] = {
+    ...rows[idx],
+    tracking_pin_hash: hash,
+    last_updated_at: now,
+    audit_log: [
+      ...rows[idx].audit_log,
+      {
+        at: now,
+        actor_kind: actorKind,
+        actor_email: actor.includes("@") ? actor : undefined,
+        actor,
+        action: "RESET_PIN",
+        detail: "Rotación manual de PIN por administración",
+      },
+    ],
+  };
+  await writeStore(rows);
+  return { incident: rows[idx], trackingPin: newPin };
 }
 
 export async function getIncidentByTracking(trackingCode: string, pin: string) {

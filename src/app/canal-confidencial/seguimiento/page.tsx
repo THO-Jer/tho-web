@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { incidentsCopy } from "@/content/incidentsCopy";
+
 type Snapshot = {
   status: string;
   process_phase: string;
@@ -29,10 +31,10 @@ export default function SeguimientoIncidentePage() {
         body: JSON.stringify({ tracking_code: trackingCode.trim().toUpperCase(), pin: pin.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo consultar el caso.");
+      if (!res.ok) throw new Error(incidentsCopy.invalidTrackingMessage);
       setSnapshot(data.incident || null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error consultando seguimiento.");
+    } catch {
+      setError(incidentsCopy.invalidTrackingMessage);
     } finally {
       setLoading(false);
     }
@@ -42,9 +44,7 @@ export default function SeguimientoIncidentePage() {
     <main className="min-h-screen bg-tho-bg px-4 py-10">
       <section className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Seguimiento de incidente</h1>
-        <p className="mt-3 text-sm text-slate-600">
-          Ingresa tu código de seguimiento y PIN para revisar únicamente estado y fase del proceso.
-        </p>
+        <p className="mt-3 text-sm text-slate-600">{incidentsCopy.trackingIntro}</p>
 
         <form onSubmit={onSubmit} className="mt-6 grid gap-4">
           <label className="grid gap-1">
@@ -83,6 +83,13 @@ export default function SeguimientoIncidentePage() {
         ) : null}
 
         {error ? <p className="mt-4 text-sm text-rose-700">{error}</p> : null}
+
+        <div className="mt-6 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+          <p><strong>¿Perdiste tu PIN?</strong></p>
+          <p className="mt-1">{incidentsCopy.lostPinMessage}</p>
+          <p className="mt-1">{incidentsCopy.lostPinContactMessage}</p>
+          <p className="mt-1">{incidentsCopy.lostPinAnonymousMessage}</p>
+        </div>
       </section>
     </main>
   );

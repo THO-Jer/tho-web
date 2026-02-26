@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { BrandLoader } from "@/components/BrandLoader";
+import { incidentsCopy } from "@/content/incidentsCopy";
 
 const INCIDENT_TYPES = ["Acoso laboral", "Acoso sexual", "Maltrato", "Conflicto ético", "Otro"] as const;
 
@@ -67,6 +68,21 @@ export default function StudioCanalConfidencialReportarPage() {
     }
   }
 
+  async function onCopy(value: string) {
+    if (!value) return;
+    try {
+      await navigator.clipboard.writeText(value);
+    } catch {
+      // no-op
+    }
+  }
+
+  function onAcknowledgeAndClear() {
+    setSuccessCaseCode("");
+    setTrackingCode("");
+    setTrackingPin("");
+  }
+
   if (checking) {
     return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando formulario..." /></main>;
   }
@@ -76,7 +92,7 @@ export default function StudioCanalConfidencialReportarPage() {
       <section className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Formulario de reporte confidencial</h1>
         <p className="mt-3 text-sm text-slate-600">
-          Completa los datos solicitados. El relato original será resguardado como registro base.
+          Completa los datos solicitados. El relato original se resguarda sin modificaciones.
         </p>
 
         <form className="mt-6 grid gap-4" onSubmit={onSubmit}>
@@ -140,8 +156,19 @@ export default function StudioCanalConfidencialReportarPage() {
           <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
             <p>Reporte enviado con éxito. Código de caso: <strong>{successCaseCode}</strong></p>
             <p className="mt-1">Código de seguimiento: <strong>{trackingCode}</strong></p>
-            <p className="mt-1">PIN de seguimiento: <strong>{trackingPin}</strong> (se muestra solo una vez).</p>
-            <p className="mt-1 text-xs">Guarda tracking code y PIN; el sistema público no puede recuperar el PIN.</p>
+            <p className="mt-1">PIN de seguimiento: <strong>{trackingPin}</strong></p>
+            <p className="mt-1 text-xs">{incidentsCopy.pinOneTimeWarning}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button type="button" onClick={() => onCopy(trackingCode)} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold">
+                Copiar código
+              </button>
+              <button type="button" onClick={() => onCopy(trackingPin)} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold">
+                Copiar PIN
+              </button>
+              <button type="button" onClick={onAcknowledgeAndClear} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold">
+                Entiendo / Continuar
+              </button>
+            </div>
             <Link href="/canal-confidencial/seguimiento" className="mt-3 inline-flex rounded-md border border-emerald-300 px-3 py-1.5 font-semibold">
               Consultar estado del caso
             </Link>
