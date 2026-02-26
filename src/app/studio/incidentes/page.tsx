@@ -50,7 +50,7 @@ function CollaboratorView() {
       </ul>
 
       <div className="mt-5 flex flex-wrap gap-2">
-        <Link href="/canal-confidencial" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
+        <Link href="/studio/canal-confidencial/reportar" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
           Crear nuevo reporte
         </Link>
         <Link href="/canal-confidencial/seguimiento" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
@@ -161,7 +161,7 @@ export default function StudioIncidentesPage() {
           </div>
           <div className="flex gap-2">
             <Link href="/studio" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver al Studio</Link>
-            <Link href="/canal-confidencial" target="_blank" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Abrir formulario público</Link>
+            <Link href="/studio/canal-confidencial/reportar" target="_blank" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Abrir formulario público</Link>
             {canManage ? (
               <button
                 type="button"

@@ -3,14 +3,10 @@
 import { useState } from "react";
 
 type Snapshot = {
-  case_code: string;
-  tracking_code: string;
   status: string;
   process_phase: string;
-  status_started_at: string;
-  status_max_days: number;
-  status_deadline_at: string;
-  legal_note: string;
+  last_updated_at: string;
+  institutional_note: string;
 };
 
 export default function SeguimientoIncidentePage() {
@@ -79,13 +75,10 @@ export default function SeguimientoIncidentePage() {
 
         {snapshot ? (
           <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-            <p><strong>Caso:</strong> {snapshot.case_code}</p>
             <p><strong>Estado:</strong> {snapshot.status}</p>
             <p><strong>Fase del proceso:</strong> {snapshot.process_phase}</p>
-            <p><strong>Estado vigente desde:</strong> {new Date(snapshot.status_started_at).toLocaleString()}</p>
-            <p><strong>Plazo máximo del estado:</strong> {snapshot.status_max_days} días</p>
-            <p><strong>Fecha límite referencial:</strong> {new Date(snapshot.status_deadline_at).toLocaleDateString()}</p>
-            <p className="mt-2 text-xs text-slate-500">{snapshot.legal_note}</p>
+            <p><strong>Última actualización:</strong> {new Date(snapshot.last_updated_at).toLocaleString()}</p>
+            <p className="mt-2 text-xs text-slate-500">{snapshot.institutional_note}</p>
           </div>
         ) : null}
 

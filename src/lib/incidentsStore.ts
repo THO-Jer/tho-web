@@ -254,19 +254,11 @@ export function getIncidentSla(status: IncidentStatus) {
 }
 
 export function getIncidentPublicSnapshot(incident: InternalIncident) {
-  const slaDays = getIncidentSla(incident.status);
-  const startedAt = incident.last_updated_at || incident.created_at;
-  const deadline = new Date(new Date(startedAt).getTime() + slaDays * 24 * 60 * 60 * 1000).toISOString();
-
   return {
-    case_code: incident.case_code,
-    tracking_code: incident.tracking_code,
     status: incident.status,
     process_phase: incident.process_phase,
-    status_started_at: startedAt,
-    status_max_days: slaDays,
-    status_deadline_at: deadline,
-    legal_note: "Plazos referenciales para gestión interna alineada a Ley Karin.",
+    last_updated_at: incident.last_updated_at || incident.created_at,
+    institutional_note: "Canal interno de THO con confidencialidad y debido proceso en cada etapa.",
   };
 }
 

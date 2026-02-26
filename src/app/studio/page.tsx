@@ -42,7 +42,7 @@ const modules: ModuleItem[] = [
   {
     title: "Canal Confidencial de Incidentes",
     desc: "Recepción formal de denuncias y panel Director con trazabilidad y gestión por estado.",
-    href: "/studio/incidentes",
+    href: "/studio/canal-confidencial",
     status: "Activo",
     external: false,
     allowed: (p) => Boolean(p?.canIncidents),
