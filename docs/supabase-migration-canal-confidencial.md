@@ -30,7 +30,7 @@ create table if not exists public.studio_roles (
   role text not null default 'member',
   active boolean not null default true,
   blocked boolean not null default false,
-  provider text not null default 'any',
+  provider text not null default 'any', -- hint de origen, no bloqueo duro de auth
   can_blog boolean not null default false,
   can_crm boolean not null default false,
   can_incidents boolean not null default false,
@@ -48,7 +48,7 @@ create table if not exists public.studio_login_logs (
 create table if not exists public.studio_access_requests (
   id bigserial primary key,
   email text not null,
-  provider text not null default 'any',
+  provider text not null default 'any', -- hint de origen, no bloqueo duro de auth
   status text not null default 'pending',
   requested_at timestamptz not null default now(),
   resolved_at timestamptz
@@ -63,7 +63,6 @@ create table if not exists public.incidents (
   description text not null,
   event_date date not null,
   involved_people text,
-  attachment_url text,
   anonymous boolean not null default true,
   reporter_email text,
   created_at timestamptz not null default now(),
@@ -83,6 +82,8 @@ create table if not exists public.incident_events (
   id bigserial primary key,
   incident_id uuid not null references public.incidents(id) on delete cascade,
   at timestamptz not null default now(),
+  actor_kind text not null,
+  actor_email text,
   actor text not null,
   action text not null,
   detail text
@@ -121,3 +122,10 @@ create table if not exists public.incident_attachments (
 3. Iniciar sesión en `/studio`
 4. Crear incidente desde `/canal-confidencial`
 5. Verificar filas en `incidents`, `incident_events` y, si aplica, `incident_attachments`
+
+
+## 7) Seguridad de acceso a datos
+
+- No consultar tablas sensibles desde el cliente web.
+- Mantener operaciones sensibles (roles, incidentes, eventos, adjuntos) exclusivamente vía API server-side.
+- Activar RLS en tablas de negocio y usar service role sólo en API server-side.

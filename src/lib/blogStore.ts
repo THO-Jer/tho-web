@@ -49,7 +49,7 @@ function getSupabaseEnv() {
     .trim()
     .replace(/^ttps:\/\//, "https://")
     .replace(/\/$/, "");
-  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY || "").trim();
+  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   return { url, service };
 }
 

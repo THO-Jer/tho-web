@@ -10,6 +10,8 @@ export type UrgencyLevel = "Bajo" | "Medio" | "Alto";
 
 export type IncidentAudit = {
   at: string;
+  actor_kind: string;
+  actor_email?: string;
   actor: string;
   action: string;
   detail?: string;
@@ -24,7 +26,7 @@ export type InternalIncident = {
   description: string;
   event_date: string;
   involved_people?: string;
-  attachment_url?: string;
+  attachments?: string[];
   anonymous: boolean;
   reporter_email?: string;
   created_at: string;
@@ -55,7 +57,7 @@ const STATUS_SLA_DAYS: Record<IncidentStatus, number> = {
 
 function getSupabaseEnv() {
   const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
-  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY || "").trim();
+  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   return { url, service };
 }
 
@@ -98,7 +100,14 @@ function getSecuritySalt() {
 }
 
 function pinHash(pin: string) {
-  return crypto.createHash("sha256").update(`${getSecuritySalt()}:${pin}`).digest("hex");
+  return crypto.scryptSync(pin, getSecuritySalt(), 64).toString("hex");
+}
+
+function isPinValid(pin: string, hash: string) {
+  const left = Buffer.from(pinHash(pin.trim()), "hex");
+  const right = Buffer.from(hash, "hex");
+  if (left.length !== right.length) return false;
+  return crypto.timingSafeEqual(left, right);
 }
 
 function getPhaseFromStatus(status: IncidentStatus) {
@@ -127,7 +136,11 @@ function withDefaults(row: Partial<InternalIncident>): InternalIncident {
     description: row.description || "",
     event_date: row.event_date || new Date().toISOString().slice(0, 10),
     involved_people: row.involved_people || undefined,
-    attachment_url: row.attachment_url || undefined,
+    attachments: Array.isArray((row as Partial<InternalIncident>).attachments)
+      ? ((row as Partial<InternalIncident>).attachments as string[]).filter(Boolean)
+      : row.attachment_url
+      ? [String((row as Partial<Record<string, unknown>>).attachment_url)]
+      : undefined,
     anonymous: Boolean(row.anonymous),
     reporter_email: row.reporter_email || undefined,
     created_at: row.created_at || new Date().toISOString(),
@@ -165,18 +178,28 @@ async function readStore(): Promise<InternalIncident[]> {
       const incidentId = String(row.incident_id || "");
       if (!incidentId) continue;
       const arr = eventsByIncident.get(incidentId) || [];
-      arr.push({ at: String(row.at || new Date().toISOString()), actor: String(row.actor || "system"), action: String(row.action || "Evento"), detail: row.detail ? String(row.detail) : undefined });
+      arr.push({
+        at: String(row.at || new Date().toISOString()),
+        actor_kind: String(row.actor_kind || "system"),
+        actor_email: row.actor_email ? String(row.actor_email) : undefined,
+        actor: String(row.actor || row.actor_email || row.actor_kind || "system"),
+        action: String(row.action || "Evento"),
+        detail: row.detail ? String(row.detail) : undefined,
+      });
       eventsByIncident.set(incidentId, arr);
     }
 
-    const attachmentMap = new Map<string, string>();
+    const attachmentMap = new Map<string, string[]>();
     for (const row of attachments) {
       const incidentId = String(row.incident_id || "");
-      if (!incidentId || attachmentMap.has(incidentId)) continue;
-      attachmentMap.set(incidentId, String(row.url || ""));
+      if (!incidentId) continue;
+      const arr = attachmentMap.get(incidentId) || [];
+      const url = String(row.url || "");
+      if (url) arr.push(url);
+      attachmentMap.set(incidentId, arr);
     }
 
-    return incidents.map((row) => withDefaults({ ...row, attachment_url: attachmentMap.get(String(row.id || "")), audit_log: eventsByIncident.get(String(row.id || "")) || [] }));
+    return incidents.map((row) => withDefaults({ ...row, attachments: attachmentMap.get(String(row.id || "")) || [], audit_log: eventsByIncident.get(String(row.id || "")) || [] }));
   }
 
   if (requireSupabaseInProduction()) {
@@ -256,7 +279,7 @@ export async function createIncident(input: {
   description: string;
   event_date: string;
   involved_people?: string;
-  attachment_url?: string;
+  attachments?: string[];
   anonymous: boolean;
   reporter_email?: string;
   sourceIp?: string;
@@ -282,7 +305,7 @@ export async function createIncident(input: {
     description: input.description.trim(),
     event_date: input.event_date,
     involved_people: input.involved_people?.trim() || undefined,
-    attachment_url: input.attachment_url?.trim() || undefined,
+
     anonymous: Boolean(input.anonymous),
     reporter_email: input.anonymous ? undefined : input.reporter_email?.trim().toLowerCase(),
     created_at: now,
@@ -299,6 +322,8 @@ export async function createIncident(input: {
     audit_log: [
       {
         at: now,
+        actor_kind: "system",
+        actor_email: undefined,
         actor: "system",
         action: "Caso creado",
         detail: "Ingreso de denuncia por canal confidencial.",
@@ -315,7 +340,7 @@ export async function createIncident(input: {
     });
     await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
       method: "POST",
-      body: JSON.stringify([{ incident_id: created.id, at: now, actor: "system", action: "Caso creado", detail: "Ingreso de denuncia por canal confidencial." }]),
+      body: JSON.stringify([{ incident_id: created.id, at: now, actor_kind: "system", actor_email: null, actor: "system", action: "Caso creado", detail: "Ingreso de denuncia por canal confidencial." }]),
     });
     return { incident: created, trackingPin };
   }
@@ -340,13 +365,10 @@ export async function attachIncidentEvidence(caseCode: string, attachmentUrl: st
     });
     await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
       method: "POST",
-      body: JSON.stringify([{ incident_id: incident.id, at: now, actor: "system", action: "Evidencia adjuntada", detail: attachmentUrl }]),
+      body: JSON.stringify([{ incident_id: incident.id, at: now, actor_kind: "system", actor_email: null, actor: "system", action: "Evidencia adjuntada", detail: attachmentUrl }]),
     });
-    const updated = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?id=eq.${encodeURIComponent(String(incident.id))}`, {
-      method: "PATCH",
-      body: JSON.stringify({ attachment_url: attachmentUrl, last_updated_at: now }),
-    })) as Array<Partial<InternalIncident>>;
-    return withDefaults(updated[0]);
+    const refreshed = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?select=*&id=eq.${encodeURIComponent(String(incident.id))}&limit=1`)) as Array<Partial<InternalIncident>>;
+    return withDefaults({ ...(refreshed[0] || incident), attachments: [attachmentUrl] });
   }
 
   const rows = await readStore();
@@ -356,11 +378,11 @@ export async function attachIncidentEvidence(caseCode: string, attachmentUrl: st
   const now = new Date().toISOString();
   rows[idx] = {
     ...rows[idx],
-    attachment_url: attachmentUrl,
+attachments: [...(rows[idx].attachments || []), attachmentUrl],
     last_updated_at: now,
     audit_log: [
       ...rows[idx].audit_log,
-      { at: now, actor: "system", action: "Evidencia adjuntada", detail: attachmentUrl },
+      { at: now, actor_kind: "system", actor_email: undefined, actor: "system", action: "Evidencia adjuntada", detail: attachmentUrl },
     ],
   };
 
@@ -397,7 +419,7 @@ export async function updateIncidentById(
 
     await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
       method: "POST",
-      body: JSON.stringify([{ incident_id: id, at: now, actor, action: "Actualización de caso", detail: `Estado: ${current.status} -> ${nextStatus}` }]),
+      body: JSON.stringify([{ incident_id: id, at: now, actor_kind: "director", actor_email: actor.includes("@") ? actor : null, actor, action: "Actualización de caso", detail: `Estado: ${current.status} -> ${nextStatus}` }]),
     });
 
     return withDefaults(updatedRows[0]);
@@ -421,6 +443,8 @@ export async function updateIncidentById(
       ...current.audit_log,
       {
         at: now,
+        actor_kind: "director",
+        actor_email: actor.includes("@") ? actor : undefined,
         actor,
         action: "Actualización de caso",
         detail: `Estado: ${current.status} -> ${nextStatus}`,
@@ -439,9 +463,7 @@ export async function getIncidentByTracking(trackingCode: string, pin: string) {
   if (!incident) return null;
   if (!incident.tracking_pin_hash) return null;
 
-  if (incident.tracking_pin_hash !== pinHash(pin.trim())) {
-    return null;
-  }
+  if (!isPinValid(pin, incident.tracking_pin_hash)) return null;
 
   return getIncidentPublicSnapshot(incident);
 }

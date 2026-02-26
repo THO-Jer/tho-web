@@ -59,7 +59,7 @@ const ROLE_REQUESTS_TABLE = process.env.STUDIO_ACCESS_REQUESTS_TABLE || "studio_
 
 function getSupabaseEnv() {
   const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
-  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY || "").trim();
+  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   return { url, service };
 }
 

@@ -15,7 +15,7 @@ type Incident = {
   event_date: string;
   anonymous: boolean;
   reporter_email?: string;
-  attachment_url?: string;
+  attachments?: string[];
   status: "Recibido" | "En revisión" | "Derivado" | "Cerrado";
   urgency_level: "Bajo" | "Medio" | "Alto";
   suggested_action: string;
@@ -235,10 +235,14 @@ export default function StudioIncidentesPage() {
                     </div>
                   ) : null}
 
-                  {active.attachment_url ? (
-                    <a href={active.attachment_url} target="_blank" rel="noreferrer" className="inline-flex w-fit rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
-                      Ver evidencia adjunta
-                    </a>
+                  {active.attachments?.length ? (
+                    <div className="grid gap-2">
+                      {active.attachments.map((url, idx) => (
+                        <a key={`${url}-${idx}`} href={url} target="_blank" rel="noreferrer" className="inline-flex w-fit rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
+                          Ver evidencia adjunta {active.attachments && active.attachments.length > 1 ? `#${idx + 1}` : ""}
+                        </a>
+                      ))}
+                    </div>
                   ) : null}
 
                   <div className="grid gap-2 sm:grid-cols-2">
