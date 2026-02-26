@@ -136,11 +136,7 @@ function withDefaults(row: Partial<InternalIncident>): InternalIncident {
     description: row.description || "",
     event_date: row.event_date || new Date().toISOString().slice(0, 10),
     involved_people: row.involved_people || undefined,
-    attachments: Array.isArray((row as Partial<InternalIncident>).attachments)
-      ? ((row as Partial<InternalIncident>).attachments as string[]).filter(Boolean)
-      : row.attachment_url
-      ? [String((row as Partial<Record<string, unknown>>).attachment_url)]
-      : undefined,
+    attachments: Array.isArray(row.attachments) ? row.attachments.filter(Boolean) : undefined,
     anonymous: Boolean(row.anonymous),
     reporter_email: row.reporter_email || undefined,
     created_at: row.created_at || new Date().toISOString(),
