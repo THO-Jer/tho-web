@@ -8,12 +8,15 @@ import { BrandLoader } from "@/components/BrandLoader";
 
 type SessionData = {
   authenticated: boolean;
+  role?: string;
+  canManageAccess?: boolean;
   permissions?: { canIncidents?: boolean };
 };
 
 export default function StudioCanalConfidencialLandingPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
+  const [showCommitteeAccess, setShowCommitteeAccess] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
@@ -23,6 +26,8 @@ export default function StudioCanalConfidencialLandingPage() {
           router.replace("/studio");
           return;
         }
+        const isSuperAdmin = String(data.role || "") === "superadmin";
+        setShowCommitteeAccess(isSuperAdmin || Boolean(data.canManageAccess));
       })
       .catch(() => router.replace("/studio"))
       .finally(() => setChecking(false));
@@ -62,6 +67,11 @@ export default function StudioCanalConfidencialLandingPage() {
           <Link href="/canal-confidencial/seguimiento" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
             Consultar un caso existente
           </Link>
+          {showCommitteeAccess ? (
+            <Link href="/studio/incidentes" className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-100">
+              Acceso Comité (panel interno)
+            </Link>
+          ) : null}
           <Link href="/studio" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
             Volver al Studio
           </Link>
