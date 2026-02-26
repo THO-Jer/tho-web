@@ -320,11 +320,33 @@ export async function createIncident(input: {
   };
 
   if (hasSupabaseStore()) {
+    const incidentInsert = {
+      id: created.id,
+      case_code: created.case_code,
+      tracking_code: created.tracking_code,
+      tracking_pin_hash: created.tracking_pin_hash,
+      type: created.type,
+      description: created.description,
+      event_date: created.event_date,
+      involved_people: created.involved_people || null,
+      anonymous: created.anonymous,
+      reporter_email: created.reporter_email || null,
+      created_at: created.created_at,
+      status: created.status,
+      process_phase: created.process_phase,
+      urgency_level: created.urgency_level,
+      suggested_action: created.suggested_action,
+      director_notes: created.director_notes || "",
+      internal_suggestion_urgency: created.internal_suggestion_urgency || created.urgency_level,
+      internal_suggestion_action: created.internal_suggestion_action || created.suggested_action,
+      director_only_notes: created.director_only_notes || "",
+      last_updated_at: created.last_updated_at,
+      ip_hash: created.ip_hash || null,
+    };
+
     await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}`, {
       method: "POST",
-      body: JSON.stringify([{
-        ...created,
-      }]),
+      body: JSON.stringify([incidentInsert]),
     });
     await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
       method: "POST",
