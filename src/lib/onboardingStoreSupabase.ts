@@ -40,10 +40,16 @@ export function hasOnboardingSupabaseStore(onboardingStore: string) {
   return process.env.NODE_ENV === "production" ? Boolean(url && service) : Boolean(url && service);
 }
 
+function normalizeTrack(value: unknown): OnboardingRecord["track"] {
+  const track = String(value || "general").trim();
+  if (["sales", "creative_ops", "advisory_ops", "general"].includes(track)) return track as OnboardingRecord["track"];
+  return "general";
+}
+
 function recordFromProgressRow(row: Record<string, unknown>): OnboardingRecord {
   return {
     email: String(row.email || "").trim().toLowerCase(),
-    track: String(row.track || "general"),
+    track: normalizeTrack(row.track),
     started_at: String(row.created_at || row.updated_at || new Date().toISOString()),
     completed_at: row.completed_at ? String(row.completed_at) : undefined,
     completed_units: Array.isArray(row.completed_units) ? row.completed_units.map((u) => String(u)).filter(Boolean) : [],
@@ -148,4 +154,20 @@ export async function upsertOnboardingSupabaseQuizResult(input: {
       }]),
     }).catch(() => null);
   }
+}
+
+export async function getStudioRoleTeamByEmail(email: string) {
+  const normalized = String(email || "").trim().toLowerCase();
+  if (!normalized) return "general" as const;
+
+  const roleTable = process.env.STUDIO_ROLES_TABLE || "studio_roles";
+  const rows = await supabaseRequest(`/rest/v1/${roleTable}?select=team&email=eq.${encodeURIComponent(normalized)}&limit=1`).catch(() => []);
+  if (!Array.isArray(rows) || !rows.length) return "general" as const;
+
+  const team = String((rows[0] as Record<string, unknown>).team || "general").trim();
+  if (["sales", "creative_ops", "advisory_ops", "general"].includes(team)) {
+    return team as "sales" | "creative_ops" | "advisory_ops" | "general";
+  }
+
+  return "general" as const;
 }

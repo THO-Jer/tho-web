@@ -13,17 +13,22 @@ type OnboardingUnit = {
   durationMinutes: number;
 };
 
+type Recommendation = { topic: string; unitSlug: string; unitTitle: string };
+
 type OnboardingData = {
   progress: number;
   completed: boolean;
   completed_units: string[];
   conversation_suggested: boolean;
   updated_at: string;
+  last_seen_unit?: string;
   last_saved_at?: string;
+  recommendations?: Recommendation[];
 };
 
 type ApiResponse = {
   config: { required: boolean; blockInternal: boolean; store: string; persistenceNote: string };
+  track: "sales" | "creative_ops" | "advisory_ops" | "general";
   units: OnboardingUnit[];
   onboarding: OnboardingData;
 };
@@ -35,6 +40,7 @@ export default function StudioOnboardingLandingPage() {
   const [units, setUnits] = useState<OnboardingUnit[]>([]);
   const [data, setData] = useState<OnboardingData | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [track, setTrack] = useState<ApiResponse["track"]>("general");
   const [config, setConfig] = useState<ApiResponse["config"] | null>(null);
 
   useEffect(() => {
@@ -59,6 +65,7 @@ export default function StudioOnboardingLandingPage() {
 
         setUnits(onboarding.units || []);
         setData(onboarding.onboarding || null);
+        setTrack(onboarding.track || "general");
         setConfig(onboarding.config || null);
         setIsAdmin(String(session.role || "") === "superadmin" || Boolean(session.canManageAccess));
       } catch (error) {
@@ -73,11 +80,26 @@ export default function StudioOnboardingLandingPage() {
 
   const nextUnit = useMemo(() => {
     if (!data) return units[0];
+    if (data.last_seen_unit && units.some((unit) => unit.slug === data.last_seen_unit)) {
+      return units.find((unit) => unit.slug === data.last_seen_unit) || units[0];
+    }
     const done = new Set(data.completed_units || []);
     return units.find((unit) => !done.has(unit.slug)) || units[0];
   }, [data, units]);
 
   const totalMinutes = useMemo(() => units.reduce((sum, unit) => sum + (unit.durationMinutes || 0), 0), [units]);
+
+  function timeAgo(iso?: string) {
+    if (!iso) return "Sin registro";
+    const diff = Date.now() - new Date(iso).getTime();
+    if (Number.isNaN(diff)) return "Sin registro";
+    const minutes = Math.max(1, Math.round(diff / 60000));
+    if (minutes < 60) return `hace ${minutes} min`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `hace ${hours} h`;
+    const days = Math.round(hours / 24);
+    return `hace ${days} día(s)`;
+  }
 
   if (loading) {
     return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando Onboarding..." /></main>;
@@ -104,12 +126,12 @@ export default function StudioOnboardingLandingPage() {
             Estado: {data?.completed ? "Completado" : "En curso"}
             {data?.conversation_suggested ? " · Conversación sugerida" : ""}
           </p>
-          <p className="mt-1 text-xs text-slate-500">Último guardado: {data?.last_saved_at ? new Date(data.last_saved_at).toLocaleString() : "Sin registro"}</p>
+          <p className="mt-1 text-xs text-slate-500">Último guardado: {timeAgo(data?.last_saved_at)}</p>
         </div>
 
         {config ? (
           <p className="mt-3 text-xs text-slate-500">
-            Persistencia: <strong>{config.store}</strong> · {config.persistenceNote}
+            Track activo: <strong>{track}</strong> · Persistencia: <strong>{config.store}</strong> · {config.persistenceNote}
           </p>
         ) : null}
 
@@ -131,6 +153,24 @@ export default function StudioOnboardingLandingPage() {
             );
           })}
         </div>
+
+
+        {data?.completed && data?.recommendations?.length ? (
+          <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <h3 className="text-sm font-semibold text-emerald-900">Recomendación de refuerzo</h3>
+            <p className="mt-1 text-xs text-emerald-900">Estos temas pueden requerir una breve conversación de alineación:</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-emerald-900">
+              {data.recommendations.map((item) => (
+                <li key={`${item.topic}-${item.unitSlug}`}>
+                  <span className="font-semibold">{item.topic}</span> ·{' '}
+                  <Link href={`/studio/onboarding/${item.unitSlug}`} className="underline underline-offset-2">
+                    Revisar {item.unitTitle}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         <div className="mt-6 flex flex-wrap gap-2">
           {nextUnit ? (

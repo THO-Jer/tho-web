@@ -269,7 +269,8 @@ export default function StudioIndexPage() {
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {modules.map((item) => {
               const isSuperAdmin = role === "superadmin";
-              const blockedByOnboarding = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && !isSuperAdmin && item.key !== "onboarding";
+              const onboardingAllowedPaths = ["/studio/onboarding", "/studio/canal-confidencial"];
+              const blockedByOnboarding = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && !isSuperAdmin && !onboardingAllowedPaths.includes(item.href);
               return (
               <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.status}</div>

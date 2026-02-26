@@ -2,8 +2,18 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import { defaultOnboardingQuiz, defaultOnboardingUnits, OnboardingQuizQuestion, OnboardingUnit } from "@/content/onboardingContent";
-import { hasOnboardingSupabaseStore, listOnboardingSupabaseRecords, upsertOnboardingSupabaseProgress, upsertOnboardingSupabaseQuizResult } from "@/lib/onboardingStoreSupabase";
+import { getStudioRoleTeamByEmail, hasOnboardingSupabaseStore, listOnboardingSupabaseRecords, upsertOnboardingSupabaseProgress, upsertOnboardingSupabaseQuizResult } from "@/lib/onboardingStoreSupabase";
 import { getWritableDataPath } from "@/lib/storagePaths";
+
+
+export type OnboardingTrack = "sales" | "creative_ops" | "advisory_ops" | "general";
+
+const TRACK_MODULES: Record<OnboardingTrack, string[]> = {
+  general: ["A"],
+  sales: ["A", "B"],
+  creative_ops: ["A", "C"],
+  advisory_ops: ["A", "D"],
+};
 
 export type OnboardingQuizResult = {
   answered_at: string;
@@ -15,7 +25,7 @@ export type OnboardingQuizResult = {
 
 export type OnboardingRecord = {
   email: string;
-  track: "sales" | "creative_ops" | "advisory_ops" | "general";
+  track: OnboardingTrack;
   started_at: string;
   completed_at?: string;
   completed_units: string[];
@@ -42,6 +52,12 @@ const ONBOARDING_QUIZ_ATTEMPTS_TABLE = process.env.ONBOARDING_QUIZ_ATTEMPTS_TABL
 
 function hasSupabaseStore() {
   return hasOnboardingSupabaseStore(ONBOARDING_STORE);
+}
+
+function getOnboardingStoreMode() {
+  if (ONBOARDING_STORE === "json") return "json";
+  if (hasSupabaseStore()) return "supabase";
+  return "json";
 }
 
 function normalizeEmail(email: string) {
@@ -138,7 +154,7 @@ function normalizeQuiz(quiz: unknown): OnboardingQuizQuestion[] {
 function inferModuleSlug(unitSlug: string, units: OnboardingUnit[]) {
   const index = units.findIndex((u) => u.slug === unitSlug);
   if (index < 0) return undefined;
-  const letter = ["A", "B", "C", "D"][index] || String(index + 1);
+  const letter = getModuleLetterByIndex(index);
   return letter;
 }
 
@@ -221,6 +237,40 @@ async function upsertSupabaseRecords(records: OnboardingRecord[]) {
   })));
 }
 
+
+function getModuleLetterByIndex(index: number) {
+  return ["A", "B", "C", "D"][index] || String(index + 1);
+}
+
+function getApplicableUnitsByTrack(units: OnboardingUnit[], track: OnboardingTrack) {
+  const allowed = new Set(TRACK_MODULES[track] || TRACK_MODULES.general);
+  return units.filter((_, index) => allowed.has(getModuleLetterByIndex(index)));
+}
+
+function getUnitByTopic(units: OnboardingUnit[], topic: string) {
+  const map: Record<string, string> = {
+    identidad: "identidad-tho",
+    ventas: "ventas-tho",
+    operacion_creativa: "operacion-creativa",
+    operacion_asesorias: "operacion-asesorias",
+    operacion: "operacion-creativa",
+    seguridad: "operacion-asesorias",
+    onboarding: "identidad-tho",
+  };
+  const slug = map[topic];
+  return units.find((unit) => unit.slug === slug) || units[0];
+}
+
+export function getRecommendationsFromTopics(units: OnboardingUnit[], topics: string[]) {
+  return Array.from(new Set(topics.map((topic) => topic.trim()).filter(Boolean))).map((topic) => {
+    const unit = getUnitByTopic(units, topic);
+    return {
+      topic,
+      unitSlug: unit?.slug || units[0]?.slug || "",
+      unitTitle: unit?.title || "Unidad sugerida",
+    };
+  }).filter((item) => item.unitSlug);
+}
 async function readState(): Promise<OnboardingState> {
   if (hasSupabaseStore()) return readStateFromSupabase();
   return readStateFromJson();
@@ -273,7 +323,7 @@ export async function getOrCreateOnboardingRecord(email: string) {
 
   const created: OnboardingRecord = {
     email: normalized,
-    track: "general",
+    track: await getStudioRoleTeamByEmail(normalized),
     started_at: now,
     completed_units: [],
     conversation_suggested: false,
@@ -296,19 +346,20 @@ export async function markUnitCompleted(email: string, unitSlug: string) {
 
   const state = await readState();
   const now = new Date().toISOString();
-  const units = state.units.map((u) => u.slug);
-  if (!units.includes(unitSlug)) throw new Error("Unidad no encontrada.");
-
   const index = state.records.findIndex((row) => row.email === normalized);
   const current = index >= 0 ? state.records[index] : {
     email: normalized,
-    track: "general",
+    track: await getStudioRoleTeamByEmail(normalized),
     started_at: now,
     completed_units: [],
     conversation_suggested: false,
     updated_at: now,
     last_access_at: now,
   };
+
+  const applicableUnits = getApplicableUnitsByTrack(state.units, current.track || "general");
+  const units = applicableUnits.map((u) => u.slug);
+  if (!units.includes(unitSlug)) throw new Error("Unidad no aplicable para tu track.");
 
   const completed = Array.from(new Set([...current.completed_units, unitSlug]));
   const done = completed.length >= units.length;
@@ -340,25 +391,10 @@ export async function submitQuiz(email: string, answers: Array<{ question_id: st
 
   const state = await readState();
   const now = new Date().toISOString();
-  const questionMap = new Map(state.quiz.map((q) => [q.id, q]));
-
-  let correct = 0;
-  const failedTopics: string[] = [];
-  for (const answer of answers) {
-    const question = questionMap.get(answer.question_id);
-    if (!question) continue;
-    if (Number(answer.selected_index) === question.correctIndex) correct += 1;
-    else failedTopics.push(question.topic);
-  }
-
-  const topicsToReinforce = Array.from(new Set(failedTopics));
-  const total = state.quiz.length;
-  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
-
   const index = state.records.findIndex((row) => row.email === normalized);
   const current = index >= 0 ? state.records[index] : {
     email: normalized,
-    track: "general",
+    track: await getStudioRoleTeamByEmail(normalized),
     started_at: now,
     completed_units: [],
     conversation_suggested: false,
@@ -369,6 +405,27 @@ export async function submitQuiz(email: string, answers: Array<{ question_id: st
   if (current.quiz_result && !allowsQuizRetry()) {
     throw new Error("La evaluación ya fue respondida.");
   }
+
+  const applicableUnits = getApplicableUnitsByTrack(state.units, current.track || "general");
+  const applicableSlugs = new Set(applicableUnits.map((u) => u.slug));
+  const filteredQuiz = state.quiz.filter((q) => {
+    const unit = getUnitByTopic(state.units, q.topic);
+    return unit ? applicableSlugs.has(unit.slug) : true;
+  });
+
+  const questionMap = new Map(filteredQuiz.map((q) => [q.id, q]));
+  let correct = 0;
+  const failedTopics: string[] = [];
+  for (const answer of answers) {
+    const question = questionMap.get(answer.question_id);
+    if (!question) continue;
+    if (Number(answer.selected_index) === question.correctIndex) correct += 1;
+    else failedTopics.push(question.topic);
+  }
+
+  const topicsToReinforce = Array.from(new Set(failedTopics));
+  const total = filteredQuiz.length;
+  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
 
   const next: OnboardingRecord = {
     ...current,
@@ -398,11 +455,10 @@ export async function submitQuiz(email: string, answers: Array<{ question_id: st
 
 export async function listOnboardingRecords() {
   const state = await readState();
-  const unitsCount = Math.max(1, state.units.length);
-
   return state.records
     .map((record) => {
-      const progress = Math.round((record.completed_units.length / unitsCount) * 100);
+      const applicableCount = Math.max(1, getApplicableUnitsByTrack(state.units, record.track).length);
+      const progress = Math.round((record.completed_units.length / applicableCount) * 100);
       const autoConversationSuggested = !record.completed_at && progress > 0 && progress < 100;
       return {
         ...record,
@@ -418,4 +474,11 @@ export async function setQuiz(quiz: OnboardingQuizQuestion[]) {
   state.quiz = quiz;
   await writeStateToJson(state);
   return state.quiz;
+}
+
+
+export async function getApplicableOnboardingUnits(email: string) {
+  const state = await readState();
+  const record = await getOrCreateOnboardingRecord(email);
+  return getApplicableUnitsByTrack(state.units, record.track);
 }

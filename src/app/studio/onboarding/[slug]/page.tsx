@@ -120,6 +120,18 @@ export default function StudioOnboardingUnitPage() {
     }
   }
 
+  function timeAgo(iso?: string) {
+    if (!iso) return "Sin registro";
+    const diff = Date.now() - new Date(iso).getTime();
+    if (Number.isNaN(diff)) return "Sin registro";
+    const minutes = Math.max(1, Math.round(diff / 60000));
+    if (minutes < 60) return `hace ${minutes} min`;
+    const hours = Math.round(minutes / 60);
+    if (hours < 24) return `hace ${hours} h`;
+    const days = Math.round(hours / 24);
+    return `hace ${days} día(s)`;
+  }
+
   if (loading) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando unidad..." /></main>;
 
   if (!unit) {
@@ -167,7 +179,7 @@ export default function StudioOnboardingUnitPage() {
           <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver</Link>
         </div>
 
-        <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {onboarding?.last_saved_at ? new Date(onboarding.last_saved_at).toLocaleString() : "Sin registro"}</p>
+        <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {timeAgo(onboarding?.last_saved_at)}</p>
 
         {showQuiz ? (
           <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
