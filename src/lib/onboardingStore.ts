@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import { defaultOnboardingQuiz, defaultOnboardingUnits, OnboardingQuizQuestion, OnboardingUnit } from "@/content/onboardingContent";
-import { hasOnboardingSupabaseStore, readOnboardingStateFromSupabase, upsertOnboardingSupabaseRecords, writeOnboardingSupabaseQuiz, writeOnboardingSupabaseUnits } from "@/lib/onboardingStoreSupabase";
+import { hasOnboardingSupabaseStore, listOnboardingSupabaseRecords, upsertOnboardingSupabaseProgress, upsertOnboardingSupabaseQuizResult } from "@/lib/onboardingStoreSupabase";
 import { getWritableDataPath } from "@/lib/storagePaths";
 
 export type OnboardingQuizResult = {
@@ -15,9 +15,12 @@ export type OnboardingQuizResult = {
 
 export type OnboardingRecord = {
   email: string;
+  track: "sales" | "creative_ops" | "advisory_ops" | "general";
   started_at: string;
   completed_at?: string;
   completed_units: string[];
+  last_seen_module?: string;
+  last_seen_unit?: string;
   conversation_suggested: boolean;
   internal_signal?: string;
   updated_at: string;
@@ -33,9 +36,9 @@ type OnboardingState = {
 
 const ONBOARDING_PATH = getWritableDataPath("studio", "onboarding.json");
 const ONBOARDING_STORE = (process.env.ONBOARDING_STORE || "").trim().toLowerCase();
-const ONBOARDING_UNITS_TABLE = process.env.ONBOARDING_UNITS_TABLE || "studio_onboarding_units";
-const ONBOARDING_RECORDS_TABLE = process.env.ONBOARDING_RECORDS_TABLE || "studio_onboarding_records";
-const ONBOARDING_QUIZ_TABLE = process.env.ONBOARDING_QUIZ_TABLE || "studio_onboarding_quiz";
+const ONBOARDING_PROGRESS_TABLE = process.env.ONBOARDING_PROGRESS_TABLE || process.env.ONBOARDING_RECORDS_TABLE || "onboarding_progress";
+const ONBOARDING_QUIZ_RESULTS_TABLE = process.env.ONBOARDING_QUIZ_RESULTS_TABLE || "onboarding_quiz_results";
+const ONBOARDING_QUIZ_ATTEMPTS_TABLE = process.env.ONBOARDING_QUIZ_ATTEMPTS_TABLE || "onboarding_quiz_attempts";
 
 function hasSupabaseStore() {
   return hasOnboardingSupabaseStore(ONBOARDING_STORE);
@@ -132,16 +135,26 @@ function normalizeQuiz(quiz: unknown): OnboardingQuizQuestion[] {
   return parsed.length ? parsed : defaultOnboardingQuiz;
 }
 
+function inferModuleSlug(unitSlug: string, units: OnboardingUnit[]) {
+  const index = units.findIndex((u) => u.slug === unitSlug);
+  if (index < 0) return undefined;
+  const letter = ["A", "B", "C", "D"][index] || String(index + 1);
+  return letter;
+}
+
 function normalizeRecords(records: unknown): OnboardingRecord[] {
   if (!Array.isArray(records)) return [];
   return records
     .map((record) => ({
       email: normalizeEmail(String((record as { email?: unknown }).email || "")),
+      track: (["sales", "creative_ops", "advisory_ops", "general"].includes(String((record as { track?: unknown }).track || "")) ? String((record as { track?: unknown }).track) : "general") as "sales" | "creative_ops" | "advisory_ops" | "general",
       started_at: String((record as { started_at?: unknown }).started_at || new Date().toISOString()),
       completed_at: (record as { completed_at?: unknown }).completed_at ? String((record as { completed_at?: unknown }).completed_at) : undefined,
       completed_units: Array.isArray((record as { completed_units?: unknown[] }).completed_units)
         ? ((record as { completed_units?: unknown[] }).completed_units || []).map((unit) => String(unit)).filter(Boolean)
         : [],
+      last_seen_module: (record as { last_seen_module?: unknown }).last_seen_module ? String((record as { last_seen_module?: unknown }).last_seen_module) : undefined,
+      last_seen_unit: (record as { last_seen_unit?: unknown }).last_seen_unit ? String((record as { last_seen_unit?: unknown }).last_seen_unit) : undefined,
       conversation_suggested: Boolean((record as { conversation_suggested?: unknown }).conversation_suggested),
       internal_signal: (record as { internal_signal?: unknown }).internal_signal ? String((record as { internal_signal?: unknown }).internal_signal) : undefined,
       updated_at: String((record as { updated_at?: unknown }).updated_at || new Date().toISOString()),
@@ -184,26 +197,28 @@ async function writeStateToJson(state: OnboardingState) {
 }
 
 async function readStateFromSupabase(): Promise<OnboardingState> {
-  return readOnboardingStateFromSupabase({
-    unitsTable: ONBOARDING_UNITS_TABLE,
-    quizTable: ONBOARDING_QUIZ_TABLE,
-    recordsTable: ONBOARDING_RECORDS_TABLE,
-    normalizeUnits,
-    normalizeQuiz,
-    normalizeRecords,
-  });
+  const [records, content] = await Promise.all([
+    listOnboardingSupabaseRecords({
+      progressTable: ONBOARDING_PROGRESS_TABLE,
+      quizResultsTable: ONBOARDING_QUIZ_RESULTS_TABLE,
+    }),
+    readStateFromJson(),
+  ]);
+
+  return {
+    units: content.units,
+    quiz: content.quiz,
+    records,
+  };
 }
 
 async function upsertSupabaseRecords(records: OnboardingRecord[]) {
-  await upsertOnboardingSupabaseRecords(ONBOARDING_RECORDS_TABLE, records);
-}
-
-async function writeUnitsToSupabase(units: OnboardingUnit[]) {
-  await writeOnboardingSupabaseUnits(ONBOARDING_UNITS_TABLE, units);
-}
-
-async function writeQuizToSupabase(quiz: OnboardingQuizQuestion[]) {
-  await writeOnboardingSupabaseQuiz(ONBOARDING_QUIZ_TABLE, quiz);
+  await Promise.all(records.map((record) => upsertOnboardingSupabaseProgress(ONBOARDING_PROGRESS_TABLE, record)));
+  await Promise.all(records.map((record) => upsertOnboardingSupabaseQuizResult({
+    quizResultsTable: ONBOARDING_QUIZ_RESULTS_TABLE,
+    quizAttemptsTable: ONBOARDING_QUIZ_ATTEMPTS_TABLE,
+    record,
+  })));
 }
 
 async function readState(): Promise<OnboardingState> {
@@ -232,11 +247,6 @@ export async function getQuizForAdmin() {
 }
 
 export async function setUnits(units: OnboardingUnit[]) {
-  if (hasSupabaseStore()) {
-    await writeUnitsToSupabase(units);
-    return units;
-  }
-
   const state = await readStateFromJson();
   state.units = units;
   await writeStateToJson(state);
@@ -263,6 +273,7 @@ export async function getOrCreateOnboardingRecord(email: string) {
 
   const created: OnboardingRecord = {
     email: normalized,
+    track: "general",
     started_at: now,
     completed_units: [],
     conversation_suggested: false,
@@ -291,6 +302,7 @@ export async function markUnitCompleted(email: string, unitSlug: string) {
   const index = state.records.findIndex((row) => row.email === normalized);
   const current = index >= 0 ? state.records[index] : {
     email: normalized,
+    track: "general",
     started_at: now,
     completed_units: [],
     conversation_suggested: false,
@@ -302,7 +314,10 @@ export async function markUnitCompleted(email: string, unitSlug: string) {
   const done = completed.length >= units.length;
   const next: OnboardingRecord = {
     ...current,
+    track: current.track || "general",
     completed_units: completed,
+    last_seen_unit: unitSlug,
+    last_seen_module: inferModuleSlug(unitSlug, state.units),
     completed_at: done ? (current.completed_at || now) : undefined,
     conversation_suggested: done ? false : current.conversation_suggested,
     updated_at: now,
@@ -343,6 +358,7 @@ export async function submitQuiz(email: string, answers: Array<{ question_id: st
   const index = state.records.findIndex((row) => row.email === normalized);
   const current = index >= 0 ? state.records[index] : {
     email: normalized,
+    track: "general",
     started_at: now,
     completed_units: [],
     conversation_suggested: false,
@@ -350,8 +366,13 @@ export async function submitQuiz(email: string, answers: Array<{ question_id: st
     last_access_at: now,
   };
 
+  if (current.quiz_result && !allowsQuizRetry()) {
+    throw new Error("La evaluación ya fue respondida.");
+  }
+
   const next: OnboardingRecord = {
     ...current,
+    track: current.track || "general",
     updated_at: now,
     last_access_at: now,
     completed_at: current.completed_at || now,
@@ -393,11 +414,6 @@ export async function listOnboardingRecords() {
 }
 
 export async function setQuiz(quiz: OnboardingQuizQuestion[]) {
-  if (hasSupabaseStore()) {
-    await writeQuizToSupabase(quiz);
-    return quiz;
-  }
-
   const state = await readStateFromJson();
   state.quiz = quiz;
   await writeStateToJson(state);

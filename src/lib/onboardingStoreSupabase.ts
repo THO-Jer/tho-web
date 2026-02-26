@@ -1,4 +1,3 @@
-import { OnboardingQuizQuestion, OnboardingUnit } from "@/content/onboardingContent";
 import type { OnboardingRecord } from "@/lib/onboardingStore";
 
 type SupabaseEnv = { url: string; service: string };
@@ -41,47 +40,112 @@ export function hasOnboardingSupabaseStore(onboardingStore: string) {
   return process.env.NODE_ENV === "production" ? Boolean(url && service) : Boolean(url && service);
 }
 
-export async function readOnboardingStateFromSupabase(input: {
-  unitsTable: string;
-  quizTable: string;
-  recordsTable: string;
-  normalizeUnits: (units: unknown) => OnboardingUnit[];
-  normalizeQuiz: (quiz: unknown) => OnboardingQuizQuestion[];
-  normalizeRecords: (records: unknown) => OnboardingRecord[];
-}) {
-  const [unitsRows, quizRows, recordsRows] = await Promise.all([
-    supabaseRequest(`/rest/v1/${input.unitsTable}?select=data&limit=1`).catch(() => []),
-    supabaseRequest(`/rest/v1/${input.quizTable}?select=data&limit=1`).catch(() => []),
-    supabaseRequest(`/rest/v1/${input.recordsTable}?select=*&order=email.asc`).catch(() => []),
-  ]);
-
-  const unitsData = Array.isArray(unitsRows) && unitsRows[0] ? (unitsRows[0] as { data?: unknown }).data : undefined;
-  const quizData = Array.isArray(quizRows) && quizRows[0] ? (quizRows[0] as { data?: unknown }).data : undefined;
-
+function recordFromProgressRow(row: Record<string, unknown>): OnboardingRecord {
   return {
-    units: input.normalizeUnits(unitsData),
-    quiz: input.normalizeQuiz(quizData),
-    records: input.normalizeRecords(recordsRows),
+    email: String(row.email || "").trim().toLowerCase(),
+    track: String(row.track || "general"),
+    started_at: String(row.created_at || row.updated_at || new Date().toISOString()),
+    completed_at: row.completed_at ? String(row.completed_at) : undefined,
+    completed_units: Array.isArray(row.completed_units) ? row.completed_units.map((u) => String(u)).filter(Boolean) : [],
+    last_seen_module: row.last_seen_module ? String(row.last_seen_module) : undefined,
+    last_seen_unit: row.last_seen_unit ? String(row.last_seen_unit) : undefined,
+    conversation_suggested: false,
+    internal_signal: undefined,
+    updated_at: String(row.updated_at || new Date().toISOString()),
+    last_access_at: String(row.last_saved_at || row.updated_at || new Date().toISOString()),
   };
 }
 
-export async function upsertOnboardingSupabaseRecords(recordsTable: string, records: OnboardingRecord[]) {
-  await supabaseRequest(`/rest/v1/${recordsTable}?on_conflict=email`, {
-    method: "POST",
-    body: JSON.stringify(records),
+export async function listOnboardingSupabaseRecords(input: {
+  progressTable: string;
+  quizResultsTable: string;
+}) {
+  const [progressRows, quizRows] = await Promise.all([
+    supabaseRequest(`/rest/v1/${input.progressTable}?select=*&order=email.asc`).catch(() => []),
+    supabaseRequest(`/rest/v1/${input.quizResultsTable}?select=*&order=email.asc`).catch(() => []),
+  ]);
+
+  const records = Array.isArray(progressRows)
+    ? (progressRows as Array<Record<string, unknown>>).map(recordFromProgressRow).filter((r) => r.email)
+    : [];
+
+  const quizByEmail = new Map<string, Record<string, unknown>>();
+  if (Array.isArray(quizRows)) {
+    for (const row of quizRows as Array<Record<string, unknown>>) {
+      const email = String(row.email || "").trim().toLowerCase();
+      if (!email) continue;
+      quizByEmail.set(email, row);
+    }
+  }
+
+  return records.map((record) => {
+    const quiz = quizByEmail.get(record.email);
+    if (!quiz) return record;
+    const score = Number(quiz.score || 0);
+    const total = Number(quiz.max_score || 0);
+    const missed = Array.isArray(quiz.missed_topics) ? quiz.missed_topics.map((t) => String(t)).filter(Boolean) : [];
+
+    return {
+      ...record,
+      conversation_suggested: missed.length > 0,
+      quiz_result: {
+        answered_at: String(quiz.submitted_at || quiz.updated_at || new Date().toISOString()),
+        score,
+        total,
+        topics_to_reinforce: missed,
+        answers: [],
+      },
+      updated_at: String(quiz.updated_at || record.updated_at),
+    };
   });
 }
 
-export async function writeOnboardingSupabaseUnits(unitsTable: string, units: OnboardingUnit[]) {
-  await supabaseRequest(`/rest/v1/${unitsTable}?on_conflict=id`, {
+export async function upsertOnboardingSupabaseProgress(progressTable: string, record: OnboardingRecord) {
+  await supabaseRequest(`/rest/v1/${progressTable}?on_conflict=email`, {
     method: "POST",
-    body: JSON.stringify([{ id: 1, data: units }]),
+    body: JSON.stringify([{
+      email: record.email,
+      track: record.track || "general",
+      completed_units: record.completed_units,
+      last_seen_module: record.last_seen_module || null,
+      last_seen_unit: record.last_seen_unit || null,
+      last_saved_at: record.last_access_at,
+      completed_at: record.completed_at || null,
+    }]),
   });
 }
 
-export async function writeOnboardingSupabaseQuiz(quizTable: string, quiz: OnboardingQuizQuestion[]) {
-  await supabaseRequest(`/rest/v1/${quizTable}?on_conflict=id`, {
+export async function upsertOnboardingSupabaseQuizResult(input: {
+  quizResultsTable: string;
+  quizAttemptsTable?: string;
+  record: OnboardingRecord;
+}) {
+  if (!input.record.quiz_result) return;
+
+  const quiz = input.record.quiz_result;
+  await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email`, {
     method: "POST",
-    body: JSON.stringify([{ id: 1, data: quiz }]),
+    body: JSON.stringify([{
+      email: input.record.email,
+      track: input.record.track || "general",
+      score: quiz.score,
+      max_score: quiz.total,
+      missed_topics: quiz.topics_to_reinforce,
+      submitted_at: quiz.answered_at,
+    }]),
   });
+
+  if (input.quizAttemptsTable) {
+    await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+      method: "POST",
+      body: JSON.stringify([{
+        email: input.record.email,
+        track: input.record.track || "general",
+        score: quiz.score,
+        max_score: quiz.total,
+        missed_topics: quiz.topics_to_reinforce,
+        submitted_at: quiz.answered_at,
+      }]),
+    }).catch(() => null);
+  }
 }
