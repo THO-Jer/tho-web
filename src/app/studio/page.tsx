@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
@@ -53,11 +53,26 @@ export default function StudioIndexPage() {
   const [email, setEmail] = useState<string | null>(null);
   const [checking, setChecking] = useState(true);
   const [message, setMessage] = useState("");
+  const [oauthBaseUrl, setOauthBaseUrl] = useState("");
   const [canManageAccess, setCanManageAccess] = useState(false);
   const [permissions, setPermissions] = useState<StudioPermissions | null>(null);
-  const [localEmail, setLocalEmail] = useState("");
+  const [magicEmail, setMagicEmail] = useState("");
+  const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const publicSupabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+  const redirectTo = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    return `${window.location.origin}/studio`;
+  }, []);
 
   useEffect(() => {
+    const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+    const hashError = params.get("error_description") || params.get("error");
+    const queryParams = new URLSearchParams(window.location.search);
+    const queryError = queryParams.get("error_description") || queryParams.get("error");
+
     const verifySession = async () => {
       const res = await fetch("/api/admin/session", { credentials: "include" });
       const data = await res.json();
@@ -69,50 +84,101 @@ export default function StudioIndexPage() {
         setPermissions(null);
       }
       setCanManageAccess(Boolean(data.canManageAccess));
+      if (typeof data.oauthBaseUrl === "string") {
+        setOauthBaseUrl(data.oauthBaseUrl);
+      }
     };
 
-    verifySession()
-      .catch(() => setMessage("No se pudo verificar sesión."))
-      .finally(() => setChecking(false));
+    const run = async () => {
+      setChecking(true);
+      try {
+        if (hashError || queryError) {
+          throw new Error(decodeURIComponent(hashError || queryError || "OAuth error"));
+        }
+
+        if (accessToken) {
+          const res = await fetch("/api/admin/session", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ action: "oauth_login", accessToken }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || "No se pudo completar login.");
+          if (data.ok === false) {
+            setMessage(data.error || "No autorizado.");
+          } else {
+            setMessage("Sesión iniciada correctamente.");
+          }
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        await verifySession();
+      } catch (error) {
+        setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión.");
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    run();
   }, []);
 
-  async function onLocalLogin() {
-    try {
-      const normalizedEmail = localEmail.trim().toLowerCase();
-      if (!normalizedEmail || !normalizedEmail.includes("@")) {
-        setMessage("Ingresa un correo válido.");
-        return;
-      }
-
-      const res = await fetch("/api/admin/session", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ action: "local_login", email: normalizedEmail }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo iniciar sesión local.");
-
-      if (data.ok === false) {
-        setMessage(data.error || "No autorizado.");
-        return;
-      }
-
-      setMessage("Sesión iniciada correctamente.");
-      setLocalEmail("");
-      setEmail(data.email ?? null);
-      setPermissions(data.permissions ?? null);
-      setCanManageAccess(Boolean(data.canManageAccess));
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión local.");
+  function onOAuthLogin() {
+    const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
+    if (!supabaseUrl) {
+      setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth.");
+      return;
     }
+
+    const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
+    authUrl.searchParams.set("provider", "azure");
+    authUrl.searchParams.set("redirect_to", redirectTo);
+    authUrl.searchParams.set("scopes", "openid profile email");
+    authUrl.searchParams.set("prompt", "select_account");
+    window.location.href = authUrl.toString();
+  }
+
+  async function onSendMagicLink() {
+    const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
+    const emailValue = magicEmail.trim().toLowerCase();
+    if (!supabaseUrl || !publicSupabaseAnon) {
+      setMessage("Faltan variables públicas de Supabase para magic link.");
+      return;
+    }
+    if (!emailValue || !emailValue.includes("@")) {
+      setMessage("Ingresa un correo válido para magic link.");
+      return;
+    }
+
+    const res = await fetch(`${supabaseUrl}/auth/v1/otp`, {
+      method: "POST",
+      headers: {
+        apikey: publicSupabaseAnon,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        email: emailValue,
+        create_user: true,
+        should_create_user: true,
+        email_redirect_to: redirectTo,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      setMessage(`No se pudo enviar magic link: ${err}`);
+      return;
+    }
+
+    setMessage("Magic link enviado. Revisa tu correo.");
+    setMagicEmail("");
   }
 
   async function onLogout() {
     await fetch("/api/admin/session", { method: "DELETE", credentials: "include" });
     setEmail(null);
     setPermissions(null);
-    setCanManageAccess(false);
     setMessage("Sesión cerrada.");
   }
 
@@ -123,7 +189,7 @@ export default function StudioIndexPage() {
         <section className="mx-auto max-w-6xl px-4 py-14">
           <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">THO Studio</h1>
           <p className="mt-3 max-w-3xl text-slate-700">
-            Acceso controlado por correo autorizado desde el módulo Control de Accesos.
+            Acceso unificado con Supabase Auth (Microsoft para internos, magic link para externos) y allowlist de roles en Studio.
           </p>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
@@ -131,17 +197,22 @@ export default function StudioIndexPage() {
 
             {!checking && !email ? (
               <div>
-                <p className="text-sm text-slate-700">Ingresa con tu correo autorizado.</p>
+                <p className="text-sm text-slate-700">Ingresa con Microsoft o solicita magic link si eres externo autorizado.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button onClick={onOAuthLogin} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">
+                    Ingresar con Microsoft
+                  </button>
+                </div>
                 <div className="mt-4 grid gap-2 sm:max-w-lg sm:grid-cols-[1fr_auto]">
                   <input
                     type="email"
-                    value={localEmail}
-                    onChange={(e) => setLocalEmail(e.target.value)}
-                    placeholder="tu@correo.com"
+                    value={magicEmail}
+                    onChange={(e) => setMagicEmail(e.target.value)}
+                    placeholder="freelancer@correo.com"
                     className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
                   />
-                  <button onClick={() => onLocalLogin()} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700" type="button">
-                    Ingresar
+                  <button onClick={onSendMagicLink} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700" type="button">
+                    Enviar magic link
                   </button>
                 </div>
               </div>

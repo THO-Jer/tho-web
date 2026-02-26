@@ -33,18 +33,65 @@ export type InternalIncident = {
   urgency_level: UrgencyLevel;
   suggested_action: string;
   director_notes?: string;
+  internal_suggestion_urgency?: UrgencyLevel;
+  internal_suggestion_action?: string;
+  director_only_notes?: string;
   last_updated_at: string;
   audit_log: IncidentAudit[];
   ip_hash?: string;
 };
 
 const INCIDENTS_PATH = getWritableDataPath("incidents", "incidents.json");
+const INCIDENTS_TABLE = process.env.INCIDENTS_TABLE || "incidents";
+const INCIDENT_EVENTS_TABLE = process.env.INCIDENT_EVENTS_TABLE || "incident_events";
+const INCIDENT_ATTACHMENTS_TABLE = process.env.INCIDENT_ATTACHMENTS_TABLE || "incident_attachments";
+
 const STATUS_SLA_DAYS: Record<IncidentStatus, number> = {
   "Recibido": 3,
   "En revisión": 8,
   "Derivado": 15,
   "Cerrado": 30,
 };
+
+function getSupabaseEnv() {
+  const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
+  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY || "").trim();
+  return { url, service };
+}
+
+function hasSupabaseStore() {
+  const { url, service } = getSupabaseEnv();
+  return Boolean(url && service);
+}
+
+function requireSupabaseInProduction() {
+  return process.env.VERCEL === "1" || process.env.NODE_ENV === "production";
+}
+
+async function supabaseRequest(pathname: string, init?: RequestInit) {
+  const { url, service } = getSupabaseEnv();
+  if (!url || !service) throw new Error("Supabase incidents store no configurado");
+
+  const res = await fetch(`${url}${pathname}`, {
+    ...init,
+    headers: {
+      apikey: service,
+      Authorization: `Bearer ${service}`,
+      "content-type": "application/json",
+      Prefer: "return=representation",
+      ...(init?.headers || {}),
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Supabase incidents store error (${res.status}): ${body}`);
+  }
+
+  if (res.status === 204) return null;
+  return res.json();
+}
 
 function getSecuritySalt() {
   return process.env.INCIDENT_SECURITY_SALT || process.env.INCIDENT_IP_SALT || "tho-incident-default-salt";
@@ -89,6 +136,9 @@ function withDefaults(row: Partial<InternalIncident>): InternalIncident {
     urgency_level: (row.urgency_level || "Bajo") as UrgencyLevel,
     suggested_action: row.suggested_action || "",
     director_notes: row.director_notes || "",
+    internal_suggestion_urgency: (row.internal_suggestion_urgency || row.urgency_level || "Bajo") as UrgencyLevel,
+    internal_suggestion_action: row.internal_suggestion_action || row.suggested_action || "",
+    director_only_notes: row.director_only_notes || "",
     last_updated_at: row.last_updated_at || row.created_at || new Date().toISOString(),
     audit_log: Array.isArray(row.audit_log) ? row.audit_log : [],
     ip_hash: row.ip_hash || undefined,
@@ -105,6 +155,34 @@ async function ensureStore() {
 }
 
 async function readStore(): Promise<InternalIncident[]> {
+  if (hasSupabaseStore()) {
+    const incidents = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?select=*&order=created_at.desc`)) as Array<Partial<InternalIncident>>;
+    const events = (await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}?select=incident_id,at,actor,action,detail&order=at.asc`)) as Array<Record<string, unknown>>;
+    const attachments = (await supabaseRequest(`/rest/v1/${INCIDENT_ATTACHMENTS_TABLE}?select=incident_id,url,created_at&order=created_at.desc`)) as Array<Record<string, unknown>>;
+
+    const eventsByIncident = new Map<string, IncidentAudit[]>();
+    for (const row of events) {
+      const incidentId = String(row.incident_id || "");
+      if (!incidentId) continue;
+      const arr = eventsByIncident.get(incidentId) || [];
+      arr.push({ at: String(row.at || new Date().toISOString()), actor: String(row.actor || "system"), action: String(row.action || "Evento"), detail: row.detail ? String(row.detail) : undefined });
+      eventsByIncident.set(incidentId, arr);
+    }
+
+    const attachmentMap = new Map<string, string>();
+    for (const row of attachments) {
+      const incidentId = String(row.incident_id || "");
+      if (!incidentId || attachmentMap.has(incidentId)) continue;
+      attachmentMap.set(incidentId, String(row.url || ""));
+    }
+
+    return incidents.map((row) => withDefaults({ ...row, attachment_url: attachmentMap.get(String(row.id || "")), audit_log: eventsByIncident.get(String(row.id || "")) || [] }));
+  }
+
+  if (requireSupabaseInProduction()) {
+    throw new Error("Debes configurar Supabase para incidents en producción.");
+  }
+
   await ensureStore();
   const raw = await fs.readFile(INCIDENTS_PATH, "utf8");
   const rows = JSON.parse(raw) as Partial<InternalIncident>[];
@@ -112,6 +190,8 @@ async function readStore(): Promise<InternalIncident[]> {
 }
 
 async function writeStore(rows: InternalIncident[]) {
+  if (hasSupabaseStore()) return;
+  if (requireSupabaseInProduction()) throw new Error("Debes configurar Supabase para incidents en producción.");
   await ensureStore();
   await fs.writeFile(INCIDENTS_PATH, `${JSON.stringify(rows, null, 2)}\n`, "utf8");
 }
@@ -211,6 +291,9 @@ export async function createIncident(input: {
     urgency_level: suggested.urgency,
     suggested_action: suggested.action,
     director_notes: "",
+    internal_suggestion_urgency: suggested.urgency,
+    internal_suggestion_action: suggested.action,
+    director_only_notes: "",
     last_updated_at: now,
     ip_hash: hashIp(input.sourceIp),
     audit_log: [
@@ -223,6 +306,20 @@ export async function createIncident(input: {
     ],
   };
 
+  if (hasSupabaseStore()) {
+    await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}`, {
+      method: "POST",
+      body: JSON.stringify([{
+        ...created,
+      }]),
+    });
+    await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
+      method: "POST",
+      body: JSON.stringify([{ incident_id: created.id, at: now, actor: "system", action: "Caso creado", detail: "Ingreso de denuncia por canal confidencial." }]),
+    });
+    return { incident: created, trackingPin };
+  }
+
   const rows = await readStore();
   rows.unshift(created);
   await writeStore(rows);
@@ -231,6 +328,27 @@ export async function createIncident(input: {
 }
 
 export async function attachIncidentEvidence(caseCode: string, attachmentUrl: string) {
+  if (hasSupabaseStore()) {
+    const matches = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?select=*&case_code=eq.${encodeURIComponent(caseCode)}&limit=1`)) as Array<Partial<InternalIncident>>;
+    const incident = matches[0];
+    if (!incident?.id) throw new Error("Caso no encontrado para adjuntar evidencia.");
+
+    const now = new Date().toISOString();
+    await supabaseRequest(`/rest/v1/${INCIDENT_ATTACHMENTS_TABLE}`, {
+      method: "POST",
+      body: JSON.stringify([{ incident_id: incident.id, url: attachmentUrl, created_at: now }]),
+    });
+    await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
+      method: "POST",
+      body: JSON.stringify([{ incident_id: incident.id, at: now, actor: "system", action: "Evidencia adjuntada", detail: attachmentUrl }]),
+    });
+    const updated = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?id=eq.${encodeURIComponent(String(incident.id))}`, {
+      method: "PATCH",
+      body: JSON.stringify({ attachment_url: attachmentUrl, last_updated_at: now }),
+    })) as Array<Partial<InternalIncident>>;
+    return withDefaults(updated[0]);
+  }
+
   const rows = await readStore();
   const idx = rows.findIndex((row) => row.case_code === caseCode);
   if (idx < 0) throw new Error("Caso no encontrado para adjuntar evidencia.");
@@ -256,9 +374,35 @@ export async function listIncidents() {
 
 export async function updateIncidentById(
   id: string,
-  patch: { status?: IncidentStatus; director_notes?: string },
+  patch: { status?: IncidentStatus; director_notes?: string; director_only_notes?: string },
   actor = "director"
 ) {
+  if (hasSupabaseStore()) {
+    const rows = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?select=*&id=eq.${encodeURIComponent(id)}&limit=1`)) as Array<Partial<InternalIncident>>;
+    const current = rows[0];
+    if (!current) throw new Error("Caso no encontrado.");
+
+    const now = new Date().toISOString();
+    const nextStatus = (patch.status || current.status || "Recibido") as IncidentStatus;
+    const updatedRows = (await supabaseRequest(`/rest/v1/${INCIDENTS_TABLE}?id=eq.${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        status: nextStatus,
+        process_phase: getPhaseFromStatus(nextStatus),
+        director_notes: typeof patch.director_notes === "string" ? patch.director_notes : current.director_notes || "",
+        director_only_notes: typeof patch.director_only_notes === "string" ? patch.director_only_notes : current.director_only_notes || "",
+        last_updated_at: now,
+      }),
+    })) as Array<Partial<InternalIncident>>;
+
+    await supabaseRequest(`/rest/v1/${INCIDENT_EVENTS_TABLE}`, {
+      method: "POST",
+      body: JSON.stringify([{ incident_id: id, at: now, actor, action: "Actualización de caso", detail: `Estado: ${current.status} -> ${nextStatus}` }]),
+    });
+
+    return withDefaults(updatedRows[0]);
+  }
+
   const rows = await readStore();
   const idx = rows.findIndex((row) => row.id === id);
   if (idx < 0) throw new Error("Caso no encontrado.");
@@ -271,6 +415,7 @@ export async function updateIncidentById(
     status: nextStatus,
     process_phase: getPhaseFromStatus(nextStatus),
     director_notes: typeof patch.director_notes === "string" ? patch.director_notes : current.director_notes,
+    director_only_notes: typeof patch.director_only_notes === "string" ? patch.director_only_notes : current.director_only_notes,
     last_updated_at: now,
     audit_log: [
       ...current.audit_log,

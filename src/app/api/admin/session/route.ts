@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getStudioPermissionsLocal, isStudioSuperAdmin, LOCAL_SESSION_COOKIE, readSession } from "@/lib/adminAuth";
-import { isBlockedEmail, logStudioLogin } from "@/lib/studioAccessStore";
+import { getUserFromToken, readSession, SESSION_COOKIE, validateSupabaseAccessToken } from "@/lib/adminAuth";
+import { createAccessRequest, logStudioLogin } from "@/lib/studioAccessStore";
 
 export const dynamic = "force-dynamic";
+
+function getSupabaseEnv() {
+  const rawUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_SUPABASE_PUBLIC_URL;
+  const url = rawUrl?.trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
+  return { url };
+}
 
 function getSourceIp(req: NextRequest) {
   const forwarded = req.headers.get("x-forwarded-for") || "";
@@ -13,11 +19,14 @@ function getSourceIp(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
+  const { url } = getSupabaseEnv();
   return NextResponse.json({
     authenticated: Boolean(session),
     email: session?.email ?? null,
     provider: session?.provider ?? null,
+    oauthBaseUrl: url ?? null,
     canManageAccess: Boolean(session?.canManageAccess),
+    role: session?.role ?? null,
     permissions: session
       ? {
           canBlog: session.canBlog,
@@ -30,46 +39,50 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = (await req.json()) as { action?: string; email?: string };
+    const payload = (await req.json()) as { action?: string; accessToken?: string };
     const action = String(payload.action || "").trim();
 
-    if (action !== "local_login") {
-      return NextResponse.json({ error: "Acción no válida. Usa local_login." }, { status: 400 });
+    if (action !== "oauth_login") {
+      return NextResponse.json({ error: "Acción no válida. Usa OAuth." }, { status: 400 });
     }
 
-    const email = String(payload.email || "").trim().toLowerCase();
-    if (!email || !email.includes("@")) {
-      return NextResponse.json({ error: "Email inválido." }, { status: 400 });
-    }
+    const token = (payload.accessToken || "").trim();
+    if (!token) return NextResponse.json({ error: "Token OAuth faltante." }, { status: 400 });
 
-    const permissions = await getStudioPermissionsLocal(email);
-    if (!permissions) {
-      if (isStudioSuperAdmin(email) && await isBlockedEmail(email)) {
-        return NextResponse.json({ ok: false, error: "Tu correo superadmin está bloqueado en Control de Accesos.", reason: "superadmin_blocked" });
+    const valid = await validateSupabaseAccessToken(token);
+    if (!valid) {
+      const tokenUser = await getUserFromToken(token);
+      if (tokenUser?.email) {
+        await createAccessRequest({ email: tokenUser.email, provider: tokenUser.provider });
       }
-      return NextResponse.json({ ok: false, error: "Correo no autorizado. Debe habilitarse desde Control de Accesos.", reason: "local_not_authorized" });
+      return NextResponse.json({
+        ok: false,
+        error: "Tu acceso aún no está autorizado. Se creó solicitud en allowlist para revisión.",
+        requestCreated: Boolean(tokenUser?.email),
+      });
     }
 
     await logStudioLogin({
       at: new Date().toISOString(),
-      email,
-      provider: "local",
+      email: valid.email,
+      provider: valid.provider,
       ip: getSourceIp(req),
     });
 
     const response = NextResponse.json({
       ok: true,
-      email,
-      provider: "local",
-      canManageAccess: permissions.canManageAccess,
+      email: valid.email,
+      provider: valid.provider,
+      canManageAccess: valid.permissions.canManageAccess,
+      role: valid.permissions.role,
       permissions: {
-        canBlog: permissions.canBlog,
-        canCrm: permissions.canCrm,
-        canIncidents: permissions.canIncidents,
+        canBlog: valid.permissions.canBlog,
+        canCrm: valid.permissions.canCrm,
+        canIncidents: valid.permissions.canIncidents,
       },
     });
 
-    response.cookies.set(LOCAL_SESSION_COOKIE, email, {
+    response.cookies.set(SESSION_COOKIE, token, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
@@ -88,6 +101,6 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE() {
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(LOCAL_SESSION_COOKIE, "", { httpOnly: true, path: "/", expires: new Date(0) });
+  response.cookies.set(SESSION_COOKIE, "", { httpOnly: true, path: "/", expires: new Date(0) });
   return response;
 }

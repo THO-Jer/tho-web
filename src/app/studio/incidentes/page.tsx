@@ -28,6 +28,7 @@ type Incident = {
 type SessionData = {
   authenticated: boolean;
   canManageAccess?: boolean;
+  role?: string;
   permissions?: { canIncidents?: boolean };
 };
 
@@ -70,6 +71,7 @@ export default function StudioIncidentesPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [canManage, setCanManage] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
@@ -80,6 +82,7 @@ export default function StudioIncidentesPage() {
           return;
         }
         setCanManage(Boolean(data.canManageAccess));
+        setRole(String(data.role || ""));
       })
       .catch(() => router.replace("/studio"))
       .finally(() => setChecking(false));
@@ -225,10 +228,12 @@ export default function StudioIncidentesPage() {
                     <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{active.description}</p>
                   </div>
 
-                  <div>
-                    <h3 className="text-sm font-semibold text-slate-800">Sugerencia automática</h3>
-                    <p className="mt-1 text-sm text-slate-700">{active.suggested_action}</p>
-                  </div>
+                  {role === "superadmin" ? (
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-800">Sugerencia automática (solo director)</h3>
+                      <p className="mt-1 text-sm text-slate-700">{active.suggested_action}</p>
+                    </div>
+                  ) : null}
 
                   {active.attachment_url ? (
                     <a href={active.attachment_url} target="_blank" rel="noreferrer" className="inline-flex w-fit rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
