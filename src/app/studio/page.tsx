@@ -14,6 +14,7 @@ type StudioPermissions = {
 };
 
 type ModuleItem = {
+  key: string;
   title: string;
   desc: string;
   href: string;
@@ -24,6 +25,16 @@ type ModuleItem = {
 
 const modules: ModuleItem[] = [
   {
+    key: "onboarding",
+    title: "Studio Onboarding",
+    desc: "Inducción obligatoria THO por módulos: identidad, ventas y operación con progreso visible.",
+    href: "/studio/onboarding",
+    status: "Nuevo",
+    external: false,
+    allowed: () => true,
+  },
+  {
+    key: "blog",
     title: "Studio Blog",
     desc: "Gestión editorial completa de entradas, SEO y medios.",
     href: "/studio/blog",
@@ -32,6 +43,7 @@ const modules: ModuleItem[] = [
     allowed: (p) => Boolean(p?.canBlog),
   },
   {
+    key: "crm",
     title: "Studio Leads y CRM",
     desc: "Acceso directo a CRM para revisar formularios, estado comercial y seguimiento.",
     href: "https://crm-tho.vercel.app",
@@ -40,6 +52,7 @@ const modules: ModuleItem[] = [
     allowed: (p) => Boolean(p?.canCrm),
   },
   {
+    key: "incidents",
     title: "Canal Confidencial de Incidentes",
     desc: "Recepción formal de denuncias y panel Director con trazabilidad y gestión por estado.",
     href: "/studio/canal-confidencial",
@@ -57,6 +70,9 @@ export default function StudioIndexPage() {
   const [canManageAccess, setCanManageAccess] = useState(false);
   const [permissions, setPermissions] = useState<StudioPermissions | null>(null);
   const [magicEmail, setMagicEmail] = useState("");
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const [onboardingRequired, setOnboardingRequired] = useState(true);
+  const [onboardingBlockInternal, setOnboardingBlockInternal] = useState(false);
   const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const publicSupabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
@@ -79,6 +95,18 @@ export default function StudioIndexPage() {
       if (data.authenticated) {
         setEmail(data.email ?? null);
         setPermissions(data.permissions ?? null);
+
+        try {
+          const onboardingRes = await fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" });
+          const onboarding = await onboardingRes.json();
+          if (onboardingRes.ok) {
+            setOnboardingCompleted(Boolean(onboarding?.onboarding?.completed));
+            setOnboardingRequired(Boolean(onboarding?.config?.required ?? true));
+            setOnboardingBlockInternal(Boolean(onboarding?.config?.blockInternal ?? false));
+          }
+        } catch {
+          setOnboardingCompleted(false);
+        }
       } else {
         setEmail(null);
         setPermissions(null);
@@ -237,7 +265,9 @@ export default function StudioIndexPage() {
           ) : null}
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {modules.map((item) => (
+            {modules.map((item) => {
+              const blockedByOnboarding = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && item.key !== "onboarding";
+              return (
               <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.status}</div>
                 <h2 className="mt-2 text-2xl font-semibold text-slate-900">{item.title}</h2>
@@ -246,13 +276,16 @@ export default function StudioIndexPage() {
                   <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Requiere sesión</div>
                 ) : !item.allowed(permissions) ? (
                   <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Sin permiso asignado</div>
+                ) : blockedByOnboarding ? (
+                  <div className="mt-5 inline-flex rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">Bloqueado hasta completar Onboarding</div>
                 ) : item.external ? (
                   <a href={item.href} target="_blank" rel="noreferrer" className="mt-5 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">Entrar</a>
                 ) : (
                   <Link href={item.href} className="mt-5 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">Entrar</Link>
                 )}
               </article>
-            ))}
+            );
+            })}
           </div>
         </section>
       </main>
