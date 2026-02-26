@@ -18,10 +18,12 @@ type OnboardingData = {
   completed: boolean;
   completed_units: string[];
   conversation_suggested: boolean;
+  updated_at: string;
+  last_saved_at?: string;
 };
 
 type ApiResponse = {
-  config: { required: boolean; blockInternal: boolean };
+  config: { required: boolean; blockInternal: boolean; store: string; persistenceNote: string };
   units: OnboardingUnit[];
   onboarding: OnboardingData;
 };
@@ -33,6 +35,7 @@ export default function StudioOnboardingLandingPage() {
   const [units, setUnits] = useState<OnboardingUnit[]>([]);
   const [data, setData] = useState<OnboardingData | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [config, setConfig] = useState<ApiResponse["config"] | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -56,6 +59,7 @@ export default function StudioOnboardingLandingPage() {
 
         setUnits(onboarding.units || []);
         setData(onboarding.onboarding || null);
+        setConfig(onboarding.config || null);
         setIsAdmin(String(session.role || "") === "superadmin" || Boolean(session.canManageAccess));
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "No se pudo cargar onboarding.");
@@ -73,6 +77,8 @@ export default function StudioOnboardingLandingPage() {
     return units.find((unit) => !done.has(unit.slug)) || units[0];
   }, [data, units]);
 
+  const totalMinutes = useMemo(() => units.reduce((sum, unit) => sum + (unit.durationMinutes || 0), 0), [units]);
+
   if (loading) {
     return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando Onboarding..." /></main>;
   }
@@ -82,8 +88,9 @@ export default function StudioOnboardingLandingPage() {
       <section className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
         <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Studio Onboarding</h1>
         <p className="mt-3 text-sm text-slate-700">
-          Ruta obligatoria de alineación THO para identidad, método y protocolos operativos. Evaluación formativa (sin nota) próximamente.
+          Ruta obligatoria de alineación THO para identidad, método y protocolos operativos. Incluye evaluación formativa (sin nota punitiva).
         </p>
+        <p className="mt-2 text-xs text-slate-500">Duración estimada total: {totalMinutes} minutos.</p>
 
         <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <div className="flex items-center justify-between gap-3 text-sm">
@@ -97,7 +104,14 @@ export default function StudioOnboardingLandingPage() {
             Estado: {data?.completed ? "Completado" : "En curso"}
             {data?.conversation_suggested ? " · Conversación sugerida" : ""}
           </p>
+          <p className="mt-1 text-xs text-slate-500">Último guardado: {data?.last_saved_at ? new Date(data.last_saved_at).toLocaleString() : "Sin registro"}</p>
         </div>
+
+        {config ? (
+          <p className="mt-3 text-xs text-slate-500">
+            Persistencia: <strong>{config.store}</strong> · {config.persistenceNote}
+          </p>
+        ) : null}
 
         <div className="mt-5 grid gap-3">
           {units.map((unit, idx) => {
@@ -120,7 +134,7 @@ export default function StudioOnboardingLandingPage() {
 
         <div className="mt-6 flex flex-wrap gap-2">
           {nextUnit ? (
-            <Link href={`/studio/onboarding/${nextUnit.slug}`} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Comenzar</Link>
+            <Link href={`/studio/onboarding/${nextUnit.slug}`} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">Continuar donde quedaste</Link>
           ) : null}
           {isAdmin ? (
             <Link href="/studio/onboarding/admin" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Panel Admin Onboarding</Link>

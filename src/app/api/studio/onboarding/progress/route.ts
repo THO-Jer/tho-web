@@ -17,8 +17,9 @@ export async function POST(req: NextRequest) {
       getUnits(),
     ]);
     const progress = units.length ? Math.round((record.completed_units.length / units.length) * 100) : 0;
-    const completed = Boolean(record.completed_at) || (units.length > 0 && record.completed_units.length >= units.length);
-    return NextResponse.json({ onboarding: { ...record, progress, completed } });
+    const completedUnitsDone = units.length > 0 && record.completed_units.length >= units.length;
+    const completed = Boolean(record.completed_at) || completedUnitsDone;
+    return NextResponse.json({ onboarding: { ...record, progress, completed, completed_units_done: completedUnitsDone, last_saved_at: record.updated_at } });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "No se pudo actualizar progreso." }, { status: 400 });
   }

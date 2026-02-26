@@ -68,6 +68,7 @@ export default function StudioIndexPage() {
   const [message, setMessage] = useState("");
   const [oauthBaseUrl, setOauthBaseUrl] = useState("");
   const [canManageAccess, setCanManageAccess] = useState(false);
+  const [role, setRole] = useState("");
   const [permissions, setPermissions] = useState<StudioPermissions | null>(null);
   const [magicEmail, setMagicEmail] = useState("");
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
@@ -112,6 +113,7 @@ export default function StudioIndexPage() {
         setPermissions(null);
       }
       setCanManageAccess(Boolean(data.canManageAccess));
+      setRole(String(data.role || ""));
       if (typeof data.oauthBaseUrl === "string") {
         setOauthBaseUrl(data.oauthBaseUrl);
       }
@@ -266,7 +268,8 @@ export default function StudioIndexPage() {
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {modules.map((item) => {
-              const blockedByOnboarding = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && item.key !== "onboarding";
+              const isSuperAdmin = role === "superadmin";
+              const blockedByOnboarding = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && !isSuperAdmin && item.key !== "onboarding";
               return (
               <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.status}</div>
@@ -277,7 +280,7 @@ export default function StudioIndexPage() {
                 ) : !item.allowed(permissions) ? (
                   <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Sin permiso asignado</div>
                 ) : blockedByOnboarding ? (
-                  <div className="mt-5 inline-flex rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">Bloqueado hasta completar Onboarding</div>
+                  <div className="mt-5 inline-flex flex-wrap items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">Bloqueado hasta completar onboarding · <Link href="/studio/onboarding" className="underline underline-offset-2">Ir a onboarding</Link></div>
                 ) : item.external ? (
                   <a href={item.href} target="_blank" rel="noreferrer" className="mt-5 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">Entrar</a>
                 ) : (

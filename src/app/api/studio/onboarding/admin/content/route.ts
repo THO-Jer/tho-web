@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { OnboardingQuizQuestion, OnboardingUnit } from "@/content/onboardingContent";
 import { readSession } from "@/lib/adminAuth";
-import { OnboardingUnit } from "@/content/onboardingContent";
-import { canManageOnboarding, getUnits, setUnits } from "@/lib/onboardingStore";
+import { canManageOnboarding, getQuizForAdmin, getUnits, setQuiz, setUnits } from "@/lib/onboardingStore";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +30,27 @@ function sanitizeUnits(input: unknown): OnboardingUnit[] {
   return units;
 }
 
+function sanitizeQuiz(input: unknown): OnboardingQuizQuestion[] {
+  if (!Array.isArray(input)) throw new Error("Formato inválido de evaluación.");
+  const quiz = input
+    .map((question, idx) => ({
+      id: String((question as { id?: unknown }).id || `q${idx + 1}`).trim(),
+      prompt: String((question as { prompt?: unknown }).prompt || "").trim(),
+      options: Array.isArray((question as { options?: unknown[] }).options)
+        ? ((question as { options?: unknown[] }).options || []).map((opt) => String(opt || "").trim()).filter(Boolean)
+        : [],
+      correctIndex: Math.max(0, Number((question as { correctIndex?: unknown }).correctIndex || 0)),
+      topic: String((question as { topic?: unknown }).topic || "general").trim(),
+    }))
+    .filter((question) => question.id && question.prompt && question.options.length >= 2 && question.correctIndex < question.options.length);
+
+  if (quiz.length < 8 || quiz.length > 12) {
+    throw new Error("La evaluación debe tener entre 8 y 12 preguntas.");
+  }
+
+  return quiz;
+}
+
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
@@ -38,8 +59,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Solo admin puede editar contenido onboarding." }, { status: 403 });
   }
 
-  const units = await getUnits();
-  return NextResponse.json({ units });
+  const [units, quiz] = await Promise.all([getUnits(), getQuizForAdmin()]);
+  return NextResponse.json({ units, quiz });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -51,10 +72,11 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const payload = (await req.json()) as { units?: unknown };
+    const payload = (await req.json()) as { units?: unknown; quiz?: unknown };
     const nextUnits = sanitizeUnits(payload.units);
-    const units = await setUnits(nextUnits);
-    return NextResponse.json({ ok: true, units });
+    const nextQuiz = sanitizeQuiz(payload.quiz);
+    const [units, quiz] = await Promise.all([setUnits(nextUnits), setQuiz(nextQuiz)]);
+    return NextResponse.json({ ok: true, units, quiz });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "No se pudo guardar contenido." }, { status: 400 });
   }

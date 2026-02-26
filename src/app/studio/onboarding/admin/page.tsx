@@ -14,6 +14,8 @@ type RecordRow = {
   conversation_suggested: boolean;
   internal_signal?: string;
   updated_at: string;
+  last_access_at?: string;
+  quiz_result?: { score: number; total: number; topics_to_reinforce: string[] };
 };
 
 type Unit = {
@@ -24,16 +26,25 @@ type Unit = {
   content: string[];
 };
 
+type QuizQuestion = {
+  id: string;
+  prompt: string;
+  options: string[];
+  correctIndex?: number;
+  topic: string;
+};
+
 export default function StudioOnboardingAdminPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [rows, setRows] = useState<RecordRow[]>([]);
   const [units, setUnits] = useState<Unit[]>([]);
+  const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [selectedEmail, setSelectedEmail] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [message, setMessage] = useState("");
-  const [contentDraft, setContentDraft] = useState("[]");
+  const [contentDraft, setContentDraft] = useState("{}");
 
   useEffect(() => {
     const run = async () => {
@@ -46,22 +57,24 @@ export default function StudioOnboardingAdminPage() {
           return;
         }
 
-        const [recordsRes, unitsRes] = await Promise.all([
+        const [recordsRes, contentRes] = await Promise.all([
           fetch("/api/studio/onboarding/admin", { credentials: "include", cache: "no-store" }),
           fetch("/api/studio/onboarding/admin/content", { credentials: "include", cache: "no-store" }),
         ]);
 
         const recordsData = await recordsRes.json();
-        const unitsData = await unitsRes.json();
-        if (!recordsRes.ok || !unitsRes.ok) {
-          throw new Error(recordsData.error || unitsData.error || "No autorizado para panel onboarding.");
+        const contentData = await contentRes.json();
+        if (!recordsRes.ok || !contentRes.ok) {
+          throw new Error(recordsData.error || contentData.error || "No autorizado para panel onboarding.");
         }
 
         const records = (recordsData.records || []) as RecordRow[];
-        const unitRows = (unitsData.units || []) as Unit[];
+        const unitRows = (contentData.units || []) as Unit[];
+        const quizRows = (contentData.quiz || []) as QuizQuestion[];
         setRows(records);
         setUnits(unitRows);
-        setContentDraft(JSON.stringify(unitRows, null, 2));
+        setQuiz(quizRows);
+        setContentDraft(JSON.stringify({ units: unitRows, quiz: quizRows }, null, 2));
         setSelectedEmail((prev) => prev || records[0]?.email || "");
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "No se pudo cargar panel onboarding.");
@@ -83,11 +96,15 @@ export default function StudioOnboardingAdminPage() {
   const active = filteredRows.find((row) => row.email === selectedEmail) || filteredRows[0];
 
   function exportCsv() {
-    const header = ["email", "progress", "completed_at", "conversation_suggested", "updated_at", "completed_units"];
+    const header = ["email", "progress", "last_access_at", "completed_at", "quiz_score", "quiz_total", "topics_to_reinforce", "conversation_suggested", "updated_at", "completed_units"];
     const lines = filteredRows.map((row) => [
       row.email,
       String(row.progress),
+      row.last_access_at || "",
       row.completed_at || "",
+      row.quiz_result ? String(row.quiz_result.score) : "",
+      row.quiz_result ? String(row.quiz_result.total) : "",
+      row.quiz_result ? row.quiz_result.topics_to_reinforce.join("|") : "",
       row.conversation_suggested ? "yes" : "no",
       row.updated_at,
       row.completed_units.join("|")
@@ -102,22 +119,41 @@ export default function StudioOnboardingAdminPage() {
     URL.revokeObjectURL(url);
   }
 
+  async function sendReminder(email: string) {
+    setMessage("");
+    try {
+      const res = await fetch("/api/studio/onboarding/admin", {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "send_reminder", email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo enviar recordatorio.");
+      setMessage(`Recordatorio enviado a ${email}.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Error enviando recordatorio.");
+    }
+  }
+
   async function saveContent() {
     setSaving(true);
     setMessage("");
     try {
-      const parsed = JSON.parse(contentDraft);
+      const parsed = JSON.parse(contentDraft) as { units?: unknown; quiz?: unknown };
       const res = await fetch("/api/studio/onboarding/admin/content", {
         method: "PATCH",
         credentials: "include",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ units: parsed }),
+        body: JSON.stringify({ units: parsed.units, quiz: parsed.quiz }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo guardar contenido.");
-      const next = (data.units || []) as Unit[];
-      setUnits(next);
-      setContentDraft(JSON.stringify(next, null, 2));
+      const nextUnits = (data.units || []) as Unit[];
+      const nextQuiz = (data.quiz || []) as QuizQuestion[];
+      setUnits(nextUnits);
+      setQuiz(nextQuiz);
+      setContentDraft(JSON.stringify({ units: nextUnits, quiz: nextQuiz }, null, 2));
       setMessage("Contenido onboarding actualizado.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error guardando contenido.");
@@ -136,11 +172,12 @@ export default function StudioOnboardingAdminPage() {
       <div className="mx-auto max-w-6xl space-y-4">
         <section className="rounded-2xl border border-slate-200 bg-white p-5">
           <h1 className="font-tho-title text-3xl text-slate-950">Panel Admin · Studio Onboarding</h1>
-          <p className="mt-2 text-sm text-slate-700">Estado de usuarios, señales internas y editor básico de contenido.</p>
+          <p className="mt-2 text-sm text-slate-700">Estado de usuarios, señales internas, resultado quiz y editor básico de contenido.</p>
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             <span className="rounded-md bg-slate-100 px-2 py-1">Usuarios: {rows.length}</span>
             <span className="rounded-md bg-slate-100 px-2 py-1">Completado: {completedCount}</span>
             <span className="rounded-md bg-slate-100 px-2 py-1">Progreso promedio: {avgProgress}%</span>
+            <span className="rounded-md bg-slate-100 px-2 py-1">Quiz preguntas: {quiz.length}</span>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-3 py-2 text-xs hover:bg-slate-50">Volver onboarding</Link>
@@ -175,7 +212,10 @@ export default function StudioOnboardingAdminPage() {
               <div className="space-y-3">
                 <h3 className="text-lg font-semibold text-slate-900">{active.email}</h3>
                 <p className="text-sm text-slate-700">Estado: {active.completed_at ? "Completado" : "En curso"} · {active.progress}%</p>
+                <p className="text-sm text-slate-700">Último acceso: {active.last_access_at ? new Date(active.last_access_at).toLocaleString() : "Sin registro"}</p>
                 <p className="text-sm text-slate-700">Señal interna: {active.conversation_suggested ? "Conversación sugerida" : "Sin señal"}</p>
+                <p className="text-sm text-slate-700">Quiz: {active.quiz_result ? `${active.quiz_result.score}% (${active.quiz_result.total} preguntas)` : "Sin responder"}</p>
+                <p className="text-xs text-slate-500">Tópicos a reforzar: {active.quiz_result?.topics_to_reinforce?.length ? active.quiz_result.topics_to_reinforce.join(", ") : "Ninguno"}</p>
                 <p className="text-xs text-slate-500">Recomendación automática: {active.progress < 50 ? "Sugerir conversación de alineación temprana." : active.completed_at ? "Alineación base lograda, mantener seguimiento normal." : "Reforzar expectativas y cierre de módulos."}</p>
                 <div>
                   <h4 className="text-sm font-semibold text-slate-800">Unidades completadas</h4>
@@ -184,6 +224,7 @@ export default function StudioOnboardingAdminPage() {
                     {!active.completed_units.length ? <li>Sin avances todavía.</li> : null}
                   </ul>
                 </div>
+                <button type="button" onClick={() => sendReminder(active.email)} className="rounded-lg border border-slate-300 px-3 py-2 text-xs hover:bg-slate-50">Enviar recordatorio</button>
               </div>
             )}
           </div>
@@ -191,7 +232,7 @@ export default function StudioOnboardingAdminPage() {
 
         <section className="rounded-2xl border border-slate-200 bg-white p-4">
           <h2 className="text-sm font-semibold text-slate-900">Editor básico de contenido (JSON)</h2>
-          <p className="mt-1 text-xs text-slate-500">Iteración inicial para evitar tocar código: editable por admin desde panel.</p>
+          <p className="mt-1 text-xs text-slate-500">Editable por admin: incluye `units` y `quiz` (8–12 preguntas).</p>
           <textarea value={contentDraft} onChange={(e) => setContentDraft(e.target.value)} rows={14} className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs" />
           <div className="mt-2 flex gap-2">
             <button type="button" onClick={saveContent} disabled={saving} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">Guardar contenido</button>

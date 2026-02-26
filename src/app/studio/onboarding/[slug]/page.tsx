@@ -15,9 +15,19 @@ type Unit = {
   resources?: Array<{ label: string; href: string }>;
 };
 
+type QuizQuestion = {
+  id: string;
+  prompt: string;
+  options: string[];
+  topic: string;
+};
+
 type Onboarding = {
   completed_units: string[];
   progress: number;
+  completed_units_done?: boolean;
+  quiz_result?: { score: number; total: number; topics_to_reinforce: string[] };
+  last_saved_at?: string;
 };
 
 export default function StudioOnboardingUnitPage() {
@@ -28,7 +38,9 @@ export default function StudioOnboardingUnitPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [units, setUnits] = useState<Unit[]>([]);
+  const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [onboarding, setOnboarding] = useState<Onboarding | null>(null);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -42,6 +54,7 @@ export default function StudioOnboardingUnitPage() {
           return;
         }
         setUnits((data.units || []) as Unit[]);
+        setQuiz((data.quiz || []) as QuizQuestion[]);
         setOnboarding(data.onboarding as Onboarding);
       } catch {
         router.replace("/studio");
@@ -72,9 +85,36 @@ export default function StudioOnboardingUnitPage() {
       if (!res.ok) throw new Error(data.error || "No se pudo guardar progreso.");
       setOnboarding(data.onboarding as Onboarding);
       if (next) router.push(`/studio/onboarding/${next.slug}`);
-      else router.push("/studio/onboarding");
+      else router.push(`/studio/onboarding/${unit.slug}`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo guardar avance.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function onSubmitQuiz() {
+    setSaving(true);
+    setMessage("");
+    try {
+      const payload = quiz.map((question) => ({ question_id: question.id, selected_index: answers[question.id] ?? -1 }));
+      if (payload.some((answer) => answer.selected_index < 0)) {
+        throw new Error("Debes responder todas las preguntas antes de finalizar.");
+      }
+
+      const res = await fetch("/api/studio/onboarding/quiz", {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ answers: payload }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo guardar evaluación.");
+      setOnboarding(data.onboarding as Onboarding);
+      setMessage("Evaluación formativa enviada. ¡Onboarding completado!");
+      router.push("/studio/onboarding");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudo enviar evaluación.");
     } finally {
       setSaving(false);
     }
@@ -94,6 +134,7 @@ export default function StudioOnboardingUnitPage() {
   }
 
   const done = Boolean(onboarding?.completed_units?.includes(unit.slug));
+  const showQuiz = !next && Boolean(onboarding?.completed_units_done || done);
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -121,12 +162,43 @@ export default function StudioOnboardingUnitPage() {
 
         <div className="mt-6 flex flex-wrap gap-2">
           <button type="button" onClick={onContinue} disabled={saving} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-            {next ? "Continuar" : "Finalizar módulo"}
+            {next ? "Continuar" : "Finalizar módulos"}
           </button>
           <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver</Link>
         </div>
 
-        <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}%</p>
+        <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {onboarding?.last_saved_at ? new Date(onboarding.last_saved_at).toLocaleString() : "Sin registro"}</p>
+
+        {showQuiz ? (
+          <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <h2 className="text-lg font-semibold text-slate-900">Evaluación formativa final</h2>
+            <p className="mt-1 text-sm text-slate-700">No punitiva: su objetivo es detectar tópicos a reforzar para conversación de alineación.</p>
+            <div className="mt-4 space-y-4">
+              {quiz.map((question, index) => (
+                <fieldset key={question.id} className="rounded-lg border border-slate-200 bg-white p-3">
+                  <legend className="text-sm font-semibold text-slate-800">{index + 1}. {question.prompt}</legend>
+                  <div className="mt-2 grid gap-2">
+                    {question.options.map((option, optionIndex) => (
+                      <label key={`${question.id}-${optionIndex}`} className="inline-flex items-center gap-2 text-sm text-slate-700">
+                        <input
+                          type="radio"
+                          name={question.id}
+                          checked={answers[question.id] === optionIndex}
+                          onChange={() => setAnswers((prev) => ({ ...prev, [question.id]: optionIndex }))}
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              ))}
+            </div>
+            <button type="button" onClick={onSubmitQuiz} disabled={saving} className="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+              Enviar evaluación formativa
+            </button>
+          </div>
+        ) : null}
+
         {message ? <p className="mt-2 text-sm text-slate-700">{message}</p> : null}
       </section>
     </main>

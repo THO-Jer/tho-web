@@ -7,6 +7,14 @@ export type OnboardingUnit = {
   resources?: Array<{ label: string; href: string }>;
 };
 
+export type OnboardingQuizQuestion = {
+  id: string;
+  prompt: string;
+  options: string[];
+  correctIndex: number;
+  topic: string;
+};
+
 export const defaultOnboardingUnits: OnboardingUnit[] = [
   {
     slug: "identidad-tho",
@@ -59,4 +67,17 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
       "Información sensible: resguardo, necesidad de acceso y manejo ético.",
     ],
   },
+];
+
+export const defaultOnboardingQuiz: OnboardingQuizQuestion[] = [
+  { id: "q1", prompt: "¿Qué combina el enfoque THO?", options: ["Rigor + Cercanía", "Sólo velocidad", "Sólo creatividad"], correctIndex: 0, topic: "identidad" },
+  { id: "q2", prompt: "¿Cuál valor implica iterar según contexto?", options: ["Humanidad", "Adaptabilidad", "Rentabilidad"], correctIndex: 1, topic: "identidad" },
+  { id: "q3", prompt: "En ventas THO, la ruta correcta es:", options: ["Implementación → Ticket", "Ticket → Estrategia → Implementación", "Estrategia → Ticket"], correctIndex: 1, topic: "ventas" },
+  { id: "q4", prompt: "¿Qué requiere siempre trazabilidad comercial?", options: ["Decisiones relevantes", "Sólo reuniones", "Nada"], correctIndex: 0, topic: "ventas" },
+  { id: "q5", prompt: "En operación creativa, la fuente principal de coordinación es:", options: ["WhatsApp", "Teams", "Correo personal"], correctIndex: 1, topic: "operacion_creativa" },
+  { id: "q6", prompt: "¿Qué elemento es obligatorio en piezas audiovisuales/gráficas?", options: ["Versionamiento", "Publicar inmediato", "No documentar"], correctIndex: 0, topic: "operacion_creativa" },
+  { id: "q7", prompt: "Un entregable mínimo de asesoría debe incluir:", options: ["Sólo diseño", "Evidencia y próximos pasos", "Sólo presupuesto"], correctIndex: 1, topic: "operacion_asesorias" },
+  { id: "q8", prompt: "Información sensible se maneja con:", options: ["Acceso abierto", "Mínimo acceso y resguardo", "Sin reglas"], correctIndex: 1, topic: "seguridad" },
+  { id: "q9", prompt: "¿Cuál es el rol esperado en comunicación con cliente?", options: ["Product Owner + equipo técnico", "Sin responsables", "Sólo ventas"], correctIndex: 0, topic: "operacion" },
+  { id: "q10", prompt: "La evaluación final de onboarding es:", options: ["Punitiva", "Formativa y de alineación", "Opcional sin registro"], correctIndex: 1, topic: "onboarding" },
 ];
