@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import { defaultOnboardingQuiz, defaultOnboardingUnits, OnboardingQuizQuestion, OnboardingUnit } from "@/content/onboardingContent";
+import { hasOnboardingSupabaseStore, readOnboardingStateFromSupabase, upsertOnboardingSupabaseRecords, writeOnboardingSupabaseQuiz, writeOnboardingSupabaseUnits } from "@/lib/onboardingStoreSupabase";
 import { getWritableDataPath } from "@/lib/storagePaths";
 
 export type OnboardingQuizResult = {
@@ -36,6 +37,10 @@ const ONBOARDING_UNITS_TABLE = process.env.ONBOARDING_UNITS_TABLE || "studio_onb
 const ONBOARDING_RECORDS_TABLE = process.env.ONBOARDING_RECORDS_TABLE || "studio_onboarding_records";
 const ONBOARDING_QUIZ_TABLE = process.env.ONBOARDING_QUIZ_TABLE || "studio_onboarding_quiz";
 
+function hasSupabaseStore() {
+  return hasOnboardingSupabaseStore(ONBOARDING_STORE);
+}
+
 function normalizeEmail(email: string) {
   return String(email || "").trim().toLowerCase();
 }
@@ -48,46 +53,8 @@ function parseBool(value: string | undefined, fallback: boolean) {
   return fallback;
 }
 
-function getSupabaseEnv() {
-  const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/^ttps:\/\//, "https://").replace(/\/$/, "");
-  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
-  return { url, service };
-}
-
-function hasSupabaseStore() {
-  const { url, service } = getSupabaseEnv();
-  if (ONBOARDING_STORE === "json") return false;
-  if (ONBOARDING_STORE === "supabase") return Boolean(url && service);
-  return Boolean(url && service);
-}
-
-export function getOnboardingStoreMode() {
-  return hasSupabaseStore() ? "supabase" : "json";
-}
-
-async function supabaseRequest(pathname: string, init?: RequestInit) {
-  const { url, service } = getSupabaseEnv();
-  if (!url || !service) throw new Error("Supabase onboarding store no configurado.");
-
-  const res = await fetch(`${url}${pathname}`, {
-    ...init,
-    headers: {
-      apikey: service,
-      Authorization: `Bearer ${service}`,
-      "content-type": "application/json",
-      Prefer: "return=representation",
-      ...(init?.headers || {}),
-    },
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`Supabase onboarding store error (${res.status}): ${body}`);
-  }
-
-  if (res.status === 204) return null;
-  return res.json();
+function allowsQuizRetry() {
+  return parseBool(process.env.ONBOARDING_QUIZ_ALLOW_RETRY, false);
 }
 
 export function getOnboardingConfig() {
@@ -106,6 +73,7 @@ export function getOnboardingConfig() {
     persistenceNote: hasSupabaseStore()
       ? "Persistencia en Supabase (sobrevive reinicios y redeploy)."
       : "Persistencia en JSON local (/tmp en Vercel puede ser efímero).",
+    quizAllowRetry: allowsQuizRetry(),
   };
 }
 
@@ -216,41 +184,26 @@ async function writeStateToJson(state: OnboardingState) {
 }
 
 async function readStateFromSupabase(): Promise<OnboardingState> {
-  const [unitsRows, quizRows, recordsRows] = await Promise.all([
-    supabaseRequest(`/rest/v1/${ONBOARDING_UNITS_TABLE}?select=data&limit=1`).catch(() => []),
-    supabaseRequest(`/rest/v1/${ONBOARDING_QUIZ_TABLE}?select=data&limit=1`).catch(() => []),
-    supabaseRequest(`/rest/v1/${ONBOARDING_RECORDS_TABLE}?select=*&order=email.asc`).catch(() => []),
-  ]);
-
-  const unitsData = Array.isArray(unitsRows) && unitsRows[0] ? (unitsRows[0] as { data?: unknown }).data : undefined;
-  const quizData = Array.isArray(quizRows) && quizRows[0] ? (quizRows[0] as { data?: unknown }).data : undefined;
-
-  return {
-    units: normalizeUnits(unitsData),
-    quiz: normalizeQuiz(quizData),
-    records: normalizeRecords(recordsRows),
-  };
+  return readOnboardingStateFromSupabase({
+    unitsTable: ONBOARDING_UNITS_TABLE,
+    quizTable: ONBOARDING_QUIZ_TABLE,
+    recordsTable: ONBOARDING_RECORDS_TABLE,
+    normalizeUnits,
+    normalizeQuiz,
+    normalizeRecords,
+  });
 }
 
 async function upsertSupabaseRecords(records: OnboardingRecord[]) {
-  await supabaseRequest(`/rest/v1/${ONBOARDING_RECORDS_TABLE}?on_conflict=email`, {
-    method: "POST",
-    body: JSON.stringify(records),
-  });
+  await upsertOnboardingSupabaseRecords(ONBOARDING_RECORDS_TABLE, records);
 }
 
 async function writeUnitsToSupabase(units: OnboardingUnit[]) {
-  await supabaseRequest(`/rest/v1/${ONBOARDING_UNITS_TABLE}?on_conflict=id`, {
-    method: "POST",
-    body: JSON.stringify([{ id: 1, data: units }]),
-  });
+  await writeOnboardingSupabaseUnits(ONBOARDING_UNITS_TABLE, units);
 }
 
 async function writeQuizToSupabase(quiz: OnboardingQuizQuestion[]) {
-  await supabaseRequest(`/rest/v1/${ONBOARDING_QUIZ_TABLE}?on_conflict=id`, {
-    method: "POST",
-    body: JSON.stringify([{ id: 1, data: quiz }]),
-  });
+  await writeOnboardingSupabaseQuiz(ONBOARDING_QUIZ_TABLE, quiz);
 }
 
 async function readState(): Promise<OnboardingState> {

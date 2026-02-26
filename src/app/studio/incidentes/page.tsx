@@ -33,6 +33,11 @@ type SessionData = {
   permissions?: { canIncidents?: boolean };
 };
 
+type OnboardingStatus = {
+  config?: { required?: boolean; blockInternal?: boolean };
+  onboarding?: { completed?: boolean };
+};
+
 type TriageForm = {
   status: Incident["status"];
   process_phase: string;
@@ -84,19 +89,39 @@ export default function StudioIncidentesPage() {
   const [newPin, setNewPin] = useState("");
   const [requestInfoText, setRequestInfoText] = useState("");
   const [triage, setTriage] = useState<TriageForm | null>(null);
+  const [blockedByOnboarding, setBlockedByOnboarding] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/session", { credentials: "include" })
-      .then((res) => res.json())
-      .then((data: SessionData) => {
+    const run = async () => {
+      try {
+        const sessionRes = await fetch("/api/admin/session", { credentials: "include" });
+        const data = (await sessionRes.json()) as SessionData;
         if (!data.authenticated || !data.permissions?.canIncidents) {
           router.replace("/studio");
           return;
         }
-        setIsSuperAdmin(String(data.role || "") === "superadmin");
-      })
-      .catch(() => router.replace("/studio"))
-      .finally(() => setChecking(false));
+
+        const isSuper = String(data.role || "") === "superadmin";
+        setIsSuperAdmin(isSuper);
+
+        if (!isSuper) {
+          const onboardingRes = await fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" });
+          const onboarding = (await onboardingRes.json()) as OnboardingStatus;
+          if (onboardingRes.ok) {
+            const required = Boolean(onboarding.config?.required ?? true);
+            const blockInternal = Boolean(onboarding.config?.blockInternal ?? false);
+            const completed = Boolean(onboarding.onboarding?.completed);
+            setBlockedByOnboarding(required && blockInternal && !completed);
+          }
+        }
+      } catch {
+        router.replace("/studio");
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    run().catch(() => undefined);
   }, [router]);
 
   const loadIncidents = useCallback(async () => {
@@ -205,6 +230,21 @@ export default function StudioIncidentesPage() {
   }
 
   if (checking) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando Canal Confidencial..." /></main>;
+
+  if (blockedByOnboarding) {
+    return (
+      <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
+        <section className="mx-auto max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6">
+          <h1 className="text-2xl font-semibold text-amber-900">Bloqueado hasta completar onboarding</h1>
+          <p className="mt-2 text-sm text-amber-900">Para acceder a este módulo interno debes completar Studio Onboarding.</p>
+          <div className="mt-4 flex gap-2">
+            <Link href="/studio/onboarding" className="rounded-lg bg-amber-900 px-4 py-2 text-sm font-semibold text-white">Ir a onboarding</Link>
+            <Link href="/studio" className="rounded-lg border border-amber-400 px-4 py-2 text-sm text-amber-900">Volver al Studio</Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   const showCommitteePanel = isSuperAdmin && !previewMode;
 
