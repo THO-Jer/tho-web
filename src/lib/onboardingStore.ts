@@ -402,6 +402,10 @@ export async function submitQuiz(email: string, answers: Array<{ question_id: st
     last_access_at: now,
   };
 
+  if (current.quiz_result && !allowsQuizRetry()) {
+    throw new Error("La evaluación ya fue respondida.");
+  }
+
   const applicableUnits = getApplicableUnitsByTrack(state.units, current.track || "general");
   const applicableSlugs = new Set(applicableUnits.map((u) => u.slug));
   const filteredQuiz = state.quiz.filter((q) => {

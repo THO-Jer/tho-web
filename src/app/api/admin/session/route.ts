@@ -80,6 +80,59 @@ export async function POST(req: NextRequest) {
     const token = (payload.accessToken || "").trim();
     if (!token) return NextResponse.json({ error: "Token OAuth faltante." }, { status: 400 });
 
+  const normalizedBase = raw.replace(/\/$/, "");
+  if (normalizedBase.endsWith("/studio")) return normalizedBase;
+  return `${normalizedBase}/studio`;
+}
+
+function getStudioRedirectUrl() {
+  const explicit = normalizeStudioRedirectUrl(process.env.STUDIO_AUTH_REDIRECT_URL || process.env.NEXT_PUBLIC_STUDIO_URL);
+  if (explicit) return explicit;
+
+  return null;
+}
+
+function getSourceIp(req: NextRequest) {
+  const forwarded = req.headers.get("x-forwarded-for") || "";
+  if (forwarded) return forwarded.split(",")[0]?.trim();
+  return req.headers.get("x-real-ip") || undefined;
+}
+
+export async function GET(req: NextRequest) {
+  const session = await readSession(req);
+  const { url } = getSupabaseEnv();
+  const studioRedirectUrl = getStudioRedirectUrl();
+  return NextResponse.json({
+    authenticated: Boolean(session),
+    email: session?.email ?? null,
+    provider: session?.provider ?? null,
+    oauthBaseUrl: url ?? null,
+    studioRedirectUrl,
+    canManageAccess: Boolean(session?.canManageAccess),
+    role: session?.role ?? null,
+    permissions: session
+      ? {
+          canBlog: session.canBlog,
+          canCrm: session.canCrm,
+          canIncidents: session.canIncidents,
+          canOnboarding: session.canOnboarding,
+        }
+      : null,
+  });
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const payload = (await req.json()) as { action?: string; accessToken?: string };
+    const action = String(payload.action || "").trim();
+
+    if (action !== "oauth_login") {
+      return NextResponse.json({ error: "Acción no válida. Usa OAuth." }, { status: 400 });
+    }
+
+    const token = (payload.accessToken || "").trim();
+    if (!token) return NextResponse.json({ error: "Token OAuth faltante." }, { status: 400 });
+
     const valid = await validateSupabaseAccessToken(token);
     if (!valid) {
       const tokenUser = await getUserFromToken(token);
