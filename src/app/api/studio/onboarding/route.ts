@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const session = await readSession(req);
     if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  if (session.canOnboarding === false) return NextResponse.json({ error: "Sin acceso al módulo onboarding." }, { status: 403 });
 
     const [units, record, quiz] = await Promise.all([
       getUnits(),

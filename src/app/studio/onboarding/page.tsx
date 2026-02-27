@@ -64,8 +64,8 @@ export default function StudioOnboardingLandingPage() {
           fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" }),
         ]);
 
-        const session = (await parseJsonSafe<{ authenticated?: boolean; role?: string; canManageAccess?: boolean }>(sessionRes)) || {};
-        if (!session.authenticated) {
+        const session = (await parseJsonSafe<{ authenticated?: boolean; role?: string; canManageAccess?: boolean; permissions?: { canOnboarding?: boolean } }>(sessionRes)) || {};
+        if (!session.authenticated || session.permissions?.canOnboarding === false) {
           router.replace("/studio");
           return;
         }

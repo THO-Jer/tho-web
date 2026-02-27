@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
           canBlog: session.canBlog,
           canCrm: session.canCrm,
           canIncidents: session.canIncidents,
+          canOnboarding: session.canOnboarding,
         }
       : null,
   });
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
         canBlog: valid.permissions.canBlog,
         canCrm: valid.permissions.canCrm,
         canIncidents: valid.permissions.canIncidents,
+        canOnboarding: valid.permissions.canOnboarding,
       },
     });
 

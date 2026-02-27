@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { readSession } from "@/lib/adminAuth";
+import { isStudioSuperAdmin, readSession } from "@/lib/adminAuth";
 import {
   blockEmail,
   listAccessRequests,
@@ -16,17 +16,57 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function getConfiguredSuperAdmins() {
+  return (process.env.STUDIO_SUPERADMINS || "max@tho.cl,francisco@tho.cl,jeremias@tho.cl")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function withSuperAdmins(authorizedUsers: Array<{
+  email: string;
+  provider: "google" | "azure" | "any";
+  active: boolean;
+  permissions: { canBlog: boolean; canCrm: boolean; canIncidents: boolean; canOnboarding: boolean };
+  updatedAt: string;
+  role?: string;
+  blocked?: boolean;
+}>) {
+  const byEmail = new Map(authorizedUsers.map((user) => [user.email, user]));
+  for (const email of getConfiguredSuperAdmins()) {
+    if (!byEmail.has(email)) {
+      byEmail.set(email, {
+        email,
+        provider: "azure",
+        active: true,
+        permissions: {
+          canBlog: true,
+          canCrm: true,
+          canIncidents: true,
+          canOnboarding: true,
+        },
+        updatedAt: new Date().toISOString(),
+        role: "superadmin",
+        blocked: false,
+      });
+    }
+  }
+
+  return Array.from(byEmail.values()).sort((a, b) => a.email.localeCompare(b.email, "es"));
+}
+
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   if (!session.canManageAccess) return NextResponse.json({ error: "Solo superadmin puede gestionar accesos." }, { status: 403 });
 
-  const [blockedEmails, logs, authorizedUsers, accessRequests] = await Promise.all([
+  const [blockedEmails, logs, authorizedUsersRaw, accessRequests] = await Promise.all([
     listBlockedEmails(),
     listStudioLoginLogs(250),
     listAuthorizedUsers(),
     listAccessRequests(),
   ]);
+  const authorizedUsers = withSuperAdmins(authorizedUsersRaw);
   return NextResponse.json({ blockedEmails, logs, authorizedUsers, accessRequests });
 }
 
@@ -55,17 +95,19 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "grant") {
-      const authorizedUsers = await upsertAuthorizedUser({
+      const authorizedUsersRaw = await upsertAuthorizedUser({
         email,
         provider: (payload.provider || "google") as StudioUserProvider,
+        role: isStudioSuperAdmin(email) ? "superadmin" : (payload.role || "member"),
         active: payload.active !== false,
         permissions: {
           canBlog: Boolean(payload.permissions?.canBlog),
           canCrm: Boolean(payload.permissions?.canCrm),
           canIncidents: Boolean(payload.permissions?.canIncidents),
+          canOnboarding: payload.permissions?.canOnboarding !== false,
         },
       });
-      return NextResponse.json({ ok: true, authorizedUsers });
+      return NextResponse.json({ ok: true, authorizedUsers: withSuperAdmins(authorizedUsersRaw) });
     }
 
     if (action === "approve_request") {
@@ -73,18 +115,20 @@ export async function POST(req: NextRequest) {
       if (!requestId) return NextResponse.json({ error: "requestId es obligatorio." }, { status: 400 });
 
       await resolveAccessRequest(requestId, "approved");
-      const authorizedUsers = await upsertAuthorizedUser({
+      const authorizedUsersRaw = await upsertAuthorizedUser({
         email,
         provider: (payload.provider || "google") as StudioUserProvider,
+        role: isStudioSuperAdmin(email) ? "superadmin" : (payload.role || "member"),
         active: payload.active !== false,
         permissions: {
           canBlog: Boolean(payload.permissions?.canBlog),
           canCrm: Boolean(payload.permissions?.canCrm),
           canIncidents: Boolean(payload.permissions?.canIncidents),
+          canOnboarding: payload.permissions?.canOnboarding !== false,
         },
       });
       const accessRequests = await listAccessRequests();
-      return NextResponse.json({ ok: true, authorizedUsers, accessRequests });
+      return NextResponse.json({ ok: true, authorizedUsers: withSuperAdmins(authorizedUsersRaw), accessRequests });
     }
 
     if (action === "reject_request") {
@@ -95,8 +139,8 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "revoke") {
-      const authorizedUsers = await removeAuthorizedUser(email);
-      return NextResponse.json({ ok: true, authorizedUsers });
+      const authorizedUsersRaw = await removeAuthorizedUser(email);
+      return NextResponse.json({ ok: true, authorizedUsers: withSuperAdmins(authorizedUsersRaw) });
     }
 
     return NextResponse.json({ error: "Acción inválida." }, { status: 400 });

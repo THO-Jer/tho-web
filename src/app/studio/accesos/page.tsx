@@ -1,18 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { BrandLoader } from "@/components/BrandLoader";
 
 type LoginLog = { at: string; email: string; provider: string; ip?: string };
+type Permissions = { canBlog: boolean; canCrm: boolean; canIncidents: boolean; canOnboarding: boolean };
 type AuthorizedUser = {
   email: string;
   provider: "google" | "azure" | "any";
   active: boolean;
-  permissions: { canBlog: boolean; canCrm: boolean; canIncidents: boolean };
+  permissions: Permissions;
   updatedAt: string;
+  role?: string;
 };
 type AccessRequest = {
   id: string;
@@ -23,6 +25,14 @@ type AccessRequest = {
   resolvedAt?: string;
 };
 
+type RowEditorState = {
+  provider: "google" | "azure" | "any";
+  canBlog: boolean;
+  canCrm: boolean;
+  canIncidents: boolean;
+  canOnboarding: boolean;
+};
+
 export default function StudioAccesosPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
@@ -31,30 +41,48 @@ export default function StudioAccesosPage() {
   const [logs, setLogs] = useState<LoginLog[]>([]);
   const [authorized, setAuthorized] = useState<AuthorizedUser[]>([]);
   const [requests, setRequests] = useState<AccessRequest[]>([]);
+  const [rowEditors, setRowEditors] = useState<Record<string, RowEditorState>>({});
   const [emailInput, setEmailInput] = useState("");
   const [grantProvider, setGrantProvider] = useState<"google" | "azure" | "any">("google");
   const [grantBlog, setGrantBlog] = useState(true);
   const [grantCrm, setGrantCrm] = useState(true);
   const [grantIncidents, setGrantIncidents] = useState(false);
+  const [grantOnboarding, setGrantOnboarding] = useState(true);
   const [message, setMessage] = useState("");
 
-  async function loadData() {
+  function hydrateEditors(users: AuthorizedUser[]) {
+    const next: Record<string, RowEditorState> = {};
+    for (const user of users) {
+      next[user.email] = {
+        provider: user.provider,
+        canBlog: Boolean(user.permissions?.canBlog),
+        canCrm: Boolean(user.permissions?.canCrm),
+        canIncidents: Boolean(user.permissions?.canIncidents),
+        canOnboarding: user.permissions?.canOnboarding !== false,
+      };
+    }
+    setRowEditors(next);
+  }
+
+  const loadData = useCallback(async () => {
     setLoading(true);
     setMessage("");
     try {
       const res = await fetch("/api/admin/access-control", { credentials: "include", cache: "no-store" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo cargar control de accesos.");
+      const users = (data.authorizedUsers || []) as AuthorizedUser[];
       setBlocked(data.blockedEmails || []);
       setLogs(data.logs || []);
-      setAuthorized(data.authorizedUsers || []);
+      setAuthorized(users);
       setRequests(data.accessRequests || []);
+      hydrateEditors(users);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error cargando datos.");
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
@@ -68,9 +96,9 @@ export default function StudioAccesosPage() {
       })
       .catch(() => router.replace("/studio"))
       .finally(() => setChecking(false));
-  }, [router]);
+  }, [router, loadData]);
 
-  async function onAction(action: "block" | "unblock" | "grant" | "revoke" | "approve_request" | "reject_request", email: string, requestId?: string) {
+  async function onAction(action: "block" | "unblock" | "grant" | "revoke" | "approve_request" | "reject_request", email: string, requestId?: string, override?: RowEditorState) {
     setLoading(true);
     setMessage("");
     try {
@@ -82,11 +110,12 @@ export default function StudioAccesosPage() {
           action,
           email,
           requestId,
-          provider: grantProvider,
+          provider: override?.provider || grantProvider,
           permissions: {
-            canBlog: grantBlog,
-            canCrm: grantCrm,
-            canIncidents: grantIncidents,
+            canBlog: override?.canBlog ?? grantBlog,
+            canCrm: override?.canCrm ?? grantCrm,
+            canIncidents: override?.canIncidents ?? grantIncidents,
+            canOnboarding: override?.canOnboarding ?? grantOnboarding,
           },
         }),
       });
@@ -94,12 +123,14 @@ export default function StudioAccesosPage() {
       if (!res.ok) throw new Error(data.error || "No se pudo actualizar.");
 
       if (data.blockedEmails) setBlocked(data.blockedEmails);
-      if (data.authorizedUsers) setAuthorized(data.authorizedUsers);
+      if (data.authorizedUsers) {
+        setAuthorized(data.authorizedUsers);
+        hydrateEditors(data.authorizedUsers);
+      }
       if (data.accessRequests) setRequests(data.accessRequests);
 
       if (action === "grant") {
-        setMessage("Correo autorizado/actualizado.");
-        setEmailInput("");
+        setMessage("Permisos actualizados correctamente.");
       } else if (action === "approve_request") {
         setMessage("Solicitud aprobada y permisos asignados.");
       } else if (action === "reject_request") {
@@ -126,7 +157,7 @@ export default function StudioAccesosPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Control de accesos Studio</h1>
-            <p className="mt-2 text-sm text-slate-600">Superadmins (max/francisco/jeremias) entran con Microsoft y gestionan permisos por correo aquí.</p>
+            <p className="mt-2 text-sm text-slate-600">Ahora puedes editar permisos por correo y módulo (Blog, CRM, Incidentes y Onboarding).</p>
           </div>
           <Link href="/studio" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver al Studio</Link>
         </div>
@@ -146,12 +177,13 @@ export default function StudioAccesosPage() {
               <option value="any">Cualquiera</option>
             </select>
           </div>
-          <div className="mt-3 flex flex-wrap gap-4 text-sm">
+          <div className="mt-3 flex flex-wrap gap-3 text-sm">
             <label className="inline-flex items-center gap-2"><input type="checkbox" checked={grantBlog} onChange={(e) => setGrantBlog(e.target.checked)} /> Blog</label>
             <label className="inline-flex items-center gap-2"><input type="checkbox" checked={grantCrm} onChange={(e) => setGrantCrm(e.target.checked)} /> CRM</label>
             <label className="inline-flex items-center gap-2"><input type="checkbox" checked={grantIncidents} onChange={(e) => setGrantIncidents(e.target.checked)} /> Incidentes</label>
+            <label className="inline-flex items-center gap-2"><input type="checkbox" checked={grantOnboarding} onChange={(e) => setGrantOnboarding(e.target.checked)} /> Onboarding</label>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-4 flex gap-2">
             <button type="button" disabled={loading || !emailInput.trim()} onClick={() => onAction("grant", emailInput)} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Guardar autorización</button>
             <button type="button" disabled={loading || !emailInput.trim()} onClick={() => onAction("block", emailInput)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm">Bloquear correo</button>
           </div>
@@ -161,21 +193,56 @@ export default function StudioAccesosPage() {
         <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
           <h2 className="text-lg font-semibold text-slate-900">Correos autorizados ({authorized.length})</h2>
           <div className="mt-3 grid gap-2">
-            {authorized.map((user) => (
-              <div key={user.email} className="rounded-lg border border-slate-200 px-3 py-2 text-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <strong>{user.email}</strong> · proveedor: {user.provider}
-                    <div className="text-xs text-slate-500">Permisos: {[user.permissions.canBlog ? "Blog" : "", user.permissions.canCrm ? "CRM" : "", user.permissions.canIncidents ? "Incidentes" : ""].filter(Boolean).join(" · ") || "Sin permisos"}</div>
+            {authorized.map((user) => {
+              const row = rowEditors[user.email] || {
+                provider: user.provider,
+                canBlog: user.permissions.canBlog,
+                canCrm: user.permissions.canCrm,
+                canIncidents: user.permissions.canIncidents,
+                canOnboarding: user.permissions.canOnboarding !== false,
+              };
+              return (
+                <div key={user.email} className="rounded-lg border border-slate-200 px-3 py-3 text-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <strong>{user.email}</strong>
+                      <span className="ml-2 rounded bg-slate-100 px-2 py-0.5 text-[11px] uppercase text-slate-600">{user.role || "member"}</span>
+                      <div className="text-xs text-slate-500">Última actualización: {new Date(user.updatedAt).toLocaleString()}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onAction("grant", user.email, undefined, row)}
+                        className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
+                      >
+                        Guardar permisos
+                      </button>
+                      <button type="button" onClick={() => onAction("revoke", user.email)} className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">Quitar acceso</button>
+                      <button type="button" onClick={() => onAction("block", user.email)} className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">Bloquear</button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button type="button" onClick={() => onAction("revoke", user.email)} className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">Quitar acceso</button>
-                    <button type="button" onClick={() => onAction("block", user.email)} className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">Bloquear</button>
+
+                  <div className="mt-3 grid gap-3 md:grid-cols-3">
+                    <select
+                      value={row.provider}
+                      onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, provider: e.target.value as RowEditorState["provider"] } }))}
+                      className="rounded-lg border border-slate-300 px-2 py-1 text-xs"
+                    >
+                      <option value="google">Google</option>
+                      <option value="azure">Microsoft</option>
+                      <option value="any">Cualquiera</option>
+                    </select>
+                    <div className="md:col-span-2 flex flex-wrap gap-3 text-xs">
+                      <label className="inline-flex items-center gap-2"><input type="checkbox" checked={row.canBlog} onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, canBlog: e.target.checked } }))} /> Blog</label>
+                      <label className="inline-flex items-center gap-2"><input type="checkbox" checked={row.canCrm} onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, canCrm: e.target.checked } }))} /> CRM</label>
+                      <label className="inline-flex items-center gap-2"><input type="checkbox" checked={row.canIncidents} onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, canIncidents: e.target.checked } }))} /> Incidentes</label>
+                      <label className="inline-flex items-center gap-2"><input type="checkbox" checked={row.canOnboarding} onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, canOnboarding: e.target.checked } }))} /> Onboarding</label>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            {!authorized.length ? <p className="text-sm text-slate-500">No hay correos autorizados (excepto superadmins).</p> : null}
+              );
+            })}
+            {!authorized.length ? <p className="text-sm text-slate-500">No hay correos autorizados.</p> : null}
           </div>
         </section>
 

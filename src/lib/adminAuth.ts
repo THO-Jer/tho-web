@@ -77,22 +77,27 @@ export async function getStudioPermissions(email: string): Promise<SessionPermis
   if (!normalized) return null;
   if (await isBlockedEmail(normalized)) return null;
 
-  if (isStudioSuperAdmin(normalized)) {
+  const superAdminByEmail = isStudioSuperAdmin(normalized);
+  const allowedUser = await getAuthorizedUser(normalized);
+
+  if (superAdminByEmail) {
+    if (allowedUser && (!allowedUser.active || allowedUser.blocked)) return null;
     return {
-      canBlog: true,
-      canCrm: true,
-      canIncidents: true,
+      canBlog: allowedUser?.permissions?.canBlog ?? true,
+      canCrm: allowedUser?.permissions?.canCrm ?? true,
+      canIncidents: allowedUser?.permissions?.canIncidents ?? true,
+      canOnboarding: allowedUser?.permissions?.canOnboarding ?? true,
       canManageAccess: true,
       isSuperAdmin: true,
       role: "superadmin",
     };
   }
 
-  const allowedUser = await getAuthorizedUser(normalized);
   if (!allowedUser || !allowedUser.active || allowedUser.blocked) return null;
 
   return {
     ...allowedUser.permissions,
+    canOnboarding: allowedUser.permissions.canOnboarding !== false,
     canManageAccess: allowedUser.role === "superadmin" || allowedUser.role === "director" || allowedUser.role === "rrhh_admin",
     isSuperAdmin: allowedUser.role === "superadmin",
     role: allowedUser.role || "member",

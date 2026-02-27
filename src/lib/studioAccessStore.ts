@@ -16,6 +16,7 @@ export type StudioUserPermissions = {
   canBlog: boolean;
   canCrm: boolean;
   canIncidents: boolean;
+  canOnboarding: boolean;
 };
 
 export type StudioAuthorizedUser = {
@@ -51,6 +52,7 @@ const DEFAULT_PERMISSIONS: StudioUserPermissions = {
   canBlog: false,
   canCrm: false,
   canIncidents: false,
+  canOnboarding: true,
 };
 
 const ROLE_TABLE = process.env.STUDIO_ROLES_TABLE || "studio_roles";
@@ -122,6 +124,7 @@ function normalizePermissions(input: Partial<StudioUserPermissions> | undefined)
     canBlog: Boolean(input?.canBlog),
     canCrm: Boolean(input?.canCrm),
     canIncidents: Boolean(input?.canIncidents),
+    canOnboarding: input?.canOnboarding !== false,
   };
 }
 
@@ -134,6 +137,7 @@ function rowToAuthorized(row: Record<string, unknown>): StudioAuthorizedUser {
       canBlog: Boolean(row.can_blog),
       canCrm: Boolean(row.can_crm),
       canIncidents: Boolean(row.can_incidents),
+      canOnboarding: row.can_onboarding !== false,
     },
     updatedAt: String(row.updated_at || new Date().toISOString()),
     role: String(row.role || "member"),
@@ -356,6 +360,7 @@ export async function upsertAuthorizedUser(input: {
         can_blog: Boolean(input.permissions?.canBlog),
         can_crm: Boolean(input.permissions?.canCrm),
         can_incidents: Boolean(input.permissions?.canIncidents),
+        can_onboarding: input.permissions?.canOnboarding !== false,
         updated_at: new Date().toISOString(),
       }]),
     });

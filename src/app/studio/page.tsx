@@ -11,6 +11,7 @@ type StudioPermissions = {
   canBlog: boolean;
   canCrm: boolean;
   canIncidents: boolean;
+  canOnboarding?: boolean;
 };
 
 type ModuleItem = {
@@ -31,7 +32,7 @@ const modules: ModuleItem[] = [
     href: "/studio/onboarding",
     status: "Nuevo",
     external: false,
-    allowed: () => true,
+    allowed: (p) => p?.canOnboarding !== false,
   },
   {
     key: "blog",
