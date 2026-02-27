@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BrandLoader } from "@/components/BrandLoader";
+import { createSupabaseBrowserAuthClient } from "@/lib/supabaseBrowserAuth";
 
 type StudioPermissions = {
   canBlog: boolean;
@@ -72,12 +73,16 @@ export default function StudioIndexPage() {
   const [role, setRole] = useState("");
   const [permissions, setPermissions] = useState<StudioPermissions | null>(null);
   const [magicEmail, setMagicEmail] = useState("");
+  const [magicSending, setMagicSending] = useState(false);
+  const [magicCooldownUntil, setMagicCooldownUntil] = useState(0);
+  const [magicCooldownSeconds, setMagicCooldownSeconds] = useState(0);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [onboardingRequired, setOnboardingRequired] = useState(true);
   const [onboardingBlockInternal, setOnboardingBlockInternal] = useState(false);
   const [studioRedirectUrl, setStudioRedirectUrl] = useState("");
   const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const publicSupabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  const publicStudioAuthRedirect = (process.env.NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL || "").trim();
 
   const redirectTo = useMemo(() => {
     if (studioRedirectUrl) return studioRedirectUrl;
@@ -86,6 +91,32 @@ export default function StudioIndexPage() {
     return envStudio.endsWith("/studio") ? envStudio : `${envStudio}/studio`;
   }, [studioRedirectUrl]);
 
+  const oauthCallbackUrl = useMemo(() => {
+    if (!redirectTo) return "";
+    return `${redirectTo.replace(/\/$/, "")}/auth/callback`;
+  }, [redirectTo]);
+
+  const magicRedirectTo = useMemo(() => {
+    return publicStudioAuthRedirect.replace(/\/$/, "");
+  }, [publicStudioAuthRedirect]);
+
+  useEffect(() => {
+    if (!magicCooldownUntil) {
+      setMagicCooldownSeconds(0);
+      return;
+    }
+
+    const update = () => {
+      const remaining = Math.max(0, Math.ceil((magicCooldownUntil - Date.now()) / 1000));
+      setMagicCooldownSeconds(remaining);
+      if (remaining <= 0) setMagicCooldownUntil(0);
+    };
+
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, [magicCooldownUntil]);
+
   useEffect(() => {
     const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
     const params = new URLSearchParams(hash);
@@ -93,6 +124,12 @@ export default function StudioIndexPage() {
     const hashError = params.get("error_description") || params.get("error");
     const queryParams = new URLSearchParams(window.location.search);
     const queryError = queryParams.get("error_description") || queryParams.get("error");
+
+    if (accessToken || hashError || queryError) {
+      const callbackPath = `/studio/auth/callback${window.location.search}${window.location.hash}`;
+      window.location.replace(callbackPath);
+      return;
+    }
 
     const verifySession = async () => {
       const res = await fetch("/api/admin/session", { credentials: "include" });
@@ -159,7 +196,7 @@ export default function StudioIndexPage() {
     };
 
     run();
-  }, []);
+  }, [oauthCallbackUrl]);
 
   function onOAuthLogin() {
     const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
@@ -175,7 +212,7 @@ export default function StudioIndexPage() {
 
     const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
     authUrl.searchParams.set("provider", "azure");
-    authUrl.searchParams.set("redirect_to", redirectTo);
+    authUrl.searchParams.set("redirect_to", oauthCallbackUrl || redirectTo);
     authUrl.searchParams.set("scopes", "openid profile email");
     authUrl.searchParams.set("prompt", "select_account");
     window.location.href = authUrl.toString();
@@ -190,6 +227,8 @@ export default function StudioIndexPage() {
     }
     if (!redirectTo) {
       setMessage("Falta STUDIO_AUTH_REDIRECT_URL (o NEXT_PUBLIC_STUDIO_URL) para forzar redirect del Studio.");
+    if (!magicRedirectTo) {
+      setMessage("Falta NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL para forzar redirect del Magic Link.");
       return;
     }
     if (!emailValue || !emailValue.includes("@")) {
@@ -222,6 +261,44 @@ export default function StudioIndexPage() {
 
     setMessage("Magic link enviado. Revisa tu correo. Si te redirige a CRM, revisa STUDIO_AUTH_REDIRECT_URL y Redirect URLs en Supabase.");
     setMagicEmail("");
+    if (magicCooldownSeconds > 0) {
+      setMessage(`Espera ${magicCooldownSeconds}s para solicitar un nuevo magic link.`);
+      return;
+    }
+
+    setMagicSending(true);
+    try {
+      console.info("[studio] sending magic link with emailRedirectTo", magicRedirectTo);
+      const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
+      const { error, response } = await supabase.auth.signInWithOtp({
+        email: emailValue,
+        options: {
+          emailRedirectTo: magicRedirectTo,
+          shouldCreateUser: true,
+        },
+      });
+
+      if (error) {
+        const err = error.message;
+        const retryAfter = Number(response?.headers.get("retry-after") || "0");
+        const parsedSeconds = Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter
+          : Number((err.match(/(\d+)\s*(?:seg|second|min)/i) || ["", "0"])[1] || "0");
+        if (parsedSeconds > 0) {
+          setMagicCooldownUntil(Date.now() + parsedSeconds * 1000);
+          setMessage(`Debes esperar ${parsedSeconds}s antes de solicitar otro magic link.`);
+          return;
+        }
+        setMessage(`No se pudo enviar magic link: ${err}`);
+        return;
+      }
+
+      setMagicCooldownUntil(Date.now() + 60 * 1000);
+      setMessage(`Magic link enviado. Revisa tu correo. Te redirigirá a ${magicRedirectTo} cuando verifiques el enlace.`);
+      setMagicEmail("");
+    } finally {
+      setMagicSending(false);
+    }
   }
 
   async function onLogout() {
@@ -262,6 +339,8 @@ export default function StudioIndexPage() {
                   />
                   <button onClick={onSendMagicLink} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700" type="button">
                     Enviar magic link
+                  <button onClick={onSendMagicLink} disabled={magicSending || magicCooldownSeconds > 0} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60" type="button">
+                    {magicSending ? "Enviando..." : magicCooldownSeconds > 0 ? `Reintentar en ${magicCooldownSeconds}s` : "Enviar magic link"}
                   </button>
                 </div>
               </div>
