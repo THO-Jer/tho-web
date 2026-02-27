@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
+import { getWritableDataPath } from "@/lib/storagePaths";
+
 export type BlogStatus = "draft" | "published";
 
 export type BlogPost = {
@@ -39,7 +41,7 @@ type BlogPostRow = {
   seo_description: string | null;
 };
 
-const BLOG_PATH = path.join(process.cwd(), "data", "blog", "posts.json");
+const BLOG_PATH = getWritableDataPath("blog", "posts.json");
 const BLOG_TABLE = process.env.BLOG_POSTS_TABLE || "blog_posts";
 
 function getSupabaseEnv() {
@@ -47,7 +49,7 @@ function getSupabaseEnv() {
     .trim()
     .replace(/^ttps:\/\//, "https://")
     .replace(/\/$/, "");
-  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY || "").trim();
+  const service = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   return { url, service };
 }
 
