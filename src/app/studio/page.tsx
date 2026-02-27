@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BrandLoader } from "@/components/BrandLoader";
+import { createSupabaseBrowserAuthClient } from "@/lib/supabaseBrowserAuth";
 
 type StudioPermissions = {
   canBlog: boolean;
@@ -213,30 +214,20 @@ export default function StudioIndexPage() {
 
     setMagicSending(true);
     try {
-      const res = await fetch(`${supabaseUrl}/auth/v1/otp`, {
-        method: "POST",
-        headers: {
-          apikey: publicSupabaseAnon,
-          "content-type": "application/json",
+      const magicRedirectTo = oauthCallbackUrl || redirectTo;
+      console.info("[studio] sending magic link with emailRedirectTo", magicRedirectTo);
+      const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
+      const { error, response } = await supabase.auth.signInWithOtp({
+        email: emailValue,
+        options: {
+          emailRedirectTo: magicRedirectTo,
+          shouldCreateUser: true,
         },
-        body: JSON.stringify({
-          email: emailValue,
-          create_user: true,
-          should_create_user: true,
-          email_redirect_to: redirectTo,
-          redirect_to: redirectTo,
-          emailRedirectTo: redirectTo,
-          redirectTo,
-          options: {
-            emailRedirectTo: redirectTo,
-            shouldCreateUser: true,
-          },
-        }),
       });
 
-      if (!res.ok) {
-        const err = await res.text();
-        const retryAfter = Number(res.headers.get("retry-after") || "0");
+      if (error) {
+        const err = error.message;
+        const retryAfter = Number(response?.headers.get("retry-after") || "0");
         const parsedSeconds = Number.isFinite(retryAfter) && retryAfter > 0
           ? retryAfter
           : Number((err.match(/(\d+)\s*(?:seg|second|min)/i) || ["", "0"])[1] || "0");
@@ -250,7 +241,7 @@ export default function StudioIndexPage() {
       }
 
       setMagicCooldownUntil(Date.now() + 60 * 1000);
-      setMessage("Magic link enviado. Revisa tu correo. Te redirigirá a /studio cuando verifiques el enlace.");
+      setMessage(`Magic link enviado. Revisa tu correo. Te redirigirá a ${oauthCallbackUrl || redirectTo} cuando verifiques el enlace.`);
       setMagicEmail("");
     } finally {
       setMagicSending(false);
