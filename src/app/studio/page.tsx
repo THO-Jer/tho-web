@@ -75,13 +75,17 @@ export default function StudioIndexPage() {
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [onboardingRequired, setOnboardingRequired] = useState(true);
   const [onboardingBlockInternal, setOnboardingBlockInternal] = useState(false);
+  const [studioRedirectUrl, setStudioRedirectUrl] = useState("");
   const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const publicSupabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
   const redirectTo = useMemo(() => {
+    if (studioRedirectUrl) return studioRedirectUrl;
     if (typeof window === "undefined") return "";
+    const envStudio = (process.env.NEXT_PUBLIC_STUDIO_URL || "").trim().replace(/\/$/, "");
+    if (envStudio) return envStudio.endsWith("/studio") ? envStudio : `${envStudio}/studio`;
     return `${window.location.origin}/studio`;
-  }, []);
+  }, [studioRedirectUrl]);
 
   useEffect(() => {
     const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
@@ -117,6 +121,9 @@ export default function StudioIndexPage() {
       setRole(String(data.role || ""));
       if (typeof data.oauthBaseUrl === "string") {
         setOauthBaseUrl(data.oauthBaseUrl);
+      }
+      if (typeof data.studioRedirectUrl === "string") {
+        setStudioRedirectUrl(data.studioRedirectUrl);
       }
     };
 
@@ -193,6 +200,7 @@ export default function StudioIndexPage() {
         create_user: true,
         should_create_user: true,
         email_redirect_to: redirectTo,
+        redirect_to: redirectTo,
       }),
     });
 
@@ -202,7 +210,7 @@ export default function StudioIndexPage() {
       return;
     }
 
-    setMessage("Magic link enviado. Revisa tu correo.");
+    setMessage("Magic link enviado. Revisa tu correo. Si te redirige a CRM, revisa STUDIO_AUTH_REDIRECT_URL y Redirect URLs en Supabase.");
     setMagicEmail("");
   }
 

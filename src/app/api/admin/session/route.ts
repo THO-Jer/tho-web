@@ -11,6 +11,25 @@ function getSupabaseEnv() {
   return { url };
 }
 
+
+function normalizeStudioRedirectUrl(value: string | undefined) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+  const normalizedBase = raw.replace(/\/$/, "");
+  if (normalizedBase.endsWith("/studio")) return normalizedBase;
+  return `${normalizedBase}/studio`;
+}
+
+function getStudioRedirectUrl(req: NextRequest) {
+  const explicit = normalizeStudioRedirectUrl(process.env.STUDIO_AUTH_REDIRECT_URL || process.env.NEXT_PUBLIC_STUDIO_URL);
+  if (explicit) return explicit;
+
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
+  const proto = req.headers.get("x-forwarded-proto") || "https";
+  if (!host) return null;
+  return `${proto}://${host}/studio`;
+}
+
 function getSourceIp(req: NextRequest) {
   const forwarded = req.headers.get("x-forwarded-for") || "";
   if (forwarded) return forwarded.split(",")[0]?.trim();
@@ -20,11 +39,13 @@ function getSourceIp(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
   const { url } = getSupabaseEnv();
+  const studioRedirectUrl = getStudioRedirectUrl(req);
   return NextResponse.json({
     authenticated: Boolean(session),
     email: session?.email ?? null,
     provider: session?.provider ?? null,
     oauthBaseUrl: url ?? null,
+    studioRedirectUrl,
     canManageAccess: Boolean(session?.canManageAccess),
     role: session?.role ?? null,
     permissions: session
