@@ -109,6 +109,7 @@ export async function listOnboardingSupabaseRecords(input: {
 export async function upsertOnboardingSupabaseProgress(progressTable: string, record: OnboardingRecord) {
   await supabaseRequest(`/rest/v1/${progressTable}?on_conflict=email`, {
     method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
     body: JSON.stringify([{
       email: record.email,
       track: record.track || "general",
@@ -131,6 +132,7 @@ export async function upsertOnboardingSupabaseQuizResult(input: {
   const quiz = input.record.quiz_result;
   await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email`, {
     method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
     body: JSON.stringify([{
       email: input.record.email,
       track: input.record.track || "general",
