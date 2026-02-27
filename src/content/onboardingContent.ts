@@ -19,13 +19,20 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
   {
     slug: "identidad-tho",
     title: "Módulo A · Identidad THO",
-    summary: "Propósito, propuesta de valor, valores y límites de lo que sí/no promete THO.",
-    durationMinutes: 12,
+    summary: "Qué es THO, cómo se posiciona y cuáles son sus estándares operativos no negociables.",
+    durationMinutes: 30,
     content: [
-      "THO combina rigor con cercanía: decidimos con evidencia y comunicamos con humanidad.",
-      "Valores en práctica: Humanidad (escucha activa), Colaboración (decisiones compartidas) y Adaptabilidad (iteración con contexto).",
-      "Enfoque THO: claridad incómoda cuando hace falta para proteger resultados y relaciones.",
-      "Límites: no prometemos resultados sin trazabilidad, ni hacemos bypass de protocolos de ética y calidad.",
+      "A0 — ¿Qué es un onboarding y por qué existe?: No es una inducción administrativa; es un proceso de alineación cultural y operativa para asegurar coherencia interna, reducir ambigüedades y proteger calidad + reputación.",
+      "A1 — Propósito organizacional: THO existe para fortalecer organizaciones y conectarlas con su entorno, asegurando viabilidad, legitimidad y coherencia estratégica. Esto implica mejorar decisiones, reducir riesgos y explicitar tensiones antes de crisis.",
+      "A2 — Propuesta de valor: propósito ≠ propuesta de valor. En THO, generamos valor con diagnóstico riguroso, diseño estratégico, acompañamiento estructurado, trazabilidad y gestión de riesgos. No vendemos optimismo; vendemos estructura, claridad y método.",
+      "A3 — Qué significa ‘trabajo bueno’ en THO: problema delimitado, decisiones explícitas, riesgos identificados, responsables + próximos pasos y registro trazable. Definition of Done: contexto, evidencia, decisión, riesgos, próximos pasos con responsable y fecha.",
+      "A4 — Valores organizacionales: Humanidad (cuidado del lenguaje y no exposición innecesaria), Colaboración (documentación compartida y feedback estructurado) y Adaptabilidad (ajustar estrategia según evidencia, no por orgullo).",
+      "A5 — Límites y no negociables: no prometer lo que no se puede sostener con método, no trabajar sin trazabilidad mínima, no usar información sensible sin protocolo y no improvisar procesos críticos. Los límites protegen a la organización y al equipo.",
+      "A6 — Ética operativa: registro adecuado, confidencialidad, declaración temprana de conflictos y uso de canales formales como el Canal Confidencial. Ante duda: documentar, consultar y limitar acceso cuando hay sensibilidad.",
+      "Reflexión guiada sugerida: ¿cómo se traduce este propósito en tu rol? ¿qué proyectos no serían coherentes? ¿dónde sería difícil aplicar estos valores y qué harías para sostenerlos?",
+    ],
+    resources: [
+      { label: "Código de Ética THO", href: "/etica" },
     ],
   },
   {
