@@ -99,6 +99,13 @@ async function supabaseRequest(pathname: string, init?: RequestInit) {
   return res.json();
 }
 
+
+function isMissingCanOnboardingColumnError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  const msg = String(error.message || "");
+  return msg.includes("can_onboarding") && msg.includes("PGRST204");
+}
+
 async function ensureStore() {
   await fs.mkdir(path.dirname(ACCESS_PATH), { recursive: true });
   try {
@@ -348,22 +355,33 @@ export async function upsertAuthorizedUser(input: {
   if (!email || !email.includes("@")) throw new Error("Email inválido para autorizar.");
 
   if (hasSupabaseStore()) {
-    await supabaseRequest(`/rest/v1/${ROLE_TABLE}?on_conflict=email`, {
-      method: "POST",
-      headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-      body: JSON.stringify([{
-        email,
-        provider: normalizeProvider(input.provider),
-        active: input.active !== false,
-        blocked: false,
-        role: input.role || "member",
-        can_blog: Boolean(input.permissions?.canBlog),
-        can_crm: Boolean(input.permissions?.canCrm),
-        can_incidents: Boolean(input.permissions?.canIncidents),
-        can_onboarding: input.permissions?.canOnboarding !== false,
-        updated_at: new Date().toISOString(),
-      }]),
-    });
+    const basePayload = {
+      email,
+      provider: normalizeProvider(input.provider),
+      active: input.active !== false,
+      blocked: false,
+      role: input.role || "member",
+      can_blog: Boolean(input.permissions?.canBlog),
+      can_crm: Boolean(input.permissions?.canCrm),
+      can_incidents: Boolean(input.permissions?.canIncidents),
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      await supabaseRequest(`/rest/v1/${ROLE_TABLE}?on_conflict=email`, {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+        body: JSON.stringify([{ ...basePayload, can_onboarding: input.permissions?.canOnboarding !== false }]),
+      });
+    } catch (error) {
+      if (!isMissingCanOnboardingColumnError(error)) throw error;
+      await supabaseRequest(`/rest/v1/${ROLE_TABLE}?on_conflict=email`, {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+        body: JSON.stringify([basePayload]),
+      });
+    }
+
     return listAuthorizedUsers();
   }
 
