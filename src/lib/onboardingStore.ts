@@ -402,16 +402,21 @@ export async function submitQuiz(email: string, answers: Array<{ question_id: st
     last_access_at: now,
   };
 
-  if (current.quiz_result && !allowsQuizRetry()) {
-    throw new Error("La evaluación ya fue respondida.");
-  }
-
   const applicableUnits = getApplicableUnitsByTrack(state.units, current.track || "general");
   const applicableSlugs = new Set(applicableUnits.map((u) => u.slug));
   const filteredQuiz = state.quiz.filter((q) => {
     const unit = getUnitByTopic(state.units, q.topic);
     return unit ? applicableSlugs.has(unit.slug) : true;
   });
+
+  const filteredIds = new Set(filteredQuiz.map((q) => q.id));
+  const existingAnsweredCount = Array.isArray(current.quiz_result?.answers)
+    ? current.quiz_result.answers.filter((row) => filteredIds.has(row.question_id)).length
+    : 0;
+  const isEvaluationComplete = filteredQuiz.length > 0 && existingAnsweredCount >= filteredQuiz.length;
+  if (current.quiz_result && !allowsQuizRetry() && isEvaluationComplete) {
+    throw new Error("La evaluación ya fue respondida.");
+  }
 
   const questionMap = new Map(filteredQuiz.map((q) => [q.id, q]));
   let correct = 0;
