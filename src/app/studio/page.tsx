@@ -81,10 +81,9 @@ export default function StudioIndexPage() {
 
   const redirectTo = useMemo(() => {
     if (studioRedirectUrl) return studioRedirectUrl;
-    if (typeof window === "undefined") return "";
     const envStudio = (process.env.NEXT_PUBLIC_STUDIO_URL || "").trim().replace(/\/$/, "");
-    if (envStudio) return envStudio.endsWith("/studio") ? envStudio : `${envStudio}/studio`;
-    return `${window.location.origin}/studio`;
+    if (!envStudio) return "";
+    return envStudio.endsWith("/studio") ? envStudio : `${envStudio}/studio`;
   }, [studioRedirectUrl]);
 
   useEffect(() => {
@@ -169,6 +168,11 @@ export default function StudioIndexPage() {
       return;
     }
 
+    if (!redirectTo) {
+      setMessage("Falta STUDIO_AUTH_REDIRECT_URL (o NEXT_PUBLIC_STUDIO_URL) para forzar redirect del Studio.");
+      return;
+    }
+
     const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
     authUrl.searchParams.set("provider", "azure");
     authUrl.searchParams.set("redirect_to", redirectTo);
@@ -182,6 +186,10 @@ export default function StudioIndexPage() {
     const emailValue = magicEmail.trim().toLowerCase();
     if (!supabaseUrl || !publicSupabaseAnon) {
       setMessage("Faltan variables públicas de Supabase para magic link.");
+      return;
+    }
+    if (!redirectTo) {
+      setMessage("Falta STUDIO_AUTH_REDIRECT_URL (o NEXT_PUBLIC_STUDIO_URL) para forzar redirect del Studio.");
       return;
     }
     if (!emailValue || !emailValue.includes("@")) {

@@ -20,14 +20,11 @@ function normalizeStudioRedirectUrl(value: string | undefined) {
   return `${normalizedBase}/studio`;
 }
 
-function getStudioRedirectUrl(req: NextRequest) {
+function getStudioRedirectUrl() {
   const explicit = normalizeStudioRedirectUrl(process.env.STUDIO_AUTH_REDIRECT_URL || process.env.NEXT_PUBLIC_STUDIO_URL);
   if (explicit) return explicit;
 
-  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
-  const proto = req.headers.get("x-forwarded-proto") || "https";
-  if (!host) return null;
-  return `${proto}://${host}/studio`;
+  return null;
 }
 
 function getSourceIp(req: NextRequest) {
@@ -39,7 +36,7 @@ function getSourceIp(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
   const { url } = getSupabaseEnv();
-  const studioRedirectUrl = getStudioRedirectUrl(req);
+  const studioRedirectUrl = getStudioRedirectUrl();
   return NextResponse.json({
     authenticated: Boolean(session),
     email: session?.email ?? null,
