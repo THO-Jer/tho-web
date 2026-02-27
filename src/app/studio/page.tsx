@@ -82,6 +82,7 @@ export default function StudioIndexPage() {
   const [studioRedirectUrl, setStudioRedirectUrl] = useState("");
   const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const publicSupabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  const publicStudioAuthRedirect = (process.env.NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL || "").trim();
 
   const redirectTo = useMemo(() => {
     if (studioRedirectUrl) return studioRedirectUrl;
@@ -94,6 +95,10 @@ export default function StudioIndexPage() {
     if (!redirectTo) return "";
     return `${redirectTo.replace(/\/$/, "")}/auth/callback`;
   }, [redirectTo]);
+
+  const magicRedirectTo = useMemo(() => {
+    return publicStudioAuthRedirect.replace(/\/$/, "");
+  }, [publicStudioAuthRedirect]);
 
   useEffect(() => {
     if (!magicCooldownUntil) {
@@ -199,8 +204,8 @@ export default function StudioIndexPage() {
       setMessage("Faltan variables públicas de Supabase para magic link.");
       return;
     }
-    if (!redirectTo) {
-      setMessage("Falta STUDIO_AUTH_REDIRECT_URL (o NEXT_PUBLIC_STUDIO_URL) para forzar redirect del Studio.");
+    if (!magicRedirectTo) {
+      setMessage("Falta NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL para forzar redirect del Magic Link.");
       return;
     }
     if (!emailValue || !emailValue.includes("@")) {
@@ -214,7 +219,6 @@ export default function StudioIndexPage() {
 
     setMagicSending(true);
     try {
-      const magicRedirectTo = oauthCallbackUrl || redirectTo;
       console.info("[studio] sending magic link with emailRedirectTo", magicRedirectTo);
       const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
       const { error, response } = await supabase.auth.signInWithOtp({
@@ -241,7 +245,7 @@ export default function StudioIndexPage() {
       }
 
       setMagicCooldownUntil(Date.now() + 60 * 1000);
-      setMessage(`Magic link enviado. Revisa tu correo. Te redirigirá a ${oauthCallbackUrl || redirectTo} cuando verifiques el enlace.`);
+      setMessage(`Magic link enviado. Revisa tu correo. Te redirigirá a ${magicRedirectTo} cuando verifiques el enlace.`);
       setMagicEmail("");
     } finally {
       setMagicSending(false);

@@ -22,13 +22,7 @@ export function createSupabaseBrowserAuthClient(url: string, anonKey: string) {
           body: JSON.stringify({
             email: payload.email,
             create_user: payload.options?.shouldCreateUser ?? true,
-            should_create_user: payload.options?.shouldCreateUser ?? true,
-            options: {
-              emailRedirectTo: payload.options?.emailRedirectTo,
-              shouldCreateUser: payload.options?.shouldCreateUser ?? true,
-            },
             email_redirect_to: payload.options?.emailRedirectTo,
-            redirect_to: payload.options?.emailRedirectTo,
           }),
         });
 

@@ -10,6 +10,7 @@ Configura en producción:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `STUDIO_AUTH_REDIRECT_URL` (ej: `https://tho-web.vercel.app/studio`)
+- `NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL` (ej: `https://tho-web.vercel.app/studio/auth/callback`)
 - `NEXT_PUBLIC_STUDIO_URL` (ej: `https://tho-web.vercel.app`)
 - `STUDIO_ROLES_TABLE=studio_roles`
 - `STUDIO_LOGIN_LOGS_TABLE=studio_login_logs`
@@ -103,7 +104,8 @@ create table if not exists public.incident_attachments (
 
 - Internos: usar botón Microsoft (`provider=azure`) en `/studio`.
 - Externos: usar botón "Enviar magic link" en `/studio`.
-- El redirect de login se fuerza siempre a Studio con `STUDIO_AUTH_REDIRECT_URL` (fallback permitido: `NEXT_PUBLIC_STUDIO_URL + /studio`).
+- OAuth Microsoft usa `STUDIO_AUTH_REDIRECT_URL` hacia Studio.
+- Magic Link usa explícitamente `NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL` (recomendado: `https://tho-web.vercel.app/studio/auth/callback`).
 - En Supabase Auth > URL Configuration, agregar `https://tho-web.vercel.app/studio` y `https://tho-web.vercel.app/studio/auth/callback` en Redirect URLs permitidas.
 - La autorización final depende de `studio_roles` + superadmins por `STUDIO_SUPERADMINS`.
 
