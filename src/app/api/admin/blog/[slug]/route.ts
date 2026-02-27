@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { isAdminAuthorized } from "@/lib/adminAuth";
+import { readSession } from "@/lib/adminAuth";
 import { deletePost, updatePost } from "@/lib/blogStore";
 
 export const dynamic = "force-dynamic";
 
+function unauthorized() {
+  return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-  if (!(await isAdminAuthorized(req))) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
+  const session = await readSession(req);
+  if (!session || !session.canBlog) return unauthorized();
 
   try {
     const payload = await req.json();
@@ -23,9 +26,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sl
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
-  if (!(await isAdminAuthorized(req))) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
+  const session = await readSession(req);
+  if (!session || !session.canBlog) return unauthorized();
 
   try {
     const { slug } = await params;

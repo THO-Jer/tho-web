@@ -6,31 +6,61 @@ import { useEffect, useMemo, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BrandLoader } from "@/components/BrandLoader";
+import { createSupabaseBrowserAuthClient } from "@/lib/supabaseBrowserAuth";
 
-const modules = [
+type StudioPermissions = {
+  canBlog: boolean;
+  canCrm: boolean;
+  canIncidents: boolean;
+  canOnboarding?: boolean;
+};
+
+type ModuleItem = {
+  key: string;
+  title: string;
+  desc: string;
+  href: string;
+  status: string;
+  external: boolean;
+  allowed: (perm: StudioPermissions | null) => boolean;
+};
+
+const modules: ModuleItem[] = [
   {
+    key: "onboarding",
+    title: "Studio Onboarding",
+    desc: "Inducción obligatoria THO por módulos: identidad, ventas y operación con progreso visible.",
+    href: "/studio/onboarding",
+    status: "Nuevo",
+    external: false,
+    allowed: (p) => p?.canOnboarding !== false,
+  },
+  {
+    key: "blog",
     title: "Studio Blog",
     desc: "Gestión editorial completa de entradas, SEO y medios.",
     href: "/studio/blog",
     status: "Activo",
+    external: false,
+    allowed: (p) => Boolean(p?.canBlog),
   },
   {
-    title: "Studio Recursos",
-    desc: "Curar y publicar PDFs, guías, plantillas y descargables.",
-    href: "#",
-    status: "Próximamente",
-  },
-  {
-    title: "Studio Casos y Experiencia",
-    desc: "Actualizar casos, resultados e hitos de proyectos por industria.",
-    href: "#",
-    status: "Próximamente",
-  },
-  {
+    key: "crm",
     title: "Studio Leads y CRM",
-    desc: "Panel para revisar formularios, estado CRM y seguimiento comercial.",
-    href: "#",
-    status: "Próximamente",
+    desc: "Acceso directo a CRM para revisar formularios, estado comercial y seguimiento.",
+    href: "https://crm-tho.vercel.app",
+    status: "Activo",
+    external: true,
+    allowed: (p) => Boolean(p?.canCrm),
+  },
+  {
+    key: "incidents",
+    title: "Canal Confidencial de Incidentes",
+    desc: "Recepción formal de denuncias y panel Director con trazabilidad y gestión por estado.",
+    href: "/studio/canal-confidencial",
+    status: "Activo",
+    external: false,
+    allowed: (p) => Boolean(p?.canIncidents),
   },
 ];
 
@@ -107,12 +137,53 @@ export default function StudioIndexPage() {
   const [evaluationReady, setEvaluationReady] = useState(false);
   const [evaluationPassed, setEvaluationPassed] = useState(false);
   const [evaluationResult, setEvaluationResult] = useState("");
+  const [canManageAccess, setCanManageAccess] = useState(false);
+  const [role, setRole] = useState("");
+  const [permissions, setPermissions] = useState<StudioPermissions | null>(null);
+  const [magicEmail, setMagicEmail] = useState("");
+  const [magicSending, setMagicSending] = useState(false);
+  const [magicCooldownUntil, setMagicCooldownUntil] = useState(0);
+  const [magicCooldownSeconds, setMagicCooldownSeconds] = useState(0);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const [onboardingRequired, setOnboardingRequired] = useState(true);
+  const [onboardingBlockInternal, setOnboardingBlockInternal] = useState(false);
+  const [studioRedirectUrl, setStudioRedirectUrl] = useState("");
   const publicSupabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  const publicSupabaseAnon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  const publicStudioAuthRedirect = (process.env.NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL || "").trim();
 
   const redirectTo = useMemo(() => {
-    if (typeof window === "undefined") return "";
-    return `${window.location.origin}/studio`;
-  }, []);
+    if (studioRedirectUrl) return studioRedirectUrl;
+    const envStudio = (process.env.NEXT_PUBLIC_STUDIO_URL || "").trim().replace(/\/$/, "");
+    if (!envStudio) return "";
+    return envStudio.endsWith("/studio") ? envStudio : `${envStudio}/studio`;
+  }, [studioRedirectUrl]);
+
+  const oauthCallbackUrl = useMemo(() => {
+    if (!redirectTo) return "";
+    return `${redirectTo.replace(/\/$/, "")}/auth/callback`;
+  }, [redirectTo]);
+
+  const magicRedirectTo = useMemo(() => {
+    return publicStudioAuthRedirect.replace(/\/$/, "");
+  }, [publicStudioAuthRedirect]);
+
+  useEffect(() => {
+    if (!magicCooldownUntil) {
+      setMagicCooldownSeconds(0);
+      return;
+    }
+
+    const update = () => {
+      const remaining = Math.max(0, Math.ceil((magicCooldownUntil - Date.now()) / 1000));
+      setMagicCooldownSeconds(remaining);
+      if (remaining <= 0) setMagicCooldownUntil(0);
+    };
+
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, [magicCooldownUntil]);
 
   useEffect(() => {
     const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
@@ -122,49 +193,57 @@ export default function StudioIndexPage() {
     const queryParams = new URLSearchParams(window.location.search);
     const queryError = queryParams.get("error_description") || queryParams.get("error");
 
+    if (accessToken || hashError || queryError) {
+      const callbackPath = `/studio/auth/callback${window.location.search}${window.location.hash}`;
+      window.location.replace(callbackPath);
+      return;
+    }
+
     const verifySession = async () => {
       const res = await fetch("/api/admin/session", { credentials: "include" });
       const data = await res.json();
       if (data.authenticated) {
         setEmail(data.email ?? null);
+        setPermissions(data.permissions ?? null);
+
+        try {
+          const onboardingRes = await fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" });
+          const onboarding = await onboardingRes.json();
+          if (onboardingRes.ok) {
+            setOnboardingCompleted(Boolean(onboarding?.onboarding?.completed));
+            setOnboardingRequired(Boolean(onboarding?.config?.required ?? true));
+            setOnboardingBlockInternal(Boolean(onboarding?.config?.blockInternal ?? false));
+          }
+        } catch {
+          setOnboardingCompleted(false);
+        }
       } else {
         setEmail(null);
+        setPermissions(null);
       }
+      setCanManageAccess(Boolean(data.canManageAccess));
+      setRole(String(data.role || ""));
       if (typeof data.oauthBaseUrl === "string") {
         setOauthBaseUrl(data.oauthBaseUrl);
+      }
+      if (typeof data.studioRedirectUrl === "string") {
+        setStudioRedirectUrl(data.studioRedirectUrl);
       }
     };
 
     const run = async () => {
       setChecking(true);
       try {
-        if (hashError || queryError) {
-          throw new Error(decodeURIComponent(hashError || queryError || "OAuth error"));
-        }
-
-        if (accessToken) {
-          const res = await fetch("/api/admin/session", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ action: "oauth_login", accessToken }),
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || "No se pudo completar login.");
-          setMessage("Sesión iniciada con Microsoft.");
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
-
         await verifySession();
       } catch (error) {
-        setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión con Microsoft.");
+        setMessage(error instanceof Error ? error.message : "No se pudo iniciar sesión.");
       } finally {
         setChecking(false);
       }
     };
 
     run();
-  }, []);
+  }, [oauthCallbackUrl]);
 
   useEffect(() => {
     if (!email) return;
@@ -179,23 +258,85 @@ export default function StudioIndexPage() {
   }, [moduleStartedAt, currentModule, completedModules]);
 
   function onMicrosoftLogin() {
+  function onOAuthLogin() {
     const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
     if (!supabaseUrl) {
-      setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth Microsoft.");
+      setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth.");
+      return;
+    }
+
+    if (!redirectTo) {
+      setMessage("Falta STUDIO_AUTH_REDIRECT_URL (o NEXT_PUBLIC_STUDIO_URL) para forzar redirect del Studio.");
       return;
     }
 
     const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
     authUrl.searchParams.set("provider", "azure");
-    authUrl.searchParams.set("redirect_to", redirectTo);
+    authUrl.searchParams.set("redirect_to", oauthCallbackUrl || redirectTo);
     authUrl.searchParams.set("scopes", "openid profile email");
     authUrl.searchParams.set("prompt", "select_account");
     window.location.href = authUrl.toString();
   }
 
+  async function onSendMagicLink() {
+    const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
+    const emailValue = magicEmail.trim().toLowerCase();
+    if (!supabaseUrl || !publicSupabaseAnon) {
+      setMessage("Faltan variables públicas de Supabase para magic link.");
+      return;
+    }
+    if (!magicRedirectTo) {
+      setMessage("Falta NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL para forzar redirect del Magic Link.");
+      return;
+    }
+    if (!emailValue || !emailValue.includes("@")) {
+      setMessage("Ingresa un correo válido para magic link.");
+      return;
+    }
+    if (magicCooldownSeconds > 0) {
+      setMessage(`Espera ${magicCooldownSeconds}s para solicitar un nuevo magic link.`);
+      return;
+    }
+
+    setMagicSending(true);
+    try {
+      console.info("[studio] sending magic link with emailRedirectTo", magicRedirectTo);
+      const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
+      const { error, response } = await supabase.auth.signInWithOtp({
+        email: emailValue,
+        options: {
+          emailRedirectTo: magicRedirectTo,
+          shouldCreateUser: true,
+        },
+      });
+
+      if (error) {
+        const err = error.message;
+        const retryAfter = Number(response?.headers.get("retry-after") || "0");
+        const parsedSeconds = Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter
+          : Number((err.match(/(\d+)\s*(?:seg|second|min)/i) || ["", "0"])[1] || "0");
+        if (parsedSeconds > 0) {
+          setMagicCooldownUntil(Date.now() + parsedSeconds * 1000);
+          setMessage(`Debes esperar ${parsedSeconds}s antes de solicitar otro magic link.`);
+          return;
+        }
+        setMessage(`No se pudo enviar magic link: ${err}`);
+        return;
+      }
+
+      setMagicCooldownUntil(Date.now() + 60 * 1000);
+      setMessage(`Magic link enviado. Revisa tu correo. Te redirigirá a ${magicRedirectTo} cuando verifiques el enlace.`);
+      setMagicEmail("");
+    } finally {
+      setMagicSending(false);
+    }
+  }
+
   async function onLogout() {
     await fetch("/api/admin/session", { method: "DELETE", credentials: "include" });
     setEmail(null);
+    setPermissions(null);
     setMessage("Sesión cerrada.");
   }
 
@@ -236,7 +377,7 @@ export default function StudioIndexPage() {
         <section className="mx-auto max-w-6xl px-4 py-14">
           <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">THO Studio</h1>
           <p className="mt-3 max-w-3xl text-slate-700">
-            Acceso interno centralizado. Inicia sesión una vez y luego puedes operar cualquier módulo del Studio.
+            Acceso unificado con Supabase Auth (Microsoft para internos, magic link para externos) y allowlist de roles en Studio.
           </p>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
@@ -244,151 +385,69 @@ export default function StudioIndexPage() {
 
             {!checking && !email ? (
               <div>
-                <p className="text-sm text-slate-700">Ingresa con Microsoft para acceder al Studio.</p>
-                <button
-                  onClick={onMicrosoftLogin}
-                  className="mt-3 rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700"
-                  type="button"
-                >
-                  Ingresar con Microsoft
-                </button>
+                <p className="text-sm text-slate-700">Ingresa con Microsoft o solicita magic link si eres externo autorizado.</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button onClick={onOAuthLogin} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">
+                    Ingresar con Microsoft
+                  </button>
+                </div>
+                <div className="mt-4 grid gap-2 sm:max-w-lg sm:grid-cols-[1fr_auto]">
+                  <input
+                    type="email"
+                    value={magicEmail}
+                    onChange={(e) => setMagicEmail(e.target.value)}
+                    placeholder="freelancer@correo.com"
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  />
+                  <button onClick={onSendMagicLink} disabled={magicSending || magicCooldownSeconds > 0} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60" type="button">
+                    {magicSending ? "Enviando..." : magicCooldownSeconds > 0 ? `Reintentar en ${magicCooldownSeconds}s` : "Enviar magic link"}
+                  </button>
+                </div>
               </div>
             ) : null}
 
             {!checking && email ? (
               <div className="flex flex-wrap items-center gap-3">
                 <div className="text-sm text-slate-700">Sesión activa como <strong>{email}</strong>.</div>
-                <button onClick={onLogout} className="rounded-lg border border-slate-300 px-3 py-2 text-xs" type="button">
-                  Salir
-                </button>
+                <button onClick={onLogout} className="rounded-lg border border-slate-300 px-3 py-2 text-xs" type="button">Salir</button>
               </div>
             ) : null}
 
             {message ? <p className="mt-3 text-sm text-slate-700">{message}</p> : null}
           </div>
 
-          {email ? (
-            <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">Onboarding obligatorio</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-950">Debes completar cada módulo para desbloquear el siguiente</h2>
-              <p className="mt-3 max-w-3xl text-sm text-slate-700">
-                El flujo bloquea el avance por tiempo real de lectura. La evaluación final está anclada al mismo panel para evitar navegación rápida hacia arriba y reforzar comprensión antes de operar el Studio.
-              </p>
-
-              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-lg font-semibold text-slate-900">{activeModule.title}</h3>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Paso {currentModule + 1} de {totalModules}</div>
-                </div>
-
-                <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-slate-900 transition-all" style={{ width: `${progress}%` }} />
-                </div>
-                <p className="mt-2 text-xs text-slate-600">
-                  {remainingSeconds > 0 ? `Lectura en curso: espera ${remainingSeconds}s para habilitar el siguiente módulo.` : "Tiempo mínimo cumplido. Puedes desbloquear el siguiente módulo."}
-                </p>
-
-                <div className="mt-5 grid gap-3">
-                  {activeModule.paragraphs.map((paragraph) => (
-                    <p key={paragraph} className="text-sm leading-relaxed text-slate-700">{paragraph}</p>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={completeCurrentModule}
-                  disabled={remainingSeconds > 0}
-                  className="mt-6 rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
-                >
-                  {currentModule === totalModules - 1 ? "Finalizar módulo y abrir evaluación" : "Completar módulo y continuar"}
-                </button>
-              </div>
-
-              <div className="mt-5 flex flex-wrap gap-2">
-                {onboardingFlow.map((module, index) => {
-                  const unlocked = index === 0 || completedModules.includes(index - 1);
-                  const done = completedModules.includes(index);
-                  return (
-                    <button
-                      type="button"
-                      key={module.title}
-                      onClick={() => unlocked && setCurrentModule(index)}
-                      className={`rounded-lg border px-3 py-2 text-xs font-semibold ${done ? "border-emerald-200 bg-emerald-50 text-emerald-700" : unlocked ? "border-slate-300 bg-white text-slate-700" : "border-slate-200 bg-slate-100 text-slate-400"}`}
-                      disabled={!unlocked}
-                    >
-                      {done ? "✓" : index + 1}. {module.title}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {evaluationReady ? (
-                <div className="mt-8 rounded-2xl border border-slate-900 bg-slate-950 p-5 text-white">
-                  <h3 className="text-xl font-semibold">Evaluación de cierre (obligatoria)</h3>
-                  <p className="mt-2 text-sm text-slate-200">Responde correctamente las 3 preguntas para habilitar los accesos del Studio.</p>
-
-                  <div className="mt-5 grid gap-4">
-                    {evaluationQuestions.map((item, index) => (
-                      <fieldset key={item.question} className="rounded-xl border border-slate-700 p-4">
-                        <legend className="px-1 text-sm font-semibold">{index + 1}. {item.question}</legend>
-                        <div className="mt-3 grid gap-2">
-                          {item.options.map((option, optionIndex) => (
-                            <label key={option} className="flex cursor-pointer items-start gap-2 text-sm text-slate-100">
-                              <input
-                                type="radio"
-                                name={`question-${index}`}
-                                checked={answers[index] === optionIndex}
-                                onChange={() => setAnswers((prev) => ({ ...prev, [index]: optionIndex }))}
-                              />
-                              <span>{option}</span>
-                            </label>
-                          ))}
-                        </div>
-                      </fieldset>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={submitEvaluation}
-                    className="mt-5 rounded-lg bg-white px-4 py-2 text-xs font-semibold text-slate-950"
-                  >
-                    Enviar evaluación
-                  </button>
-                  {evaluationResult ? <p className="mt-3 text-sm text-slate-200">{evaluationResult}</p> : null}
-                </div>
-              ) : null}
-            </section>
+          {canManageAccess ? (
+            <div className="mt-4">
+              <Link href="/studio/accesos" className="inline-flex rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50">
+                Control de accesos (superadmin)
+              </Link>
+            </div>
           ) : null}
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {modules.map((item) => (
+            {modules.map((item) => {
+              const isSuperAdmin = role === "superadmin";
+              const onboardingAllowedPaths = ["/studio/onboarding", "/studio/canal-confidencial"];
+              const blockedByOnboarding = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && !isSuperAdmin && !onboardingAllowedPaths.includes(item.href);
+              return (
               <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.status}</div>
                 <h2 className="mt-2 text-2xl font-semibold text-slate-900">{item.title}</h2>
                 <p className="mt-2 text-sm text-slate-700">{item.desc}</p>
-                {item.href === "#" ? (
-                  <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">
-                    Se habilita en siguiente fase
-                  </div>
-                ) : email && evaluationPassed ? (
-                  <Link
-                    href={item.href}
-                    className="mt-5 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white"
-                  >
-                    Entrar
-                  </Link>
-                ) : email ? (
-                  <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">
-                    Completa onboarding + evaluación
-                  </div>
+                {!email ? (
+                  <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Requiere sesión</div>
+                ) : !item.allowed(permissions) ? (
+                  <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Sin permiso asignado</div>
+                ) : blockedByOnboarding ? (
+                  <div className="mt-5 inline-flex flex-wrap items-center gap-1 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900">Bloqueado hasta completar onboarding · <Link href="/studio/onboarding" className="underline underline-offset-2">Ir a onboarding</Link></div>
+                ) : item.external ? (
+                  <a href={item.href} target="_blank" rel="noreferrer" className="mt-5 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">Entrar</a>
                 ) : (
-                  <div className="mt-5 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">
-                    Requiere sesión
-                  </div>
+                  <Link href={item.href} className="mt-5 inline-flex rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white">Entrar</Link>
                 )}
               </article>
-            ))}
+            );
+            })}
           </div>
         </section>
       </main>

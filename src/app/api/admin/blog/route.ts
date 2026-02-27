@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { isAdminAuthorized } from "@/lib/adminAuth";
+import { readSession } from "@/lib/adminAuth";
 import { createPost, listAllPosts } from "@/lib/blogStore";
 
 export const dynamic = "force-dynamic";
 
+function unauthorized() {
+  return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+}
+
 export async function GET(req: NextRequest) {
-  if (!(await isAdminAuthorized(req))) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
+  const session = await readSession(req);
+  if (!session || !session.canBlog) return unauthorized();
 
   const posts = await listAllPosts();
   return NextResponse.json({ posts });
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await isAdminAuthorized(req))) {
-    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
-  }
+  const session = await readSession(req);
+  if (!session || !session.canBlog) return unauthorized();
 
   try {
     const payload = await req.json();
