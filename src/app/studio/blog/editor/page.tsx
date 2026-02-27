@@ -132,6 +132,7 @@ export default function BlogStudioPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [blockedByOnboarding, setBlockedByOnboarding] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
   const [repoPickerMode, setRepoPickerMode] = useState<"cover" | "inline" | null>(null);
@@ -154,13 +155,25 @@ export default function BlogStudioPage() {
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         if (!data.authenticated) {
           router.replace("/studio");
           return;
         }
         setAuthenticated(true);
         if (data.email) setEmail(data.email);
+        const isSuperAdmin = String(data.role || "") === "superadmin";
+        if (!isSuperAdmin) {
+          const onboardingRes = await fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" });
+          const onboarding = await onboardingRes.json();
+          if (onboardingRes.ok) {
+            const required = Boolean(onboarding?.config?.required ?? true);
+            const blockInternal = Boolean(onboarding?.config?.blockInternal ?? false);
+            const completed = Boolean(onboarding?.onboarding?.completed);
+            setBlockedByOnboarding(required && blockInternal && !completed);
+          }
+        }
+
       })
       .catch(() => {
         router.replace("/studio");
@@ -497,6 +510,21 @@ export default function BlogStudioPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (blockedByOnboarding) {
+    return (
+      <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
+        <section className="mx-auto max-w-3xl rounded-2xl border border-amber-300 bg-amber-50 p-6">
+          <h1 className="text-2xl font-semibold text-amber-900">Bloqueado hasta completar onboarding</h1>
+          <p className="mt-2 text-sm text-amber-900">Para acceder a este módulo interno primero debes completar Studio Onboarding.</p>
+          <div className="mt-4 flex gap-2">
+            <Link href="/studio/onboarding" className="rounded-lg bg-amber-900 px-4 py-2 text-sm font-semibold text-white">Ir a onboarding</Link>
+            <Link href="/studio/canal-confidencial" className="rounded-lg border border-amber-400 px-4 py-2 text-sm text-amber-900">Canal confidencial</Link>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   if (checkingAuth) {
