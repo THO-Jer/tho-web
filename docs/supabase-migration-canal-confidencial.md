@@ -9,6 +9,8 @@ Configura en producción:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `STUDIO_AUTH_REDIRECT_URL` (ej: `https://tho-web.vercel.app/studio`)
+- `NEXT_PUBLIC_STUDIO_URL` (ej: `https://tho-web.vercel.app`)
 - `STUDIO_ROLES_TABLE=studio_roles`
 - `STUDIO_LOGIN_LOGS_TABLE=studio_login_logs`
 - `STUDIO_ACCESS_REQUESTS_TABLE=studio_access_requests`
@@ -101,6 +103,8 @@ create table if not exists public.incident_attachments (
 
 - Internos: usar botón Microsoft (`provider=azure`) en `/studio`.
 - Externos: usar botón "Enviar magic link" en `/studio`.
+- El redirect de login se fuerza siempre a Studio con `STUDIO_AUTH_REDIRECT_URL` (fallback permitido: `NEXT_PUBLIC_STUDIO_URL + /studio`).
+- En Supabase Auth > URL Configuration, agregar **exactamente** `https://tho-web.vercel.app/studio` en Redirect URLs permitidas.
 - La autorización final depende de `studio_roles` + superadmins por `STUDIO_SUPERADMINS`.
 
 ## 4) Permisos por rol

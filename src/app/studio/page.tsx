@@ -209,6 +209,8 @@ export default function StudioIndexPage() {
         should_create_user: true,
         email_redirect_to: redirectTo,
         redirect_to: redirectTo,
+        emailRedirectTo: redirectTo,
+        redirectTo,
       }),
     });
 
