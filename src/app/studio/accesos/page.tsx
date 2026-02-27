@@ -25,6 +25,14 @@ type AccessRequest = {
   resolvedAt?: string;
 };
 
+type AuditIssue = {
+  id: string;
+  module: "access" | "onboarding" | "incidents";
+  severity: "error" | "warning";
+  message: string;
+  fixSql?: string;
+};
+
 type RowEditorState = {
   provider: "google" | "azure" | "any";
   canBlog: boolean;
@@ -49,6 +57,9 @@ export default function StudioAccesosPage() {
   const [grantIncidents, setGrantIncidents] = useState(false);
   const [grantOnboarding, setGrantOnboarding] = useState(true);
   const [message, setMessage] = useState("");
+  const [auditIssues, setAuditIssues] = useState<AuditIssue[]>([]);
+  const [auditCheckedAt, setAuditCheckedAt] = useState("");
+  const [auditLoading, setAuditLoading] = useState(false);
 
   function hydrateEditors(users: AuthorizedUser[]) {
     const next: Record<string, RowEditorState> = {};
@@ -146,6 +157,33 @@ export default function StudioAccesosPage() {
       setMessage(error instanceof Error ? error.message : "Error actualizando acceso.");
     } finally {
       setLoading(false);
+    }
+  }
+
+
+  async function runSupabaseAudit() {
+    setAuditLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/admin/supabase-audit", { credentials: "include", cache: "no-store" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "No se pudo ejecutar auditoría.");
+      setAuditIssues(data.issues || []);
+      setAuditCheckedAt(String(data.checkedAt || ""));
+      if (!data.issues?.length) setMessage("Auditoría OK: no se detectaron problemas críticos.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Error ejecutando auditoría.");
+    } finally {
+      setAuditLoading(false);
+    }
+  }
+
+  async function copySql(sql: string) {
+    try {
+      await navigator.clipboard.writeText(sql);
+      setMessage("SQL copiado al portapapeles.");
+    } catch {
+      setMessage("No se pudo copiar SQL.");
     }
   }
 
@@ -279,6 +317,32 @@ export default function StudioAccesosPage() {
               </div>
             ))}
             {!requests.length ? <p className="text-sm text-slate-500">No hay solicitudes registradas.</p> : null}
+          </div>
+        </section>
+
+
+        <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold text-slate-900">Auditoría técnica de Supabase</h2>
+            <button type="button" onClick={runSupabaseAudit} disabled={auditLoading} className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">
+              {auditLoading ? "Auditando..." : "Ejecutar auditoría"}
+            </button>
+          </div>
+          <p className="text-xs text-slate-500">Detecta tablas/columnas faltantes del Studio y sugiere SQL para corregir desde el SQL Editor de Supabase.</p>
+          {auditCheckedAt ? <p className="mt-2 text-xs text-slate-500">Última ejecución: {new Date(auditCheckedAt).toLocaleString()}</p> : null}
+          <div className="mt-3 grid gap-2">
+            {auditIssues.map((issue) => (
+              <div key={issue.id} className={`rounded-lg border px-3 py-2 text-sm ${issue.severity === "error" ? "border-rose-200 bg-rose-50" : "border-amber-200 bg-amber-50"}`}>
+                <div className="font-semibold">[{issue.module}] {issue.message}</div>
+                {issue.fixSql ? (
+                  <div className="mt-2">
+                    <pre className="overflow-auto rounded bg-slate-900 p-2 text-xs text-slate-100">{issue.fixSql}</pre>
+                    <button type="button" onClick={() => copySql(issue.fixSql || "")} className="mt-2 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs">Copiar SQL</button>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+            {!auditIssues.length ? <p className="text-sm text-slate-500">Sin resultados de auditoría todavía.</p> : null}
           </div>
         </section>
 
