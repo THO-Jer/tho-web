@@ -33,6 +33,17 @@ type ApiResponse = {
   onboarding: OnboardingData;
 };
 
+
+async function parseJsonSafe<T>(res: Response): Promise<T | null> {
+  const raw = await res.text();
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
 export default function StudioOnboardingLandingPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -42,6 +53,7 @@ export default function StudioOnboardingLandingPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [track, setTrack] = useState<ApiResponse["track"]>("general");
   const [config, setConfig] = useState<ApiResponse["config"] | null>(null);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     const run = async () => {
@@ -52,15 +64,15 @@ export default function StudioOnboardingLandingPage() {
           fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" }),
         ]);
 
-        const session = await sessionRes.json();
+        const session = (await parseJsonSafe<{ authenticated?: boolean; role?: string; canManageAccess?: boolean }>(sessionRes)) || {};
         if (!session.authenticated) {
           router.replace("/studio");
           return;
         }
 
-        const onboarding = (await onboardingRes.json()) as ApiResponse & { error?: string };
-        if (!onboardingRes.ok) {
-          throw new Error(onboarding.error || "No se pudo cargar onboarding.");
+        const onboarding = (await parseJsonSafe<ApiResponse & { error?: string }>(onboardingRes)) || null;
+        if (!onboardingRes.ok || !onboarding) {
+          throw new Error(onboarding?.error || "No se pudo cargar onboarding. Si persiste, revisa configuración Supabase y roles.");
         }
 
         setUnits(onboarding.units || []);
@@ -76,7 +88,7 @@ export default function StudioOnboardingLandingPage() {
     };
 
     run().catch(() => undefined);
-  }, [router]);
+  }, [router, reloadToken]);
 
   const nextUnit = useMemo(() => {
     if (!data) return units[0];
@@ -133,6 +145,20 @@ export default function StudioOnboardingLandingPage() {
           <p className="mt-3 text-xs text-slate-500">
             Track activo: <strong>{track}</strong> · Persistencia: <strong>{config.store}</strong> · {config.persistenceNote}
           </p>
+        ) : null}
+
+
+        {!units.length ? (
+          <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            No encontramos módulos visibles para tu track actual.
+            <button
+              type="button"
+              onClick={() => setReloadToken((prev) => prev + 1)}
+              className="ml-2 underline underline-offset-2"
+            >
+              Reintentar carga
+            </button>
+          </div>
         ) : null}
 
         <div className="mt-5 grid gap-3">
