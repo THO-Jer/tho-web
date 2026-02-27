@@ -47,6 +47,7 @@ export function Header() {
             Quiénes somos
           </Link>
 
+        <div className="order-3 flex w-full items-center justify-end gap-2 lg:hidden">
           <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950" : "text-slate-700"}`}>
             Blog
           </Link>
@@ -85,6 +86,7 @@ export function Header() {
             Blog
           </Link>
 
+        <div className="order-2 flex items-center gap-2 lg:order-none">
           <a
             href="https://bit.ly/bookTHO"
             target="_blank"
