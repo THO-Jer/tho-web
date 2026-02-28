@@ -309,7 +309,12 @@ function summarizeOnboarding(record: OnboardingRecord, state: OnboardingState, r
   const units = getApplicableUnitsByTrack(state.units, record.track);
   const statuses = computeModuleStatuses(record, state);
   const completedSet = new Set(record.completed_units || []);
-  const progress = units.length ? Math.round((units.filter((u) => completedSet.has(u.slug)).length / units.length) * 100) : 0;
+  const requiredLessonTags = units.flatMap((unit, idx) => {
+    const moduleKey = moduleKeyByIndex(idx);
+    return parseLessonIds(unit.content).map((lessonId) => `${moduleKey}:${lessonId}`);
+  });
+  const completedLessons = requiredLessonTags.filter((tag) => completedSet.has(tag)).length;
+  const progress = requiredLessonTags.length ? Math.round((completedLessons / requiredLessonTags.length) * 100) : 0;
   const completed = statuses.every((status) => status.status === "validated" || ["C", "D"].includes(status.moduleKey));
   return {
     progress,
