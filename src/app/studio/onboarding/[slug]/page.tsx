@@ -34,6 +34,86 @@ const moduleVisuals: Record<string, { cover: string; accent: string }> = {
   D: { cover: "/ilustraciones/10.png", accent: "text-emerald-700" },
 };
 
+type LessonGuide = {
+  whyItMatters: string;
+  whatToDo: string;
+  commonMistake: string;
+  checklist: string[];
+  caseBrief: string;
+};
+
+const moduleALessonGuides: Record<string, LessonGuide> = {
+  A0: {
+    whyItMatters: "Define el estándar base: onboarding es alineación operativa para evitar ambigüedad, errores repetidos y daño reputacional.",
+    whatToDo: "Antes de ejecutar, verifica propósito, criterio de calidad y trazabilidad mínima de tu trabajo.",
+    commonMistake: "Tratar el onboarding como lectura pasiva sin traducirlo a decisiones concretas del rol.",
+    checklist: ["Entiendo qué protege este onboarding", "Sé qué evidencia dejar en cada entrega", "Identifico cuándo debo escalar dudas"],
+    caseBrief: "Caso breve: proyecto urgente sin contexto completo. Respuesta esperada: pausar, delimitar problema, definir responsable y registrar acuerdo antes de ejecutar.",
+  },
+  A1: {
+    whyItMatters: "El propósito institucional guía prioridades cuando hay tensión entre velocidad, calidad y riesgo.",
+    whatToDo: "Conecta cada tarea con impacto organizacional: decisión, riesgo mitigado o legitimidad fortalecida.",
+    commonMistake: "Ejecutar tareas aisladas sin evaluar coherencia estratégica.",
+    checklist: ["Puedo explicar para qué existe THO", "Relaciono mi rol con ese propósito", "Identifico riesgos de incoherencia"],
+    caseBrief: "Caso breve: cliente pide solución rápida sin diagnóstico. Respuesta esperada: encuadrar alcance, explicitar riesgos y proponer ruta metodológica.",
+  },
+  A2: {
+    whyItMatters: "Diferenciar propósito y propuesta de valor evita promesas vagas y mejora posicionamiento profesional.",
+    whatToDo: "Habla en términos de método: diagnóstico, diseño, acompañamiento, trazabilidad y gestión de riesgos.",
+    commonMistake: "Vender entusiasmo o esfuerzo sin explicar estructura ni resultados verificables.",
+    checklist: ["Distingo propósito vs. propuesta de valor", "Puedo explicar el método THO", "Evito lenguaje ambiguo en propuestas"],
+    caseBrief: "Caso breve: cliente pide “algo innovador”. Respuesta esperada: traducir necesidad a hipótesis, criterios de éxito y entregables trazables.",
+  },
+
+  A3: {
+    whyItMatters: "Eleva el estándar de entrega: calidad no es estética, es decisión trazable y ejecutable.",
+    whatToDo: "Antes de cerrar cualquier pieza, valida contexto, evidencia, decisión, riesgos y próximos pasos con responsable.",
+    commonMistake: "Dar por terminado algo “bonito” pero sin criterio ni accountability.",
+    checklist: ["Problema delimitado", "Decisión explícita", "Riesgos identificados", "Responsable y fecha definidos"],
+    caseBrief: "Caso breve: entrega enviada sin riesgos documentados. Respuesta esperada: reabrir entrega, incorporar matriz mínima de riesgos y responsables.",
+  },
+  A4: {
+    whyItMatters: "Los valores son reglas operativas, no slogans. Definen cómo se trabaja bajo presión.",
+    whatToDo: "Practica humanidad en el lenguaje, colaboración en documentación y adaptabilidad basada en evidencia.",
+    commonMistake: "Invocar valores solo en discurso, pero decidir por conveniencia o orgullo.",
+    checklist: ["Cuidé forma y fondo de la comunicación", "Dejé documentación compartida", "Ajusté decisión ante evidencia"],
+    caseBrief: "Caso breve: feedback crítico del cliente. Respuesta esperada: consolidar observaciones, ajustar con método y comunicar límites con respeto.",
+  },
+  A5: {
+    whyItMatters: "Los no negociables protegen al equipo, al cliente y a la reputación institucional.",
+    whatToDo: "Ante presión por atajos, sostén método mínimo: trazabilidad, resguardo de datos y alcance realista.",
+    commonMistake: "Aceptar compromisos inviables para “resolver rápido”.",
+    checklist: ["No prometí lo que no puedo sostener", "Resguardé información sensible", "No omití trazabilidad mínima"],
+    caseBrief: "Caso breve: cliente solicita acceso amplio a datos sensibles. Respuesta esperada: aplicar mínimo acceso y canal formal de autorización.",
+  },
+  A6: {
+    whyItMatters: "Ética operativa consistente evita conflictos, protege a personas y da legitimidad a la intervención.",
+    whatToDo: "Registra decisiones con contexto, declara conflictos tempranamente y usa canales formales.",
+    commonMistake: "Resolver por canal informal temas que requieren trazabilidad o control de acceso.",
+    checklist: ["Decisión registrada con contexto", "Conflictos declarados", "Canal formal utilizado"],
+    caseBrief: "Caso breve: instrucción sensible por chat informal. Respuesta esperada: mover a canal formal y dejar registro de decisión.",
+  },
+  A7: {
+    whyItMatters: "Escalar a tiempo reduce exposición legal, reputacional y operativa.",
+    whatToDo: "Si detectas tensión crítica entre urgencia y calidad, documenta riesgo y escala con recomendación clara.",
+    commonMistake: "Normalizar excepciones frecuentes hasta que se vuelven crisis.",
+    checklist: ["Riesgo identificado", "Escalamiento ejecutado", "Criterio de decisión documentado"],
+    caseBrief: "Caso breve: entrega urgente con dudas de confidencialidad. Respuesta esperada: detener envío, escalar y redefinir ruta segura.",
+  },
+  "Reflexión guiada sugerida": {
+    whyItMatters: "La reflexión transforma contenido en criterio aplicable al rol.",
+    whatToDo: "Formula compromisos concretos: qué harás distinto, qué límites sostendrás y cuándo escalarás.",
+    commonMistake: "Responder de forma genérica sin conexión con decisiones reales del trabajo.",
+    checklist: ["Definí 2 compromisos operativos", "Identifiqué 1 riesgo de incoherencia", "Definí cómo lo escalaría"],
+    caseBrief: "Caso breve: proyecto atractivo pero incoherente con método THO. Respuesta esperada: explicitar por qué no es compatible y proponer alternativa responsable.",
+  },
+};
+
+function getLessonGuide(moduleKey: string, lessonId: string): LessonGuide | null {
+  if (moduleKey !== "A") return null;
+  return moduleALessonGuides[lessonId] || null;
+}
+
 function parseLessons(content: string[]): Lesson[] {
   return content.map((paragraph, index) => {
     const normalized = paragraph.replace(/\s+/g, " ").trim();
@@ -211,6 +291,8 @@ export default function StudioOnboardingUnitPage() {
 
   const lesson = lessons[activeLesson];
   const visual = moduleVisuals[moduleKey] || moduleVisuals.A;
+  const lessonProgressPct = lessons.length ? Math.round((completedLessonCount / lessons.length) * 100) : 0;
+  const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson.id) : null;
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -222,6 +304,15 @@ export default function StudioOnboardingUnitPage() {
               <h1 className="mt-2 text-3xl font-semibold text-slate-900">{unit.title}</h1>
               <p className="mt-2 text-sm text-slate-700">{unit.summary}</p>
               <p className="mt-2 text-xs text-slate-500">Lecciones completadas: {completedLessonCount}/{lessons.length} · Intentos quiz: {status?.attempts ?? 0}/{status?.maxAttempts ?? 3}</p>
+              <div className="mt-3 max-w-md">
+                <div className="mb-1 flex items-center justify-between text-[11px] font-medium text-slate-500">
+                  <span>Avance del módulo</span>
+                  <span>{lessonProgressPct}%</span>
+                </div>
+                <div className="h-2 rounded-full bg-slate-200">
+                  <div className="h-2 rounded-full bg-slate-900" style={{ width: `${lessonProgressPct}%` }} />
+                </div>
+              </div>
             </div>
             <Image src="/brand/logo-negro.png" alt="THO" width={90} height={90} className="opacity-80" />
           </div>
@@ -242,6 +333,36 @@ export default function StudioOnboardingUnitPage() {
                 ) : (
                   <p className="mt-3 text-sm leading-relaxed text-slate-700">{lesson.body}</p>
                 )}
+
+                {lessonGuide ? (
+                  <div className="mt-4 space-y-3 rounded-xl border border-sky-100 bg-sky-50/70 p-3">
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Por qué importa</p>
+                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.whyItMatters}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Qué debes hacer en THO</p>
+                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.whatToDo}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Error frecuente</p>
+                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.commonMistake}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Checklist de salida</p>
+                      <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                        {lessonGuide.checklist.map((item) => (
+                          <li key={`${lesson.id}-${item}`}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="rounded-lg border border-sky-200 bg-white p-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Mini caso THO</p>
+                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.caseBrief}</p>
+                    </div>
+                  </div>
+                ) : null}
+
                 <p className="mt-4 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
                 <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
               </div>
