@@ -25,7 +25,7 @@ type Onboarding = {
   module_status?: ModuleStatus[];
 };
 
-type Lesson = { id: string; label: string; body: string; bullets: string[]; highlight?: string };
+type Lesson = { id: string; label: string; title: string; subtitle: string; bullets: string[] };
 
 const moduleVisuals: Record<string, { cover: string; accent: string }> = {
   A: { cover: "/ilustraciones/1.png", accent: "text-sky-700" },
@@ -38,8 +38,7 @@ type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
   commonMistake: string;
-  checklist: string[];
-  caseBrief: string;
+  keyLearnings: string[];
 };
 
 const moduleALessonGuides: Record<string, LessonGuide> = {
@@ -47,71 +46,71 @@ const moduleALessonGuides: Record<string, LessonGuide> = {
     whyItMatters: "Define el estándar base: onboarding es alineación operativa para evitar ambigüedad, errores repetidos y daño reputacional.",
     whatToDo: "Antes de ejecutar, verifica propósito, criterio de calidad y trazabilidad mínima de tu trabajo.",
     commonMistake: "Tratar el onboarding como lectura pasiva sin traducirlo a decisiones concretas del rol.",
-    checklist: ["Entiendo qué protege este onboarding", "Sé qué evidencia dejar en cada entrega", "Identifico cuándo debo escalar dudas"],
-    caseBrief: "Caso breve: proyecto urgente sin contexto completo. Respuesta esperada: pausar, delimitar problema, definir responsable y registrar acuerdo antes de ejecutar.",
+    keyLearnings: ["Entiendo qué protege este onboarding", "Sé qué evidencia dejar en cada entrega", "Identifico cuándo debo escalar dudas"],
   },
   A1: {
     whyItMatters: "El propósito institucional guía prioridades cuando hay tensión entre velocidad, calidad y riesgo.",
     whatToDo: "Conecta cada tarea con impacto organizacional: decisión, riesgo mitigado o legitimidad fortalecida.",
     commonMistake: "Ejecutar tareas aisladas sin evaluar coherencia estratégica.",
-    checklist: ["Puedo explicar para qué existe THO", "Relaciono mi rol con ese propósito", "Identifico riesgos de incoherencia"],
-    caseBrief: "Caso breve: cliente pide solución rápida sin diagnóstico. Respuesta esperada: encuadrar alcance, explicitar riesgos y proponer ruta metodológica.",
+    keyLearnings: ["Puedo explicar para qué existe THO", "Relaciono mi rol con ese propósito", "Identifico riesgos de incoherencia"],
   },
   A2: {
     whyItMatters: "Diferenciar propósito y propuesta de valor evita promesas vagas y mejora posicionamiento profesional.",
     whatToDo: "Habla en términos de método: diagnóstico, diseño, acompañamiento, trazabilidad y gestión de riesgos.",
     commonMistake: "Vender entusiasmo o esfuerzo sin explicar estructura ni resultados verificables.",
-    checklist: ["Distingo propósito vs. propuesta de valor", "Puedo explicar el método THO", "Evito lenguaje ambiguo en propuestas"],
-    caseBrief: "Caso breve: cliente pide “algo innovador”. Respuesta esperada: traducir necesidad a hipótesis, criterios de éxito y entregables trazables.",
+    keyLearnings: ["Distingo propósito vs. propuesta de valor", "Puedo explicar el método THO", "Evito lenguaje ambiguo en propuestas"],
   },
 
   A3: {
     whyItMatters: "Eleva el estándar de entrega: calidad no es estética, es decisión trazable y ejecutable.",
     whatToDo: "Antes de cerrar cualquier pieza, valida contexto, evidencia, decisión, riesgos y próximos pasos con responsable.",
     commonMistake: "Dar por terminado algo “bonito” pero sin criterio ni accountability.",
-    checklist: ["Problema delimitado", "Decisión explícita", "Riesgos identificados", "Responsable y fecha definidos"],
-    caseBrief: "Caso breve: entrega enviada sin riesgos documentados. Respuesta esperada: reabrir entrega, incorporar matriz mínima de riesgos y responsables.",
+    keyLearnings: ["Problema delimitado", "Decisión explícita", "Riesgos identificados", "Responsable y fecha definidos"],
   },
   A4: {
     whyItMatters: "Los valores son reglas operativas, no slogans. Definen cómo se trabaja bajo presión.",
     whatToDo: "Practica humanidad en el lenguaje, colaboración en documentación y adaptabilidad basada en evidencia.",
     commonMistake: "Invocar valores solo en discurso, pero decidir por conveniencia o orgullo.",
-    checklist: ["Cuidé forma y fondo de la comunicación", "Dejé documentación compartida", "Ajusté decisión ante evidencia"],
-    caseBrief: "Caso breve: feedback crítico del cliente. Respuesta esperada: consolidar observaciones, ajustar con método y comunicar límites con respeto.",
+    keyLearnings: ["Cuidé forma y fondo de la comunicación", "Dejé documentación compartida", "Ajusté decisión ante evidencia"],
   },
   A5: {
     whyItMatters: "Los no negociables protegen al equipo, al cliente y a la reputación institucional.",
     whatToDo: "Ante presión por atajos, sostén método mínimo: trazabilidad, resguardo de datos y alcance realista.",
     commonMistake: "Aceptar compromisos inviables para “resolver rápido”.",
-    checklist: ["No prometí lo que no puedo sostener", "Resguardé información sensible", "No omití trazabilidad mínima"],
-    caseBrief: "Caso breve: cliente solicita acceso amplio a datos sensibles. Respuesta esperada: aplicar mínimo acceso y canal formal de autorización.",
+    keyLearnings: ["No prometí lo que no puedo sostener", "Resguardé información sensible", "No omití trazabilidad mínima"],
   },
   A6: {
     whyItMatters: "Ética operativa consistente evita conflictos, protege a personas y da legitimidad a la intervención.",
     whatToDo: "Registra decisiones con contexto, declara conflictos tempranamente y usa canales formales.",
     commonMistake: "Resolver por canal informal temas que requieren trazabilidad o control de acceso.",
-    checklist: ["Decisión registrada con contexto", "Conflictos declarados", "Canal formal utilizado"],
-    caseBrief: "Caso breve: instrucción sensible por chat informal. Respuesta esperada: mover a canal formal y dejar registro de decisión.",
+    keyLearnings: ["Decisión registrada con contexto", "Conflictos declarados", "Canal formal utilizado"],
   },
   A7: {
     whyItMatters: "Escalar a tiempo reduce exposición legal, reputacional y operativa.",
     whatToDo: "Si detectas tensión crítica entre urgencia y calidad, documenta riesgo y escala con recomendación clara.",
     commonMistake: "Normalizar excepciones frecuentes hasta que se vuelven crisis.",
-    checklist: ["Riesgo identificado", "Escalamiento ejecutado", "Criterio de decisión documentado"],
-    caseBrief: "Caso breve: entrega urgente con dudas de confidencialidad. Respuesta esperada: detener envío, escalar y redefinir ruta segura.",
+    keyLearnings: ["Riesgo identificado", "Escalamiento ejecutado", "Criterio de decisión documentado"],
   },
   "Reflexión guiada sugerida": {
     whyItMatters: "La reflexión transforma contenido en criterio aplicable al rol.",
     whatToDo: "Formula compromisos concretos: qué harás distinto, qué límites sostendrás y cuándo escalarás.",
     commonMistake: "Responder de forma genérica sin conexión con decisiones reales del trabajo.",
-    checklist: ["Definí 2 compromisos operativos", "Identifiqué 1 riesgo de incoherencia", "Definí cómo lo escalaría"],
-    caseBrief: "Caso breve: proyecto atractivo pero incoherente con método THO. Respuesta esperada: explicitar por qué no es compatible y proponer alternativa responsable.",
+    keyLearnings: ["Definí 2 compromisos operativos", "Identifiqué 1 riesgo de incoherencia", "Definí cómo lo escalaría"],
   },
 };
 
-function getLessonGuide(moduleKey: string, lessonId: string): LessonGuide | null {
-  if (moduleKey !== "A") return null;
-  return moduleALessonGuides[lessonId] || null;
+function getLessonGuide(moduleKey: string, lesson: Lesson): LessonGuide {
+  if (moduleKey === "A" && moduleALessonGuides[lesson.id]) return moduleALessonGuides[lesson.id];
+  return {
+    whyItMatters: `Esta lección define criterio operativo para ${moduleKey}.`,
+    whatToDo: "Traduce el contenido en una acción concreta, registra decisión y responsable.",
+    commonMistake: "Leer y seguir avanzando sin convertir el contenido en criterio aplicable.",
+    keyLearnings: [
+      lesson.subtitle || "Identifica la idea principal",
+      lesson.bullets[0] || "Define una acción aplicable a tu rol",
+      "Documenta el criterio para continuidad del equipo",
+    ],
+  };
 }
 
 function parseLessons(content: string[]): Lesson[] {
@@ -122,11 +121,12 @@ function parseLessons(content: string[]): Lesson[] {
     const label = match ? String(match[1]).trim() : `Lección ${index + 1}`;
     const body = match ? String(match[2]).trim() : normalized;
     const segments = body.split(/\.\s+/).map((segment) => segment.trim()).filter(Boolean);
-    const highlight = segments[0] || body;
+    const subtitle = segments[0] || body;
     const bullets = segments.slice(1).map((segment) => segment.replace(/\.$/, ""));
-    return { id, label, body, bullets, highlight };
+    return { id, label, title: label, subtitle, bullets };
   });
 }
+
 
 function unitTopicMap(slug: string, topic: string) {
   const t = topic.toLowerCase();
@@ -167,6 +167,7 @@ export default function StudioOnboardingUnitPage() {
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
   const [tick, setTick] = useState(() => Date.now());
   const lessonRef = useRef<HTMLElement | null>(null);
+  const lessonEndRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -213,15 +214,13 @@ export default function StudioOnboardingUnitPage() {
   }, [activeLesson, moduleKey]);
 
   useEffect(() => {
-    const onScroll = () => {
-      const el = lessonRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      if (rect.bottom <= window.innerHeight - 16) setReachedEnd(true);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const marker = lessonEndRef.current;
+    if (!marker) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) setReachedEnd(true);
+    }, { threshold: 0.25 });
+    observer.observe(marker);
+    return () => observer.disconnect();
   }, [activeLesson, lessons.length]);
 
   const elapsedSeconds = Math.floor((tick - lessonStartAt) / 1000);
@@ -292,7 +291,7 @@ export default function StudioOnboardingUnitPage() {
   const lesson = lessons[activeLesson];
   const visual = moduleVisuals[moduleKey] || moduleVisuals.A;
   const lessonProgressPct = lessons.length ? Math.round((completedLessonCount / lessons.length) * 100) : 0;
-  const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson.id) : null;
+  const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson) : null;
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -322,17 +321,21 @@ export default function StudioOnboardingUnitPage() {
           <article ref={lessonRef} className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
             <div className="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
               <div className="p-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1} · {lesson.label}</p>
-                <p className={`mt-2 text-base font-semibold ${visual.accent}`}>{lesson.highlight}</p>
-                {lesson.bullets.length ? (
-                  <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
-                    {lesson.bullets.map((bullet, idx) => (
-                      <li key={`${lesson.id}-bullet-${idx}`}>{bullet}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-3 text-sm leading-relaxed text-slate-700">{lesson.body}</p>
-                )}
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1}</p>
+                <h2 className="mt-1 text-lg font-semibold text-slate-900">{lesson.title}</h2>
+                <p className={`mt-2 text-base font-medium ${visual.accent}`}>{lesson.subtitle}</p>
+                <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Puntos de clarificación</p>
+                  {lesson.bullets.length ? (
+                    <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
+                      {lesson.bullets.map((bullet, idx) => (
+                        <li key={`${lesson.id}-bullet-${idx}`}>{bullet}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-sm text-slate-600">No hay aclaraciones adicionales en esta lección.</p>
+                  )}
+                </div>
 
                 {lessonGuide ? (
                   <div className="mt-4 space-y-3 rounded-xl border border-sky-100 bg-sky-50/70 p-3">
@@ -349,16 +352,12 @@ export default function StudioOnboardingUnitPage() {
                       <p className="mt-1 text-sm text-slate-700">{lessonGuide.commonMistake}</p>
                     </div>
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Checklist de salida</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Aprendizajes clave</p>
                       <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-700">
-                        {lessonGuide.checklist.map((item) => (
+                        {lessonGuide.keyLearnings.slice(0, 3).map((item) => (
                           <li key={`${lesson.id}-${item}`}>{item}</li>
                         ))}
                       </ul>
-                    </div>
-                    <div className="rounded-lg border border-sky-200 bg-white p-2">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Mini caso THO</p>
-                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.caseBrief}</p>
                     </div>
                   </div>
                 ) : null}
@@ -370,13 +369,20 @@ export default function StudioOnboardingUnitPage() {
                 <Image src={visual.cover} alt={`Ilustración módulo ${moduleKey}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
               </div>
             </div>
+            <div ref={lessonEndRef} className="h-0 w-0" />
             <div className="border-t border-slate-200 bg-slate-50/60 p-4">
               <div className="flex flex-wrap gap-2">
                 <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.max(0, v - 1))} disabled={activeLesson <= 0}>Anterior</button>
                 <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.min(lessons.length - 1, v + 1))} disabled={activeLesson >= lessons.length - 1}>Siguiente</button>
-                <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving || isLessonDone(lesson.id) || !canMarkLesson} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
-                  {isLessonDone(lesson.id) ? "Lección completada" : "Marcar como completada"}
-                </button>
+                {isLessonDone(lesson.id) ? (
+                  <span className="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800">Lección completada</span>
+                ) : canMarkLesson ? (
+                  <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
+                    Marcar como completada
+                  </button>
+                ) : (
+                  <span className="rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Completa lectura + tiempo mínimo para habilitar</span>
+                )}
               </div>
             </div>
           </article>
