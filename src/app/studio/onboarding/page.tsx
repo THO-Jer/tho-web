@@ -19,7 +19,8 @@ type OnboardingData = {
   progress: number;
   completed: boolean;
   completed_units: string[];
-  conversation_suggested: boolean;
+  module_status?: Array<{ moduleKey: string; status: string; attempts: number; maxAttempts: number }>;
+  can_access?: { blog: boolean; incidents: boolean; crmStudio: boolean };
   updated_at: string;
   last_seen_unit?: string;
   last_saved_at?: string;
@@ -27,7 +28,7 @@ type OnboardingData = {
 };
 
 type ApiResponse = {
-  config: { required: boolean; blockInternal: boolean; store: string; persistenceNote: string };
+  config: { required: boolean; blockInternal: boolean; store: string; persistenceNote: string; passScore?: number; maxAttempts?: number; minLessonTimeSeconds?: number };
   track: "sales" | "creative_ops" | "advisory_ops" | "general";
   units: OnboardingUnit[];
   onboarding: OnboardingData;
@@ -95,8 +96,8 @@ export default function StudioOnboardingLandingPage() {
     if (data.last_seen_unit && units.some((unit) => unit.slug === data.last_seen_unit)) {
       return units.find((unit) => unit.slug === data.last_seen_unit) || units[0];
     }
-    const done = new Set(data.completed_units || []);
-    return units.find((unit) => !done.has(unit.slug)) || units[0];
+    const status = new Map((data.module_status || []).map((row) => [row.moduleKey, row.status]));
+    return units.find((_, index) => status.get(["A","B","C","D"][index] || "") !== "validated") || units[0];
   }, [data, units]);
 
   const totalMinutes = useMemo(() => units.reduce((sum, unit) => sum + (unit.durationMinutes || 0), 0), [units]);
@@ -136,14 +137,14 @@ export default function StudioOnboardingLandingPage() {
           </div>
           <p className="mt-2 text-xs text-slate-600">
             Estado: {data?.completed ? "Completado" : "En curso"}
-            {data?.conversation_suggested ? " · Conversación sugerida" : ""}
+
           </p>
           <p className="mt-1 text-xs text-slate-500">Último guardado: {timeAgo(data?.last_saved_at)}</p>
         </div>
 
         {config ? (
           <p className="mt-3 text-xs text-slate-500">
-            Track activo: <strong>{track}</strong> · Persistencia: <strong>{config.store}</strong> · {config.persistenceNote}
+            Track activo: <strong>{track}</strong> · Persistencia: <strong>{config.store}</strong> · {config.persistenceNote} · Corte aprobación: {config.passScore ?? 80}% · Intentos por módulo: {config.maxAttempts ?? 3}
           </p>
         ) : null}
 
@@ -163,17 +164,19 @@ export default function StudioOnboardingLandingPage() {
 
         <div className="mt-5 grid gap-3">
           {units.map((unit, idx) => {
-            const done = Boolean(data?.completed_units?.includes(unit.slug));
+            const moduleKey = ["A", "B", "C", "D"][idx] || "";
+            const row = data?.module_status?.find((item) => item.moduleKey === moduleKey);
+            const done = row?.status === "validated";
+            const locked = row?.status === "locked";
             return (
               <article key={unit.slug} className="rounded-xl border border-slate-200 p-4">
-                <div className="text-xs font-semibold uppercase text-slate-500">Paso {idx + 1} · {unit.durationMinutes} min</div>
+                <div className="text-xs font-semibold uppercase text-slate-500">Mapa A-D · Módulo {moduleKey} · {unit.durationMinutes} min</div>
                 <h2 className="mt-1 text-lg font-semibold text-slate-900">{unit.title}</h2>
                 <p className="mt-1 text-sm text-slate-700">{unit.summary}</p>
+                <p className="mt-2 text-xs text-slate-500">Estado: {row?.status || "in_progress"} · Intentos: {row?.attempts ?? 0}/{row?.maxAttempts ?? (config?.maxAttempts || 3)}</p>
                 <div className="mt-3 flex items-center gap-2">
-                  <Link href={`/studio/onboarding/${unit.slug}`} className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">
-                    {done ? "Revisar" : "Continuar"}
-                  </Link>
-                  {done ? <span className="text-xs font-semibold text-emerald-700">Completado</span> : null}
+                  {locked ? <span className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs text-slate-500">Bloqueado</span> : <Link href={`/studio/onboarding/${unit.slug}`} className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">{done ? "Revisar" : "Continuar"}</Link>}
+                  {done ? <span className="text-xs font-semibold text-emerald-700">Validado</span> : null}
                 </div>
               </article>
             );

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { BrandLoader } from "@/components/BrandLoader";
 
@@ -16,34 +16,21 @@ type Unit = {
   resources?: Array<{ label: string; href: string }>;
 };
 
-type QuizQuestion = {
-  id: string;
-  prompt: string;
-  options: string[];
-  topic: string;
-};
-
+type QuizQuestion = { id: string; prompt: string; options: string[]; topic: string };
+type ModuleStatus = { moduleKey: string; status: "locked" | "in_progress" | "validated" | "failed_max_attempts"; attempts: number; maxAttempts: number };
 type Onboarding = {
   completed_units: string[];
   progress: number;
-  completed_units_done?: boolean;
-  quiz_result?: {
-    score: number;
-    total: number;
-    topics_to_reinforce: string[];
-    answers?: Array<{ question_id: string; selected_index: number }>;
-  };
   last_saved_at?: string;
+  module_status?: ModuleStatus[];
 };
 
-function parseSubmodules(content: string[]) {
+function parseLessons(content: string[]) {
   return content.map((paragraph, index) => {
     const normalized = paragraph.replace(/\s+/g, " ").trim();
     const match = normalized.match(/^([A-Z]\d+|Reflexión guiada sugerida|Venta consultiva en THO|Cierre del módulo)\s*[—:-]\s*(.+)$/i);
-    if (match) {
-      return { id: `${match[1]}-${index}`, label: match[1], body: match[2] };
-    }
-    return { id: `p-${index}`, label: `Bloque ${index + 1}`, body: normalized };
+    if (match) return { id: String(match[1]).trim(), label: match[1], body: match[2] };
+    return { id: `L${index + 1}`, label: `Lección ${index + 1}`, body: normalized };
   });
 }
 
@@ -58,6 +45,15 @@ function unitTopicMap(slug: string, topic: string) {
   return (byUnit[slug] || []).some((prefix) => t.startsWith(prefix));
 }
 
+function topicToLesson(topic: string, lessons: Array<{ id: string; label: string }>) {
+  const t = topic.toLowerCase();
+  if (t.startsWith("identidad") || t.startsWith("onboarding")) return lessons.find((l) => l.id.startsWith("A")) || lessons[0];
+  if (t.startsWith("ventas")) return lessons.find((l) => l.id.startsWith("B")) || lessons[0];
+  if (t.startsWith("operacion_creativa") || t.startsWith("operacion")) return lessons.find((l) => l.id.startsWith("C")) || lessons[0];
+  if (t.startsWith("operacion_asesorias") || t.startsWith("seguridad")) return lessons.find((l) => l.id.startsWith("D")) || lessons[0];
+  return lessons[0];
+}
+
 export default function StudioOnboardingUnitPage() {
   const router = useRouter();
   const params = useParams<{ slug: string }>();
@@ -70,6 +66,13 @@ export default function StudioOnboardingUnitPage() {
   const [onboarding, setOnboarding] = useState<Onboarding | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [message, setMessage] = useState("");
+  const [activeLesson, setActiveLesson] = useState(0);
+  const [lessonStartAt, setLessonStartAt] = useState<number>(Date.now());
+  const [reachedEnd, setReachedEnd] = useState(false);
+  const [minLessonSeconds, setMinLessonSeconds] = useState(12);
+  const [failedTopics, setFailedTopics] = useState<string[]>([]);
+  const [tick, setTick] = useState(() => Date.now());
+  const lessonRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -77,45 +80,61 @@ export default function StudioOnboardingUnitPage() {
       try {
         const res = await fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" });
         const data = await res.json();
-        if (!res.ok) {
-          router.replace("/studio");
-          return;
-        }
+        if (!res.ok) return router.replace("/studio");
         setUnits((data.units || []) as Unit[]);
         setQuiz((data.quiz || []) as QuizQuestion[]);
-        const nextOnboarding = data.onboarding as Onboarding;
-        setOnboarding(nextOnboarding);
-
-        const persistedAnswers = Array.isArray(nextOnboarding?.quiz_result?.answers)
-          ? nextOnboarding.quiz_result.answers.reduce<Record<string, number>>((acc, row) => {
-              acc[row.question_id] = Number(row.selected_index || -1);
-              return acc;
-            }, {})
-          : {};
-        setAnswers(persistedAnswers);
+        setOnboarding(data.onboarding as Onboarding);
+        setMinLessonSeconds(Number(data?.config?.minLessonTimeSeconds || 12));
       } catch {
         router.replace("/studio");
       } finally {
         setLoading(false);
       }
     };
-
     run().catch(() => undefined);
   }, [router]);
 
   const unit = useMemo(() => units.find((item) => item.slug === slug), [units, slug]);
   const currentIndex = unit ? units.findIndex((item) => item.slug === unit.slug) : -1;
+  const moduleKey = ["A", "B", "C", "D"][currentIndex] || "A";
   const next = currentIndex >= 0 ? units[currentIndex + 1] : null;
   const unitQuiz = useMemo(() => (unit ? quiz.filter((q) => unitTopicMap(unit.slug, q.topic)) : []), [quiz, unit]);
-  const submodules = useMemo(() => parseSubmodules(unit?.content || []), [unit]);
+  const lessons = useMemo(() => parseLessons(unit?.content || []), [unit]);
 
-  async function onContinue() {
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setTick(Date.now()), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const completedSet = useMemo(() => new Set(onboarding?.completed_units || []), [onboarding]);
+  const isLessonDone = (lessonId: string) => completedSet.has(`${moduleKey}:${lessonId}`);
+  const completedLessonCount = lessons.filter((l) => isLessonDone(l.id)).length;
+  const allLessonsDone = lessons.length > 0 && completedLessonCount >= lessons.length;
+  const status = onboarding?.module_status?.find((item) => item.moduleKey === moduleKey);
+
+  useEffect(() => {
+    setLessonStartAt(Date.now());
+    setReachedEnd(false);
+  }, [activeLesson, moduleKey]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = lessonRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      if (rect.bottom <= window.innerHeight - 16) setReachedEnd(true);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [activeLesson, lessons.length]);
+
+  const elapsedSeconds = Math.floor((tick - lessonStartAt) / 1000);
+  const canMarkLesson = elapsedSeconds >= minLessonSeconds && reachedEnd;
+
+  async function markLesson(lessonId: string) {
     if (!unit) return;
-    if (unitQuiz.length && unitQuiz.some((question) => answers[question.id] === undefined || answers[question.id] < 0)) {
-      setMessage("Antes de continuar, responde la evaluación breve del módulo para consolidar aprendizaje.");
-      return;
-    }
-
     setSaving(true);
     setMessage("");
     try {
@@ -123,13 +142,12 @@ export default function StudioOnboardingUnitPage() {
         method: "POST",
         credentials: "include",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ unitSlug: unit.slug }),
+        body: JSON.stringify({ moduleKey, lessonId, unitSlug: unit.slug, elapsedSeconds, reachedEnd }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo guardar progreso.");
+      if (!res.ok) throw new Error(data.error || "No se pudo guardar avance.");
       setOnboarding(data.onboarding as Onboarding);
-      if (next) router.push(`/studio/onboarding/${next.slug}`);
-      else router.push(`/studio/onboarding/${unit.slug}`);
+      setActiveLesson((prev) => Math.min(prev + 1, Math.max(0, lessons.length - 1)));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo guardar avance.");
     } finally {
@@ -137,68 +155,47 @@ export default function StudioOnboardingUnitPage() {
     }
   }
 
-  async function onSubmitQuiz() {
-    if (!unitQuiz.length) return;
+  async function completeModule() {
+    if (!unit) return;
+    if (!allLessonsDone) return setMessage("Debes completar todas las lecciones antes de rendir el quiz del módulo.");
+    if (unitQuiz.some((question) => answers[question.id] === undefined || answers[question.id] < 0)) {
+      return setMessage("Responde todas las preguntas para completar el módulo.");
+    }
 
     setSaving(true);
     setMessage("");
     try {
-      const modulePayload = unitQuiz.map((question) => ({ question_id: question.id, selected_index: answers[question.id] ?? -1 }));
-      if (modulePayload.some((answer) => answer.selected_index < 0)) {
-        throw new Error("Debes responder todas las preguntas del módulo antes de enviarlo.");
-      }
-
-      const priorAnswers = Array.isArray(onboarding?.quiz_result?.answers) ? onboarding.quiz_result.answers : [];
-      const merged = new Map<string, number>();
-      for (const row of priorAnswers) merged.set(row.question_id, row.selected_index);
-      for (const row of modulePayload) merged.set(row.question_id, row.selected_index);
-
-      const payload = Array.from(merged.entries()).map(([question_id, selected_index]) => ({ question_id, selected_index }));
-
+      const payload = unitQuiz.map((question) => ({ question_id: question.id, selected_index: answers[question.id] ?? -1 }));
       const res = await fetch("/api/studio/onboarding/quiz", {
         method: "POST",
         credentials: "include",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ answers: payload }),
+        body: JSON.stringify({ moduleKey, answers: payload }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo guardar evaluación.");
       setOnboarding(data.onboarding as Onboarding);
-      setMessage("Evaluación del módulo guardada. Sigue con el siguiente bloque para completar tu ruta.");
-      if (!next) router.push("/studio/onboarding");
+      setFailedTopics(Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []);
+      if (data.passed) {
+        setMessage("Módulo validado. Puedes continuar al siguiente.");
+        if (next) router.push(`/studio/onboarding/${next.slug}`);
+        else router.push("/studio/onboarding");
+      } else {
+        const attempts = data?.moduleStatus?.attempts ?? 0;
+        const maxAttempts = data?.moduleStatus?.maxAttempts ?? 3;
+        setMessage(`No alcanzaste el puntaje mínimo. Intento ${attempts}/${maxAttempts}.`);
+      }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "No se pudo enviar evaluación.");
+      setMessage(error instanceof Error ? error.message : "No se pudo completar módulo.");
     } finally {
       setSaving(false);
     }
   }
 
-  function timeAgo(iso?: string) {
-    if (!iso) return "Sin registro";
-    const diff = Date.now() - new Date(iso).getTime();
-    if (Number.isNaN(diff)) return "Sin registro";
-    const minutes = Math.max(1, Math.round(diff / 60000));
-    if (minutes < 60) return `hace ${minutes} min`;
-    const hours = Math.round(minutes / 60);
-    if (hours < 24) return `hace ${hours} h`;
-    const days = Math.round(hours / 24);
-    return `hace ${days} día(s)`;
-  }
+  if (loading) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando módulo..." /></main>;
+  if (!unit) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><Link href="/studio/onboarding">Volver</Link></main>;
 
-  if (loading) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando unidad..." /></main>;
-
-  if (!unit) {
-    return (
-      <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
-        <section className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-6">
-          <p className="text-sm text-slate-700">Unidad no encontrada.</p>
-          <Link href="/studio/onboarding" className="mt-3 inline-flex rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">Volver a onboarding</Link>
-        </section>
-      </main>
-    );
-  }
-
-  const done = Boolean(onboarding?.completed_units?.includes(unit.slug));
+  const lesson = lessons[activeLesson];
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -206,40 +203,35 @@ export default function StudioOnboardingUnitPage() {
         <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-sky-50 via-white to-violet-50 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{unit.durationMinutes} min · {done ? "Completado" : "En curso"}</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Módulo {moduleKey} · {unit.durationMinutes} min</div>
               <h1 className="mt-2 text-3xl font-semibold text-slate-900">{unit.title}</h1>
               <p className="mt-2 text-sm text-slate-700">{unit.summary}</p>
+              <p className="mt-2 text-xs text-slate-500">Lecciones completadas: {completedLessonCount}/{lessons.length} · Intentos quiz: {status?.attempts ?? 0}/{status?.maxAttempts ?? 3}</p>
             </div>
             <Image src="/brand/logo-negro.png" alt="THO" width={90} height={90} className="opacity-80" />
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3">
-          {submodules.map((item, index) => (
-            <article key={item.id} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Submódulo {index + 1} · {item.label}</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-700">{item.body}</p>
-            </article>
-          ))}
-        </div>
-
-        {unit.resources?.length ? (
-          <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-            <h2 className="text-sm font-semibold text-emerald-900">Recursos de marca y lectura complementaria</h2>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-emerald-900">
-              {unit.resources.map((resource, idx) => (
-                <li key={`${resource.href}-${idx}`}>
-                  <a href={resource.href} target="_blank" rel="noreferrer" className="underline underline-offset-4">{resource.label}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {lesson ? (
+          <article ref={lessonRef} className="mt-6 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1} · {lesson.label}</p>
+            <p className="mt-2 text-sm leading-relaxed text-slate-700">{lesson.body}</p>
+            <p className="mt-3 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+            <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.max(0, v - 1))} disabled={activeLesson <= 0}>Anterior</button>
+              <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.min(lessons.length - 1, v + 1))} disabled={activeLesson >= lessons.length - 1}>Siguiente</button>
+              <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving || isLessonDone(lesson.id) || !canMarkLesson} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
+                {isLessonDone(lesson.id) ? "Lección completada" : "Marcar como completada"}
+              </button>
+            </div>
+          </article>
         ) : null}
 
         {unitQuiz.length ? (
           <div className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
-            <h2 className="text-lg font-semibold text-indigo-900">Evaluación formativa del módulo</h2>
-            <p className="mt-1 text-sm text-indigo-900">Este chequeo es por módulo y te ayuda a reforzar aprendizaje antes de continuar.</p>
+            <h2 className="text-lg font-semibold text-indigo-900">Evaluación del módulo</h2>
+            <p className="mt-1 text-sm text-indigo-900">Debes aprobar para validar este módulo.</p>
             <div className="mt-4 space-y-4">
               {unitQuiz.map((question, index) => (
                 <fieldset key={question.id} className="rounded-lg border border-indigo-100 bg-white p-3">
@@ -247,12 +239,7 @@ export default function StudioOnboardingUnitPage() {
                   <div className="mt-2 grid gap-2">
                     {question.options.map((option, optionIndex) => (
                       <label key={`${question.id}-${optionIndex}`} className="inline-flex items-center gap-2 text-sm text-slate-700">
-                        <input
-                          type="radio"
-                          name={question.id}
-                          checked={answers[question.id] === optionIndex}
-                          onChange={() => setAnswers((prev) => ({ ...prev, [question.id]: optionIndex }))}
-                        />
+                        <input type="radio" name={question.id} checked={answers[question.id] === optionIndex} onChange={() => setAnswers((prev) => ({ ...prev, [question.id]: optionIndex }))} />
                         {option}
                       </label>
                     ))}
@@ -260,20 +247,34 @@ export default function StudioOnboardingUnitPage() {
                 </fieldset>
               ))}
             </div>
-            <button type="button" onClick={onSubmitQuiz} disabled={saving} className="mt-4 rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-              Guardar evaluación del módulo
-            </button>
+          </div>
+        ) : null}
+
+        {failedTopics.length ? (
+          <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
+            <h3 className="text-sm font-semibold text-amber-900">Tópicos a reforzar</h3>
+            <ul className="mt-2 list-disc pl-5 text-sm text-amber-900">
+              {failedTopics.map((topic, idx) => {
+                const lessonRefItem = topicToLesson(topic, lessons);
+                return (
+                  <li key={`${topic}-${idx}`}>
+                    {topic} · {lessonRefItem ? <button type="button" onClick={() => setActiveLesson(Math.max(0, lessons.findIndex((item) => item.id === lessonRefItem.id)))} className="underline underline-offset-2">ir a {lessonRefItem.label}</button> : null}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-2">
-          <button type="button" onClick={onContinue} disabled={saving} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-            {next ? "Continuar" : "Finalizar módulos"}
+          <button type="button" onClick={completeModule} disabled={saving || !allLessonsDone || status?.status === "failed_max_attempts"} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+            Completar módulo
           </button>
           <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver</Link>
         </div>
 
-        <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {timeAgo(onboarding?.last_saved_at)}</p>
+        {status?.status === "failed_max_attempts" ? <p className="mt-2 text-sm text-rose-700">Alcanzaste el máximo de intentos. Solicita reset a un superadmin.</p> : null}
+        <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {onboarding?.last_saved_at || "Sin registro"}</p>
         {message ? <p className="mt-2 text-sm text-slate-700">{message}</p> : null}
       </section>
     </main>

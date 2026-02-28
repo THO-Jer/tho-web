@@ -170,7 +170,9 @@ export default function BlogStudioPage() {
             const required = Boolean(onboarding?.config?.required ?? true);
             const blockInternal = Boolean(onboarding?.config?.blockInternal ?? false);
             const completed = Boolean(onboarding?.onboarding?.completed);
-            setBlockedByOnboarding(required && blockInternal && !completed);
+            const canAccess = onboarding?.onboarding?.can_access || {};
+            const moduleAllowed = Boolean(canAccess.blog);
+            setBlockedByOnboarding((required && blockInternal && !completed) || !moduleAllowed);
           }
         }
 

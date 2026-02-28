@@ -1,5 +1,30 @@
 import type { OnboardingRecord } from "@/lib/onboardingStore";
 
+export type OnboardingModuleState = "locked" | "in_progress" | "validated" | "failed_max_attempts";
+
+export type OnboardingModuleStatusRow = {
+  email: string;
+  track: OnboardingRecord["track"];
+  module_key: string;
+  status: OnboardingModuleState;
+  attempts: number;
+  max_attempts: number;
+  validated_at?: string;
+  updated_at: string;
+};
+
+export type OnboardingQuizResultRow = {
+  email: string;
+  track: OnboardingRecord["track"];
+  module_key: string;
+  score: number;
+  max_score: number;
+  missed_topics: string[];
+  submitted_at: string;
+};
+
+export type OnboardingQuizAttemptRow = OnboardingQuizResultRow & { id?: string; passed?: boolean };
+
 type SupabaseEnv = { url: string; service: string };
 
 function getSupabaseEnv(): SupabaseEnv {
@@ -31,6 +56,14 @@ async function supabaseRequest(pathname: string, init?: RequestInit) {
 
   if (res.status === 204) return null;
   return res.json();
+}
+
+function normalizeModuleState(value: unknown): OnboardingModuleState {
+  const normalized = String(value || "locked").trim();
+  if (["locked", "in_progress", "validated", "failed_max_attempts"].includes(normalized)) {
+    return normalized as OnboardingModuleState;
+  }
+  return "locked";
 }
 
 export function hasOnboardingSupabaseStore(onboardingStore: string) {
@@ -156,6 +189,121 @@ export async function upsertOnboardingSupabaseQuizResult(input: {
       }]),
     }).catch(() => null);
   }
+}
+
+export async function getOnboardingModuleStatusRows(input: { moduleStatusTable: string; email?: string; track?: string }) {
+  const filters: string[] = ["select=*"];
+  if (input.email) filters.push(`email=eq.${encodeURIComponent(input.email)}`);
+  if (input.track) filters.push(`track=eq.${encodeURIComponent(input.track)}`);
+  filters.push("order=module_key.asc", "order=updated_at.desc");
+  const rows = await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?${filters.join("&")}`).catch(() => []);
+  if (!Array.isArray(rows)) return [] as OnboardingModuleStatusRow[];
+  return (rows as Array<Record<string, unknown>>).map((row) => ({
+    email: String(row.email || "").trim().toLowerCase(),
+    track: normalizeTrack(row.track),
+    module_key: String(row.module_key || "").trim(),
+    status: normalizeModuleState(row.status),
+    attempts: Math.max(0, Number(row.attempts || 0)),
+    max_attempts: Math.max(1, Number(row.max_attempts || 3)),
+    validated_at: row.validated_at ? String(row.validated_at) : undefined,
+    updated_at: String(row.updated_at || new Date().toISOString()),
+  })).filter((row) => row.email && row.module_key);
+}
+
+export async function upsertOnboardingModuleStatus(input: {
+  moduleStatusTable: string;
+  row: Omit<OnboardingModuleStatusRow, "updated_at"> & { updated_at?: string };
+}) {
+  const updatedAt = input.row.updated_at || new Date().toISOString();
+  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?on_conflict=email,track,module_key`, {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+    body: JSON.stringify([{
+      email: input.row.email,
+      track: input.row.track,
+      module_key: input.row.module_key,
+      status: input.row.status,
+      attempts: input.row.attempts,
+      max_attempts: input.row.max_attempts,
+      validated_at: input.row.validated_at || null,
+      updated_at: updatedAt,
+    }]),
+  });
+}
+
+export async function getOnboardingQuizResultRows(input: { quizResultsTable: string; email?: string; track?: string }) {
+  const filters: string[] = ["select=*"];
+  if (input.email) filters.push(`email=eq.${encodeURIComponent(input.email)}`);
+  if (input.track) filters.push(`track=eq.${encodeURIComponent(input.track)}`);
+  filters.push("order=submitted_at.desc");
+  const rows = await supabaseRequest(`/rest/v1/${input.quizResultsTable}?${filters.join("&")}`).catch(() => []);
+  if (!Array.isArray(rows)) return [] as OnboardingQuizResultRow[];
+  return (rows as Array<Record<string, unknown>>).map((row) => ({
+    email: String(row.email || "").trim().toLowerCase(),
+    track: normalizeTrack(row.track),
+    module_key: String(row.module_key || "").trim(),
+    score: Number(row.score || 0),
+    max_score: Number(row.max_score || 0),
+    missed_topics: Array.isArray(row.missed_topics) ? row.missed_topics.map((topic) => String(topic)).filter(Boolean) : [],
+    submitted_at: String(row.submitted_at || row.updated_at || new Date().toISOString()),
+  })).filter((row) => row.email && row.module_key);
+}
+
+export async function getOnboardingQuizAttemptRows(input: { quizAttemptsTable: string; email?: string; track?: string; moduleKey?: string }) {
+  const filters: string[] = ["select=*"];
+  if (input.email) filters.push(`email=eq.${encodeURIComponent(input.email)}`);
+  if (input.track) filters.push(`track=eq.${encodeURIComponent(input.track)}`);
+  if (input.moduleKey) filters.push(`module_key=eq.${encodeURIComponent(input.moduleKey)}`);
+  filters.push("order=submitted_at.desc");
+  const rows = await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}?${filters.join("&")}`).catch(() => []);
+  if (!Array.isArray(rows)) return [] as OnboardingQuizAttemptRow[];
+  return (rows as Array<Record<string, unknown>>).map((row) => ({
+    id: row.id ? String(row.id) : undefined,
+    email: String(row.email || "").trim().toLowerCase(),
+    track: normalizeTrack(row.track),
+    module_key: String(row.module_key || "").trim(),
+    score: Number(row.score || 0),
+    max_score: Number(row.max_score || 0),
+    missed_topics: Array.isArray(row.missed_topics) ? row.missed_topics.map((topic) => String(topic)).filter(Boolean) : [],
+    passed: typeof row.passed === "boolean" ? row.passed : undefined,
+    submitted_at: String(row.submitted_at || row.updated_at || new Date().toISOString()),
+  })).filter((row) => row.email && row.module_key);
+}
+
+export async function upsertOnboardingQuizResultByModule(input: {
+  quizResultsTable: string;
+  row: OnboardingQuizResultRow;
+}) {
+  await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email,track,module_key`, {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+    body: JSON.stringify([input.row]),
+  });
+}
+
+export async function insertOnboardingQuizAttempt(input: { quizAttemptsTable: string; row: OnboardingQuizAttemptRow }) {
+  await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+    method: "POST",
+    body: JSON.stringify([input.row]),
+  });
+}
+
+export async function getOnboardingAdminOverviewRows(viewName = "onboarding_admin_overview") {
+  const rows = await supabaseRequest(`/rest/v1/${viewName}?select=*`).catch(() => []);
+  if (!Array.isArray(rows)) return [] as Array<Record<string, unknown>>;
+  return rows as Array<Record<string, unknown>>;
+}
+
+export async function resetOnboardingModuleStatus(input: {
+  moduleStatusTable: string;
+  email: string;
+  track: string;
+  moduleKey: string;
+}) {
+  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}&module_key=eq.${encodeURIComponent(input.moduleKey)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status: "in_progress", attempts: 0, validated_at: null, updated_at: new Date().toISOString() }),
+  });
 }
 
 export async function getStudioRoleTeamByEmail(email: string) {
