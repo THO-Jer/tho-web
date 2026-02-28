@@ -191,8 +191,8 @@ async function readStateFromSupabase(): Promise<OnboardingState> {
   for (const row of moduleRows) {
     const email = normalizeEmail(row.email);
     if (!moduleStatusByEmail[email]) moduleStatusByEmail[email] = {};
-    moduleStatusByEmail[email][row.module_key] = {
-      moduleKey: row.module_key as ModuleKey,
+    moduleStatusByEmail[email][row.module] = {
+      moduleKey: row.module as ModuleKey,
       status: row.status,
       attempts: row.attempts_used,
       maxAttempts: row.max_attempts,
@@ -345,7 +345,7 @@ async function persistModuleStatus(record: OnboardingRecord, status: ModuleStatu
       row: {
         email,
         track: record.track,
-        module_key: status.moduleKey,
+        module: status.moduleKey,
         status: status.status,
         attempts_used: status.attempts,
         max_attempts: status.maxAttempts,

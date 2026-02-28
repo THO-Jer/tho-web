@@ -5,7 +5,7 @@ export type OnboardingModuleState = "locked" | "in_progress" | "validated" | "fa
 export type OnboardingModuleStatusRow = {
   email: string;
   track: OnboardingRecord["track"];
-  module_key: string;
+  module: string;
   status: OnboardingModuleState;
   attempts_used: number;
   max_attempts: number;
@@ -195,19 +195,19 @@ export async function getOnboardingModuleStatusRows(input: { moduleStatusTable: 
   const filters: string[] = ["select=*"];
   if (input.email) filters.push(`email=eq.${encodeURIComponent(input.email)}`);
   if (input.track) filters.push(`track=eq.${encodeURIComponent(input.track)}`);
-  filters.push("order=module_key.asc", "order=updated_at.desc");
+  filters.push("order=module.asc", "order=updated_at.desc");
   const rows = await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?${filters.join("&")}`).catch(() => []);
   if (!Array.isArray(rows)) return [] as OnboardingModuleStatusRow[];
   return (rows as Array<Record<string, unknown>>).map((row) => ({
     email: String(row.email || "").trim().toLowerCase(),
     track: normalizeTrack(row.track),
-    module_key: String(row.module_key || "").trim(),
+    module: String(row.module || row.module_key || "").trim(),
     status: normalizeModuleState(row.status),
     attempts_used: Math.max(0, Number(row.attempts_used || 0)),
     max_attempts: Math.max(1, Number(row.max_attempts || 3)),
     validated_at: row.validated_at ? String(row.validated_at) : undefined,
     updated_at: String(row.updated_at || new Date().toISOString()),
-  })).filter((row) => row.email && row.module_key);
+  })).filter((row) => row.email && row.module);
 }
 
 export async function upsertOnboardingModuleStatus(input: {
@@ -215,13 +215,13 @@ export async function upsertOnboardingModuleStatus(input: {
   row: Omit<OnboardingModuleStatusRow, "updated_at"> & { updated_at?: string };
 }) {
   const updatedAt = input.row.updated_at || new Date().toISOString();
-  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?on_conflict=email,track,module_key`, {
+  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?on_conflict=email,track,module`, {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=representation" },
     body: JSON.stringify([{
       email: input.row.email,
       track: input.row.track,
-      module_key: input.row.module_key,
+      module: input.row.module,
       status: input.row.status,
       attempts_used: input.row.attempts_used,
       max_attempts: input.row.max_attempts,
@@ -241,7 +241,7 @@ export async function getOnboardingQuizResultRows(input: { quizResultsTable: str
   return (rows as Array<Record<string, unknown>>).map((row) => ({
     email: String(row.email || "").trim().toLowerCase(),
     track: normalizeTrack(row.track),
-    module_key: String(row.module_key || "").trim(),
+    module_key: String(row.module_key || row.module || "").trim(),
     score: Number(row.score || 0),
     max_score: Number(row.max_score || 0),
     missed_topics: Array.isArray(row.missed_topics) ? row.missed_topics.map((topic) => String(topic)).filter(Boolean) : [],
@@ -261,7 +261,7 @@ export async function getOnboardingQuizAttemptRows(input: { quizAttemptsTable: s
     id: row.id ? String(row.id) : undefined,
     email: String(row.email || "").trim().toLowerCase(),
     track: normalizeTrack(row.track),
-    module_key: String(row.module_key || "").trim(),
+    module_key: String(row.module_key || row.module || "").trim(),
     score: Number(row.score || 0),
     max_score: Number(row.max_score || 0),
     missed_topics: Array.isArray(row.missed_topics) ? row.missed_topics.map((topic) => String(topic)).filter(Boolean) : [],
@@ -300,7 +300,7 @@ export async function resetOnboardingModuleStatus(input: {
   track: string;
   moduleKey: string;
 }) {
-  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}&module_key=eq.${encodeURIComponent(input.moduleKey)}`, {
+  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}&module=eq.${encodeURIComponent(input.moduleKey)}`, {
     method: "PATCH",
     body: JSON.stringify({ status: "in_progress", attempts_used: 0, validated_at: null, updated_at: new Date().toISOString() }),
   });
