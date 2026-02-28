@@ -261,7 +261,7 @@ export default function StudioOnboardingUnitPage() {
           </article>
         ) : null}
 
-        {unitQuiz.length ? (
+        {unitQuiz.length && allLessonsDone ? (
           <div className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
             <h2 className="text-lg font-semibold text-indigo-900">Evaluación del módulo</h2>
             <p className="mt-1 text-sm text-indigo-900">Debes aprobar para validar este módulo.</p>
@@ -283,6 +283,15 @@ export default function StudioOnboardingUnitPage() {
           </div>
         ) : null}
 
+        {unitQuiz.length && !allLessonsDone ? (
+          <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <h2 className="text-sm font-semibold text-slate-800">Evaluación del módulo bloqueada temporalmente</h2>
+            <p className="mt-1 text-sm text-slate-700">
+              El quiz aparece al finalizar y completar todas las lecciones del módulo ({completedLessonCount}/{lessons.length}).
+            </p>
+          </div>
+        ) : null}
+
         {failedTopics.length ? (
           <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
             <h3 className="text-sm font-semibold text-amber-900">Tópicos a reforzar</h3>
@@ -300,9 +309,11 @@ export default function StudioOnboardingUnitPage() {
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-2">
-          <button type="button" onClick={completeModule} disabled={saving || !allLessonsDone || status?.status === "failed_max_attempts"} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-            Completar módulo
-          </button>
+          {allLessonsDone ? (
+            <button type="button" onClick={completeModule} disabled={saving || status?.status === "failed_max_attempts"} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+              Completar módulo
+            </button>
+          ) : null}
           <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver</Link>
         </div>
 

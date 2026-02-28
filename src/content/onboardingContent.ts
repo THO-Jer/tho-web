@@ -19,7 +19,7 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
   {
     slug: "identidad-tho",
     title: "Módulo A · Identidad THO",
-    summary: "Qué es THO, cómo se posiciona y cuáles son sus estándares operativos no negociables.",
+    summary: "Fundamentos institucionales de THO: propósito, estándar profesional, ética aplicada y criterios operativos no negociables para actuar con consistencia.",
     durationMinutes: 30,
     content: [
       "A0 — ¿Qué es un onboarding y por qué existe?: No es una inducción administrativa; es un proceso de alineación cultural y operativa para asegurar coherencia interna, reducir ambigüedades y proteger calidad + reputación.",
@@ -28,7 +28,8 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
       "A3 — Qué significa ‘trabajo bueno’ en THO: problema delimitado, decisiones explícitas, riesgos identificados, responsables + próximos pasos y registro trazable. Definition of Done: contexto, evidencia, decisión, riesgos, próximos pasos con responsable y fecha.",
       "A4 — Valores organizacionales: Humanidad (cuidado del lenguaje y no exposición innecesaria), Colaboración (documentación compartida y feedback estructurado) y Adaptabilidad (ajustar estrategia según evidencia, no por orgullo).",
       "A5 — Límites y no negociables: no prometer lo que no se puede sostener con método, no trabajar sin trazabilidad mínima, no usar información sensible sin protocolo y no improvisar procesos críticos. Los límites protegen a la organización y al equipo.",
-      "A6 — Ética operativa: registro adecuado, confidencialidad, declaración temprana de conflictos y uso de canales formales como el Canal Confidencial. Ante duda: documentar, consultar y limitar acceso cuando hay sensibilidad.",
+      "A6 — Ética operativa: registrar decisiones con contexto suficiente, proteger confidencialidad, declarar conflictos de interés en forma temprana y usar canales formales (ej. Canal Confidencial). Ante duda: documentar, consultar y aplicar principio de mínimo acceso.",
+      "A7 — Criterio de escalamiento: cuando haya tensión entre urgencia y calidad, prima el método. Escala riesgos reputacionales, legales o de confidencialidad a liderazgo y deja registro del criterio usado.",
       "Reflexión guiada sugerida: ¿cómo se traduce este propósito en tu rol? ¿qué proyectos no serían coherentes? ¿dónde sería difícil aplicar estos valores y qué harías para sostenerlos?",
     ],
     resources: [
@@ -38,7 +39,7 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
   {
     slug: "ventas-tho",
     title: "Módulo B · Ventas en THO",
-    summary: "Venta consultiva, rutas de servicio, pricing en UF, diagnóstico de cliente, CRM comercial-financiero y ética comercial.",
+    summary: "Sistema comercial THO: diagnóstico consultivo, diseño de oferta, criterios de calificación, pricing en UF, CRM y estándar ético de cierre.",
     durationMinutes: 50,
     content: [
       "B1 — Qué significa vender en THO: no es empujar volumen; es construir relaciones sostenibles con clientes compatibles con nuestro método. Vender implica diagnosticar antes de ofrecer, encuadrar expectativas, explicar límites y proteger reputación institucional.",
@@ -52,13 +53,14 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
       "Criterio profesional: si no hay condiciones mínimas, aumenta riesgo operativo, desgaste y riesgo reputacional. Decir 'no' también es una decisión profesional en THO.",
       "B5 — CRM en THO (corazón operativo): componente comercial (pipeline, etapas, historial, dashboard de cierres, conversión, tiempo de cierre, estado de cuentas ticket/cuenta clave). Regla base: si no está registrado, no existe.",
       "Componente financiero/contable del CRM: registro de facturas emitidas/recibidas, boletas de honorarios y gastos menores (caja chica), con dashboard financiero, estado de resultados, soporte a contabilidad y base para operación renta.",
-      "B6 — Ética comercial: en THO no se promete rapidez sin método, no se ofrece profundidad no sostenible y no se ocultan riesgos. Vender también es cuidar coherencia estratégica.",
+      "B6 — Ética comercial: en THO no se promete rapidez sin método, no se ofrece profundidad no sostenible y no se ocultan riesgos. Vender también es proteger la gobernanza de expectativas y la viabilidad del equipo.",
+      "B7 — Cierre profesional: toda propuesta debe cerrar con alcance, supuestos, exclusiones, hitos, responsables y formato de seguimiento. Un cierre de calidad reduce fricción operativa y reclamos posteriores.",
     ],
   },
   {
     slug: "operacion-creativa",
     title: "Módulo C · Operación Creativa en THO",
-    summary: "Marco Scrum adaptado, estructura documental en Teams, Excel anual, producción con método y resguardo de información sensible.",
+    summary: "Modelo de operación creativa en THO: gobernanza de flujo, trazabilidad documental, control de calidad y resguardo profesional de activos.",
     durationMinutes: 55,
     content: [
       "C1 — Marco metodológico: Scrum adaptado a THO. No se aplica como framework rígido, pero sí sus principios (ciclos cortos, roles definidos, priorización explícita, revisión constante y transparencia) para asegurar orden, visibilidad y control de riesgo operativo.",
@@ -73,12 +75,13 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
       "C6 — Definición de Hecho (DoD) creativa: alineación al brief general, estándar técnico cumplido, numeración correcta, almacenamiento correcto, registro en Excel, responsable identificable y aprobación consolidada. La estética no reemplaza método.",
       "C7 — Cierre y aprendizaje: publicar, registrar enlace en Excel, verificar carpeta y confirmar orden documental. Aprendizajes relevantes deben documentarse en canal formal para continuidad operativa.",
       "C8 — Información sensible: almacenar en carpeta correspondiente, no circular por canales informales y no distribuir fuera de Teams sin control. El cuidado de información es responsabilidad profesional.",
+      "C9 — Estándar de continuidad: cada entrega debe permitir que otra persona retome el trabajo sin perder contexto. Si no hay trazabilidad para continuidad, el trabajo no está terminado.",
     ],
   },
   {
     slug: "operacion-asesorias",
     title: "Módulo D · Operación Asesorías en THO",
-    summary: "Fundamentos conceptuales, estructura de intervención, trazabilidad y ética para asesorías en sistemas organizacionales complejos.",
+    summary: "Arquitectura de asesoría THO: marco conceptual, diseño de intervención, estándar de entregables y criterio ético para decisiones complejas.",
     durationMinutes: 55,
     content: [
       "D1 — Qué significa asesorar en THO: no es ejecutar tareas ni validar decisiones tomadas. Es intervenir sistemas organizacionales complejos con método, considerando cultura, poder, incentivos, emociones, historia y entorno.",
@@ -92,6 +95,7 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
       "D7 — Documentación y trazabilidad: toda decisión relevante debe registrarse y poder reconstruirse. La trazabilidad protege frente a conflictos, cambios de criterio y malentendidos.",
       "D8 — Ética en asesorías: no exagerar conclusiones, no omitir riesgos para agradar, no ajustar diagnóstico para que sea políticamente cómodo. La legitimidad de THO se sostiene en la claridad.",
       "D9 — Formación avanzada: profundizaciones posteriores en gestión del cambio, doble materialidad, relacionamiento comunitario, análisis organizacional y metodologías participativas.",
+      "D10 — Señales de alerta en asesoría: cambios abruptos de alcance sin decisión explícita, recomendaciones sin evidencia mínima y omisión de actores críticos son indicadores de riesgo metodológico.",
       "Cierre del módulo: asesorar en THO es intervenir con método, marco conceptual y responsabilidad ética; no es producir documentos, es mejorar la calidad de decisiones organizacionales.",
     ],
   },
