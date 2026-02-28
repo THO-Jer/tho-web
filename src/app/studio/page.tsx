@@ -77,6 +77,7 @@ export default function StudioIndexPage() {
   const [magicCooldownUntil, setMagicCooldownUntil] = useState(0);
   const [magicCooldownSeconds, setMagicCooldownSeconds] = useState(0);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
+  const [onboardingAccess, setOnboardingAccess] = useState<{ blog?: boolean; incidents?: boolean; crmStudio?: boolean }>({});
   const [onboardingRequired, setOnboardingRequired] = useState(true);
   const [onboardingBlockInternal, setOnboardingBlockInternal] = useState(false);
   const [studioRedirectUrl, setStudioRedirectUrl] = useState("");
@@ -145,6 +146,7 @@ export default function StudioIndexPage() {
             setOnboardingCompleted(Boolean(onboarding?.onboarding?.completed));
             setOnboardingRequired(Boolean(onboarding?.config?.required ?? true));
             setOnboardingBlockInternal(Boolean(onboarding?.config?.blockInternal ?? false));
+            setOnboardingAccess(onboarding?.onboarding?.can_access || {});
           }
         } catch {
           setOnboardingCompleted(false);
@@ -317,7 +319,9 @@ export default function StudioIndexPage() {
             {modules.map((item) => {
               const isSuperAdmin = role === "superadmin";
               const onboardingAllowedPaths = ["/studio/onboarding", "/studio/canal-confidencial"];
-              const blockedByOnboarding = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && !isSuperAdmin && !onboardingAllowedPaths.includes(item.href);
+              const blockedByOnboardingBase = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && !isSuperAdmin && !onboardingAllowedPaths.includes(item.href);
+              const blockedByModuleRule = !isSuperAdmin && ((item.key === "blog" && onboardingAccess.blog === false) || (item.key === "incidents" && onboardingAccess.incidents === false) || (item.key === "crm" && onboardingAccess.crmStudio === false));
+              const blockedByOnboarding = blockedByOnboardingBase || blockedByModuleRule;
               return (
               <article key={item.title} className="rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">{item.status}</div>

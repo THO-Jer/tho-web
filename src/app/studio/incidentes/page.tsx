@@ -35,7 +35,7 @@ type SessionData = {
 
 type OnboardingStatus = {
   config?: { required?: boolean; blockInternal?: boolean };
-  onboarding?: { completed?: boolean };
+  onboarding?: { completed?: boolean; can_access?: { incidents?: boolean } };
 };
 
 type TriageForm = {
@@ -111,7 +111,9 @@ export default function StudioIncidentesPage() {
             const required = Boolean(onboarding.config?.required ?? true);
             const blockInternal = Boolean(onboarding.config?.blockInternal ?? false);
             const completed = Boolean(onboarding.onboarding?.completed);
-            setBlockedByOnboarding(required && blockInternal && !completed);
+            const canAccess = onboarding?.onboarding?.can_access || {};
+            const moduleAllowed = Boolean(canAccess.incidents);
+            setBlockedByOnboarding((required && blockInternal && !completed) || !moduleAllowed);
           }
         }
       } catch {
