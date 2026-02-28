@@ -7,7 +7,7 @@ export type OnboardingModuleStatusRow = {
   track: OnboardingRecord["track"];
   module_key: string;
   status: OnboardingModuleState;
-  attempts: number;
+  attempts_used: number;
   max_attempts: number;
   validated_at?: string;
   updated_at: string;
@@ -203,7 +203,7 @@ export async function getOnboardingModuleStatusRows(input: { moduleStatusTable: 
     track: normalizeTrack(row.track),
     module_key: String(row.module_key || "").trim(),
     status: normalizeModuleState(row.status),
-    attempts: Math.max(0, Number(row.attempts || 0)),
+    attempts_used: Math.max(0, Number(row.attempts_used || 0)),
     max_attempts: Math.max(1, Number(row.max_attempts || 3)),
     validated_at: row.validated_at ? String(row.validated_at) : undefined,
     updated_at: String(row.updated_at || new Date().toISOString()),
@@ -223,7 +223,7 @@ export async function upsertOnboardingModuleStatus(input: {
       track: input.row.track,
       module_key: input.row.module_key,
       status: input.row.status,
-      attempts: input.row.attempts,
+      attempts_used: input.row.attempts_used,
       max_attempts: input.row.max_attempts,
       validated_at: input.row.validated_at || null,
       updated_at: updatedAt,
@@ -302,7 +302,7 @@ export async function resetOnboardingModuleStatus(input: {
 }) {
   await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}&module_key=eq.${encodeURIComponent(input.moduleKey)}`, {
     method: "PATCH",
-    body: JSON.stringify({ status: "in_progress", attempts: 0, validated_at: null, updated_at: new Date().toISOString() }),
+    body: JSON.stringify({ status: "in_progress", attempts_used: 0, validated_at: null, updated_at: new Date().toISOString() }),
   });
 }
 

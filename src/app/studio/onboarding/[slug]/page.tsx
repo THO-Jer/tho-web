@@ -25,12 +25,26 @@ type Onboarding = {
   module_status?: ModuleStatus[];
 };
 
-function parseLessons(content: string[]) {
+type Lesson = { id: string; label: string; body: string; bullets: string[]; highlight?: string };
+
+const moduleVisuals: Record<string, { cover: string; accent: string }> = {
+  A: { cover: "/ilustraciones/1.png", accent: "text-sky-700" },
+  B: { cover: "/ilustraciones/4.png", accent: "text-indigo-700" },
+  C: { cover: "/ilustraciones/7.png", accent: "text-violet-700" },
+  D: { cover: "/ilustraciones/10.png", accent: "text-emerald-700" },
+};
+
+function parseLessons(content: string[]): Lesson[] {
   return content.map((paragraph, index) => {
     const normalized = paragraph.replace(/\s+/g, " ").trim();
     const match = normalized.match(/^([A-Z]\d+|Reflexión guiada sugerida|Venta consultiva en THO|Cierre del módulo)\s*[—:-]\s*(.+)$/i);
-    if (match) return { id: String(match[1]).trim(), label: match[1], body: match[2] };
-    return { id: `L${index + 1}`, label: `Lección ${index + 1}`, body: normalized };
+    const id = match ? String(match[1]).trim() : `L${index + 1}`;
+    const label = match ? String(match[1]).trim() : `Lección ${index + 1}`;
+    const body = match ? String(match[2]).trim() : normalized;
+    const segments = body.split(/\.\s+/).map((segment) => segment.trim()).filter(Boolean);
+    const highlight = segments[0] || body;
+    const bullets = segments.slice(1).map((segment) => segment.replace(/\.$/, ""));
+    return { id, label, body, bullets, highlight };
   });
 }
 
@@ -196,6 +210,7 @@ export default function StudioOnboardingUnitPage() {
   if (!unit) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><Link href="/studio/onboarding">Volver</Link></main>;
 
   const lesson = lessons[activeLesson];
+  const visual = moduleVisuals[moduleKey] || moduleVisuals.A;
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -213,17 +228,35 @@ export default function StudioOnboardingUnitPage() {
         </div>
 
         {lesson ? (
-          <article ref={lessonRef} className="mt-6 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1} · {lesson.label}</p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-700">{lesson.body}</p>
-            <p className="mt-3 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
-            <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.max(0, v - 1))} disabled={activeLesson <= 0}>Anterior</button>
-              <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.min(lessons.length - 1, v + 1))} disabled={activeLesson >= lessons.length - 1}>Siguiente</button>
-              <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving || isLessonDone(lesson.id) || !canMarkLesson} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
-                {isLessonDone(lesson.id) ? "Lección completada" : "Marcar como completada"}
-              </button>
+          <article ref={lessonRef} className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
+              <div className="p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1} · {lesson.label}</p>
+                <p className={`mt-2 text-base font-semibold ${visual.accent}`}>{lesson.highlight}</p>
+                {lesson.bullets.length ? (
+                  <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
+                    {lesson.bullets.map((bullet, idx) => (
+                      <li key={`${lesson.id}-bullet-${idx}`}>{bullet}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-3 text-sm leading-relaxed text-slate-700">{lesson.body}</p>
+                )}
+                <p className="mt-4 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+              <div className="relative min-h-44 bg-slate-50">
+                <Image src={visual.cover} alt={`Ilustración módulo ${moduleKey}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+              </div>
+            </div>
+            <div className="border-t border-slate-200 bg-slate-50/60 p-4">
+              <div className="flex flex-wrap gap-2">
+                <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.max(0, v - 1))} disabled={activeLesson <= 0}>Anterior</button>
+                <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.min(lessons.length - 1, v + 1))} disabled={activeLesson >= lessons.length - 1}>Siguiente</button>
+                <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving || isLessonDone(lesson.id) || !canMarkLesson} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
+                  {isLessonDone(lesson.id) ? "Lección completada" : "Marcar como completada"}
+                </button>
+              </div>
             </div>
           </article>
         ) : null}

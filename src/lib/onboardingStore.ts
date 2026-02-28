@@ -194,7 +194,7 @@ async function readStateFromSupabase(): Promise<OnboardingState> {
     moduleStatusByEmail[email][row.module_key] = {
       moduleKey: row.module_key as ModuleKey,
       status: row.status,
-      attempts: row.attempts,
+      attempts: row.attempts_used,
       maxAttempts: row.max_attempts,
       validatedAt: row.validated_at,
     };
@@ -347,7 +347,7 @@ async function persistModuleStatus(record: OnboardingRecord, status: ModuleStatu
         track: record.track,
         module_key: status.moduleKey,
         status: status.status,
-        attempts: status.attempts,
+        attempts_used: status.attempts,
         max_attempts: status.maxAttempts,
         validated_at: status.validatedAt,
       },
@@ -477,7 +477,9 @@ export async function submitModuleQuiz(email: string, moduleKey: string, answers
   const statuses = computeModuleStatuses(current, state);
   const currentStatus = getModuleStatus(statuses, moduleKey);
   if (!currentStatus) throw new Error("Módulo no aplicable.");
-  if (currentStatus.status === "failed_max_attempts") throw new Error("Se alcanzó el máximo de intentos. Solicita reset de superadmin.");
+  if (currentStatus.status === "failed_max_attempts" || currentStatus.attempts >= currentStatus.maxAttempts) {
+    throw new Error("Se alcanzó el máximo de intentos. Solicita reset de superadmin.");
+  }
 
   const unit = getUnitByModuleKey(state.units, moduleKey);
   if (!unit) throw new Error("Módulo no configurado.");
@@ -509,7 +511,7 @@ export async function submitModuleQuiz(email: string, moduleKey: string, answers
   const nextStatus: ModuleStatus = {
     ...currentStatus,
     attempts,
-    status: passed ? "validated" : attempts >= MODULE_MAX_ATTEMPTS ? "failed_max_attempts" : "in_progress",
+    status: passed ? "validated" : attempts >= currentStatus.maxAttempts ? "failed_max_attempts" : "in_progress",
     validatedAt: passed ? now : undefined,
   };
 
