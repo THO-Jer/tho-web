@@ -120,10 +120,13 @@ function parseLessons(content: string[]): Lesson[] {
     const id = match ? String(match[1]).trim() : `L${index + 1}`;
     const label = match ? String(match[1]).trim() : `Lección ${index + 1}`;
     const body = match ? String(match[2]).trim() : normalized;
-    const segments = body.split(/\.\s+/).map((segment) => segment.trim()).filter(Boolean);
-    const subtitle = segments[0] || body;
+    const colonIdx = body.indexOf(":");
+    const title = colonIdx > 0 ? body.slice(0, colonIdx).trim() : body.split(/\.\s+/)[0].trim();
+    const remainder = colonIdx > 0 ? body.slice(colonIdx + 1).trim() : body;
+    const segments = remainder.split(/\.\s+/).map((segment) => segment.trim()).filter(Boolean);
+    const subtitle = segments[0] || remainder || title;
     const bullets = segments.slice(1).map((segment) => segment.replace(/\.$/, ""));
-    return { id, label, title: label, subtitle, bullets };
+    return { id, label, title, subtitle, bullets };
   });
 }
 

@@ -73,6 +73,11 @@ export function hasOnboardingSupabaseStore(onboardingStore: string) {
   return process.env.NODE_ENV === "production" ? Boolean(url && service) : Boolean(url && service);
 }
 
+function isMissingColumnError(error: unknown, column: string) {
+  const text = error instanceof Error ? error.message : String(error || "");
+  return text.includes("PGRST204") && text.includes(`'${column}'`);
+}
+
 function normalizeTrack(value: unknown): OnboardingRecord["track"] {
   const track = String(value || "general").trim();
   if (["sales", "creative_ops", "advisory_ops", "general"].includes(track)) return track as OnboardingRecord["track"];
@@ -253,11 +258,10 @@ export async function getOnboardingQuizAttemptRows(input: { quizAttemptsTable: s
   const filters: string[] = ["select=*"];
   if (input.email) filters.push(`email=eq.${encodeURIComponent(input.email)}`);
   if (input.track) filters.push(`track=eq.${encodeURIComponent(input.track)}`);
-  if (input.moduleKey) filters.push(`module_key=eq.${encodeURIComponent(input.moduleKey)}`);
   filters.push("order=submitted_at.desc");
   const rows = await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}?${filters.join("&")}`).catch(() => []);
   if (!Array.isArray(rows)) return [] as OnboardingQuizAttemptRow[];
-  return (rows as Array<Record<string, unknown>>).map((row) => ({
+  const mapped = (rows as Array<Record<string, unknown>>).map((row) => ({
     id: row.id ? String(row.id) : undefined,
     email: String(row.email || "").trim().toLowerCase(),
     track: normalizeTrack(row.track),
@@ -268,24 +272,57 @@ export async function getOnboardingQuizAttemptRows(input: { quizAttemptsTable: s
     passed: typeof row.passed === "boolean" ? row.passed : undefined,
     submitted_at: String(row.submitted_at || row.updated_at || new Date().toISOString()),
   })).filter((row) => row.email && row.module_key);
+  return input.moduleKey ? mapped.filter((row) => row.module_key === input.moduleKey) : mapped;
 }
 
 export async function upsertOnboardingQuizResultByModule(input: {
   quizResultsTable: string;
   row: OnboardingQuizResultRow;
 }) {
-  await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email,track,module_key`, {
-    method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-    body: JSON.stringify([input.row]),
-  });
+  const nextRow = {
+    email: input.row.email,
+    track: input.row.track,
+    module: input.row.module_key,
+    score: input.row.score,
+    max_score: input.row.max_score,
+    missed_topics: input.row.missed_topics,
+    submitted_at: input.row.submitted_at,
+  };
+
+  try {
+    await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email,track,module`, {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify([nextRow]),
+    });
+  } catch (error) {
+    if (!isMissingColumnError(error, "module")) throw error;
+    await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email,track,module_key`, {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify([input.row]),
+    });
+  }
 }
 
 export async function insertOnboardingQuizAttempt(input: { quizAttemptsTable: string; row: OnboardingQuizAttemptRow }) {
-  await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
-    method: "POST",
-    body: JSON.stringify([input.row]),
-  });
+  const nextRow = {
+    ...input.row,
+    module: input.row.module_key,
+  };
+
+  try {
+    await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+      method: "POST",
+      body: JSON.stringify([nextRow]),
+    });
+  } catch (error) {
+    if (!isMissingColumnError(error, "module")) throw error;
+    await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+      method: "POST",
+      body: JSON.stringify([input.row]),
+    });
+  }
 }
 
 export async function getOnboardingAdminOverviewRows(viewName = "onboarding_admin_overview") {
