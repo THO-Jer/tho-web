@@ -146,7 +146,7 @@ export default function StudioCanalConfidencialReportarPage() {
           <button
             type="submit"
             disabled={sending}
-            className="btn-unified-motion btn-tho-hover-gradient inline-flex w-fit rounded-xl border border-slate-700/20 bg-slate-900 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white disabled:opacity-60"
+            className="btn-unified-motion inline-flex w-fit rounded-xl border border-rose-800 bg-rose-700 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-rose-800 disabled:opacity-60"
           >
             {sending ? "Enviando..." : "Enviar reporte"}
           </button>
