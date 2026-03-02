@@ -72,10 +72,6 @@ export default function StudioIndexPage() {
   const [canManageAccess, setCanManageAccess] = useState(false);
   const [role, setRole] = useState("");
   const [permissions, setPermissions] = useState<StudioPermissions | null>(null);
-  const [magicEmail, setMagicEmail] = useState("");
-  const [magicSending, setMagicSending] = useState(false);
-  const [magicCooldownUntil, setMagicCooldownUntil] = useState(0);
-  const [magicCooldownSeconds, setMagicCooldownSeconds] = useState(0);
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [onboardingAccess, setOnboardingAccess] = useState<{ blog?: boolean; incidents?: boolean; crmStudio?: boolean }>({});
   const [onboardingRequired, setOnboardingRequired] = useState(true);
@@ -97,26 +93,7 @@ export default function StudioIndexPage() {
     return `${redirectTo.replace(/\/$/, "")}/auth/callback`;
   }, [redirectTo]);
 
-  const magicRedirectTo = useMemo(() => {
-    return publicStudioAuthRedirect.replace(/\/$/, "");
-  }, [publicStudioAuthRedirect]);
 
-  useEffect(() => {
-    if (!magicCooldownUntil) {
-      setMagicCooldownSeconds(0);
-      return;
-    }
-
-    const update = () => {
-      const remaining = Math.max(0, Math.ceil((magicCooldownUntil - Date.now()) / 1000));
-      setMagicCooldownSeconds(remaining);
-      if (remaining <= 0) setMagicCooldownUntil(0);
-    };
-
-    update();
-    const timer = window.setInterval(update, 1000);
-    return () => window.clearInterval(timer);
-  }, [magicCooldownUntil]);
 
   useEffect(() => {
     const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : "";
@@ -179,78 +156,22 @@ export default function StudioIndexPage() {
     run();
   }, [oauthCallbackUrl]);
 
-  function onOAuthLogin() {
+  async function onOAuthLogin() {
     const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
-    if (!supabaseUrl) {
-      setMessage("Falta NEXT_PUBLIC_SUPABASE_URL para OAuth.");
-      return;
-    }
-
-    if (!redirectTo) {
-      setMessage("Falta STUDIO_AUTH_REDIRECT_URL (o NEXT_PUBLIC_STUDIO_URL) para forzar redirect del Studio.");
-      return;
-    }
-
-    const authUrl = new URL("/auth/v1/authorize", supabaseUrl);
-    authUrl.searchParams.set("provider", "azure");
-    authUrl.searchParams.set("redirect_to", oauthCallbackUrl || redirectTo);
-    authUrl.searchParams.set("scopes", "openid profile email");
-    authUrl.searchParams.set("prompt", "select_account");
-    window.location.href = authUrl.toString();
-  }
-
-  async function onSendMagicLink() {
-    const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
-    const emailValue = magicEmail.trim().toLowerCase();
     if (!supabaseUrl || !publicSupabaseAnon) {
-      setMessage("Faltan variables públicas de Supabase para magic link.");
-      return;
-    }
-    if (!magicRedirectTo) {
-      setMessage("Falta NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL para forzar redirect del Magic Link.");
-      return;
-    }
-    if (!emailValue || !emailValue.includes("@")) {
-      setMessage("Ingresa un correo válido para magic link.");
-      return;
-    }
-    if (magicCooldownSeconds > 0) {
-      setMessage(`Espera ${magicCooldownSeconds}s para solicitar un nuevo magic link.`);
+      setMessage("Faltan variables públicas de Supabase para OAuth Google.");
       return;
     }
 
-    setMagicSending(true);
-    try {
-      console.info("[studio] sending magic link with emailRedirectTo", magicRedirectTo);
-      const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
-      const { error, response } = await supabase.auth.signInWithOtp({
-        email: emailValue,
-        options: {
-          emailRedirectTo: magicRedirectTo,
-          shouldCreateUser: true,
-        },
-      });
+    const redirectTarget = publicStudioAuthRedirect || "https://tho-web.vercel.app/studio";
+    const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: redirectTarget },
+    });
 
-      if (error) {
-        const err = error.message;
-        const retryAfter = Number(response?.headers.get("retry-after") || "0");
-        const parsedSeconds = Number.isFinite(retryAfter) && retryAfter > 0
-          ? retryAfter
-          : Number((err.match(/(\d+)\s*(?:seg|second|min)/i) || ["", "0"])[1] || "0");
-        if (parsedSeconds > 0) {
-          setMagicCooldownUntil(Date.now() + parsedSeconds * 1000);
-          setMessage(`Debes esperar ${parsedSeconds}s antes de solicitar otro magic link.`);
-          return;
-        }
-        setMessage(`No se pudo enviar magic link: ${err}`);
-        return;
-      }
-
-      setMagicCooldownUntil(Date.now() + 60 * 1000);
-      setMessage(`Magic link enviado. Revisa tu correo. Te redirigirá a ${magicRedirectTo} cuando verifiques el enlace.`);
-      setMagicEmail("");
-    } finally {
-      setMagicSending(false);
+    if (error) {
+      setMessage(`No se pudo iniciar con Google: ${error.message}`);
     }
   }
 
@@ -268,7 +189,7 @@ export default function StudioIndexPage() {
         <section className="mx-auto max-w-6xl px-4 py-14">
           <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">THO Studio</h1>
           <p className="mt-3 max-w-3xl text-slate-700">
-            Acceso unificado con Supabase Auth (Microsoft para internos, magic link para externos) y allowlist de roles en Studio.
+            Acceso unificado con Supabase Auth vía Google OAuth y allowlist de roles en Studio.
           </p>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
@@ -276,22 +197,10 @@ export default function StudioIndexPage() {
 
             {!checking && !email ? (
               <div>
-                <p className="text-sm text-slate-700">Ingresa con Microsoft o solicita magic link si eres externo autorizado.</p>
+                <p className="text-sm text-slate-700">Ingresa con Google OAuth para acceder al Studio.</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <button onClick={onOAuthLogin} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">
-                    Ingresar con Microsoft
-                  </button>
-                </div>
-                <div className="mt-4 grid gap-2 sm:max-w-lg sm:grid-cols-[1fr_auto]">
-                  <input
-                    type="email"
-                    value={magicEmail}
-                    onChange={(e) => setMagicEmail(e.target.value)}
-                    placeholder="freelancer@correo.com"
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                  />
-                  <button onClick={onSendMagicLink} disabled={magicSending || magicCooldownSeconds > 0} className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 disabled:cursor-not-allowed disabled:opacity-60" type="button">
-                    {magicSending ? "Enviando..." : magicCooldownSeconds > 0 ? `Reintentar en ${magicCooldownSeconds}s` : "Enviar magic link"}
+                  <button onClick={() => { void onOAuthLogin(); }} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">
+                    Ingresar con Google
                   </button>
                 </div>
               </div>
