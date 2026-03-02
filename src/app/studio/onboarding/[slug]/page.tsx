@@ -385,6 +385,91 @@ const qualityLessonA4 = {
   ],
 };
 
+
+const culturalLessonA5 = {
+  label: "LECCIÓN 6 · Cultura organizacional",
+  title: "Valores organizacionales en acción",
+  premise: [
+    "En THO los valores no son aspiraciones.",
+    "Son criterios de comportamiento.",
+    "No describen cómo nos gustaría ser.",
+    "Definen cómo debemos actuar.",
+  ],
+  sections: [
+    {
+      heading: "1. Humanidad",
+      protects: [
+        "Dignidad de personas y comunidades.",
+        "Integridad del relato institucional.",
+        "Responsabilidad comunicacional.",
+      ],
+      requires: [
+        "No instrumentalizar actores territoriales.",
+        "No simplificar conflictos complejos por conveniencia.",
+        "No usar datos sensibles sin criterio.",
+      ],
+      standard: "Humanidad no es amabilidad. Es responsabilidad.",
+      invalidates: [
+        "Narrativas manipuladoras.",
+        "Omisiones estratégicas deliberadas.",
+        "Lenguaje que minimiza impacto real.",
+      ],
+    },
+    {
+      heading: "2. Colaboración",
+      protects: [
+        "Calidad colectiva.",
+        "Coherencia interdisciplinaria.",
+        "Reducción de errores invisibles.",
+      ],
+      requires: [
+        "Revisión cruzada real.",
+        "Feedback explícito.",
+        "Escucha activa entre roles.",
+      ],
+      standard: "Colaboración no es cordialidad. Es trabajo compartido.",
+      invalidates: [
+        "Trabajo en silo.",
+        "Decisiones unilaterales en temas críticos.",
+        "Cierre sin revisión externa.",
+      ],
+    },
+    {
+      heading: "3. Adaptabilidad",
+      protects: [
+        "Relevancia contextual.",
+        "Capacidad de ajuste estratégico.",
+        "Respuesta ante cambios reales.",
+      ],
+      requires: [
+        "Revisar hipótesis.",
+        "Ajustar cuando la evidencia cambia.",
+        "No aferrarse al diseño original por orgullo.",
+      ],
+      standard: "Adaptabilidad no es improvisación. Es flexibilidad estructurada.",
+      invalidates: [
+        "Rigidez innecesaria.",
+        "Cambios sin fundamento.",
+        "Reacciones impulsivas.",
+      ],
+    },
+  ],
+  tension: {
+    heading: "Tensión real",
+    intro: "Los valores no siempre coinciden entre sí.",
+    bullets: [
+      "Adaptabilidad tensiona metodología.",
+      "Colaboración ralentiza velocidad.",
+      "Humanidad tensiona rentabilidad.",
+    ],
+    closing: "El estándar no elimina la tensión. Define cómo se navega.",
+  },
+  synthesis: [
+    "Si un comportamiento contradice un valor, no es una variación estilística.",
+    "Es una desviación cultural.",
+  ],
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -651,6 +736,7 @@ export default function StudioOnboardingUnitPage() {
   const isContrastLesson = moduleKey === "A" && lesson?.id === "A2";
   const isOperationalLesson = moduleKey === "A" && lesson?.id === "A3";
   const isQualityLesson = moduleKey === "A" && lesson?.id === "A4";
+  const isCulturalLesson = moduleKey === "A" && lesson?.id === "A5";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -987,6 +1073,77 @@ export default function StudioOnboardingUnitPage() {
                   <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
                     {qualityLessonA4.synthesis.map((line, idx) => (
                       <p key={`a4-synth-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isCulturalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{culturalLessonA5.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{culturalLessonA5.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {culturalLessonA5.premise.map((paragraph, idx) => (
+                    <p key={`a5-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-8">
+                  {culturalLessonA5.sections.map((section) => (
+                    <section key={section.heading} className="space-y-3">
+                      <h3 className="text-xl font-semibold text-slate-900">{section.heading}</h3>
+
+                      <div>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Qué protege</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                          {section.protects.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Qué exige</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                          {section.requires.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <p className="text-[16px] font-medium leading-relaxed text-slate-800">{section.standard}</p>
+
+                      <div>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Qué invalida</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                          {section.invalidates.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </section>
+                  ))}
+                </div>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{culturalLessonA5.tension.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{culturalLessonA5.tension.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {culturalLessonA5.tension.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{culturalLessonA5.tension.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {culturalLessonA5.synthesis.map((line, idx) => (
+                      <p key={`a5-synth-${idx}`}>{line}</p>
                     ))}
                   </div>
                 </section>
