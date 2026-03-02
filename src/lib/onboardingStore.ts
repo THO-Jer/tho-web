@@ -238,7 +238,20 @@ function getApplicableUnitsByTrack(units: OnboardingUnit[], track: OnboardingTra
 function getUnitByTopic(units: OnboardingUnit[], topic: string) {
   const t = topic.toLowerCase();
   const byUnit: Record<string, string[]> = {
-    "identidad-tho": ["identidad", "onboarding"],
+    "identidad-tho": [
+      "identidad",
+      "onboarding",
+      "adaptabilidad_ordenada",
+      "definition_of_done",
+      "metodo_sobre_costumbre",
+      "limites_institucionales",
+      "protocolo_etico",
+      "escalamiento",
+      "marco_agile",
+      "coherencia",
+      "integridad_territorial",
+      "trazabilidad",
+    ],
     "ventas-tho": ["ventas"],
     "operacion-creativa": ["operacion_creativa", "operacion"],
     "operacion-asesorias": ["operacion_asesorias", "seguridad"],
