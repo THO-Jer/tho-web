@@ -101,6 +101,72 @@ const foundationalLessonA0 = {
   reflection: "Antes de continuar: ¿En tu experiencia previa, dónde viste que la falta de estándar generó problemas evitables?",
 };
 
+
+const architecturalLessonA1 = {
+  label: "LECCIÓN 2 · Arquitectura estratégica",
+  title: "Propósito organizacional",
+  definition: [
+    "El propósito no es un mensaje.",
+    "Es un criterio de decisión.",
+    "THO existe para fortalecer organizaciones y conectarlas con su entorno, asegurando viabilidad, legitimidad y coherencia estratégica.",
+    "Pero eso no es una frase inspiradora. Es un marco operativo.",
+  ],
+  sections: [
+    {
+      heading: "1. Qué NO es propósito",
+      intro: "No es:",
+      bullets: [
+        "Un slogan.",
+        "Una narrativa de marketing.",
+        "Una declaración aspiracional desconectada de decisiones reales.",
+        "Una excusa para aceptar cualquier proyecto.",
+      ],
+      closing: "Cuando el propósito se convierte en discurso, pierde capacidad de orientar.",
+    },
+    {
+      heading: "2. Qué SÍ es propósito",
+      intro: "Es un filtro. Define:",
+      bullets: [
+        "Qué proyectos aceptamos.",
+        "Qué riesgos estamos dispuestos a asumir.",
+        "Qué tensiones debemos explicitar.",
+        "Qué decisiones priorizamos cuando hay conflicto.",
+      ],
+      closing: "El propósito no motiva. Ordena.",
+    },
+    {
+      heading: "3. Cómo opera en la práctica",
+      intro: "El propósito interviene cuando hay tensión entre:",
+      bullets: [
+        "Ingreso y coherencia.",
+        "Velocidad y calidad.",
+        "Relación comercial y estándar profesional.",
+        "Oportunidad y riesgo reputacional.",
+      ],
+      closing: "Cuando no hay tensión, el propósito no se nota. Cuando hay tensión, el propósito decide.",
+    },
+  ],
+  scenario: {
+    heading: "Escenario aplicado",
+    text: [
+      "Un proyecto es rentable y técnicamente viable, pero implica minimizar públicamente un riesgo socioambiental relevante.",
+      "La pregunta no es: ¿Podemos hacerlo?",
+      "La pregunta es: ¿Es coherente con fortalecer organizaciones y conectar con su entorno de manera legítima?",
+    ],
+  },
+  translation: {
+    heading: "Traducción operativa",
+    intro: "En THO, propósito significa:",
+    bullets: [
+      "No aceptar proyectos incoherentes con legitimidad institucional.",
+      "No omitir riesgos críticos por conveniencia.",
+      "No separar rentabilidad de responsabilidad estratégica.",
+      "No reducir complejidad para hacerlo más vendible.",
+    ],
+  },
+  synthesis: "Si no puedes explicar cómo tu decisión fortalece organización y entorno al mismo tiempo, probablemente estás operando fuera del propósito.",
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -363,6 +429,7 @@ export default function StudioOnboardingUnitPage() {
   const lessonProgressPct = lessons.length ? Math.round((completedLessonCount / lessons.length) * 100) : 0;
   const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson) : null;
   const isFoundationalLesson = moduleKey === "A" && lesson?.id === "A0";
+  const isArchitecturalLesson = moduleKey === "A" && lesson?.id === "A1";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -440,6 +507,59 @@ export default function StudioOnboardingUnitPage() {
                 <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
                   <h3 className="text-lg font-semibold text-slate-900">Micro-reflexión</h3>
                   <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{foundationalLessonA0.reflection}</p>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isArchitecturalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{architecturalLessonA1.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{architecturalLessonA1.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {architecturalLessonA1.definition.map((paragraph, idx) => (
+                    <p key={`a1-def-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-7">
+                  {architecturalLessonA1.sections.map((section) => (
+                    <section key={section.heading}>
+                      <h3 className="text-xl font-semibold text-slate-900">{section.heading}</h3>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{section.intro}</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                        {section.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{section.closing}</p>
+                    </section>
+                  ))}
+                </div>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{architecturalLessonA1.scenario.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {architecturalLessonA1.scenario.text.map((line, idx) => (
+                      <p key={`a1-scenario-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{architecturalLessonA1.translation.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{architecturalLessonA1.translation.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {architecturalLessonA1.translation.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{architecturalLessonA1.synthesis}</p>
                 </section>
 
                 <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
