@@ -605,6 +605,58 @@ const ethicsLessonA7 = {
   ],
 };
 
+
+const integrationLessonA8 = {
+  label: "LECCIÓN 9 · Integración",
+  title: "Qué significa operar bajo el estándar THO",
+  summary: [
+    "Qué es una organización adaptable.",
+    "Cómo funcionan las metodologías ágiles en nuestro contexto.",
+    "Qué entendemos por “done”.",
+    "Qué valores sostienen nuestra práctica.",
+    "Cuáles son nuestros límites institucionales.",
+    "Cómo actuar ante tensiones éticas.",
+  ],
+  selfAssessment: [
+    {
+      id: "pressure",
+      prompt: "Si mañana enfrentas una presión externa:",
+      question: "¿Podrías explicar el estándar THO sin reducirlo a opinión?",
+    },
+    {
+      id: "critical-tension",
+      prompt: "Si detectas una tensión crítica:",
+      question: "¿Sabes cuándo escalar y cuándo decidir localmente?",
+    },
+    {
+      id: "method-cut",
+      prompt: "Si un cliente pide acortar metodología:",
+      question: "¿Podrías argumentar técnicamente por qué una etapa no debe omitirse?",
+    },
+    {
+      id: "discomfort",
+      prompt: "Si algo “no se siente correcto”:",
+      question: "¿Sabes cómo activar el protocolo sin personalizar el conflicto?",
+    },
+  ],
+  assessmentClosing: "No se trata de marcar todo “sí”. Se trata de tener claridad.",
+  declaration: {
+    heading: "Declaración operativa",
+    intro: "Operar en THO implica:",
+    bullets: [
+      "Priorizar método sobre improvisación.",
+      "Priorizar coherencia sobre conveniencia.",
+      "Priorizar estándar sobre urgencia.",
+    ],
+    closing: [
+      "Si completas este módulo, declaras que comprendes ese marco.",
+      "No implica perfección. Implica responsabilidad.",
+    ],
+  },
+  confirmationLabel: "He leído y comprendo el estándar institucional descrito en este módulo.",
+  actionLabel: "Continuar a evaluación",
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -740,8 +792,11 @@ export default function StudioOnboardingUnitPage() {
   const [minLessonSeconds, setMinLessonSeconds] = useState(12);
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
   const [tick, setTick] = useState(() => Date.now());
+  const [integrationAnswers, setIntegrationAnswers] = useState<Record<string, "si" | "no" | null>>({ pressure: null, "critical-tension": null, "method-cut": null, discomfort: null });
+  const [integrationConfirmed, setIntegrationConfirmed] = useState(false);
   const lessonRef = useRef<HTMLElement | null>(null);
   const lessonEndRef = useRef<HTMLDivElement | null>(null);
+  const quizSectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -874,6 +929,7 @@ export default function StudioOnboardingUnitPage() {
   const isCulturalLesson = moduleKey === "A" && lesson?.id === "A5";
   const isBoundaryLesson = moduleKey === "A" && lesson?.id === "A6";
   const isEthicsLesson = moduleKey === "A" && lesson?.id === "A7";
+  const isIntegrationLesson = moduleKey === "A" && lesson?.id === "Reflexión guiada sugerida";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -1418,6 +1474,82 @@ export default function StudioOnboardingUnitPage() {
                 <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
                 <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
               </div>
+            ) : isIntegrationLesson ? (
+              <div className="mx-auto max-w-[760px] p-6 sm:p-10">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{integrationLessonA8.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{integrationLessonA8.title}</h2>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
+                  <p className="text-[15px] leading-relaxed text-slate-700">Durante este módulo revisaste:</p>
+                  <ul className="mt-3 list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-slate-700">
+                    {integrationLessonA8.summary.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                  <p className="mt-3 text-[15px] font-medium text-slate-800">Ahora la pregunta no es conceptual. Es operativa.</p>
+                </section>
+
+                <section className="mt-8 space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Autoevaluación breve</h3>
+                  {integrationLessonA8.selfAssessment.map((item, idx) => (
+                    <div key={item.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                      <p className="text-sm font-semibold text-slate-900">{idx + 1}. {item.prompt}</p>
+                      <p className="mt-1 text-[15px] leading-relaxed text-slate-700">{item.question}</p>
+                      <div className="mt-3 flex gap-3">
+                        <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                          <input
+                            type="radio"
+                            name={`integration-${item.id}`}
+                            checked={integrationAnswers[item.id] === "si"}
+                            onChange={() => setIntegrationAnswers((prev) => ({ ...prev, [item.id]: "si" }))}
+                          />
+                          Sí
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                          <input
+                            type="radio"
+                            name={`integration-${item.id}`}
+                            checked={integrationAnswers[item.id] === "no"}
+                            onChange={() => setIntegrationAnswers((prev) => ({ ...prev, [item.id]: "no" }))}
+                          />
+                          No
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="text-[15px] font-medium text-slate-800">{integrationLessonA8.assessmentClosing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 className="text-lg font-semibold text-slate-900">{integrationLessonA8.declaration.heading}</h3>
+                  <p className="mt-2 text-[15px] text-slate-700">{integrationLessonA8.declaration.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                    {integrationLessonA8.declaration.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                  <div className="mt-3 space-y-1 text-[15px] font-medium text-slate-800">
+                    {integrationLessonA8.declaration.closing.map((line) => <p key={line}>{line}</p>)}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-300 bg-white p-5">
+                  <h3 className="text-lg font-semibold text-slate-900">Confirmación antes del quiz</h3>
+                  <label className="mt-3 inline-flex items-start gap-2 text-sm text-slate-700">
+                    <input type="checkbox" checked={integrationConfirmed} onChange={(e) => setIntegrationConfirmed(e.target.checked)} className="mt-0.5" />
+                    <span>{integrationLessonA8.confirmationLabel}</span>
+                  </label>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      disabled={!integrationConfirmed}
+                      onClick={() => quizSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                      className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                    >
+                      {integrationLessonA8.actionLabel}
+                    </button>
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
             ) : (
               <div className="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
                 <div className="p-5">
@@ -1490,7 +1622,7 @@ export default function StudioOnboardingUnitPage() {
         ) : null}
 
         {unitQuiz.length && allLessonsDone ? (
-          <div className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+          <div ref={quizSectionRef} className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
             <h2 className="text-lg font-semibold text-indigo-900">Evaluación del módulo</h2>
             <p className="mt-1 text-sm text-indigo-900">Debes aprobar para validar este módulo.</p>
             <div className="mt-4 space-y-4">
