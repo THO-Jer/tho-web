@@ -165,9 +165,21 @@ export default function StudioIndexPage() {
 
     const redirectTarget = publicStudioAuthRedirect || "https://tho-web.vercel.app/studio";
     const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
+    const providerOptions = provider === "azure"
+      ? {
+          redirectTo: redirectTarget,
+          scopes: "openid profile email",
+          queryParams: { prompt: "select_account" },
+        }
+      : {
+          redirectTo: redirectTarget,
+          scopes: "email profile",
+          queryParams: { prompt: "select_account" },
+        };
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: redirectTarget },
+      options: providerOptions,
     });
 
     if (error) {
