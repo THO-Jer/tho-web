@@ -34,6 +34,73 @@ const moduleVisuals: Record<string, { cover: string; accent: string }> = {
   D: { cover: "/ilustraciones/10.png", accent: "text-emerald-700" },
 };
 
+const foundationalLessonA0 = {
+  label: "LECCIÓN 1 · Marco institucional",
+  title: "¿Qué es el onboarding y por qué existe?",
+  strategicFrame: [
+    "No es una inducción administrativa.",
+    "Es un mecanismo de coherencia institucional.",
+    "El onboarding en THO no está diseñado para informar. Está diseñado para alinear criterio.",
+    "Cuando una organización crece sin estándares explícitos, cada persona comienza a definir calidad, ética y método según su propio marco. Eso genera fricción invisible, inconsistencias y riesgos acumulativos.",
+    "El onboarding existe para evitar eso.",
+  ],
+  blocks: [
+    {
+      heading: "1. Qué protege",
+      intro: "El onboarding protege tres cosas:",
+      bullets: [
+        "Coherencia interna en decisiones.",
+        "Estándar mínimo de calidad operativa.",
+        "Reputación institucional frente a clientes y aliados.",
+      ],
+      closing: "No es formación genérica. Es una capa de protección organizacional.",
+    },
+    {
+      heading: "2. Qué evita",
+      intro: "Sin onboarding:",
+      bullets: [
+        "La calidad se vuelve subjetiva.",
+        "La trazabilidad desaparece.",
+        "Las decisiones se toman por intuición aislada.",
+        "La cultura se fragmenta.",
+      ],
+      closing: "El costo no es inmediato, pero es acumulativo.",
+    },
+    {
+      heading: "3. Qué instala",
+      intro: "El onboarding instala un marco común:",
+      bullets: [
+        "Cómo entendemos calidad.",
+        "Qué significa trabajo terminado.",
+        "Cuándo escalar.",
+        "Qué no es negociable.",
+      ],
+      closing: "No es contenido teórico. Es arquitectura operativa.",
+    },
+  ],
+  tension: {
+    heading: "Tensión real",
+    intro: "Siempre habrá tensión entre:",
+    bullets: [
+      "Velocidad y método.",
+      "Urgencia y trazabilidad.",
+      "Resultado y estándar.",
+    ],
+    closing: "El onboarding no elimina esa tensión. Define cómo se resuelve.",
+  },
+  practice: {
+    heading: "Traducción práctica",
+    intro: "En la práctica, esto significa:",
+    bullets: [
+      "No ejecutar sin entender estándar mínimo.",
+      "No asumir criterios implícitos.",
+      "No cerrar entregas sin contexto documentado.",
+      "No improvisar procesos críticos.",
+    ],
+  },
+  reflection: "Antes de continuar: ¿En tu experiencia previa, dónde viste que la falta de estándar generó problemas evitables?",
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -295,6 +362,7 @@ export default function StudioOnboardingUnitPage() {
   const visual = moduleVisuals[moduleKey] || moduleVisuals.A;
   const lessonProgressPct = lessons.length ? Math.round((completedLessonCount / lessons.length) * 100) : 0;
   const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson) : null;
+  const isFoundationalLesson = moduleKey === "A" && lesson?.id === "A0";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -322,56 +390,113 @@ export default function StudioOnboardingUnitPage() {
 
         {lesson ? (
           <article ref={lessonRef} className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <div className="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
-              <div className="p-5">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1}</p>
-                <h2 className="mt-1 text-lg font-semibold text-slate-900">{lesson.title}</h2>
-                <p className={`mt-2 text-base font-medium ${visual.accent}`}>{lesson.subtitle}</p>
-                <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Puntos de clarificación</p>
-                  {lesson.bullets.length ? (
-                    <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
-                      {lesson.bullets.map((bullet, idx) => (
-                        <li key={`${lesson.id}-bullet-${idx}`}>{bullet}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-2 text-sm text-slate-600">No hay aclaraciones adicionales en esta lección.</p>
-                  )}
+            {isFoundationalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{foundationalLessonA0.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{foundationalLessonA0.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {foundationalLessonA0.strategicFrame.map((paragraph, idx) => (
+                    <p key={`frame-${idx}`}>{paragraph}</p>
+                  ))}
                 </div>
 
-                {lessonGuide ? (
-                  <div className="mt-4 space-y-3 rounded-xl border border-sky-100 bg-sky-50/70 p-3">
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Por qué importa</p>
-                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.whyItMatters}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Qué debes hacer en THO</p>
-                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.whatToDo}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Error frecuente</p>
-                      <p className="mt-1 text-sm text-slate-700">{lessonGuide.commonMistake}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Aprendizajes clave</p>
-                      <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-700">
-                        {lessonGuide.keyLearnings.slice(0, 3).map((item) => (
-                          <li key={`${lesson.id}-${item}`}>{item}</li>
+                <div className="mt-8 space-y-7">
+                  {foundationalLessonA0.blocks.map((block) => (
+                    <section key={block.heading}>
+                      <h3 className="text-xl font-semibold text-slate-900">{block.heading}</h3>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{block.intro}</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                        {block.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
                         ))}
                       </ul>
-                    </div>
-                  </div>
-                ) : null}
+                      <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{block.closing}</p>
+                    </section>
+                  ))}
+                </div>
 
-                <p className="mt-4 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{foundationalLessonA0.tension.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{foundationalLessonA0.tension.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {foundationalLessonA0.tension.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{foundationalLessonA0.tension.closing}</p>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{foundationalLessonA0.practice.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{foundationalLessonA0.practice.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {foundationalLessonA0.practice.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Micro-reflexión</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{foundationalLessonA0.reflection}</p>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
                 <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
               </div>
-              <div className="relative min-h-44 bg-slate-50">
-                <Image src={visual.cover} alt={`Ilustración módulo ${moduleKey}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+            ) : (
+              <div className="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
+                <div className="p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1}</p>
+                  <h2 className="mt-1 text-lg font-semibold text-slate-900">{lesson.title}</h2>
+                  <p className={`mt-2 text-base font-medium ${visual.accent}`}>{lesson.subtitle}</p>
+                  <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Puntos de clarificación</p>
+                    {lesson.bullets.length ? (
+                      <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
+                        {lesson.bullets.map((bullet, idx) => (
+                          <li key={`${lesson.id}-bullet-${idx}`}>{bullet}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-sm text-slate-600">No hay aclaraciones adicionales en esta lección.</p>
+                    )}
+                  </div>
+
+                  {lessonGuide ? (
+                    <div className="mt-4 space-y-3 rounded-xl border border-sky-100 bg-sky-50/70 p-3">
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Por qué importa</p>
+                        <p className="mt-1 text-sm text-slate-700">{lessonGuide.whyItMatters}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Cómo proceder</p>
+                        <p className="mt-1 text-sm text-slate-700">{lessonGuide.whatToDo}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Error frecuente</p>
+                        <p className="mt-1 text-sm text-slate-700">{lessonGuide.commonMistake}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Aprendizajes clave</p>
+                        <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                          {lessonGuide.keyLearnings.slice(0, 3).map((item) => (
+                            <li key={`${lesson.id}-${item}`}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <p className="mt-4 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                  <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+                </div>
+                <div className="relative min-h-44 bg-slate-50">
+                  <Image src={visual.cover} alt={`Ilustración módulo ${moduleKey}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+                </div>
               </div>
-            </div>
+            )}
             <div ref={lessonEndRef} className="h-0 w-0" />
             <div className="border-t border-slate-200 bg-slate-50/60 p-4">
               <div className="flex flex-wrap gap-2">
