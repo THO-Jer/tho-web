@@ -156,22 +156,22 @@ export default function StudioIndexPage() {
     run();
   }, [oauthCallbackUrl]);
 
-  async function onOAuthLogin() {
+  async function onOAuthLogin(provider: "google" | "azure") {
     const supabaseUrl = oauthBaseUrl || publicSupabaseUrl;
     if (!supabaseUrl || !publicSupabaseAnon) {
-      setMessage("Faltan variables públicas de Supabase para OAuth Google.");
+      setMessage("Faltan variables públicas de Supabase para OAuth.");
       return;
     }
 
     const redirectTarget = publicStudioAuthRedirect || "https://tho-web.vercel.app/studio";
     const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider,
       options: { redirectTo: redirectTarget },
     });
 
     if (error) {
-      setMessage(`No se pudo iniciar con Google: ${error.message}`);
+      setMessage(`No se pudo iniciar con ${provider === "azure" ? "Microsoft" : "Google"}: ${error.message}`);
     }
   }
 
@@ -189,7 +189,7 @@ export default function StudioIndexPage() {
         <section className="mx-auto max-w-6xl px-4 py-14">
           <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">THO Studio</h1>
           <p className="mt-3 max-w-3xl text-slate-700">
-            Acceso unificado con Supabase Auth vía Google OAuth y allowlist de roles en Studio.
+            Acceso unificado con Supabase Auth vía Microsoft y Google OAuth, con allowlist de roles en Studio.
           </p>
 
           <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
@@ -197,9 +197,12 @@ export default function StudioIndexPage() {
 
             {!checking && !email ? (
               <div>
-                <p className="text-sm text-slate-700">Ingresa con Google OAuth para acceder al Studio.</p>
+                <p className="text-sm text-slate-700">Ingresa con Microsoft o Google OAuth para acceder al Studio.</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <button onClick={() => { void onOAuthLogin(); }} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">
+                  <button onClick={() => { void onOAuthLogin("azure"); }} className="rounded-lg border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-700" type="button">
+                    Ingresar con Microsoft
+                  </button>
+                  <button onClick={() => { void onOAuthLogin("google"); }} className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700" type="button">
                     Ingresar con Google
                   </button>
                 </div>
