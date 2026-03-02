@@ -664,6 +664,19 @@ type LessonGuide = {
   keyLearnings: string[];
 };
 
+const topicReviewLabel: Record<string, string> = {
+  adaptabilidad_ordenada: "Adaptabilidad ordenada",
+  definition_of_done: "Definition of Done",
+  metodo_sobre_costumbre: "Método sobre costumbre",
+  limites_institucionales: "Límites institucionales",
+  protocolo_etico: "Protocolo ético",
+  escalamiento: "Escalamiento",
+  marco_agile: "Marco Agile",
+  coherencia: "Coherencia institucional",
+  integridad_territorial: "Integridad territorial",
+  trazabilidad: "Trazabilidad",
+};
+
 const moduleALessonGuides: Record<string, LessonGuide> = {
   A0: {
     whyItMatters: "Define el estándar base: onboarding es alineación operativa para evitar ambigüedad, errores repetidos y daño reputacional.",
@@ -757,7 +770,7 @@ function parseLessons(content: string[]): Lesson[] {
 function unitTopicMap(slug: string, topic: string) {
   const t = topic.toLowerCase();
   const byUnit: Record<string, string[]> = {
-    "identidad-tho": ["identidad", "onboarding"],
+    "identidad-tho": ["identidad", "onboarding", "adaptabilidad_ordenada", "definition_of_done", "metodo_sobre_costumbre", "limites_institucionales", "protocolo_etico", "escalamiento", "marco_agile", "coherencia", "integridad_territorial", "trazabilidad"],
     "ventas-tho": ["ventas"],
     "operacion-creativa": ["operacion_creativa", "operacion"],
     "operacion-asesorias": ["operacion_asesorias", "seguridad"],
@@ -767,6 +780,11 @@ function unitTopicMap(slug: string, topic: string) {
 
 function topicToLesson(topic: string, lessons: Array<{ id: string; label: string }>) {
   const t = topic.toLowerCase();
+  if (t.startsWith("adaptabilidad_ordenada") || t.startsWith("marco_agile")) return lessons.find((l) => l.id === "A5" || l.id === "A4") || lessons[0];
+  if (t.startsWith("definition_of_done") || t.startsWith("metodo_sobre_costumbre")) return lessons.find((l) => l.id === "A3") || lessons[0];
+  if (t.startsWith("limites_institucionales")) return lessons.find((l) => l.id === "A6") || lessons[0];
+  if (t.startsWith("protocolo_etico") || t.startsWith("escalamiento")) return lessons.find((l) => l.id === "A7") || lessons[0];
+  if (t.startsWith("coherencia") || t.startsWith("integridad_territorial") || t.startsWith("trazabilidad")) return lessons.find((l) => l.id === "Reflexión guiada sugerida") || lessons[0];
   if (t.startsWith("identidad") || t.startsWith("onboarding")) return lessons.find((l) => l.id.startsWith("A")) || lessons[0];
   if (t.startsWith("ventas")) return lessons.find((l) => l.id.startsWith("B")) || lessons[0];
   if (t.startsWith("operacion_creativa") || t.startsWith("operacion")) return lessons.find((l) => l.id.startsWith("C")) || lessons[0];
@@ -791,6 +809,7 @@ export default function StudioOnboardingUnitPage() {
   const [reachedEnd, setReachedEnd] = useState(false);
   const [minLessonSeconds, setMinLessonSeconds] = useState(12);
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
+  const [showReinforceModal, setShowReinforceModal] = useState(false);
   const [tick, setTick] = useState(() => Date.now());
   const [integrationAnswers, setIntegrationAnswers] = useState<Record<string, "si" | "no" | null>>({ pressure: null, "critical-tension": null, "method-cut": null, discomfort: null });
   const [integrationConfirmed, setIntegrationConfirmed] = useState(false);
@@ -821,7 +840,6 @@ export default function StudioOnboardingUnitPage() {
   const unit = useMemo(() => units.find((item) => item.slug === slug), [units, slug]);
   const currentIndex = unit ? units.findIndex((item) => item.slug === unit.slug) : -1;
   const moduleKey = ["A", "B", "C", "D"][currentIndex] || "A";
-  const next = currentIndex >= 0 ? units[currentIndex + 1] : null;
   const unitQuiz = useMemo(() => (unit ? quiz.filter((q) => unitTopicMap(unit.slug, q.topic)) : []), [quiz, unit]);
   const lessons = useMemo(() => parseLessons(unit?.content || []), [unit]);
 
@@ -900,11 +918,11 @@ export default function StudioOnboardingUnitPage() {
       setFailedTopics(Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []);
       if (data.passed) {
         setMessage("Módulo validado. Puedes continuar al siguiente.");
-        if (next) router.push(`/studio/onboarding/${next.slug}`);
-        else router.push("/studio/onboarding");
+        router.push("/studio/onboarding");
       } else {
         const attempts = data?.moduleStatus?.attempts ?? 0;
         const maxAttempts = data?.moduleStatus?.maxAttempts ?? 3;
+        setShowReinforceModal(Boolean((Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []).length));
         setMessage(`No alcanzaste el puntaje mínimo. Intento ${attempts}/${maxAttempts}.`);
       }
     } catch (error) {
@@ -1660,7 +1678,7 @@ export default function StudioOnboardingUnitPage() {
                 const lessonRefItem = topicToLesson(topic, lessons);
                 return (
                   <li key={`${topic}-${idx}`}>
-                    {topic} · {lessonRefItem ? <button type="button" onClick={() => setActiveLesson(Math.max(0, lessons.findIndex((item) => item.id === lessonRefItem.id)))} className="underline underline-offset-2">ir a {lessonRefItem.label}</button> : null}
+                    {`Revisar: ${topicReviewLabel[topic] || topic}`} · {lessonRefItem ? <button type="button" onClick={() => setActiveLesson(Math.max(0, lessons.findIndex((item) => item.id === lessonRefItem.id)))} className="underline underline-offset-2">ir a {lessonRefItem.label}</button> : null}
                   </li>
                 );
               })}
@@ -1678,6 +1696,23 @@ export default function StudioOnboardingUnitPage() {
         </div>
 
         {status?.status === "failed_max_attempts" ? <p className="mt-2 text-sm text-rose-700">Alcanzaste el máximo de intentos. Solicita reset a un superadmin.</p> : null}
+
+        {showReinforceModal && failedTopics.length ? (
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4" role="dialog" aria-modal="true" aria-label="Feedback de evaluación">
+            <div className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-5 shadow-xl">
+              <h3 className="text-lg font-semibold text-slate-900">Reforzar antes de reintentar</h3>
+              <p className="mt-1 text-sm text-slate-700">No solo incorrecto: revisa estos tópicos del estándar institucional.</p>
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-800">
+                {failedTopics.map((topic) => <li key={`modal-${topic}`}>{`Revisar: ${topicReviewLabel[topic] || topic}`}</li>)}
+              </ul>
+              <div className="mt-4 flex justify-end">
+                <button type="button" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white" onClick={() => setShowReinforceModal(false)}>
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
         <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {onboarding?.last_saved_at || "Sin registro"}</p>
         {message ? <p className="mt-2 text-sm text-slate-700">{message}</p> : null}
       </section>
