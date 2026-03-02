@@ -8,6 +8,8 @@ import { BrandLoader } from "@/components/BrandLoader";
 
 type LoginLog = { at: string; email: string; provider: string; ip?: string };
 type Permissions = { canBlog: boolean; canCrm: boolean; canIncidents: boolean; canOnboarding: boolean };
+type Team = "sales" | "creative_ops" | "advisory_ops" | "general";
+
 type AuthorizedUser = {
   email: string;
   provider: "google" | "azure" | "any";
@@ -15,6 +17,7 @@ type AuthorizedUser = {
   permissions: Permissions;
   updatedAt: string;
   role?: string;
+  team?: Team;
 };
 type AccessRequest = {
   id: string;
@@ -35,6 +38,7 @@ type AuditIssue = {
 
 type RowEditorState = {
   provider: "google" | "azure" | "any";
+  team: Team;
   canBlog: boolean;
   canCrm: boolean;
   canIncidents: boolean;
@@ -52,6 +56,7 @@ export default function StudioAccesosPage() {
   const [rowEditors, setRowEditors] = useState<Record<string, RowEditorState>>({});
   const [emailInput, setEmailInput] = useState("");
   const [grantProvider, setGrantProvider] = useState<"google" | "azure" | "any">("google");
+  const [grantTeam, setGrantTeam] = useState<Team>("general");
   const [grantBlog, setGrantBlog] = useState(true);
   const [grantCrm, setGrantCrm] = useState(true);
   const [grantIncidents, setGrantIncidents] = useState(false);
@@ -66,6 +71,7 @@ export default function StudioAccesosPage() {
     for (const user of users) {
       next[user.email] = {
         provider: user.provider,
+        team: user.team || "general",
         canBlog: Boolean(user.permissions?.canBlog),
         canCrm: Boolean(user.permissions?.canCrm),
         canIncidents: Boolean(user.permissions?.canIncidents),
@@ -122,6 +128,7 @@ export default function StudioAccesosPage() {
           email,
           requestId,
           provider: override?.provider || grantProvider,
+          team: override?.team || grantTeam,
           permissions: {
             canBlog: override?.canBlog ?? grantBlog,
             canCrm: override?.canCrm ?? grantCrm,
@@ -202,7 +209,7 @@ export default function StudioAccesosPage() {
 
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5">
           <h2 className="text-lg font-semibold text-slate-900">Autorizar correo y permisos</h2>
-          <div className="mt-3 grid gap-3 md:grid-cols-2">
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
             <input
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
@@ -213,6 +220,12 @@ export default function StudioAccesosPage() {
               <option value="google">Google</option>
               <option value="azure">Microsoft</option>
               <option value="any">Cualquiera</option>
+            </select>
+            <select value={grantTeam} onChange={(e) => setGrantTeam(e.target.value as Team)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+              <option value="general">Track: General</option>
+              <option value="sales">Track: Sales</option>
+              <option value="creative_ops">Track: Creative Ops</option>
+              <option value="advisory_ops">Track: Advisory Ops</option>
             </select>
           </div>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
@@ -234,6 +247,7 @@ export default function StudioAccesosPage() {
             {authorized.map((user) => {
               const row = rowEditors[user.email] || {
                 provider: user.provider,
+                team: user.team || "general",
                 canBlog: user.permissions.canBlog,
                 canCrm: user.permissions.canCrm,
                 canIncidents: user.permissions.canIncidents,
@@ -245,7 +259,7 @@ export default function StudioAccesosPage() {
                     <div>
                       <strong>{user.email}</strong>
                       <span className="ml-2 rounded bg-slate-100 px-2 py-0.5 text-[11px] uppercase text-slate-600">{user.role || "member"}</span>
-                      <div className="text-xs text-slate-500">Última actualización: {new Date(user.updatedAt).toLocaleString()}</div>
+                      <div className="text-xs text-slate-500">Track onboarding: {user.team || "general"} · Última actualización: {new Date(user.updatedAt).toLocaleString()}</div>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -260,7 +274,7 @@ export default function StudioAccesosPage() {
                     </div>
                   </div>
 
-                  <div className="mt-3 grid gap-3 md:grid-cols-3">
+                  <div className="mt-3 grid gap-3 md:grid-cols-4">
                     <select
                       value={row.provider}
                       onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, provider: e.target.value as RowEditorState["provider"] } }))}
@@ -269,6 +283,16 @@ export default function StudioAccesosPage() {
                       <option value="google">Google</option>
                       <option value="azure">Microsoft</option>
                       <option value="any">Cualquiera</option>
+                    </select>
+                    <select
+                      value={row.team}
+                      onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, team: e.target.value as Team } }))}
+                      className="rounded-lg border border-slate-300 px-2 py-1 text-xs"
+                    >
+                      <option value="general">General</option>
+                      <option value="sales">Sales</option>
+                      <option value="creative_ops">Creative Ops</option>
+                      <option value="advisory_ops">Advisory Ops</option>
                     </select>
                     <div className="md:col-span-2 flex flex-wrap gap-3 text-xs">
                       <label className="inline-flex items-center gap-2"><input type="checkbox" checked={row.canBlog} onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, canBlog: e.target.checked } }))} /> Blog</label>
@@ -304,6 +328,7 @@ export default function StudioAccesosPage() {
                         onClick={() => {
                           setEmailInput(req.email);
                           setGrantProvider(req.provider === "unknown" ? "google" : req.provider);
+                          setGrantTeam("general");
                           onAction("approve_request", req.email, req.id);
                         }}
                         className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50"
