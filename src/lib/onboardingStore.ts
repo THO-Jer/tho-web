@@ -24,10 +24,10 @@ export type OnboardingTrack = "sales" | "creative_ops" | "advisory_ops" | "gener
 type ModuleKey = "A" | "B" | "C" | "D";
 
 const TRACK_MODULES: Record<OnboardingTrack, ModuleKey[]> = {
-  general: ["A", "B", "C", "D"],
-  sales: ["A", "B", "C", "D"],
-  creative_ops: ["A", "B", "C", "D"],
-  advisory_ops: ["A", "B", "C", "D"],
+  general: ["A"],
+  sales: ["A", "B"],
+  creative_ops: ["A", "C"],
+  advisory_ops: ["A", "D"],
 };
 
 const MODULE_MAX_ATTEMPTS = Math.max(1, Number(process.env.ONBOARDING_MAX_ATTEMPTS_DEFAULT || 3));
