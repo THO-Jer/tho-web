@@ -167,6 +167,75 @@ const architecturalLessonA1 = {
   synthesis: "Si no puedes explicar cómo tu decisión fortalece organización y entorno al mismo tiempo, probablemente estás operando fuera del propósito.",
 };
 
+
+const contrastLessonA2 = {
+  label: "LECCIÓN 3 · Arquitectura comercial",
+  title: "Propósito vs Propuesta de Valor",
+  hook: [
+    "Confundir estos conceptos genera incoherencia comercial.",
+    "Muchas organizaciones mezclan propósito y propuesta de valor. Eso produce mensajes confusos y decisiones inconsistentes.",
+    "En THO están relacionados, pero no son lo mismo.",
+  ],
+  purpose: {
+    heading: "1. Propósito",
+    question: "¿Para qué existimos como organización?",
+    answer: "Fortalecer organizaciones y conectarlas con su entorno de forma legítima y sostenible.",
+    bullets: [
+      "No cambia según cliente.",
+      "No depende de mercado.",
+      "No se adapta por conveniencia.",
+    ],
+    closing: "Es estructural.",
+  },
+  value: {
+    heading: "2. Propuesta de valor",
+    question: "¿Por qué un cliente debería elegirnos?",
+    answer: "Aseguramos confianza en tu marca asesorando e implementando tu estrategia con método, criterio y claridad.",
+    bullets: [
+      "Es específica.",
+      "Es comunicable.",
+      "Es comercial.",
+      "Puede evolucionar.",
+    ],
+    closing: "Es relacional.",
+  },
+  crossing: {
+    heading: "3. Donde se cruzan",
+    intro: "La propuesta de valor debe estar alineada con el propósito.",
+    body: "Si vendemos algo que contradice nuestro propósito, estamos generando una brecha interna.",
+    bullets: [
+      "Se traduce en tensiones operativas.",
+      "Se traduce en desgaste.",
+      "Se traduce en pérdida de legitimidad.",
+    ],
+    closing: "La coherencia entre ambos es un activo invisible.",
+  },
+  scenario: {
+    heading: "Escenario aplicado",
+    lines: [
+      "Un cliente pide una campaña de comunicación que maquilla un problema estructural.",
+      "Propuesta de valor: Podríamos ejecutar técnicamente la campaña.",
+      "Propósito: No podemos contribuir a debilitar legitimidad institucional.",
+      "La decisión se resuelve alineando ambos planos.",
+    ],
+  },
+  translation: {
+    heading: "Traducción operativa",
+    intro: "En THO:",
+    bullets: [
+      "No vendemos lo que no podemos defender.",
+      "No diseñamos soluciones que erosionen confianza.",
+      "No aceptamos encargos incoherentes con nuestro estándar.",
+    ],
+    closing: "La propuesta de valor no es una promesa comercial vacía. Es la expresión operativa del propósito.",
+  },
+  synthesis: [
+    "Propósito define quiénes somos.",
+    "Propuesta de valor define cómo aportamos.",
+    "Cuando se alinean, la organización es consistente. Cuando se separan, aparece la disonancia.",
+  ],
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -430,6 +499,7 @@ export default function StudioOnboardingUnitPage() {
   const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson) : null;
   const isFoundationalLesson = moduleKey === "A" && lesson?.id === "A0";
   const isArchitecturalLesson = moduleKey === "A" && lesson?.id === "A1";
+  const isContrastLesson = moduleKey === "A" && lesson?.id === "A2";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -560,6 +630,74 @@ export default function StudioOnboardingUnitPage() {
                 <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
                   <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
                   <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{architecturalLessonA1.synthesis}</p>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isContrastLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{contrastLessonA2.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{contrastLessonA2.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {contrastLessonA2.hook.map((paragraph, idx) => (
+                    <p key={`a2-hook-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <section className="mt-8 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.purpose.heading}</h3>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.purpose.question}</p>
+                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.purpose.answer}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {contrastLessonA2.purpose.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.purpose.closing}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.value.heading}</h3>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.value.question}</p>
+                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.value.answer}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {contrastLessonA2.value.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.value.closing}</p>
+                  </div>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.crossing.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.crossing.intro}</p>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.crossing.body}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {contrastLessonA2.crossing.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.crossing.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.scenario.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {contrastLessonA2.scenario.lines.map((line, idx) => <p key={`a2-scenario-${idx}`}>{line}</p>)}
+                  </div>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.translation.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.translation.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {contrastLessonA2.translation.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.translation.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {contrastLessonA2.synthesis.map((line, idx) => <p key={`a2-synth-${idx}`}>{line}</p>)}
+                  </div>
                 </section>
 
                 <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
