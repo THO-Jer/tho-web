@@ -885,6 +885,11 @@ export default function StudioOnboardingUnitPage() {
   }, [activeLesson, moduleKey]);
 
   useEffect(() => {
+    lessonRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [activeLesson]);
+
+
+  useEffect(() => {
     const marker = lessonEndRef.current;
     if (!marker) return;
     const observer = new IntersectionObserver((entries) => {
@@ -990,6 +995,7 @@ export default function StudioOnboardingUnitPage() {
           <div className="mt-3 h-2 rounded-full bg-white/70">
             <div className={`h-2 rounded-full ${visual.progress}`} style={{ width: `${lessonProgressPct}%` }} />
           </div>
+          <div className="mt-4 h-[4px] w-full rounded-sm brand-block-divider" aria-hidden />
         </div>
 
         {lesson ? (
