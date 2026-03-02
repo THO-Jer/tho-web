@@ -236,6 +236,85 @@ const contrastLessonA2 = {
   ],
 };
 
+const operationalLessonA3 = {
+  label: "LECCIÓN 4 · Método de trabajo",
+  title: "Cómo trabajamos en THO",
+  premise: [
+    "El talento no es suficiente.",
+    "El método es lo que hace replicable la calidad.",
+    "En consultoría, la improvisación puede parecer creatividad. Pero sin estructura, la calidad se vuelve variable.",
+    "THO trabaja bajo un modelo operativo explícito.",
+  ],
+  sections: [
+    {
+      heading: "1. Comprensión estratégica",
+      intro: "Antes de proponer, entendemos.",
+      bullets: [
+        "Contexto institucional.",
+        "Mapa de actores.",
+        "Riesgos explícitos e implícitos.",
+        "Tensiones estructurales.",
+        "Alcance real del encargo.",
+      ],
+      closing: "No diseñamos soluciones sobre diagnósticos superficiales.",
+    },
+    {
+      heading: "2. Diseño estructurado",
+      intro: "Toda intervención tiene:",
+      bullets: [
+        "Objetivo claro.",
+        "Hipótesis de impacto.",
+        "Metodología definida.",
+        "Cronograma realista.",
+        "Entregables verificables.",
+      ],
+      closing: "No ejecutamos sin arquitectura.",
+    },
+    {
+      heading: "3. Documentación y trazabilidad",
+      intro: "Nada importante queda implícito.",
+      bullets: [
+        "Acuerdos se documentan.",
+        "Versiones se guardan.",
+        "Decisiones se justifican.",
+        "Cambios se registran.",
+      ],
+      closing: "La trazabilidad protege al equipo y al cliente.",
+    },
+    {
+      heading: "4. Cierre y evaluación",
+      intro: "No basta con entregar.",
+      bullets: [
+        "Cumplimiento de objetivo.",
+        "Aprendizajes.",
+        "Riesgos residuales.",
+        "Ajustes necesarios.",
+      ],
+      closing: "Cada proyecto deja aprendizaje institucional.",
+    },
+  ],
+  cycle: {
+    heading: "El ciclo operativo",
+    stages: ["Comprender", "Diseñar", "Ejecutar", "Documentar", "Evaluar", "Ajustar"],
+    closing: "Es un ciclo, no una línea recta.",
+  },
+  principles: {
+    heading: "Principios no negociables",
+    bullets: [
+      "No ejecutar sin diagnóstico mínimo.",
+      "No cerrar entregables sin revisión cruzada.",
+      "No improvisar procesos críticos.",
+      "No operar sin respaldo documental.",
+    ],
+  },
+  synthesis: [
+    "El método no restringe la creatividad.",
+    "La encuadra.",
+    "La calidad en THO no depende del ánimo del día.",
+    "Depende del estándar.",
+  ],
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -500,6 +579,7 @@ export default function StudioOnboardingUnitPage() {
   const isFoundationalLesson = moduleKey === "A" && lesson?.id === "A0";
   const isArchitecturalLesson = moduleKey === "A" && lesson?.id === "A1";
   const isContrastLesson = moduleKey === "A" && lesson?.id === "A2";
+  const isOperationalLesson = moduleKey === "A" && lesson?.id === "A3";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -697,6 +777,66 @@ export default function StudioOnboardingUnitPage() {
                   <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
                   <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
                     {contrastLessonA2.synthesis.map((line, idx) => <p key={`a2-synth-${idx}`}>{line}</p>)}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isOperationalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{operationalLessonA3.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{operationalLessonA3.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {operationalLessonA3.premise.map((paragraph, idx) => (
+                    <p key={`a3-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-7">
+                  {operationalLessonA3.sections.map((section) => (
+                    <section key={section.heading}>
+                      <h3 className="text-xl font-semibold text-slate-900">{section.heading}</h3>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{section.intro}</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                        {section.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{section.closing}</p>
+                    </section>
+                  ))}
+                </div>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{operationalLessonA3.cycle.heading}</h3>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] font-semibold text-slate-700">
+                    {operationalLessonA3.cycle.stages.map((stage, idx) => (
+                      <div key={stage} className="flex items-center gap-2">
+                        <span className="rounded-md border border-slate-300 bg-white px-2 py-1">{stage}</span>
+                        {idx < operationalLessonA3.cycle.stages.length - 1 ? <span className="text-slate-400">→</span> : null}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{operationalLessonA3.cycle.closing}</p>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{operationalLessonA3.principles.heading}</h3>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {operationalLessonA3.principles.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {operationalLessonA3.synthesis.map((line, idx) => (
+                      <p key={`a3-synthesis-${idx}`}>{line}</p>
+                    ))}
                   </div>
                 </section>
 
