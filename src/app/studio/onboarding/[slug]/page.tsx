@@ -538,6 +538,73 @@ const boundaryLessonA6 = {
   ],
 };
 
+
+const ethicsLessonA7 = {
+  label: "LECCIÓN 8 · Ética operativa",
+  title: "Cómo actuar ante tensiones críticas",
+  premise: [
+    "Los problemas éticos no aparecen como dilemas filosóficos.",
+    "Aparecen como decisiones prácticas bajo presión.",
+    "En THO, la ética no es declarativa.",
+    "Es operativa.",
+  ],
+  risk: {
+    heading: "1. Qué es un riesgo ético operativo",
+    intro: "Es una situación donde:",
+    bullets: [
+      "Una decisión puede afectar legitimidad institucional.",
+      "Existe tensión entre estándar y conveniencia.",
+      "El impacto puede no ser inmediato, pero sí acumulativo.",
+    ],
+    closing: "No todos los desacuerdos son riesgos éticos. Pero todos los riesgos éticos deben tratarse explícitamente.",
+  },
+  alerts: {
+    heading: "2. Señales de alerta",
+    intro: "Si aparece alguna de estas señales, se activa revisión:",
+    bullets: [
+      "Presión por omitir información relevante.",
+      "Ajuste narrativo para suavizar impacto real.",
+      "Reducción metodológica sin fundamento técnico.",
+      "Decisiones que “se sienten incómodas” pero no están justificadas.",
+      "Falta de trazabilidad en decisiones críticas.",
+    ],
+    closing: "La incomodidad no es suficiente. Pero ignorarla sistemáticamente es riesgoso.",
+  },
+  protocol: {
+    heading: "3. Protocolo de acción (4 pasos)",
+    intro: "Cuando detectes una tensión crítica:",
+    steps: [
+      { tag: "1️⃣ Explicitar", detail: "Nombrar el problema. No asumir que es menor." },
+      { tag: "2️⃣ Documentar", detail: "Registrar la situación y las alternativas consideradas." },
+      { tag: "3️⃣ Consultar", detail: "Involucrar al menos un segundo criterio interno." },
+      { tag: "4️⃣ Decidir con estándar", detail: "Resolver priorizando método y coherencia institucional." },
+    ],
+  },
+  escalation: {
+    heading: "4. Escalamiento",
+    intro: "Escalar no es dramatizar. Es proteger calidad y legitimidad.",
+    triggersIntro: "Se escala cuando:",
+    bullets: [
+      "La decisión puede afectar reputación.",
+      "El impacto excede el alcance individual.",
+      "Existe conflicto entre rentabilidad y estándar.",
+    ],
+    closing: "El escalamiento no es debilidad. Es responsabilidad compartida.",
+  },
+  matrix: {
+    heading: "Matriz simple de decisión",
+    rows: [
+      { condition: "Bajo impacto + Bajo riesgo", action: "Resolver localmente" },
+      { condition: "Alto impacto + Alto riesgo", action: "Escalar" },
+      { condition: "Alto impacto + Incertidumbre", action: "Documentar y consultar" },
+    ],
+  },
+  synthesis: [
+    "La ética operativa no busca perfección.",
+    "Busca coherencia bajo presión.",
+  ],
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -806,6 +873,7 @@ export default function StudioOnboardingUnitPage() {
   const isQualityLesson = moduleKey === "A" && lesson?.id === "A4";
   const isCulturalLesson = moduleKey === "A" && lesson?.id === "A5";
   const isBoundaryLesson = moduleKey === "A" && lesson?.id === "A6";
+  const isEthicsLesson = moduleKey === "A" && lesson?.id === "A7";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -1268,6 +1336,82 @@ export default function StudioOnboardingUnitPage() {
                     {boundaryLessonA6.synthesis.map((line, idx) => (
                       <p key={`a6-synth-${idx}`}>{line}</p>
                     ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isEthicsLesson ? (
+              <div className="mx-auto max-w-[760px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{ethicsLessonA7.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{ethicsLessonA7.title}</h2>
+
+                <div className="mt-5 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                  {ethicsLessonA7.premise.map((line, idx) => (
+                    <p key={`a7-premise-${idx}`}>{line}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-6">
+                  <section className="border-l-2 border-slate-300 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.risk.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.risk.intro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                      {ethicsLessonA7.risk.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[15px] font-medium text-slate-800">{ethicsLessonA7.risk.closing}</p>
+                  </section>
+
+                  <section className="border-l-2 border-slate-300 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.alerts.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.alerts.intro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                      {ethicsLessonA7.alerts.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[15px] font-medium text-slate-800">{ethicsLessonA7.alerts.closing}</p>
+                  </section>
+
+                  <section className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.protocol.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.protocol.intro}</p>
+                    <ol className="mt-3 space-y-2 text-[15px] text-slate-700">
+                      {ethicsLessonA7.protocol.steps.map((step) => (
+                        <li key={step.tag} className="rounded-md border border-slate-200 bg-white p-3">
+                          <p className="font-semibold text-slate-900">{step.tag}</p>
+                          <p className="mt-1">{step.detail}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+
+                  <section className="border-l-2 border-slate-300 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.escalation.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.escalation.intro}</p>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.escalation.triggersIntro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                      {ethicsLessonA7.escalation.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[15px] font-medium text-slate-800">{ethicsLessonA7.escalation.closing}</p>
+                  </section>
+                </div>
+
+                <section className="mt-8 overflow-hidden rounded-lg border border-slate-300">
+                  <h3 className="border-b border-slate-300 bg-slate-100 px-4 py-3 text-lg font-semibold text-slate-900">{ethicsLessonA7.matrix.heading}</h3>
+                  <div className="divide-y divide-slate-200">
+                    {ethicsLessonA7.matrix.rows.map((row) => (
+                      <div key={row.condition} className="grid gap-2 px-4 py-3 sm:grid-cols-[1.5fr_1fr]">
+                        <p className="text-[15px] font-medium text-slate-800">{row.condition}</p>
+                        <p className="text-[15px] text-slate-700">→ {row.action}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {ethicsLessonA7.synthesis.map((line, idx) => <p key={`a7-synth-${idx}`}>{line}</p>)}
                   </div>
                 </section>
 
