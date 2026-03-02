@@ -681,6 +681,65 @@ const integrationLessonA8 = {
   actionLabel: "Continuar a evaluación",
 };
 
+
+const consultiveSalesLessonB1 = {
+  label: "LECCIÓN B1 · Venta consultiva institucional",
+  title: "Qué significa vender en THO",
+  tension: "En THO operamos bajo un modelo de venta consultiva.",
+  intro: [
+    "No vendemos servicios prediseñados.",
+    "Diagnosticamos antes de proponer.",
+  ],
+  conceptual: {
+    heading: "Sección 1 · Marco conceptual",
+    intro: "La venta consultiva implica:",
+    bullets: [
+      "Escuchar antes de ofrecer.",
+      "Identificar problema estructural, no solo síntoma.",
+      "Evaluar compatibilidad con método.",
+      "Explicitar riesgos.",
+      "Ajustar alcance según realidad.",
+      "Rechazar si no existen condiciones mínimas.",
+    ],
+  },
+  difference: {
+    heading: "Sección 2 · Diferencia clave",
+    transactional: [
+      "Prioriza urgencia.",
+      "Promete antes de entender.",
+      "Ajusta discurso según presión.",
+      "Cierra aunque existan riesgos no resueltos.",
+    ],
+    institutional: [
+      "Diagnostica antes de proponer.",
+      "Declara límites explícitamente.",
+      "Protege al equipo de compromisos inviables.",
+      "Entiende que decir “no” también es una decisión comercial profesional.",
+    ],
+  },
+  rector: {
+    heading: "Sección 3 · Principio rector",
+    statement: "Vender en THO no es maximizar volumen.",
+    closing: "Es proteger coherencia estratégica.",
+    bullets: [
+      "Sobrecarga operativa.",
+      "Fricción contractual.",
+      "Riesgo reputacional.",
+      "Erosión del estándar profesional.",
+    ],
+  },
+  mindset: {
+    heading: "Sección 4 · Marco mental obligatorio",
+    questions: [
+      "¿Este cliente es compatible con nuestro método?",
+      "¿Estamos prometiendo algo que el sistema no puede sostener?",
+      "¿El cierre protege al equipo o lo expone?",
+      "¿Esta venta fortalece o debilita la reputación institucional?",
+    ],
+    closing: "Si no puedes responder con claridad, aún no es momento de cerrar.",
+  },
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -977,6 +1036,7 @@ export default function StudioOnboardingUnitPage() {
   const isBoundaryLesson = moduleKey === "A" && lesson?.id === "A6";
   const isEthicsLesson = moduleKey === "A" && lesson?.id === "A7";
   const isIntegrationLesson = moduleKey === "A" && lesson?.id === "Reflexión guiada sugerida";
+  const isConsultiveSalesLesson = moduleKey === "B" && lesson?.id === "B1";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -1589,6 +1649,65 @@ export default function StudioOnboardingUnitPage() {
                     </button>
                   </div>
                 </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isConsultiveSalesLesson ? (
+              <div className="mx-auto max-w-[760px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{consultiveSalesLessonB1.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{consultiveSalesLessonB1.title}</h2>
+                <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{consultiveSalesLessonB1.tension}</p>
+
+                <div className="mt-6 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                  {consultiveSalesLessonB1.intro.map((line) => <p key={line}>{line}</p>)}
+                </div>
+
+                <div className="mt-8 space-y-8">
+                  <section>
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.conceptual.heading}</h3>
+                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{consultiveSalesLessonB1.conceptual.intro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {consultiveSalesLessonB1.conceptual.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.difference.heading}</h3>
+                    <div className="mt-3 grid gap-4 md:grid-cols-2">
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-700">Venta transaccional</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-slate-700">
+                          {consultiveSalesLessonB1.difference.transactional.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                        </ul>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-white p-4">
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-700">Venta institucional THO</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-slate-700">
+                          {consultiveSalesLessonB1.difference.institutional.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                        </ul>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.rector.heading}</h3>
+                    <p className="mt-2 text-[16px] font-semibold text-slate-900">{consultiveSalesLessonB1.rector.statement}</p>
+                    <p className="mt-1 text-[16px] font-medium text-slate-800">{consultiveSalesLessonB1.rector.closing}</p>
+                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">Aceptar un cliente incompatible puede generar:</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {consultiveSalesLessonB1.rector.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  </section>
+
+                  <section className="rounded-xl border border-slate-200 bg-white p-4">
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.mindset.heading}</h3>
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {consultiveSalesLessonB1.mindset.questions.map((question) => <li key={question}>{question}</li>)}
+                    </ol>
+                    <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{consultiveSalesLessonB1.mindset.closing}</p>
+                  </section>
+                </div>
 
                 <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
                 <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
