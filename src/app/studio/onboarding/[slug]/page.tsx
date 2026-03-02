@@ -27,11 +27,35 @@ type Onboarding = {
 
 type Lesson = { id: string; label: string; title: string; subtitle: string; bullets: string[] };
 
-const moduleVisuals: Record<string, { cover: string; accent: string }> = {
-  A: { cover: "/ilustraciones/1.png", accent: "text-sky-700" },
-  B: { cover: "/ilustraciones/4.png", accent: "text-indigo-700" },
-  C: { cover: "/ilustraciones/7.png", accent: "text-violet-700" },
-  D: { cover: "/ilustraciones/10.png", accent: "text-emerald-700" },
+const moduleVisuals: Record<string, { cover: string; accent: string; hero: string; heroBorder: string; progress: string }> = {
+  A: {
+    cover: "/ilustraciones/1.png",
+    accent: "text-sky-700",
+    hero: "bg-gradient-to-r from-sky-50 via-white to-cyan-50",
+    heroBorder: "border-sky-100",
+    progress: "bg-sky-700",
+  },
+  B: {
+    cover: "/ilustraciones/4.png",
+    accent: "text-indigo-700",
+    hero: "bg-gradient-to-r from-indigo-50 via-white to-blue-50",
+    heroBorder: "border-indigo-100",
+    progress: "bg-indigo-700",
+  },
+  C: {
+    cover: "/ilustraciones/7.png",
+    accent: "text-violet-700",
+    hero: "bg-gradient-to-r from-violet-50 via-white to-fuchsia-50",
+    heroBorder: "border-violet-100",
+    progress: "bg-violet-700",
+  },
+  D: {
+    cover: "/ilustraciones/10.png",
+    accent: "text-emerald-700",
+    hero: "bg-gradient-to-r from-emerald-50 via-white to-teal-50",
+    heroBorder: "border-emerald-100",
+    progress: "bg-emerald-700",
+  },
 };
 
 const foundationalLessonA0 = {
@@ -179,7 +203,7 @@ const contrastLessonA2 = {
   purpose: {
     heading: "1. Propósito",
     question: "¿Para qué existimos como organización?",
-    answer: "Fortalecer organizaciones y conectarlas con su entorno de forma legítima y sostenible.",
+    answer: "Construir un ecosistema empresarial más humano y sostenible, donde cada proyecto contribuya, mediante su éxito, al bienestar colectivo impulsando un cambio real y significativo en las organizaciones y sus comunidades.",
     bullets: [
       "No cambia según cliente.",
       "No depende de mercado.",
@@ -952,24 +976,19 @@ export default function StudioOnboardingUnitPage() {
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
       <section className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-        <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-sky-50 via-white to-violet-50 p-4">
+        <div className={`rounded-2xl border p-4 ${visual.heroBorder} ${visual.hero}`}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Módulo {moduleKey} · {unit.durationMinutes} min</div>
-              <h1 className="mt-2 text-3xl font-semibold text-slate-900">{unit.title}</h1>
-              <p className="mt-2 text-sm text-slate-700">{unit.summary}</p>
-              <p className="mt-2 text-xs text-slate-500">Lecciones completadas: {completedLessonCount}/{lessons.length} · Intentos quiz: {status?.attempts ?? 0}/{status?.maxAttempts ?? 3}</p>
-              <div className="mt-3 max-w-md">
-                <div className="mb-1 flex items-center justify-between text-[11px] font-medium text-slate-500">
-                  <span>Avance del módulo</span>
-                  <span>{lessonProgressPct}%</span>
-                </div>
-                <div className="h-2 rounded-full bg-slate-200">
-                  <div className="h-2 rounded-full bg-slate-900" style={{ width: `${lessonProgressPct}%` }} />
-                </div>
+            <div className="flex items-center gap-3">
+              <Image src="/brand/logo-negro.png" alt="THO" width={40} height={40} className="opacity-90" />
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Programa de Onboarding</div>
+                <h1 className="text-lg font-semibold text-slate-900">{unit.title}</h1>
               </div>
             </div>
-            <Image src="/brand/logo-negro.png" alt="THO" width={90} height={90} className="opacity-80" />
+            <span className="text-xs font-medium text-slate-600">{lessonProgressPct}%</span>
+          </div>
+          <div className="mt-3 h-2 rounded-full bg-white/70">
+            <div className={`h-2 rounded-full ${visual.progress}`} style={{ width: `${lessonProgressPct}%` }} />
           </div>
         </div>
 
@@ -1098,7 +1117,7 @@ export default function StudioOnboardingUnitPage() {
                   <div className="rounded-xl border border-slate-200 bg-white p-4">
                     <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.purpose.heading}</h3>
                     <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.purpose.question}</p>
-                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.purpose.answer}</p>
+                    <p className="mt-2 text-[16px] font-semibold leading-relaxed text-slate-800">{contrastLessonA2.purpose.answer}</p>
                     <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
                       {contrastLessonA2.purpose.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
                     </ul>
