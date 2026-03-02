@@ -24,7 +24,7 @@ export type OnboardingTrack = "sales" | "creative_ops" | "advisory_ops" | "gener
 type ModuleKey = "A" | "B" | "C" | "D";
 
 const TRACK_MODULES: Record<OnboardingTrack, ModuleKey[]> = {
-  general: ["A"],
+  general: ["A", "B", "C", "D"],
   sales: ["A", "B"],
   creative_ops: ["A", "C"],
   advisory_ops: ["A", "D"],

@@ -40,6 +40,15 @@ type ApiResponse = {
 };
 
 
+
+function getModuleKeyFromSlug(slug: string) {
+  if (slug === "identidad-tho") return "A";
+  if (slug === "ventas-tho") return "B";
+  if (slug === "operacion-creativa") return "C";
+  if (slug === "operacion-asesorias") return "D";
+  return "";
+}
+
 async function parseJsonSafe<T>(res: Response): Promise<T | null> {
   const raw = await res.text();
   if (!raw) return null;
@@ -100,15 +109,14 @@ export default function StudioOnboardingLandingPage() {
       return units.find((unit) => unit.slug === data.last_seen_unit) || units[0];
     }
     const status = new Map((data.module_status || []).map((row) => [row.moduleKey, row.status]));
-    return units.find((_, index) => status.get(["A","B","C","D"][index] || "") !== "validated") || units[0];
+    return units.find((unit) => status.get(getModuleKeyFromSlug(unit.slug)) !== "validated") || units[0];
   }, [data, units]);
 
   const totalMinutes = useMemo(() => units.reduce((sum, unit) => sum + (unit.durationMinutes || 0), 0), [units]);
   const nextModuleKey = useMemo(() => {
     if (!nextUnit) return "";
-    const idx = units.findIndex((unit) => unit.slug === nextUnit.slug);
-    return idx >= 0 ? ["A", "B", "C", "D"][idx] || "" : "";
-  }, [nextUnit, units]);
+    return getModuleKeyFromSlug(nextUnit.slug);
+  }, [nextUnit]);
 
   const currentStatusLabel = data?.completed ? "Validado" : "En curso";
   const attemptsLimit = config?.maxAttempts ?? 3;
@@ -194,7 +202,7 @@ export default function StudioOnboardingLandingPage() {
 
         <div className="mt-4 grid gap-3">
           {units.map((unit, idx) => {
-            const moduleKey = ["A", "B", "C", "D"][idx] || "";
+            const moduleKey = getModuleKeyFromSlug(unit.slug) || ["A", "B", "C", "D"][idx] || "";
             const row = data?.module_status?.find((item) => item.moduleKey === moduleKey);
             const statusView = getStatusView(row?.status);
             const done = row?.status === "validated";
