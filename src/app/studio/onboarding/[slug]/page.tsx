@@ -470,6 +470,74 @@ const culturalLessonA5 = {
   ],
 };
 
+
+const boundaryLessonA6 = {
+  label: "LECCIÓN 7 · Límites institucionales",
+  title: "Lo que no es negociable en THO",
+  premise: [
+    "Toda organización define lo que hace.",
+    "Las organizaciones maduras definen también lo que no hacen.",
+    "Los límites no restringen.",
+    "Protegen coherencia, reputación y estándar.",
+  ],
+  clauses: [
+    {
+      title: "Cláusula 1",
+      statement: "No prometemos lo que no podemos sostener con método.",
+      body: "Si un cliente espera resultados que no pueden justificarse con diagnóstico o evidencia, no se prometen.",
+      closing: "La presión comercial no redefine el estándar.",
+    },
+    {
+      title: "Cláusula 2",
+      statement: "No ocultamos riesgos relevantes.",
+      body: "Si durante un proceso detectamos tensiones críticas, deben explicitarse.",
+      closing: "Silenciar riesgos para evitar incomodidad erosiona legitimidad.",
+    },
+    {
+      title: "Cláusula 3",
+      statement: "No instrumentalizamos actores territoriales.",
+      body: "Las comunidades no son recursos narrativos.",
+      closing: "El vínculo territorial es sustantivo, no cosmético.",
+    },
+    {
+      title: "Cláusula 4",
+      statement: "No cerramos entregables sin revisión crítica.",
+      body: "La prisa no sustituye el control de calidad.",
+      closing: "",
+    },
+    {
+      title: "Cláusula 5",
+      statement: "No operamos sin trazabilidad mínima.",
+      body: "Decisiones relevantes deben poder explicarse retrospectivamente.",
+      closing: "",
+    },
+  ],
+  tension: {
+    heading: "Escenario de tensión",
+    lines: [
+      "Un cliente presiona por acortar etapas metodológicas para cumplir plazos políticos.",
+      "La pregunta no es:",
+      "¿Podemos hacerlo?",
+      "La pregunta es:",
+      "¿Podemos sostenerlo profesionalmente si algo falla?",
+    ],
+  },
+  protocol: {
+    heading: "Protocolo ante conflicto de límites",
+    intro: "Cuando un límite institucional se tensiona:",
+    steps: [
+      "Se explicita internamente.",
+      "Se documenta la decisión.",
+      "Se escala si afecta coherencia estratégica.",
+      "Se prioriza estándar sobre comodidad.",
+    ],
+  },
+  synthesis: [
+    "Los límites no hacen rígida a una organización.",
+    "La hacen confiable.",
+  ],
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -737,6 +805,7 @@ export default function StudioOnboardingUnitPage() {
   const isOperationalLesson = moduleKey === "A" && lesson?.id === "A3";
   const isQualityLesson = moduleKey === "A" && lesson?.id === "A4";
   const isCulturalLesson = moduleKey === "A" && lesson?.id === "A5";
+  const isBoundaryLesson = moduleKey === "A" && lesson?.id === "A6";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -1144,6 +1213,60 @@ export default function StudioOnboardingUnitPage() {
                   <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
                     {culturalLessonA5.synthesis.map((line, idx) => (
                       <p key={`a5-synth-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isBoundaryLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{boundaryLessonA6.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{boundaryLessonA6.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {boundaryLessonA6.premise.map((paragraph, idx) => (
+                    <p key={`a6-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <section className="mt-8 space-y-4">
+                  <h3 className="text-xl font-semibold text-slate-900">Cláusulas no negociables</h3>
+                  {boundaryLessonA6.clauses.map((clause) => (
+                    <div key={clause.title} className="rounded-lg border border-slate-200 bg-white p-4">
+                      <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">{clause.title}</p>
+                      <p className="mt-2 text-[16px] font-semibold leading-relaxed text-slate-900">{clause.statement}</p>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{clause.body}</p>
+                      {clause.closing ? <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{clause.closing}</p> : null}
+                    </div>
+                  ))}
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{boundaryLessonA6.tension.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {boundaryLessonA6.tension.lines.map((line, idx) => (
+                      <p key={`a6-tension-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{boundaryLessonA6.protocol.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{boundaryLessonA6.protocol.intro}</p>
+                  <ol className="mt-2 list-decimal space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {boundaryLessonA6.protocol.steps.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {boundaryLessonA6.synthesis.map((line, idx) => (
+                      <p key={`a6-synth-${idx}`}>{line}</p>
                     ))}
                   </div>
                 </section>
