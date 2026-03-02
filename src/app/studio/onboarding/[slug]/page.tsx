@@ -315,6 +315,76 @@ const operationalLessonA3 = {
   ],
 };
 
+
+const qualityLessonA4 = {
+  label: "LECCIÓN 5 · Estándar de calidad",
+  title: "¿Qué significa que un trabajo esté \"Done\" en THO?",
+  premise: [
+    '"Hecho" no significa terminado.',
+    "Significa validado.",
+    "En metodologías ágiles, la Definition of Done (DoD) define cuándo un entregable cumple con el estándar mínimo de calidad.",
+    'Sin una definición explícita, "hecho" se vuelve subjetivo.',
+    'En THO, "done" no es percepción. Es cumplimiento verificable.',
+  ],
+  whatIs: {
+    heading: "1. Qué es Definition of Done",
+    intro: "Es un acuerdo explícito que responde:",
+    bullets: [
+      "¿Qué condiciones mínimas debe cumplir un entregable?",
+      "¿Qué criterios determinan que puede cerrarse?",
+      "¿Qué evidencia respalda su calidad?",
+    ],
+    closing: "No es burocracia. Es control de estándar.",
+  },
+  whatIsNot: {
+    heading: "2. Qué NO es “Done”",
+    intro: "No es:",
+    bullets: [
+      "“Ya lo envié.”",
+      "“El cliente no reclamó.”",
+      "“Cumple con lo pedido literal.”",
+      "“Está suficientemente bueno.”",
+    ],
+    closing: "Eso es conformidad, no calidad.",
+  },
+  criteria: {
+    heading: "3. En THO, un trabajo está “Done” cuando cumple al menos:",
+    items: [
+      { title: "1️⃣ Claridad conceptual", description: "El entregable refleja comprensión real del problema." },
+      { title: "2️⃣ Coherencia metodológica", description: "La solución está alineada con el método definido." },
+      { title: "3️⃣ Trazabilidad mínima", description: "Las decisiones relevantes están documentadas." },
+      { title: "4️⃣ Revisión cruzada", description: "Otro miembro del equipo revisó el contenido crítico." },
+      { title: "5️⃣ Riesgos explícitos", description: "No se ocultaron tensiones o riesgos relevantes." },
+    ],
+  },
+  scenario: {
+    heading: "Escenario aplicado",
+    lines: [
+      "Un informe está completo y cumple con el cronograma, pero no explicita un riesgo reputacional detectado durante el proceso.",
+      "¿Está “Done”?",
+      "Desde metodología ágil superficial, sí.",
+      "Desde estándar THO, no.",
+    ],
+  },
+  checklist: {
+    heading: "Checklist ejecutivo antes de cerrar",
+    intro: "Antes de marcar un trabajo como finalizado:",
+    bullets: [
+      "¿Está alineado con propósito?",
+      "¿Cumple el estándar metodológico?",
+      "¿Está respaldado documentalmente?",
+      "¿Fue revisado por otro criterio?",
+      "¿Explicita riesgos relevantes?",
+    ],
+    closing: "Si alguna respuesta es no, no está cerrado.",
+  },
+  synthesis: [
+    "Agilidad no es rapidez.",
+    "Es claridad estructurada.",
+    "En THO, cerrar un trabajo es asumir responsabilidad sobre su calidad.",
+  ],
+};
+
 type LessonGuide = {
   whyItMatters: string;
   whatToDo: string;
@@ -580,6 +650,7 @@ export default function StudioOnboardingUnitPage() {
   const isArchitecturalLesson = moduleKey === "A" && lesson?.id === "A1";
   const isContrastLesson = moduleKey === "A" && lesson?.id === "A2";
   const isOperationalLesson = moduleKey === "A" && lesson?.id === "A3";
+  const isQualityLesson = moduleKey === "A" && lesson?.id === "A4";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
@@ -836,6 +907,86 @@ export default function StudioOnboardingUnitPage() {
                   <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
                     {operationalLessonA3.synthesis.map((line, idx) => (
                       <p key={`a3-synthesis-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isQualityLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{qualityLessonA4.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{qualityLessonA4.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {qualityLessonA4.premise.map((paragraph, idx) => (
+                    <p key={`a4-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.whatIs.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{qualityLessonA4.whatIs.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.whatIs.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{qualityLessonA4.whatIs.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.whatIsNot.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{qualityLessonA4.whatIsNot.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.whatIsNot.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{qualityLessonA4.whatIsNot.closing}</p>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.criteria.heading}</h3>
+                  <div className="mt-3 space-y-2">
+                    {qualityLessonA4.criteria.items.map((item) => (
+                      <div key={item.title} className="rounded-lg border border-slate-200 bg-white p-3">
+                        <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                        <p className="mt-1 text-sm leading-relaxed text-slate-700">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.scenario.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.scenario.lines.map((line, idx) => (
+                      <p key={`a4-scenario-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-300 bg-white p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.checklist.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{qualityLessonA4.checklist.intro}</p>
+                  <ul className="mt-3 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.checklist.bullets.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="mt-[3px] inline-block h-4 w-4 shrink-0 rounded border border-slate-400" aria-hidden="true" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{qualityLessonA4.checklist.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {qualityLessonA4.synthesis.map((line, idx) => (
+                      <p key={`a4-synth-${idx}`}>{line}</p>
                     ))}
                   </div>
                 </section>
