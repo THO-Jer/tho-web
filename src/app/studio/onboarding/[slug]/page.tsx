@@ -850,6 +850,15 @@ function parseLessons(content: string[]): Lesson[] {
 }
 
 
+
+function getModuleKeyFromSlug(slug: string) {
+  if (slug === "identidad-tho") return "A";
+  if (slug === "ventas-tho") return "B";
+  if (slug === "operacion-creativa") return "C";
+  if (slug === "operacion-asesorias") return "D";
+  return "A";
+}
+
 function unitTopicMap(slug: string, topic: string) {
   const t = topic.toLowerCase();
   const byUnit: Record<string, string[]> = {
@@ -921,8 +930,7 @@ export default function StudioOnboardingUnitPage() {
   }, [router]);
 
   const unit = useMemo(() => units.find((item) => item.slug === slug), [units, slug]);
-  const currentIndex = unit ? units.findIndex((item) => item.slug === unit.slug) : -1;
-  const moduleKey = ["A", "B", "C", "D"][currentIndex] || "A";
+  const moduleKey = getModuleKeyFromSlug(unit?.slug || "");
   const unitQuiz = useMemo(() => (unit ? quiz.filter((q) => unitTopicMap(unit.slug, q.topic)) : []), [quiz, unit]);
   const lessons = useMemo(() => parseLessons(unit?.content || []), [unit]);
 

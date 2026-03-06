@@ -201,8 +201,8 @@ export default function StudioOnboardingLandingPage() {
         </div>
 
         <div className="mt-4 grid gap-3">
-          {units.map((unit, idx) => {
-            const moduleKey = getModuleKeyFromSlug(unit.slug) || ["A", "B", "C", "D"][idx] || "";
+          {units.map((unit) => {
+            const moduleKey = getModuleKeyFromSlug(unit.slug);
             const row = data?.module_status?.find((item) => item.moduleKey === moduleKey);
             const statusView = getStatusView(row?.status);
             const done = row?.status === "validated";

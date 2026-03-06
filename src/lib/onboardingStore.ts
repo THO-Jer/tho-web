@@ -116,7 +116,17 @@ function indexByModuleKey(moduleKey: string) {
   return ["A", "B", "C", "D"].indexOf(moduleKey);
 }
 
+function moduleKeyFromUnit(unit: OnboardingUnit, index: number): ModuleKey {
+  if (unit.slug === "identidad-tho") return "A";
+  if (unit.slug === "ventas-tho") return "B";
+  if (unit.slug === "operacion-creativa") return "C";
+  if (unit.slug === "operacion-asesorias") return "D";
+  return moduleKeyByIndex(index);
+}
+
 function getUnitByModuleKey(units: OnboardingUnit[], moduleKey: string) {
+  const bySlug = units.find((unit, index) => moduleKeyFromUnit(unit, index) === moduleKey);
+  if (bySlug) return bySlug;
   const index = indexByModuleKey(moduleKey);
   return index >= 0 ? units[index] : null;
 }
@@ -232,7 +242,7 @@ function getTrackModules(track: OnboardingTrack) {
 
 function getApplicableUnitsByTrack(units: OnboardingUnit[], track: OnboardingTrack) {
   const allowed = new Set(getTrackModules(track));
-  return units.filter((_, i) => allowed.has(moduleKeyByIndex(i)));
+  return units.filter((unit, index) => allowed.has(moduleKeyFromUnit(unit, index)));
 }
 
 function getUnitByTopic(units: OnboardingUnit[], topic: string) {
@@ -323,7 +333,7 @@ function summarizeOnboarding(record: OnboardingRecord, state: OnboardingState, r
   const statuses = computeModuleStatuses(record, state);
   const completedSet = new Set(record.completed_units || []);
   const requiredLessonTags = units.flatMap((unit, idx) => {
-    const moduleKey = moduleKeyByIndex(idx);
+    const moduleKey = moduleKeyFromUnit(unit, idx);
     return parseLessonIds(unit.content).map((lessonId) => `${moduleKey}:${lessonId}`);
   });
   const completedLessons = requiredLessonTags.filter((tag) => completedSet.has(tag)).length;
