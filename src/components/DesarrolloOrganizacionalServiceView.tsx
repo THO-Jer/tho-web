@@ -251,7 +251,7 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
           <div className="brand-block-divider mt-3 mb-8 h-[6px] w-36 rounded-sm" />
 
           <div className="esg-level-grid esg-levels-gallery grid gap-5 md:grid-cols-3">
-            <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#818cf8] bg-[linear-gradient(160deg,#eef2ff_0%,#e0e7ff_55%,#c7d2fe_100%)] p-6">
+            <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#818cf8] bg-[linear-gradient(160deg,#eef2ff_0%,#e0e7ff_55%,#c7d2fe_100%)] p-6 text-slate-900">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-4 top-4 w-14 opacity-95" />
               <p className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white">● Punto de partida recomendado</p>
@@ -267,7 +267,7 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
               </button>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#6366f1]/80 bg-[linear-gradient(160deg,#eef2ff_0%,#e0e7ff_58%,#a5b4fc_100%)] p-6">
+            <article className="esg-level-card rounded-[2.1rem] border border-[#6366f1]/80 bg-[linear-gradient(160deg,#eef2ff_0%,#e0e7ff_58%,#a5b4fc_100%)] p-6 text-slate-900">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-800">Escala de profundidad estratégica</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Ruta de Transformación y Gestión del Cambio</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
@@ -287,7 +287,7 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
               <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#4338ca]/85 bg-[linear-gradient(160deg,#e0e7ff_0%,#a5b4fc_58%,#818cf8_100%)] p-6">
+            <article className="esg-level-card rounded-[2.1rem] border border-[#4338ca]/85 bg-[linear-gradient(160deg,#e0e7ff_0%,#a5b4fc_58%,#818cf8_100%)] p-6 text-slate-900">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-900">Escala de consolidación operativa</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Implementación y Consolidación</h4>
               <ul className="mt-4 space-y-2 text-sm text-slate-700">
