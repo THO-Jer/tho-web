@@ -37,7 +37,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       .map((post) => ({ slug: post.slug, title: post.title, excerpt: post.excerpt, tags: post.tags }));
 
     return (
-      <div className="min-h-screen bg-tho-bg">
+      <div className="min-h-screen bg-tho-bg dark:bg-slate-950">
         <Header />
         <SostenibilidadServiceView relatedPosts={relatedPosts} />
         <Footer />
@@ -56,7 +56,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       .map((post) => ({ slug: post.slug, title: post.title, excerpt: post.excerpt, tags: post.tags }));
 
     return (
-      <div className="min-h-screen bg-tho-bg">
+      <div className="min-h-screen bg-tho-bg dark:bg-slate-950">
         <Header />
         <RelacionamientoServiceView relatedPosts={relatedPosts} />
         <Footer />
@@ -75,7 +75,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       .map((post) => ({ slug: post.slug, title: post.title, excerpt: post.excerpt, tags: post.tags }));
 
     return (
-      <div className="min-h-screen bg-tho-bg">
+      <div className="min-h-screen bg-tho-bg dark:bg-slate-950">
         <Header />
         <DesarrolloOrganizacionalServiceView relatedPosts={relatedPosts} />
         <Footer />
@@ -84,18 +84,18 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   }
 
   return (
-    <div className="min-h-screen bg-tho-bg">
+    <div className="min-h-screen bg-tho-bg dark:bg-slate-950">
       <Header />
       <main>
-        <section className="border-b border-slate-200 bg-white">
+        <section className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
           <div className="mx-auto max-w-6xl px-4 py-14 md:py-16">
             <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-wide ${meta.softBorder} ${meta.accentText} ${meta.softBg}`}>
               <span className={`h-2 w-2 rounded-full ${meta.accentDot}`} />
               Solución THO
             </div>
-            <h1 className="font-tho-title mt-4 text-[2.8rem] leading-[1.02] text-slate-950 md:text-[4.2rem]">{service.heroTitle}</h1>
-            <p className="mt-5 max-w-4xl text-base text-slate-700 md:text-lg">{service.problem}</p>
-            <p className="mt-3 max-w-4xl text-base font-semibold text-slate-900 md:text-lg">{service.promise}</p>
+            <h1 className="font-tho-title mt-4 text-[2.8rem] leading-[1.02] text-slate-950 md:text-[4.2rem] dark:text-slate-100">{service.heroTitle}</h1>
+            <p className="mt-5 max-w-4xl text-base text-slate-700 md:text-lg dark:text-slate-300">{service.problem}</p>
+            <p className="mt-3 max-w-4xl text-base font-semibold text-slate-900 md:text-lg dark:text-slate-100">{service.promise}</p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
                 href="https://bit.ly/bookTHO"
@@ -107,7 +107,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               </a>
               <Link
                 href="/#contacto"
-                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900"
+                className="btn-unified-motion btn-brand-neutral rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               >
                 Hablar con consultor
               </Link>
@@ -116,17 +116,17 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         </section>
 
         <section className="mx-auto max-w-6xl px-4 py-12 md:py-14">
-          <h2 className="text-2xl font-semibold text-slate-950 md:text-3xl">Niveles de servicio</h2>
-          <p className="mt-2 max-w-3xl text-sm text-slate-600 md:text-base">
+          <h2 className="text-2xl font-semibold text-slate-950 md:text-3xl dark:text-slate-100">Niveles de servicio</h2>
+          <p className="mt-2 max-w-3xl text-sm text-slate-600 md:text-base dark:text-slate-300">
             Cada nivel aumenta profundidad y soporte. Partimos con claridad rápida y escalamos hasta implementación anual.
           </p>
 
           <div className="mt-7 grid gap-4 md:grid-cols-3">
             {service.levels.map((level) => (
-              <article key={level.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-900">{level.name}</h3>
-                <p className="mt-2 text-sm text-slate-700">{level.summary}</p>
-                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600">
+              <article key={level.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{level.name}</h3>
+                <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">{level.summary}</p>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-300">
                   {level.bullets.map((bullet) => (
                     <li key={bullet}>{bullet}</li>
                   ))}
@@ -147,28 +147,28 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </div>
 
           {leadTicket ? (
-            <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6">
-              <div className="text-xs font-bold uppercase tracking-wide text-slate-500">Entrada recomendada</div>
-              <h3 className="mt-1 text-xl font-semibold text-slate-900">{leadTicket.name}</h3>
-              <p className="mt-2 text-sm text-slate-600">{leadTicket.short}</p>
-              <Link href={`/tickets/${leadTicket.slug}`} className="mt-4 inline-flex text-sm font-semibold text-slate-900 underline underline-offset-4">
+            <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+              <div className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">Entrada recomendada</div>
+              <h3 className="mt-1 text-xl font-semibold text-slate-900 dark:text-slate-100">{leadTicket.name}</h3>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{leadTicket.short}</p>
+              <Link href={`/tickets/${leadTicket.slug}`} className="mt-4 inline-flex text-sm font-semibold text-slate-900 underline underline-offset-4 dark:text-slate-100">
                 Ver ficha de solución ágil
               </Link>
             </div>
           ) : null}
         </section>
 
-        <section className="border-t border-slate-200 bg-white">
+        <section className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
           <div className="mx-auto max-w-6xl px-4 py-12">
             <h2 className="text-2xl font-semibold text-slate-950">Integra con otras soluciones</h2>
-            <p className="mt-2 max-w-3xl text-sm text-slate-600 md:text-base">
+            <p className="mt-2 max-w-3xl text-sm text-slate-600 md:text-base dark:text-slate-300">
               Este servicio se potencia cuando se articula con los otros frentes de trabajo. Explora cómo combinarlos.
             </p>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               {related.map((item) => (
-                <Link key={item.slug} href={`/servicios/${item.slug}`} className="rounded-2xl border border-slate-200 bg-tho-bg p-5 transition hover:-translate-y-0.5">
-                  <div className="text-lg font-semibold text-slate-900">{item.menuLabel}</div>
-                  <p className="mt-2 text-sm text-slate-600">{item.promise}</p>
+                <Link key={item.slug} href={`/servicios/${item.slug}`} className="rounded-2xl border border-slate-200 bg-tho-bg p-5 transition hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-900">
+                  <div className="text-lg font-semibold text-slate-900 dark:text-slate-100">{item.menuLabel}</div>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{item.promise}</p>
                 </Link>
               ))}
             </div>

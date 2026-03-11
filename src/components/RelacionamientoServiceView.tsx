@@ -320,23 +320,23 @@ export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts
               <div className="grid gap-4">
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cuándo conviene partir por aquí?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay conflictividad emergente o incertidumbre territorial y el proyecto necesita una lectura temprana para decidir con criterio.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué decisión habilita?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Te permite decidir con evidencia si avanzar a una hoja de ruta integral o focalizar recursos en brechas críticas de corto plazo.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Permite definir si conviene abrir una estrategia territorial completa o intervenir primero en actores/riesgos críticos para proteger continuidad operativa.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué NO es?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">No es una versión “ligera” del servicio completo: es un instrumento estratégico para reducir incertidumbre y ordenar la conversación ejecutiva.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">No es una campaña comunicacional ni gestión reactiva de crisis: es una lectura estratégica para ordenar decisiones antes de escalar conflicto.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué información necesito para iniciarlo?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Basta con entrevistas clave, información regulatoria relevante y los principales riesgos/iniciativas ya identificados por la organización.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Se recomienda contar con contexto del proyecto, antecedentes de relacionamiento previo y actores/zonas sensibles ya detectados por el equipo.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cómo se conecta con los siguientes niveles?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">El Flash Audit define prioridades y criterios de decisión. Desde ahí, se escala a gobernanza/roadmap o implementación según brechas y madurez.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">El mapa inicial entrega prioridades y criterios de acción. Desde ahí se escala a estrategia territorial o implementación en terreno según riesgo y madurez del proyecto.</p>
               </details>
               </div>
             </div>
