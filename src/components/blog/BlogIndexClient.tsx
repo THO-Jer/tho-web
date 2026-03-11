@@ -2,23 +2,53 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { MouseEvent, useMemo, useState } from "react";
+import { useMemo, useState, type MouseEvent } from "react";
 
-type BlogPost = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  minutes: number;
-  publishedAt?: string | null;
-  updatedAt?: string;
-  coverImage?: string;
-  coverImageAlt?: string;
-  tags: string[];
+import type { BlogPost } from "@/lib/blogStore";
+
+type BlogMonthYearOption = {
+  value: string;
+  label: string;
+  year: string;
+  month: string;
 };
 
 export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
   const [query, setQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
+
+  const monthYearOptions = useMemo(() => {
+    const map = new Map<string, BlogMonthYearOption>();
+    for (const post of posts) {
+      const date = new Date(post.publishedAt || post.updatedAt || 0);
+      if (Number.isNaN(date.getTime())) continue;
+      const year = String(date.getFullYear());
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const value = `${year}-${month}`;
+      if (!map.has(value)) {
+        map.set(value, {
+          value,
+          year,
+          month,
+          label: date.toLocaleDateString("es-CL", { month: "long", year: "numeric" }),
+        });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => (a.value < b.value ? 1 : -1));
+  }, [posts]);
+
+  const years = useMemo(() => {
+    return Array.from(new Set(monthYearOptions.map((item) => item.year))).sort((a, b) => Number(b) - Number(a));
+  }, [monthYearOptions]);
+
+  const monthsForSelectedYear = useMemo(() => {
+    if (!selectedYear) return [];
+    return monthYearOptions
+      .filter((item) => item.year === selectedYear)
+      .map((item) => ({ value: item.month, label: item.label }));
+  }, [monthYearOptions, selectedYear]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -26,6 +56,11 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
       .filter((post) => {
         const byTag = !selectedTag || post.tags.some((tag) => tag.toLowerCase() === selectedTag);
         if (!byTag) return false;
+
+        const date = new Date(post.publishedAt || post.updatedAt || 0);
+        if (selectedYear && String(date.getFullYear()) !== selectedYear) return false;
+        if (selectedMonth && String(date.getMonth() + 1).padStart(2, "0") !== selectedMonth) return false;
+
         if (!q) return true;
         return `${post.title} ${post.excerpt} ${post.tags.join(" ")}`.toLowerCase().includes(q);
       })
@@ -34,11 +69,13 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
         const bTime = new Date(b.publishedAt || b.updatedAt || 0).getTime();
         return bTime - aTime;
       });
-  }, [posts, query, selectedTag]);
+  }, [posts, query, selectedTag, selectedYear, selectedMonth]);
 
   const clearFilters = () => {
     setQuery("");
     setSelectedTag("");
+    setSelectedYear("");
+    setSelectedMonth("");
   };
 
   const onTagClick = (event: MouseEvent<HTMLButtonElement>, tag: string) => {
@@ -50,14 +87,41 @@ export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
 
   return (
     <>
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="mt-6 grid gap-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar por título o tag"
-          className="w-full min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm sm:min-w-[260px]"
+          className="w-full min-w-0 rounded-lg border border-slate-300 px-3 py-2 text-sm"
         />
-        {(query || selectedTag) ? (
+
+        <select
+          value={selectedYear}
+          onChange={(e) => {
+            setSelectedYear(e.target.value);
+            setSelectedMonth("");
+          }}
+          className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700"
+        >
+          <option value="">Año</option>
+          {years.map((year) => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
+
+        <select
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          disabled={!selectedYear}
+          className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100"
+        >
+          <option value="">Mes</option>
+          {monthsForSelectedYear.map((month) => (
+            <option key={month.value} value={month.value}>{month.label}</option>
+          ))}
+        </select>
+
+        {(query || selectedTag || selectedYear || selectedMonth) ? (
           <button
             type="button"
             onClick={clearFilters}
