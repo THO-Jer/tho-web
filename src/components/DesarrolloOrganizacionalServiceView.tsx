@@ -276,7 +276,7 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
                 <li>• Indicadores de adopción y desempeño cultural.</li>
                 <li>• Plan de implementación por etapas y hitos críticos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15 dark:bg-slate-900/80 dark:ring-white/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Hoja de ruta de transformación.</li>
@@ -296,7 +296,7 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
                 <li>• Monitoreo de avance cultural y bloqueos.</li>
                 <li>• Ajustes tácticos según aprendizaje organizacional.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15 dark:bg-slate-900/80 dark:ring-white/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Sistema operativo de transformación.</li>

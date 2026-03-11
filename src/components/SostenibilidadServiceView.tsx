@@ -276,7 +276,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 <li>• Indicadores y métricas.</li>
                 <li>• Plan de implementación.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15 dark:bg-slate-900/80 dark:ring-white/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Hoja de Ruta ESG.</li>
@@ -296,7 +296,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 <li>• Seguimiento de indicadores.</li>
                 <li>• Ajustes estratégicos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15 dark:bg-slate-900/80 dark:ring-white/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Sistema operativo ESG.</li>

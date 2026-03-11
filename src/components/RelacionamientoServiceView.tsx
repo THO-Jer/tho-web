@@ -276,7 +276,7 @@ export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts
                 <li>• Indicadores de gestión territorial.</li>
                 <li>• Plan de implementación con hitos críticos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15 dark:bg-slate-900/80 dark:ring-white/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Hoja de ruta territorial.</li>
@@ -296,7 +296,7 @@ export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts
                 <li>• Monitoreo de señales tempranas y acuerdos.</li>
                 <li>• Ajustes tácticos según evolución territorial.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15 dark:bg-slate-900/80 dark:ring-white/15">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
                 <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Sistema operativo de relacionamiento.</li>

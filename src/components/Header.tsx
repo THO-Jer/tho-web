@@ -40,7 +40,15 @@ export function Header() {
               </div>
             </div>
           </div>
-          <Link href="/quienes" className={`tho-nav-chip ${pathname === "/quienes" ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Quiénes somos</Link>
+          <div className="group relative">
+            <button className={`tho-nav-chip ${pathname === "/quienes" || pathname === "/nuestra-experiencia" ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`} type="button">Quiénes somos</button>
+            <div className="pointer-events-none absolute left-0 top-full z-30 w-64 pt-2 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+              <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-md dark:border-slate-700 dark:bg-slate-900">
+                <Link href="/quienes" className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Quiénes somos</Link>
+                <Link href="/nuestra-experiencia" className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Nuestra experiencia</Link>
+              </div>
+            </div>
+          </div>
           <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Blog</Link>
           <a href="https://bit.ly/bookTHO" target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
             <span className="relative z-10">Agendar</span>
@@ -58,7 +66,13 @@ export function Header() {
               ))}
             </div>
           </details>
-          <Link href="/quienes" className={`tho-nav-chip ${pathname === "/quienes" ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Quiénes</Link>
+          <details className="group relative">
+            <summary className="list-none tho-nav-chip cursor-pointer">Quiénes</summary>
+            <div className="absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-md dark:border-slate-700 dark:bg-slate-900">
+              <Link href="/quienes" className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Quiénes somos</Link>
+              <Link href="/nuestra-experiencia" className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Nuestra experiencia</Link>
+            </div>
+          </details>
           <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Blog</Link>
           <a href="https://bit.ly/bookTHO" target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
             <span className="relative z-10">Agendar</span>
@@ -93,6 +107,7 @@ export function Header() {
               ))}
             </div>
             <Link href="/quienes" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Quiénes somos</Link>
+            <Link href="/nuestra-experiencia" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Nuestra experiencia</Link>
             <Link href="/blog" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Blog</Link>
             <a href="https://bit.ly/bookTHO" target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient inline-flex justify-center rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
               <span className="relative z-10">Agendar</span>
