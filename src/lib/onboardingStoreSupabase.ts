@@ -380,10 +380,33 @@ export async function resetOnboardingModuleStatus(input: {
   track: string;
   moduleKey: string;
 }) {
-  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}&module=eq.${encodeURIComponent(input.moduleKey)}`, {
-    method: "PATCH",
-    body: JSON.stringify({ status: "in_progress", attempts_used: 0, validated_at: null, updated_at: new Date().toISOString() }),
-  });
+  const payload = { status: "in_progress", attempts_used: 0, validated_at: null, updated_at: new Date().toISOString() };
+  const base = `/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}`;
+  try {
+    await supabaseRequest(`${base}&module=eq.${encodeURIComponent(input.moduleKey)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+    return;
+  } catch (error) {
+    if (!isMissingColumnError(error, "module")) throw error;
+  }
+
+  try {
+    await supabaseRequest(`${base}&module_key=eq.${encodeURIComponent(input.moduleKey)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    if (isMissingColumnError(error, "attempts_used")) {
+      await supabaseRequest(`${base}&module_key=eq.${encodeURIComponent(input.moduleKey)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "in_progress", attempts: 0, validated_at: null, updated_at: new Date().toISOString() }),
+      });
+      return;
+    }
+    throw error;
+  }
 }
 
 export async function getStudioRoleTeamByEmail(email: string) {

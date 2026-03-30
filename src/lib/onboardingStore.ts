@@ -666,28 +666,12 @@ export async function resetModuleForUser(email: string, track: OnboardingTrack, 
   const normalized = normalizeEmail(email);
   if (!normalized) throw new Error("Email inválido.");
   if (!["A", "B", "C", "D"].includes(moduleKey)) throw new Error("Módulo inválido.");
-  const now = new Date().toISOString();
   if (hasSupabaseStore()) {
     await resetOnboardingModuleStatus({ moduleStatusTable: ONBOARDING_MODULE_STATUS_TABLE, email: normalized, track, moduleKey });
-    await insertOnboardingQuizAttempt({
-      quizAttemptsTable: ONBOARDING_QUIZ_ATTEMPTS_TABLE,
-      row: {
-        email: normalized,
-        track,
-        module_key: moduleKey,
-        score: 0,
-        max_score: 0,
-        missed_topics: ["admin_reset"],
-        submitted_at: now,
-        passed: true,
-      },
-    });
     return;
   }
   const state = await readStateFromJson();
   if (!state.moduleStatusByEmail[normalized]) state.moduleStatusByEmail[normalized] = {};
   state.moduleStatusByEmail[normalized][moduleKey] = { moduleKey: moduleKey as ModuleKey, status: "in_progress", attempts: 0, maxAttempts: MODULE_MAX_ATTEMPTS };
-  if (!state.quizAttemptsByEmail[normalized]) state.quizAttemptsByEmail[normalized] = [];
-  state.quizAttemptsByEmail[normalized].unshift({ module_key: moduleKey, score: 0, max_score: 0, missed_topics: ["admin_reset"], submitted_at: now });
   await writeStateToJson(state);
 }
