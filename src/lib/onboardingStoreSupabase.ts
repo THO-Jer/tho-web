@@ -307,7 +307,6 @@ export async function upsertOnboardingQuizResultByModule(input: {
 
 export async function insertOnboardingQuizAttempt(input: { quizAttemptsTable: string; row: OnboardingQuizAttemptRow }) {
   const rowWithModule = {
-    id: input.row.id,
     email: input.row.email,
     track: input.row.track,
     module: input.row.module_key,
@@ -319,7 +318,6 @@ export async function insertOnboardingQuizAttempt(input: { quizAttemptsTable: st
   };
 
   const rowWithModuleKey = {
-    id: input.row.id,
     email: input.row.email,
     track: input.row.track,
     module_key: input.row.module_key,
@@ -330,17 +328,43 @@ export async function insertOnboardingQuizAttempt(input: { quizAttemptsTable: st
     passed: input.row.passed,
   };
 
+  const rowWithModuleNoPassed = { ...rowWithModule };
+  delete (rowWithModuleNoPassed as { passed?: boolean }).passed;
+  const rowWithModuleKeyNoPassed = { ...rowWithModuleKey };
+  delete (rowWithModuleKeyNoPassed as { passed?: boolean }).passed;
+
   try {
     await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
       method: "POST",
       body: JSON.stringify([rowWithModule]),
     });
+    return;
   } catch (error) {
+    if (isMissingColumnError(error, "passed")) {
+      await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+        method: "POST",
+        body: JSON.stringify([rowWithModuleNoPassed]),
+      });
+      return;
+    }
     if (!isMissingColumnError(error, "module")) throw error;
+  }
+
+  try {
     await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
       method: "POST",
       body: JSON.stringify([rowWithModuleKey]),
     });
+  } catch (error) {
+    if (isMissingColumnError(error, "passed")) {
+      await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+        method: "POST",
+        body: JSON.stringify([rowWithModuleKeyNoPassed]),
+      });
+      return;
+    }
+    if (isMissingColumnError(error, "module_key")) return;
+    throw error;
   }
 }
 
