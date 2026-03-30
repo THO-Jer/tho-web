@@ -5,9 +5,9 @@ export type OnboardingModuleState = "locked" | "in_progress" | "validated" | "fa
 export type OnboardingModuleStatusRow = {
   email: string;
   track: OnboardingRecord["track"];
-  module_key: string;
+  module: string;
   status: OnboardingModuleState;
-  attempts: number;
+  attempts_used: number;
   max_attempts: number;
   validated_at?: string;
   updated_at: string;
@@ -71,6 +71,11 @@ export function hasOnboardingSupabaseStore(onboardingStore: string) {
   if (onboardingStore === "json") return false;
   if (onboardingStore === "supabase") return Boolean(url && service);
   return process.env.NODE_ENV === "production" ? Boolean(url && service) : Boolean(url && service);
+}
+
+function isMissingColumnError(error: unknown, column: string) {
+  const text = error instanceof Error ? error.message : String(error || "");
+  return text.includes("PGRST204") && text.includes(`'${column}'`);
 }
 
 function normalizeTrack(value: unknown): OnboardingRecord["track"] {
@@ -195,19 +200,19 @@ export async function getOnboardingModuleStatusRows(input: { moduleStatusTable: 
   const filters: string[] = ["select=*"];
   if (input.email) filters.push(`email=eq.${encodeURIComponent(input.email)}`);
   if (input.track) filters.push(`track=eq.${encodeURIComponent(input.track)}`);
-  filters.push("order=module_key.asc", "order=updated_at.desc");
+  filters.push("order=module.asc", "order=updated_at.desc");
   const rows = await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?${filters.join("&")}`).catch(() => []);
   if (!Array.isArray(rows)) return [] as OnboardingModuleStatusRow[];
   return (rows as Array<Record<string, unknown>>).map((row) => ({
     email: String(row.email || "").trim().toLowerCase(),
     track: normalizeTrack(row.track),
-    module_key: String(row.module_key || "").trim(),
+    module: String(row.module || row.module_key || "").trim(),
     status: normalizeModuleState(row.status),
-    attempts: Math.max(0, Number(row.attempts || 0)),
+    attempts_used: Math.max(0, Number(row.attempts_used || 0)),
     max_attempts: Math.max(1, Number(row.max_attempts || 3)),
     validated_at: row.validated_at ? String(row.validated_at) : undefined,
     updated_at: String(row.updated_at || new Date().toISOString()),
-  })).filter((row) => row.email && row.module_key);
+  })).filter((row) => row.email && row.module);
 }
 
 export async function upsertOnboardingModuleStatus(input: {
@@ -215,15 +220,15 @@ export async function upsertOnboardingModuleStatus(input: {
   row: Omit<OnboardingModuleStatusRow, "updated_at"> & { updated_at?: string };
 }) {
   const updatedAt = input.row.updated_at || new Date().toISOString();
-  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?on_conflict=email,track,module_key`, {
+  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?on_conflict=email,track,module`, {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=representation" },
     body: JSON.stringify([{
       email: input.row.email,
       track: input.row.track,
-      module_key: input.row.module_key,
+      module: input.row.module,
       status: input.row.status,
-      attempts: input.row.attempts,
+      attempts_used: input.row.attempts_used,
       max_attempts: input.row.max_attempts,
       validated_at: input.row.validated_at || null,
       updated_at: updatedAt,
@@ -241,7 +246,7 @@ export async function getOnboardingQuizResultRows(input: { quizResultsTable: str
   return (rows as Array<Record<string, unknown>>).map((row) => ({
     email: String(row.email || "").trim().toLowerCase(),
     track: normalizeTrack(row.track),
-    module_key: String(row.module_key || "").trim(),
+    module_key: String(row.module_key || row.module || "").trim(),
     score: Number(row.score || 0),
     max_score: Number(row.max_score || 0),
     missed_topics: Array.isArray(row.missed_topics) ? row.missed_topics.map((topic) => String(topic)).filter(Boolean) : [],
@@ -253,39 +258,71 @@ export async function getOnboardingQuizAttemptRows(input: { quizAttemptsTable: s
   const filters: string[] = ["select=*"];
   if (input.email) filters.push(`email=eq.${encodeURIComponent(input.email)}`);
   if (input.track) filters.push(`track=eq.${encodeURIComponent(input.track)}`);
-  if (input.moduleKey) filters.push(`module_key=eq.${encodeURIComponent(input.moduleKey)}`);
   filters.push("order=submitted_at.desc");
   const rows = await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}?${filters.join("&")}`).catch(() => []);
   if (!Array.isArray(rows)) return [] as OnboardingQuizAttemptRow[];
-  return (rows as Array<Record<string, unknown>>).map((row) => ({
+  const mapped = (rows as Array<Record<string, unknown>>).map((row) => ({
     id: row.id ? String(row.id) : undefined,
     email: String(row.email || "").trim().toLowerCase(),
     track: normalizeTrack(row.track),
-    module_key: String(row.module_key || "").trim(),
+    module_key: String(row.module_key || row.module || "").trim(),
     score: Number(row.score || 0),
     max_score: Number(row.max_score || 0),
     missed_topics: Array.isArray(row.missed_topics) ? row.missed_topics.map((topic) => String(topic)).filter(Boolean) : [],
     passed: typeof row.passed === "boolean" ? row.passed : undefined,
     submitted_at: String(row.submitted_at || row.updated_at || new Date().toISOString()),
   })).filter((row) => row.email && row.module_key);
+  return input.moduleKey ? mapped.filter((row) => row.module_key === input.moduleKey) : mapped;
 }
 
 export async function upsertOnboardingQuizResultByModule(input: {
   quizResultsTable: string;
   row: OnboardingQuizResultRow;
 }) {
-  await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email,track,module_key`, {
-    method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-    body: JSON.stringify([input.row]),
-  });
+  const nextRow = {
+    email: input.row.email,
+    track: input.row.track,
+    module: input.row.module_key,
+    score: input.row.score,
+    max_score: input.row.max_score,
+    missed_topics: input.row.missed_topics,
+    submitted_at: input.row.submitted_at,
+  };
+
+  try {
+    await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email,track,module`, {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify([nextRow]),
+    });
+  } catch (error) {
+    if (!isMissingColumnError(error, "module")) throw error;
+    await supabaseRequest(`/rest/v1/${input.quizResultsTable}?on_conflict=email,track,module_key`, {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify([input.row]),
+    });
+  }
 }
 
 export async function insertOnboardingQuizAttempt(input: { quizAttemptsTable: string; row: OnboardingQuizAttemptRow }) {
-  await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
-    method: "POST",
-    body: JSON.stringify([input.row]),
-  });
+  const nextRow = {
+    ...input.row,
+    module: input.row.module_key,
+  };
+
+  try {
+    await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+      method: "POST",
+      body: JSON.stringify([nextRow]),
+    });
+  } catch (error) {
+    if (!isMissingColumnError(error, "module")) throw error;
+    await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
+      method: "POST",
+      body: JSON.stringify([input.row]),
+    });
+  }
 }
 
 export async function getOnboardingAdminOverviewRows(viewName = "onboarding_admin_overview") {
@@ -300,9 +337,9 @@ export async function resetOnboardingModuleStatus(input: {
   track: string;
   moduleKey: string;
 }) {
-  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}&module_key=eq.${encodeURIComponent(input.moduleKey)}`, {
+  await supabaseRequest(`/rest/v1/${input.moduleStatusTable}?email=eq.${encodeURIComponent(input.email)}&track=eq.${encodeURIComponent(input.track)}&module=eq.${encodeURIComponent(input.moduleKey)}`, {
     method: "PATCH",
-    body: JSON.stringify({ status: "in_progress", attempts: 0, validated_at: null, updated_at: new Date().toISOString() }),
+    body: JSON.stringify({ status: "in_progress", attempts_used: 0, validated_at: null, updated_at: new Date().toISOString() }),
   });
 }
 

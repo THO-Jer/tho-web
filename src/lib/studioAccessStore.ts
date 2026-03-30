@@ -19,6 +19,8 @@ export type StudioUserPermissions = {
   canOnboarding: boolean;
 };
 
+export type StudioTeam = "sales" | "creative_ops" | "advisory_ops" | "general";
+
 export type StudioAuthorizedUser = {
   email: string;
   provider: StudioUserProvider;
@@ -26,6 +28,7 @@ export type StudioAuthorizedUser = {
   permissions: StudioUserPermissions;
   updatedAt: string;
   role?: string;
+  team?: StudioTeam;
   blocked?: boolean;
 };
 
@@ -106,6 +109,12 @@ function isMissingCanOnboardingColumnError(error: unknown) {
   return msg.includes("can_onboarding") && msg.includes("PGRST204");
 }
 
+function isMissingTeamColumnError(error: unknown) {
+  if (!(error instanceof Error)) return false;
+  const msg = String(error.message || "");
+  return msg.includes("team") && msg.includes("PGRST204");
+}
+
 async function ensureStore() {
   await fs.mkdir(path.dirname(ACCESS_PATH), { recursive: true });
   try {
@@ -124,6 +133,12 @@ function normalizeProvider(provider: unknown): StudioUserProvider {
   const value = String(provider || "").trim().toLowerCase();
   if (value === "google" || value === "azure") return value;
   return "any";
+}
+
+function normalizeTeam(input: unknown): StudioTeam {
+  const team = String(input || "general").trim();
+  if (["sales", "creative_ops", "advisory_ops", "general"].includes(team)) return team as StudioTeam;
+  return "general";
 }
 
 function normalizePermissions(input: Partial<StudioUserPermissions> | undefined): StudioUserPermissions {
@@ -148,6 +163,7 @@ function rowToAuthorized(row: Record<string, unknown>): StudioAuthorizedUser {
     },
     updatedAt: String(row.updated_at || new Date().toISOString()),
     role: String(row.role || "member"),
+    team: normalizeTeam(row.team),
     blocked: Boolean(row.blocked),
   };
 }
@@ -350,6 +366,7 @@ export async function upsertAuthorizedUser(input: {
   active?: boolean;
   permissions?: Partial<StudioUserPermissions>;
   role?: string;
+  team?: StudioTeam;
 }) {
   const email = normalizeEmail(input.email);
   if (!email || !email.includes("@")) throw new Error("Email inválido para autorizar.");
@@ -361,6 +378,7 @@ export async function upsertAuthorizedUser(input: {
       active: input.active !== false,
       blocked: false,
       role: input.role || "member",
+      team: normalizeTeam(input.team),
       can_blog: Boolean(input.permissions?.canBlog),
       can_crm: Boolean(input.permissions?.canCrm),
       can_incidents: Boolean(input.permissions?.canIncidents),
@@ -374,12 +392,35 @@ export async function upsertAuthorizedUser(input: {
         body: JSON.stringify([{ ...basePayload, can_onboarding: input.permissions?.canOnboarding !== false }]),
       });
     } catch (error) {
-      if (!isMissingCanOnboardingColumnError(error)) throw error;
-      await supabaseRequest(`/rest/v1/${ROLE_TABLE}?on_conflict=email`, {
-        method: "POST",
-        headers: { Prefer: "resolution=merge-duplicates,return=representation" },
-        body: JSON.stringify([basePayload]),
-      });
+      const payloadWithoutOnboarding = { ...basePayload };
+      if (isMissingCanOnboardingColumnError(error)) {
+        try {
+          await supabaseRequest(`/rest/v1/${ROLE_TABLE}?on_conflict=email`, {
+            method: "POST",
+            headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+            body: JSON.stringify([payloadWithoutOnboarding]),
+          });
+        } catch (fallbackError) {
+          if (!isMissingTeamColumnError(fallbackError)) throw fallbackError;
+          const legacyPayload = { ...payloadWithoutOnboarding } as Record<string, unknown>;
+          delete legacyPayload.team;
+          await supabaseRequest(`/rest/v1/${ROLE_TABLE}?on_conflict=email`, {
+            method: "POST",
+            headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+            body: JSON.stringify([legacyPayload]),
+          });
+        }
+      } else if (isMissingTeamColumnError(error)) {
+        const legacyPayload = { ...basePayload, can_onboarding: input.permissions?.canOnboarding !== false } as Record<string, unknown>;
+        delete legacyPayload.team;
+        await supabaseRequest(`/rest/v1/${ROLE_TABLE}?on_conflict=email`, {
+          method: "POST",
+          headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+          body: JSON.stringify([legacyPayload]),
+        });
+      } else {
+        throw error;
+      }
     }
 
     return listAuthorizedUsers();
@@ -393,6 +434,7 @@ export async function upsertAuthorizedUser(input: {
     active: input.active !== false,
     permissions: normalizePermissions(input.permissions),
     updatedAt: new Date().toISOString(),
+    team: normalizeTeam(input.team),
   };
 
   if (idx >= 0) state.authorizedUsers[idx] = next;

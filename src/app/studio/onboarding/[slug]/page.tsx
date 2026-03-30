@@ -25,19 +25,844 @@ type Onboarding = {
   module_status?: ModuleStatus[];
 };
 
-function parseLessons(content: string[]) {
+type Lesson = { id: string; label: string; title: string; subtitle: string; bullets: string[] };
+
+const moduleVisuals: Record<string, { cover: string; accent: string; hero: string; heroBorder: string; progress: string }> = {
+  A: {
+    cover: "/ilustraciones/1.png",
+    accent: "text-sky-700",
+    hero: "bg-gradient-to-r from-sky-50 via-white to-cyan-50",
+    heroBorder: "border-sky-100",
+    progress: "bg-sky-700",
+  },
+  B: {
+    cover: "/ilustraciones/4.png",
+    accent: "text-indigo-700",
+    hero: "bg-gradient-to-r from-indigo-50 via-white to-blue-50",
+    heroBorder: "border-indigo-100",
+    progress: "bg-indigo-700",
+  },
+  C: {
+    cover: "/ilustraciones/7.png",
+    accent: "text-violet-700",
+    hero: "bg-gradient-to-r from-violet-50 via-white to-fuchsia-50",
+    heroBorder: "border-violet-100",
+    progress: "bg-violet-700",
+  },
+  D: {
+    cover: "/ilustraciones/10.png",
+    accent: "text-emerald-700",
+    hero: "bg-gradient-to-r from-emerald-50 via-white to-teal-50",
+    heroBorder: "border-emerald-100",
+    progress: "bg-emerald-700",
+  },
+};
+
+const foundationalLessonA0 = {
+  label: "LECCIÓN 1 · Marco institucional",
+  title: "¿Qué es el onboarding y por qué existe?",
+  strategicFrame: [
+    "No es una inducción administrativa.",
+    "Es un mecanismo de coherencia institucional.",
+    "El onboarding en THO no está diseñado para informar. Está diseñado para alinear criterio.",
+    "Cuando una organización crece sin estándares explícitos, cada persona comienza a definir calidad, ética y método según su propio marco. Eso genera fricción invisible, inconsistencias y riesgos acumulativos.",
+    "El onboarding existe para evitar eso.",
+  ],
+  blocks: [
+    {
+      heading: "1. Qué protege",
+      intro: "El onboarding protege tres cosas:",
+      bullets: [
+        "Coherencia interna en decisiones.",
+        "Estándar mínimo de calidad operativa.",
+        "Reputación institucional frente a clientes y aliados.",
+      ],
+      closing: "No es formación genérica. Es una capa de protección organizacional.",
+    },
+    {
+      heading: "2. Qué evita",
+      intro: "Sin onboarding:",
+      bullets: [
+        "La calidad se vuelve subjetiva.",
+        "La trazabilidad desaparece.",
+        "Las decisiones se toman por intuición aislada.",
+        "La cultura se fragmenta.",
+      ],
+      closing: "El costo no es inmediato, pero es acumulativo.",
+    },
+    {
+      heading: "3. Qué instala",
+      intro: "El onboarding instala un marco común:",
+      bullets: [
+        "Cómo entendemos calidad.",
+        "Qué significa trabajo terminado.",
+        "Cuándo escalar.",
+        "Qué no es negociable.",
+      ],
+      closing: "No es contenido teórico. Es arquitectura operativa.",
+    },
+  ],
+  tension: {
+    heading: "Tensión real",
+    intro: "Siempre habrá tensión entre:",
+    bullets: [
+      "Velocidad y método.",
+      "Urgencia y trazabilidad.",
+      "Resultado y estándar.",
+    ],
+    closing: "El onboarding no elimina esa tensión. Define cómo se resuelve.",
+  },
+  practice: {
+    heading: "Traducción práctica",
+    intro: "En la práctica, esto significa:",
+    bullets: [
+      "No ejecutar sin entender estándar mínimo.",
+      "No asumir criterios implícitos.",
+      "No cerrar entregas sin contexto documentado.",
+      "No improvisar procesos críticos.",
+    ],
+  },
+  reflection: "Antes de continuar: ¿En tu experiencia previa, dónde viste que la falta de estándar generó problemas evitables?",
+};
+
+
+const architecturalLessonA1 = {
+  label: "LECCIÓN 2 · Arquitectura estratégica",
+  title: "Propósito organizacional",
+  definition: [
+    "El propósito no es un mensaje.",
+    "Es un criterio de decisión.",
+    "THO existe para fortalecer organizaciones y conectarlas con su entorno, asegurando viabilidad, legitimidad y coherencia estratégica.",
+    "Pero eso no es una frase inspiradora. Es un marco operativo.",
+  ],
+  sections: [
+    {
+      heading: "1. Qué NO es propósito",
+      intro: "No es:",
+      bullets: [
+        "Un slogan.",
+        "Una narrativa de marketing.",
+        "Una declaración aspiracional desconectada de decisiones reales.",
+        "Una excusa para aceptar cualquier proyecto.",
+      ],
+      closing: "Cuando el propósito se convierte en discurso, pierde capacidad de orientar.",
+    },
+    {
+      heading: "2. Qué SÍ es propósito",
+      intro: "Es un filtro. Define:",
+      bullets: [
+        "Qué proyectos aceptamos.",
+        "Qué riesgos estamos dispuestos a asumir.",
+        "Qué tensiones debemos explicitar.",
+        "Qué decisiones priorizamos cuando hay conflicto.",
+      ],
+      closing: "El propósito no motiva. Ordena.",
+    },
+    {
+      heading: "3. Cómo opera en la práctica",
+      intro: "El propósito interviene cuando hay tensión entre:",
+      bullets: [
+        "Ingreso y coherencia.",
+        "Velocidad y calidad.",
+        "Relación comercial y estándar profesional.",
+        "Oportunidad y riesgo reputacional.",
+      ],
+      closing: "Cuando no hay tensión, el propósito no se nota. Cuando hay tensión, el propósito decide.",
+    },
+  ],
+  scenario: {
+    heading: "Escenario aplicado",
+    text: [
+      "Un proyecto es rentable y técnicamente viable, pero implica minimizar públicamente un riesgo socioambiental relevante.",
+      "La pregunta no es: ¿Podemos hacerlo?",
+      "La pregunta es: ¿Es coherente con fortalecer organizaciones y conectar con su entorno de manera legítima?",
+    ],
+  },
+  translation: {
+    heading: "Traducción operativa",
+    intro: "En THO, propósito significa:",
+    bullets: [
+      "No aceptar proyectos incoherentes con legitimidad institucional.",
+      "No omitir riesgos críticos por conveniencia.",
+      "No separar rentabilidad de responsabilidad estratégica.",
+      "No reducir complejidad para hacerlo más vendible.",
+    ],
+  },
+  synthesis: "Si no puedes explicar cómo tu decisión fortalece organización y entorno al mismo tiempo, probablemente estás operando fuera del propósito.",
+};
+
+
+const contrastLessonA2 = {
+  label: "LECCIÓN 3 · Arquitectura comercial",
+  title: "Propósito vs Propuesta de Valor",
+  hook: [
+    "Confundir estos conceptos genera incoherencia comercial.",
+    "Muchas organizaciones mezclan propósito y propuesta de valor. Eso produce mensajes confusos y decisiones inconsistentes.",
+    "En THO están relacionados, pero no son lo mismo.",
+  ],
+  purpose: {
+    heading: "1. Propósito",
+    question: "¿Para qué existimos como organización?",
+    answer: "Construir un ecosistema empresarial más humano y sostenible, donde cada proyecto contribuya, mediante su éxito, al bienestar colectivo impulsando un cambio real y significativo en las organizaciones y sus comunidades.",
+    bullets: [
+      "No cambia según cliente.",
+      "No depende de mercado.",
+      "No se adapta por conveniencia.",
+    ],
+    closing: "Es estructural.",
+  },
+  value: {
+    heading: "2. Propuesta de valor",
+    question: "¿Por qué un cliente debería elegirnos?",
+    answer: "Aseguramos confianza en tu marca asesorando e implementando tu estrategia con método, criterio y claridad.",
+    bullets: [
+      "Es específica.",
+      "Es comunicable.",
+      "Es comercial.",
+      "Puede evolucionar.",
+    ],
+    closing: "Es relacional.",
+  },
+  crossing: {
+    heading: "3. Donde se cruzan",
+    intro: "La propuesta de valor debe estar alineada con el propósito.",
+    body: "Si vendemos algo que contradice nuestro propósito, estamos generando una brecha interna.",
+    bullets: [
+      "Se traduce en tensiones operativas.",
+      "Se traduce en desgaste.",
+      "Se traduce en pérdida de legitimidad.",
+    ],
+    closing: "La coherencia entre ambos es un activo invisible.",
+  },
+  scenario: {
+    heading: "Escenario aplicado",
+    lines: [
+      "Un cliente pide una campaña de comunicación que maquilla un problema estructural.",
+      "Propuesta de valor: Podríamos ejecutar técnicamente la campaña.",
+      "Propósito: No podemos contribuir a debilitar legitimidad institucional.",
+      "La decisión se resuelve alineando ambos planos.",
+    ],
+  },
+  translation: {
+    heading: "Traducción operativa",
+    intro: "En THO:",
+    bullets: [
+      "No vendemos lo que no podemos defender.",
+      "No diseñamos soluciones que erosionen confianza.",
+      "No aceptamos encargos incoherentes con nuestro estándar.",
+    ],
+    closing: "La propuesta de valor no es una promesa comercial vacía. Es la expresión operativa del propósito.",
+  },
+  synthesis: [
+    "Propósito define quiénes somos.",
+    "Propuesta de valor define cómo aportamos.",
+    "Cuando se alinean, la organización es consistente. Cuando se separan, aparece la disonancia.",
+  ],
+};
+
+const operationalLessonA3 = {
+  label: "LECCIÓN 4 · Método de trabajo",
+  title: "Cómo trabajamos en THO",
+  premise: [
+    "El talento no es suficiente.",
+    "El método es lo que hace replicable la calidad.",
+    "En consultoría, la improvisación puede parecer creatividad. Pero sin estructura, la calidad se vuelve variable.",
+    "THO trabaja bajo un modelo operativo explícito.",
+  ],
+  sections: [
+    {
+      heading: "1. Comprensión estratégica",
+      intro: "Antes de proponer, entendemos.",
+      bullets: [
+        "Contexto institucional.",
+        "Mapa de actores.",
+        "Riesgos explícitos e implícitos.",
+        "Tensiones estructurales.",
+        "Alcance real del encargo.",
+      ],
+      closing: "No diseñamos soluciones sobre diagnósticos superficiales.",
+    },
+    {
+      heading: "2. Diseño estructurado",
+      intro: "Toda intervención tiene:",
+      bullets: [
+        "Objetivo claro.",
+        "Hipótesis de impacto.",
+        "Metodología definida.",
+        "Cronograma realista.",
+        "Entregables verificables.",
+      ],
+      closing: "No ejecutamos sin arquitectura.",
+    },
+    {
+      heading: "3. Documentación y trazabilidad",
+      intro: "Nada importante queda implícito.",
+      bullets: [
+        "Acuerdos se documentan.",
+        "Versiones se guardan.",
+        "Decisiones se justifican.",
+        "Cambios se registran.",
+      ],
+      closing: "La trazabilidad protege al equipo y al cliente.",
+    },
+    {
+      heading: "4. Cierre y evaluación",
+      intro: "No basta con entregar.",
+      bullets: [
+        "Cumplimiento de objetivo.",
+        "Aprendizajes.",
+        "Riesgos residuales.",
+        "Ajustes necesarios.",
+      ],
+      closing: "Cada proyecto deja aprendizaje institucional.",
+    },
+  ],
+  cycle: {
+    heading: "El ciclo operativo",
+    stages: ["Comprender", "Diseñar", "Ejecutar", "Documentar", "Evaluar", "Ajustar"],
+    closing: "Es un ciclo, no una línea recta.",
+  },
+  principles: {
+    heading: "Principios no negociables",
+    bullets: [
+      "No ejecutar sin diagnóstico mínimo.",
+      "No cerrar entregables sin revisión cruzada.",
+      "No improvisar procesos críticos.",
+      "No operar sin respaldo documental.",
+    ],
+  },
+  synthesis: [
+    "El método no restringe la creatividad.",
+    "La encuadra.",
+    "La calidad en THO no depende del ánimo del día.",
+    "Depende del estándar.",
+  ],
+};
+
+
+const qualityLessonA4 = {
+  label: "LECCIÓN 5 · Estándar de calidad",
+  title: "¿Qué significa que un trabajo esté \"Done\" en THO?",
+  premise: [
+    '"Hecho" no significa terminado.',
+    "Significa validado.",
+    "En metodologías ágiles, la Definition of Done (DoD) define cuándo un entregable cumple con el estándar mínimo de calidad.",
+    'Sin una definición explícita, "hecho" se vuelve subjetivo.',
+    'En THO, "done" no es percepción. Es cumplimiento verificable.',
+  ],
+  whatIs: {
+    heading: "1. Qué es Definition of Done",
+    intro: "Es un acuerdo explícito que responde:",
+    bullets: [
+      "¿Qué condiciones mínimas debe cumplir un entregable?",
+      "¿Qué criterios determinan que puede cerrarse?",
+      "¿Qué evidencia respalda su calidad?",
+    ],
+    closing: "No es burocracia. Es control de estándar.",
+  },
+  whatIsNot: {
+    heading: "2. Qué NO es “Done”",
+    intro: "No es:",
+    bullets: [
+      "“Ya lo envié.”",
+      "“El cliente no reclamó.”",
+      "“Cumple con lo pedido literal.”",
+      "“Está suficientemente bueno.”",
+    ],
+    closing: "Eso es conformidad, no calidad.",
+  },
+  criteria: {
+    heading: "3. En THO, un trabajo está “Done” cuando cumple al menos:",
+    items: [
+      { title: "1️⃣ Claridad conceptual", description: "El entregable refleja comprensión real del problema." },
+      { title: "2️⃣ Coherencia metodológica", description: "La solución está alineada con el método definido." },
+      { title: "3️⃣ Trazabilidad mínima", description: "Las decisiones relevantes están documentadas." },
+      { title: "4️⃣ Revisión cruzada", description: "Otro miembro del equipo revisó el contenido crítico." },
+      { title: "5️⃣ Riesgos explícitos", description: "No se ocultaron tensiones o riesgos relevantes." },
+    ],
+  },
+  scenario: {
+    heading: "Escenario aplicado",
+    lines: [
+      "Un informe está completo y cumple con el cronograma, pero no explicita un riesgo reputacional detectado durante el proceso.",
+      "¿Está “Done”?",
+      "Desde metodología ágil superficial, sí.",
+      "Desde estándar THO, no.",
+    ],
+  },
+  checklist: {
+    heading: "Checklist ejecutivo antes de cerrar",
+    intro: "Antes de marcar un trabajo como finalizado:",
+    bullets: [
+      "¿Está alineado con propósito?",
+      "¿Cumple el estándar metodológico?",
+      "¿Está respaldado documentalmente?",
+      "¿Fue revisado por otro criterio?",
+      "¿Explicita riesgos relevantes?",
+    ],
+    closing: "Si alguna respuesta es no, no está cerrado.",
+  },
+  synthesis: [
+    "Agilidad no es rapidez.",
+    "Es claridad estructurada.",
+    "En THO, cerrar un trabajo es asumir responsabilidad sobre su calidad.",
+  ],
+};
+
+
+const culturalLessonA5 = {
+  label: "LECCIÓN 6 · Cultura organizacional",
+  title: "Valores organizacionales en acción",
+  premise: [
+    "En THO los valores no son aspiraciones.",
+    "Son criterios de comportamiento.",
+    "No describen cómo nos gustaría ser.",
+    "Definen cómo debemos actuar.",
+  ],
+  sections: [
+    {
+      heading: "1. Humanidad",
+      protects: [
+        "Dignidad de personas y comunidades.",
+        "Integridad del relato institucional.",
+        "Responsabilidad comunicacional.",
+      ],
+      requires: [
+        "No instrumentalizar actores territoriales.",
+        "No simplificar conflictos complejos por conveniencia.",
+        "No usar datos sensibles sin criterio.",
+      ],
+      standard: "Humanidad no es amabilidad. Es responsabilidad.",
+      invalidates: [
+        "Narrativas manipuladoras.",
+        "Omisiones estratégicas deliberadas.",
+        "Lenguaje que minimiza impacto real.",
+      ],
+    },
+    {
+      heading: "2. Colaboración",
+      protects: [
+        "Calidad colectiva.",
+        "Coherencia interdisciplinaria.",
+        "Reducción de errores invisibles.",
+      ],
+      requires: [
+        "Revisión cruzada real.",
+        "Feedback explícito.",
+        "Escucha activa entre roles.",
+      ],
+      standard: "Colaboración no es cordialidad. Es trabajo compartido.",
+      invalidates: [
+        "Trabajo en silo.",
+        "Decisiones unilaterales en temas críticos.",
+        "Cierre sin revisión externa.",
+      ],
+    },
+    {
+      heading: "3. Adaptabilidad",
+      protects: [
+        "Relevancia contextual.",
+        "Capacidad de ajuste estratégico.",
+        "Respuesta ante cambios reales.",
+      ],
+      requires: [
+        "Revisar hipótesis.",
+        "Ajustar cuando la evidencia cambia.",
+        "No aferrarse al diseño original por orgullo.",
+      ],
+      standard: "Adaptabilidad no es improvisación. Es flexibilidad estructurada.",
+      invalidates: [
+        "Rigidez innecesaria.",
+        "Cambios sin fundamento.",
+        "Reacciones impulsivas.",
+      ],
+    },
+  ],
+  tension: {
+    heading: "Tensión real",
+    intro: "Los valores no siempre coinciden entre sí.",
+    bullets: [
+      "Adaptabilidad tensiona metodología.",
+      "Colaboración ralentiza velocidad.",
+      "Humanidad tensiona rentabilidad.",
+    ],
+    closing: "El estándar no elimina la tensión. Define cómo se navega.",
+  },
+  synthesis: [
+    "Si un comportamiento contradice un valor, no es una variación estilística.",
+    "Es una desviación cultural.",
+  ],
+};
+
+
+const boundaryLessonA6 = {
+  label: "LECCIÓN 7 · Límites institucionales",
+  title: "Lo que no es negociable en THO",
+  premise: [
+    "Toda organización define lo que hace.",
+    "Las organizaciones maduras definen también lo que no hacen.",
+    "Los límites no restringen.",
+    "Protegen coherencia, reputación y estándar.",
+  ],
+  clauses: [
+    {
+      title: "Cláusula 1",
+      statement: "No prometemos lo que no podemos sostener con método.",
+      body: "Si un cliente espera resultados que no pueden justificarse con diagnóstico o evidencia, no se prometen.",
+      closing: "La presión comercial no redefine el estándar.",
+    },
+    {
+      title: "Cláusula 2",
+      statement: "No ocultamos riesgos relevantes.",
+      body: "Si durante un proceso detectamos tensiones críticas, deben explicitarse.",
+      closing: "Silenciar riesgos para evitar incomodidad erosiona legitimidad.",
+    },
+    {
+      title: "Cláusula 3",
+      statement: "No instrumentalizamos actores territoriales.",
+      body: "Las comunidades no son recursos narrativos.",
+      closing: "El vínculo territorial es sustantivo, no cosmético.",
+    },
+    {
+      title: "Cláusula 4",
+      statement: "No cerramos entregables sin revisión crítica.",
+      body: "La prisa no sustituye el control de calidad.",
+      closing: "",
+    },
+    {
+      title: "Cláusula 5",
+      statement: "No operamos sin trazabilidad mínima.",
+      body: "Decisiones relevantes deben poder explicarse retrospectivamente.",
+      closing: "",
+    },
+  ],
+  tension: {
+    heading: "Escenario de tensión",
+    lines: [
+      "Un cliente presiona por acortar etapas metodológicas para cumplir plazos políticos.",
+      "La pregunta no es:",
+      "¿Podemos hacerlo?",
+      "La pregunta es:",
+      "¿Podemos sostenerlo profesionalmente si algo falla?",
+    ],
+  },
+  protocol: {
+    heading: "Protocolo ante conflicto de límites",
+    intro: "Cuando un límite institucional se tensiona:",
+    steps: [
+      "Se explicita internamente.",
+      "Se documenta la decisión.",
+      "Se escala si afecta coherencia estratégica.",
+      "Se prioriza estándar sobre comodidad.",
+    ],
+  },
+  synthesis: [
+    "Los límites no hacen rígida a una organización.",
+    "La hacen confiable.",
+  ],
+};
+
+
+const ethicsLessonA7 = {
+  label: "LECCIÓN 8 · Ética operativa",
+  title: "Cómo actuar ante tensiones críticas",
+  premise: [
+    "Los problemas éticos no aparecen como dilemas filosóficos.",
+    "Aparecen como decisiones prácticas bajo presión.",
+    "En THO, la ética no es declarativa.",
+    "Es operativa.",
+  ],
+  risk: {
+    heading: "1. Qué es un riesgo ético operativo",
+    intro: "Es una situación donde:",
+    bullets: [
+      "Una decisión puede afectar legitimidad institucional.",
+      "Existe tensión entre estándar y conveniencia.",
+      "El impacto puede no ser inmediato, pero sí acumulativo.",
+    ],
+    closing: "No todos los desacuerdos son riesgos éticos. Pero todos los riesgos éticos deben tratarse explícitamente.",
+  },
+  alerts: {
+    heading: "2. Señales de alerta",
+    intro: "Si aparece alguna de estas señales, se activa revisión:",
+    bullets: [
+      "Presión por omitir información relevante.",
+      "Ajuste narrativo para suavizar impacto real.",
+      "Reducción metodológica sin fundamento técnico.",
+      "Decisiones que “se sienten incómodas” pero no están justificadas.",
+      "Falta de trazabilidad en decisiones críticas.",
+    ],
+    closing: "La incomodidad no es suficiente. Pero ignorarla sistemáticamente es riesgoso.",
+  },
+  protocol: {
+    heading: "3. Protocolo de acción (4 pasos)",
+    intro: "Cuando detectes una tensión crítica:",
+    steps: [
+      { tag: "1️⃣ Explicitar", detail: "Nombrar el problema. No asumir que es menor." },
+      { tag: "2️⃣ Documentar", detail: "Registrar la situación y las alternativas consideradas." },
+      { tag: "3️⃣ Consultar", detail: "Involucrar al menos un segundo criterio interno." },
+      { tag: "4️⃣ Decidir con estándar", detail: "Resolver priorizando método y coherencia institucional." },
+    ],
+  },
+  escalation: {
+    heading: "4. Escalamiento",
+    intro: "Escalar no es dramatizar. Es proteger calidad y legitimidad.",
+    triggersIntro: "Se escala cuando:",
+    bullets: [
+      "La decisión puede afectar reputación.",
+      "El impacto excede el alcance individual.",
+      "Existe conflicto entre rentabilidad y estándar.",
+    ],
+    closing: "El escalamiento no es debilidad. Es responsabilidad compartida.",
+  },
+  matrix: {
+    heading: "Matriz simple de decisión",
+    rows: [
+      { condition: "Bajo impacto + Bajo riesgo", action: "Resolver localmente" },
+      { condition: "Alto impacto + Alto riesgo", action: "Escalar" },
+      { condition: "Alto impacto + Incertidumbre", action: "Documentar y consultar" },
+    ],
+  },
+  synthesis: [
+    "La ética operativa no busca perfección.",
+    "Busca coherencia bajo presión.",
+  ],
+};
+
+
+const integrationLessonA8 = {
+  label: "LECCIÓN 9 · Integración",
+  title: "Qué significa operar bajo el estándar THO",
+  summary: [
+    "Qué es una organización adaptable.",
+    "Cómo funcionan las metodologías ágiles en nuestro contexto.",
+    "Qué entendemos por “done”.",
+    "Qué valores sostienen nuestra práctica.",
+    "Cuáles son nuestros límites institucionales.",
+    "Cómo actuar ante tensiones éticas.",
+  ],
+  selfAssessment: [
+    {
+      id: "pressure",
+      prompt: "Si mañana enfrentas una presión externa:",
+      question: "¿Podrías explicar el estándar THO sin reducirlo a opinión?",
+    },
+    {
+      id: "critical-tension",
+      prompt: "Si detectas una tensión crítica:",
+      question: "¿Sabes cuándo escalar y cuándo decidir localmente?",
+    },
+    {
+      id: "method-cut",
+      prompt: "Si un cliente pide acortar metodología:",
+      question: "¿Podrías argumentar técnicamente por qué una etapa no debe omitirse?",
+    },
+    {
+      id: "discomfort",
+      prompt: "Si algo “no se siente correcto”:",
+      question: "¿Sabes cómo activar el protocolo sin personalizar el conflicto?",
+    },
+  ],
+  assessmentClosing: "No se trata de marcar todo “sí”. Se trata de tener claridad.",
+  declaration: {
+    heading: "Declaración operativa",
+    intro: "Operar en THO implica:",
+    bullets: [
+      "Priorizar método sobre improvisación.",
+      "Priorizar coherencia sobre conveniencia.",
+      "Priorizar estándar sobre urgencia.",
+    ],
+    closing: [
+      "Si completas este módulo, declaras que comprendes ese marco.",
+      "No implica perfección. Implica responsabilidad.",
+    ],
+  },
+  confirmationLabel: "He leído y comprendo el estándar institucional descrito en este módulo.",
+  actionLabel: "Continuar a evaluación",
+};
+
+
+const consultiveSalesLessonB1 = {
+  label: "LECCIÓN B1 · Venta consultiva institucional",
+  title: "Qué significa vender en THO",
+  tension: "En THO operamos bajo un modelo de venta consultiva.",
+  intro: [
+    "No vendemos servicios prediseñados.",
+    "Diagnosticamos antes de proponer.",
+  ],
+  conceptual: {
+    heading: "Sección 1 · Marco conceptual",
+    intro: "La venta consultiva implica:",
+    bullets: [
+      "Escuchar antes de ofrecer.",
+      "Identificar problema estructural, no solo síntoma.",
+      "Evaluar compatibilidad con método.",
+      "Explicitar riesgos.",
+      "Ajustar alcance según realidad.",
+      "Rechazar si no existen condiciones mínimas.",
+    ],
+  },
+  difference: {
+    heading: "Sección 2 · Diferencia clave",
+    transactional: [
+      "Prioriza urgencia.",
+      "Promete antes de entender.",
+      "Ajusta discurso según presión.",
+      "Cierra aunque existan riesgos no resueltos.",
+    ],
+    institutional: [
+      "Diagnostica antes de proponer.",
+      "Declara límites explícitamente.",
+      "Protege al equipo de compromisos inviables.",
+      "Entiende que decir “no” también es una decisión comercial profesional.",
+    ],
+  },
+  rector: {
+    heading: "Sección 3 · Principio rector",
+    statement: "Vender en THO no es maximizar volumen.",
+    closing: "Es proteger coherencia estratégica.",
+    bullets: [
+      "Sobrecarga operativa.",
+      "Fricción contractual.",
+      "Riesgo reputacional.",
+      "Erosión del estándar profesional.",
+    ],
+  },
+  mindset: {
+    heading: "Sección 4 · Marco mental obligatorio",
+    questions: [
+      "¿Este cliente es compatible con nuestro método?",
+      "¿Estamos prometiendo algo que el sistema no puede sostener?",
+      "¿El cierre protege al equipo o lo expone?",
+      "¿Esta venta fortalece o debilita la reputación institucional?",
+    ],
+    closing: "Si no puedes responder con claridad, aún no es momento de cerrar.",
+  },
+};
+
+type LessonGuide = {
+  whyItMatters: string;
+  whatToDo: string;
+  commonMistake: string;
+  keyLearnings: string[];
+};
+
+const topicReviewLabel: Record<string, string> = {
+  adaptabilidad_ordenada: "Adaptabilidad ordenada",
+  definition_of_done: "Definition of Done",
+  metodo_sobre_costumbre: "Método sobre costumbre",
+  limites_institucionales: "Límites institucionales",
+  protocolo_etico: "Protocolo ético",
+  escalamiento: "Escalamiento",
+  marco_agile: "Marco Agile",
+  coherencia: "Coherencia institucional",
+  integridad_territorial: "Integridad territorial",
+  trazabilidad: "Trazabilidad",
+};
+
+const moduleALessonGuides: Record<string, LessonGuide> = {
+  A0: {
+    whyItMatters: "Define el estándar base: onboarding es alineación operativa para evitar ambigüedad, errores repetidos y daño reputacional.",
+    whatToDo: "Antes de ejecutar, verifica propósito, criterio de calidad y trazabilidad mínima de tu trabajo.",
+    commonMistake: "Tratar el onboarding como lectura pasiva sin traducirlo a decisiones concretas del rol.",
+    keyLearnings: ["Entiendo qué protege este onboarding", "Sé qué evidencia dejar en cada entrega", "Identifico cuándo debo escalar dudas"],
+  },
+  A1: {
+    whyItMatters: "El propósito institucional guía prioridades cuando hay tensión entre velocidad, calidad y riesgo.",
+    whatToDo: "Conecta cada tarea con impacto organizacional: decisión, riesgo mitigado o legitimidad fortalecida.",
+    commonMistake: "Ejecutar tareas aisladas sin evaluar coherencia estratégica.",
+    keyLearnings: ["Puedo explicar para qué existe THO", "Relaciono mi rol con ese propósito", "Identifico riesgos de incoherencia"],
+  },
+  A2: {
+    whyItMatters: "Diferenciar propósito y propuesta de valor evita promesas vagas y mejora posicionamiento profesional.",
+    whatToDo: "Habla en términos de método: diagnóstico, diseño, acompañamiento, trazabilidad y gestión de riesgos.",
+    commonMistake: "Vender entusiasmo o esfuerzo sin explicar estructura ni resultados verificables.",
+    keyLearnings: ["Distingo propósito vs. propuesta de valor", "Puedo explicar el método THO", "Evito lenguaje ambiguo en propuestas"],
+  },
+
+  A3: {
+    whyItMatters: "Eleva el estándar de entrega: calidad no es estética, es decisión trazable y ejecutable.",
+    whatToDo: "Antes de cerrar cualquier pieza, valida contexto, evidencia, decisión, riesgos y próximos pasos con responsable.",
+    commonMistake: "Dar por terminado algo “bonito” pero sin criterio ni accountability.",
+    keyLearnings: ["Problema delimitado", "Decisión explícita", "Riesgos identificados", "Responsable y fecha definidos"],
+  },
+  A4: {
+    whyItMatters: "Los valores son reglas operativas, no slogans. Definen cómo se trabaja bajo presión.",
+    whatToDo: "Practica humanidad en el lenguaje, colaboración en documentación y adaptabilidad basada en evidencia.",
+    commonMistake: "Invocar valores solo en discurso, pero decidir por conveniencia o orgullo.",
+    keyLearnings: ["Cuidé forma y fondo de la comunicación", "Dejé documentación compartida", "Ajusté decisión ante evidencia"],
+  },
+  A5: {
+    whyItMatters: "Los no negociables protegen al equipo, al cliente y a la reputación institucional.",
+    whatToDo: "Ante presión por atajos, sostén método mínimo: trazabilidad, resguardo de datos y alcance realista.",
+    commonMistake: "Aceptar compromisos inviables para “resolver rápido”.",
+    keyLearnings: ["No prometí lo que no puedo sostener", "Resguardé información sensible", "No omití trazabilidad mínima"],
+  },
+  A6: {
+    whyItMatters: "Ética operativa consistente evita conflictos, protege a personas y da legitimidad a la intervención.",
+    whatToDo: "Registra decisiones con contexto, declara conflictos tempranamente y usa canales formales.",
+    commonMistake: "Resolver por canal informal temas que requieren trazabilidad o control de acceso.",
+    keyLearnings: ["Decisión registrada con contexto", "Conflictos declarados", "Canal formal utilizado"],
+  },
+  A7: {
+    whyItMatters: "Escalar a tiempo reduce exposición legal, reputacional y operativa.",
+    whatToDo: "Si detectas tensión crítica entre urgencia y calidad, documenta riesgo y escala con recomendación clara.",
+    commonMistake: "Normalizar excepciones frecuentes hasta que se vuelven crisis.",
+    keyLearnings: ["Riesgo identificado", "Escalamiento ejecutado", "Criterio de decisión documentado"],
+  },
+  "Reflexión guiada sugerida": {
+    whyItMatters: "La reflexión transforma contenido en criterio aplicable al rol.",
+    whatToDo: "Formula compromisos concretos: qué harás distinto, qué límites sostendrás y cuándo escalarás.",
+    commonMistake: "Responder de forma genérica sin conexión con decisiones reales del trabajo.",
+    keyLearnings: ["Definí 2 compromisos operativos", "Identifiqué 1 riesgo de incoherencia", "Definí cómo lo escalaría"],
+  },
+};
+
+function getLessonGuide(moduleKey: string, lesson: Lesson): LessonGuide {
+  if (moduleKey === "A" && moduleALessonGuides[lesson.id]) return moduleALessonGuides[lesson.id];
+  return {
+    whyItMatters: `Esta lección define criterio operativo para ${moduleKey}.`,
+    whatToDo: "Traduce el contenido en una acción concreta, registra decisión y responsable.",
+    commonMistake: "Leer y seguir avanzando sin convertir el contenido en criterio aplicable.",
+    keyLearnings: [
+      lesson.subtitle || "Identifica la idea principal",
+      lesson.bullets[0] || "Define una acción aplicable a tu rol",
+      "Documenta el criterio para continuidad del equipo",
+    ],
+  };
+}
+
+function parseLessons(content: string[]): Lesson[] {
   return content.map((paragraph, index) => {
     const normalized = paragraph.replace(/\s+/g, " ").trim();
     const match = normalized.match(/^([A-Z]\d+|Reflexión guiada sugerida|Venta consultiva en THO|Cierre del módulo)\s*[—:-]\s*(.+)$/i);
-    if (match) return { id: String(match[1]).trim(), label: match[1], body: match[2] };
-    return { id: `L${index + 1}`, label: `Lección ${index + 1}`, body: normalized };
+    const id = match ? String(match[1]).trim() : `L${index + 1}`;
+    const label = match ? String(match[1]).trim() : `Lección ${index + 1}`;
+    const body = match ? String(match[2]).trim() : normalized;
+    const colonIdx = body.indexOf(":");
+    const title = colonIdx > 0 ? body.slice(0, colonIdx).trim() : body.split(/\.\s+/)[0].trim();
+    const remainder = colonIdx > 0 ? body.slice(colonIdx + 1).trim() : body;
+    const segments = remainder.split(/\.\s+/).map((segment) => segment.trim()).filter(Boolean);
+    const subtitle = segments[0] || remainder || title;
+    const bullets = segments.slice(1).map((segment) => segment.replace(/\.$/, ""));
+    return { id, label, title, subtitle, bullets };
   });
+}
+
+
+
+function getModuleKeyFromSlug(slug: string) {
+  if (slug === "identidad-tho") return "A";
+  if (slug === "ventas-tho") return "B";
+  if (slug === "operacion-creativa") return "C";
+  if (slug === "operacion-asesorias") return "D";
+  return "A";
 }
 
 function unitTopicMap(slug: string, topic: string) {
   const t = topic.toLowerCase();
   const byUnit: Record<string, string[]> = {
-    "identidad-tho": ["identidad", "onboarding"],
+    "identidad-tho": ["identidad", "onboarding", "adaptabilidad_ordenada", "definition_of_done", "metodo_sobre_costumbre", "limites_institucionales", "protocolo_etico", "escalamiento", "marco_agile", "coherencia", "integridad_territorial", "trazabilidad"],
     "ventas-tho": ["ventas"],
     "operacion-creativa": ["operacion_creativa", "operacion"],
     "operacion-asesorias": ["operacion_asesorias", "seguridad"],
@@ -47,6 +872,11 @@ function unitTopicMap(slug: string, topic: string) {
 
 function topicToLesson(topic: string, lessons: Array<{ id: string; label: string }>) {
   const t = topic.toLowerCase();
+  if (t.startsWith("adaptabilidad_ordenada") || t.startsWith("marco_agile")) return lessons.find((l) => l.id === "A5" || l.id === "A4") || lessons[0];
+  if (t.startsWith("definition_of_done") || t.startsWith("metodo_sobre_costumbre")) return lessons.find((l) => l.id === "A3") || lessons[0];
+  if (t.startsWith("limites_institucionales")) return lessons.find((l) => l.id === "A6") || lessons[0];
+  if (t.startsWith("protocolo_etico") || t.startsWith("escalamiento")) return lessons.find((l) => l.id === "A7") || lessons[0];
+  if (t.startsWith("coherencia") || t.startsWith("integridad_territorial") || t.startsWith("trazabilidad")) return lessons.find((l) => l.id === "Reflexión guiada sugerida") || lessons[0];
   if (t.startsWith("identidad") || t.startsWith("onboarding")) return lessons.find((l) => l.id.startsWith("A")) || lessons[0];
   if (t.startsWith("ventas")) return lessons.find((l) => l.id.startsWith("B")) || lessons[0];
   if (t.startsWith("operacion_creativa") || t.startsWith("operacion")) return lessons.find((l) => l.id.startsWith("C")) || lessons[0];
@@ -71,8 +901,13 @@ export default function StudioOnboardingUnitPage() {
   const [reachedEnd, setReachedEnd] = useState(false);
   const [minLessonSeconds, setMinLessonSeconds] = useState(12);
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
+  const [showReinforceModal, setShowReinforceModal] = useState(false);
   const [tick, setTick] = useState(() => Date.now());
+  const [integrationAnswers, setIntegrationAnswers] = useState<Record<string, "si" | "no" | null>>({ pressure: null, "critical-tension": null, "method-cut": null, discomfort: null });
+  const [integrationConfirmed, setIntegrationConfirmed] = useState(false);
   const lessonRef = useRef<HTMLElement | null>(null);
+  const lessonEndRef = useRef<HTMLDivElement | null>(null);
+  const quizSectionRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const run = async () => {
@@ -95,9 +930,7 @@ export default function StudioOnboardingUnitPage() {
   }, [router]);
 
   const unit = useMemo(() => units.find((item) => item.slug === slug), [units, slug]);
-  const currentIndex = unit ? units.findIndex((item) => item.slug === unit.slug) : -1;
-  const moduleKey = ["A", "B", "C", "D"][currentIndex] || "A";
-  const next = currentIndex >= 0 ? units[currentIndex + 1] : null;
+  const moduleKey = getModuleKeyFromSlug(unit?.slug || "");
   const unitQuiz = useMemo(() => (unit ? quiz.filter((q) => unitTopicMap(unit.slug, q.topic)) : []), [quiz, unit]);
   const lessons = useMemo(() => parseLessons(unit?.content || []), [unit]);
 
@@ -119,15 +952,18 @@ export default function StudioOnboardingUnitPage() {
   }, [activeLesson, moduleKey]);
 
   useEffect(() => {
-    const onScroll = () => {
-      const el = lessonRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      if (rect.bottom <= window.innerHeight - 16) setReachedEnd(true);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    lessonRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [activeLesson]);
+
+
+  useEffect(() => {
+    const marker = lessonEndRef.current;
+    if (!marker) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) setReachedEnd(true);
+    }, { threshold: 0.25 });
+    observer.observe(marker);
+    return () => observer.disconnect();
   }, [activeLesson, lessons.length]);
 
   const elapsedSeconds = Math.floor((tick - lessonStartAt) / 1000);
@@ -178,11 +1014,11 @@ export default function StudioOnboardingUnitPage() {
       setFailedTopics(Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []);
       if (data.passed) {
         setMessage("Módulo validado. Puedes continuar al siguiente.");
-        if (next) router.push(`/studio/onboarding/${next.slug}`);
-        else router.push("/studio/onboarding");
+        router.push("/studio/onboarding");
       } else {
         const attempts = data?.moduleStatus?.attempts ?? 0;
         const maxAttempts = data?.moduleStatus?.maxAttempts ?? 3;
+        setShowReinforceModal(Boolean((Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []).length));
         setMessage(`No alcanzaste el puntaje mínimo. Intento ${attempts}/${maxAttempts}.`);
       }
     } catch (error) {
@@ -196,40 +1032,767 @@ export default function StudioOnboardingUnitPage() {
   if (!unit) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><Link href="/studio/onboarding">Volver</Link></main>;
 
   const lesson = lessons[activeLesson];
+  const visual = moduleVisuals[moduleKey] || moduleVisuals.A;
+  const lessonProgressPct = lessons.length ? Math.round((completedLessonCount / lessons.length) * 100) : 0;
+  const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson) : null;
+  const isFoundationalLesson = moduleKey === "A" && lesson?.id === "A0";
+  const isArchitecturalLesson = moduleKey === "A" && lesson?.id === "A1";
+  const isContrastLesson = moduleKey === "A" && lesson?.id === "A2";
+  const isOperationalLesson = moduleKey === "A" && lesson?.id === "A3";
+  const isQualityLesson = moduleKey === "A" && lesson?.id === "A4";
+  const isCulturalLesson = moduleKey === "A" && lesson?.id === "A5";
+  const isBoundaryLesson = moduleKey === "A" && lesson?.id === "A6";
+  const isEthicsLesson = moduleKey === "A" && lesson?.id === "A7";
+  const isIntegrationLesson = moduleKey === "A" && lesson?.id === "Reflexión guiada sugerida";
+  const isConsultiveSalesLesson = moduleKey === "B" && lesson?.id === "B1";
 
   return (
     <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10">
       <section className="mx-auto max-w-4xl overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-        <div className="rounded-2xl border border-blue-100 bg-gradient-to-r from-sky-50 via-white to-violet-50 p-4">
+        <div className={`rounded-2xl border p-4 ${visual.heroBorder} ${visual.hero}`}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Módulo {moduleKey} · {unit.durationMinutes} min</div>
-              <h1 className="mt-2 text-3xl font-semibold text-slate-900">{unit.title}</h1>
-              <p className="mt-2 text-sm text-slate-700">{unit.summary}</p>
-              <p className="mt-2 text-xs text-slate-500">Lecciones completadas: {completedLessonCount}/{lessons.length} · Intentos quiz: {status?.attempts ?? 0}/{status?.maxAttempts ?? 3}</p>
+            <div className="flex items-center gap-3">
+              <Image src="/brand/logo-negro.png" alt="THO" width={40} height={40} className="opacity-90" />
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Programa de Onboarding</div>
+                <h1 className="text-lg font-semibold text-slate-900">{unit.title}</h1>
+              </div>
             </div>
-            <Image src="/brand/logo-negro.png" alt="THO" width={90} height={90} className="opacity-80" />
+            <span className="text-xs font-medium text-slate-600">{lessonProgressPct}%</span>
           </div>
+          <div className="mt-3 h-2 rounded-full bg-white/70">
+            <div className={`h-2 rounded-full ${visual.progress}`} style={{ width: `${lessonProgressPct}%` }} />
+          </div>
+          <div className="mt-4 h-[4px] w-full rounded-sm brand-block-divider" aria-hidden />
         </div>
 
         {lesson ? (
-          <article ref={lessonRef} className="mt-6 rounded-xl border border-slate-200 bg-slate-50/60 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1} · {lesson.label}</p>
-            <p className="mt-2 text-sm leading-relaxed text-slate-700">{lesson.body}</p>
-            <p className="mt-3 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
-            <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.max(0, v - 1))} disabled={activeLesson <= 0}>Anterior</button>
-              <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.min(lessons.length - 1, v + 1))} disabled={activeLesson >= lessons.length - 1}>Siguiente</button>
-              <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving || isLessonDone(lesson.id) || !canMarkLesson} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
-                {isLessonDone(lesson.id) ? "Lección completada" : "Marcar como completada"}
-              </button>
+          <article ref={lessonRef} className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
+            {isFoundationalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{foundationalLessonA0.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{foundationalLessonA0.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {foundationalLessonA0.strategicFrame.map((paragraph, idx) => (
+                    <p key={`frame-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-7">
+                  {foundationalLessonA0.blocks.map((block) => (
+                    <section key={block.heading}>
+                      <h3 className="text-xl font-semibold text-slate-900">{block.heading}</h3>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{block.intro}</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                        {block.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{block.closing}</p>
+                    </section>
+                  ))}
+                </div>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{foundationalLessonA0.tension.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{foundationalLessonA0.tension.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {foundationalLessonA0.tension.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{foundationalLessonA0.tension.closing}</p>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{foundationalLessonA0.practice.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{foundationalLessonA0.practice.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {foundationalLessonA0.practice.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Micro-reflexión</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{foundationalLessonA0.reflection}</p>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isArchitecturalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{architecturalLessonA1.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{architecturalLessonA1.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {architecturalLessonA1.definition.map((paragraph, idx) => (
+                    <p key={`a1-def-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-7">
+                  {architecturalLessonA1.sections.map((section) => (
+                    <section key={section.heading}>
+                      <h3 className="text-xl font-semibold text-slate-900">{section.heading}</h3>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{section.intro}</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                        {section.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{section.closing}</p>
+                    </section>
+                  ))}
+                </div>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{architecturalLessonA1.scenario.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {architecturalLessonA1.scenario.text.map((line, idx) => (
+                      <p key={`a1-scenario-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{architecturalLessonA1.translation.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{architecturalLessonA1.translation.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {architecturalLessonA1.translation.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{architecturalLessonA1.synthesis}</p>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isContrastLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{contrastLessonA2.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{contrastLessonA2.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {contrastLessonA2.hook.map((paragraph, idx) => (
+                    <p key={`a2-hook-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <section className="mt-8 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.purpose.heading}</h3>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.purpose.question}</p>
+                    <p className="mt-2 text-[16px] font-semibold leading-relaxed text-slate-800">{contrastLessonA2.purpose.answer}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {contrastLessonA2.purpose.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.purpose.closing}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.value.heading}</h3>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.value.question}</p>
+                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.value.answer}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {contrastLessonA2.value.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.value.closing}</p>
+                  </div>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.crossing.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.crossing.intro}</p>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.crossing.body}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {contrastLessonA2.crossing.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.crossing.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.scenario.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {contrastLessonA2.scenario.lines.map((line, idx) => <p key={`a2-scenario-${idx}`}>{line}</p>)}
+                  </div>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{contrastLessonA2.translation.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{contrastLessonA2.translation.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {contrastLessonA2.translation.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium text-slate-800">{contrastLessonA2.translation.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {contrastLessonA2.synthesis.map((line, idx) => <p key={`a2-synth-${idx}`}>{line}</p>)}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isOperationalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{operationalLessonA3.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{operationalLessonA3.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {operationalLessonA3.premise.map((paragraph, idx) => (
+                    <p key={`a3-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-7">
+                  {operationalLessonA3.sections.map((section) => (
+                    <section key={section.heading}>
+                      <h3 className="text-xl font-semibold text-slate-900">{section.heading}</h3>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{section.intro}</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                        {section.bullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                      <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{section.closing}</p>
+                    </section>
+                  ))}
+                </div>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{operationalLessonA3.cycle.heading}</h3>
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] font-semibold text-slate-700">
+                    {operationalLessonA3.cycle.stages.map((stage, idx) => (
+                      <div key={stage} className="flex items-center gap-2">
+                        <span className="rounded-md border border-slate-300 bg-white px-2 py-1">{stage}</span>
+                        {idx < operationalLessonA3.cycle.stages.length - 1 ? <span className="text-slate-400">→</span> : null}
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{operationalLessonA3.cycle.closing}</p>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{operationalLessonA3.principles.heading}</h3>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {operationalLessonA3.principles.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {operationalLessonA3.synthesis.map((line, idx) => (
+                      <p key={`a3-synthesis-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isQualityLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{qualityLessonA4.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{qualityLessonA4.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {qualityLessonA4.premise.map((paragraph, idx) => (
+                    <p key={`a4-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.whatIs.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{qualityLessonA4.whatIs.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.whatIs.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{qualityLessonA4.whatIs.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.whatIsNot.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{qualityLessonA4.whatIsNot.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.whatIsNot.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{qualityLessonA4.whatIsNot.closing}</p>
+                </section>
+
+                <section className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.criteria.heading}</h3>
+                  <div className="mt-3 space-y-2">
+                    {qualityLessonA4.criteria.items.map((item) => (
+                      <div key={item.title} className="rounded-lg border border-slate-200 bg-white p-3">
+                        <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+                        <p className="mt-1 text-sm leading-relaxed text-slate-700">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.scenario.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.scenario.lines.map((line, idx) => (
+                      <p key={`a4-scenario-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-300 bg-white p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{qualityLessonA4.checklist.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{qualityLessonA4.checklist.intro}</p>
+                  <ul className="mt-3 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {qualityLessonA4.checklist.bullets.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="mt-[3px] inline-block h-4 w-4 shrink-0 rounded border border-slate-400" aria-hidden="true" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{qualityLessonA4.checklist.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {qualityLessonA4.synthesis.map((line, idx) => (
+                      <p key={`a4-synth-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isCulturalLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{culturalLessonA5.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{culturalLessonA5.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {culturalLessonA5.premise.map((paragraph, idx) => (
+                    <p key={`a5-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-8">
+                  {culturalLessonA5.sections.map((section) => (
+                    <section key={section.heading} className="space-y-3">
+                      <h3 className="text-xl font-semibold text-slate-900">{section.heading}</h3>
+
+                      <div>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Qué protege</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                          {section.protects.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Qué exige</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                          {section.requires.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <p className="text-[16px] font-medium leading-relaxed text-slate-800">{section.standard}</p>
+
+                      <div>
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Qué invalida</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                          {section.invalidates.map((bullet) => (
+                            <li key={bullet}>{bullet}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </section>
+                  ))}
+                </div>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{culturalLessonA5.tension.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{culturalLessonA5.tension.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {culturalLessonA5.tension.bullets.map((bullet) => (
+                      <li key={bullet}>{bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{culturalLessonA5.tension.closing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {culturalLessonA5.synthesis.map((line, idx) => (
+                      <p key={`a5-synth-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isBoundaryLesson ? (
+              <div className="mx-auto max-w-[720px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{boundaryLessonA6.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{boundaryLessonA6.title}</h2>
+
+                <div className="mt-6 space-y-3 text-[16px] leading-relaxed text-slate-700">
+                  {boundaryLessonA6.premise.map((paragraph, idx) => (
+                    <p key={`a6-premise-${idx}`}>{paragraph}</p>
+                  ))}
+                </div>
+
+                <section className="mt-8 space-y-4">
+                  <h3 className="text-xl font-semibold text-slate-900">Cláusulas no negociables</h3>
+                  {boundaryLessonA6.clauses.map((clause) => (
+                    <div key={clause.title} className="rounded-lg border border-slate-200 bg-white p-4">
+                      <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">{clause.title}</p>
+                      <p className="mt-2 text-[16px] font-semibold leading-relaxed text-slate-900">{clause.statement}</p>
+                      <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{clause.body}</p>
+                      {clause.closing ? <p className="mt-2 text-[16px] font-medium leading-relaxed text-slate-800">{clause.closing}</p> : null}
+                    </div>
+                  ))}
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{boundaryLessonA6.tension.heading}</h3>
+                  <div className="mt-2 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                    {boundaryLessonA6.tension.lines.map((line, idx) => (
+                      <p key={`a6-tension-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-xl font-semibold text-slate-900">{boundaryLessonA6.protocol.heading}</h3>
+                  <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{boundaryLessonA6.protocol.intro}</p>
+                  <ol className="mt-2 list-decimal space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                    {boundaryLessonA6.protocol.steps.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {boundaryLessonA6.synthesis.map((line, idx) => (
+                      <p key={`a6-synth-${idx}`}>{line}</p>
+                    ))}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isEthicsLesson ? (
+              <div className="mx-auto max-w-[760px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{ethicsLessonA7.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{ethicsLessonA7.title}</h2>
+
+                <div className="mt-5 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                  {ethicsLessonA7.premise.map((line, idx) => (
+                    <p key={`a7-premise-${idx}`}>{line}</p>
+                  ))}
+                </div>
+
+                <div className="mt-8 space-y-6">
+                  <section className="border-l-2 border-slate-300 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.risk.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.risk.intro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                      {ethicsLessonA7.risk.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[15px] font-medium text-slate-800">{ethicsLessonA7.risk.closing}</p>
+                  </section>
+
+                  <section className="border-l-2 border-slate-300 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.alerts.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.alerts.intro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                      {ethicsLessonA7.alerts.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[15px] font-medium text-slate-800">{ethicsLessonA7.alerts.closing}</p>
+                  </section>
+
+                  <section className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.protocol.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.protocol.intro}</p>
+                    <ol className="mt-3 space-y-2 text-[15px] text-slate-700">
+                      {ethicsLessonA7.protocol.steps.map((step) => (
+                        <li key={step.tag} className="rounded-md border border-slate-200 bg-white p-3">
+                          <p className="font-semibold text-slate-900">{step.tag}</p>
+                          <p className="mt-1">{step.detail}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  </section>
+
+                  <section className="border-l-2 border-slate-300 pl-4">
+                    <h3 className="text-lg font-semibold text-slate-900">{ethicsLessonA7.escalation.heading}</h3>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.escalation.intro}</p>
+                    <p className="mt-2 text-[15px] text-slate-700">{ethicsLessonA7.escalation.triggersIntro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                      {ethicsLessonA7.escalation.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                    <p className="mt-2 text-[15px] font-medium text-slate-800">{ethicsLessonA7.escalation.closing}</p>
+                  </section>
+                </div>
+
+                <section className="mt-8 overflow-hidden rounded-lg border border-slate-300">
+                  <h3 className="border-b border-slate-300 bg-slate-100 px-4 py-3 text-lg font-semibold text-slate-900">{ethicsLessonA7.matrix.heading}</h3>
+                  <div className="divide-y divide-slate-200">
+                    {ethicsLessonA7.matrix.rows.map((row) => (
+                      <div key={row.condition} className="grid gap-2 px-4 py-3 sm:grid-cols-[1.5fr_1fr]">
+                        <p className="text-[15px] font-medium text-slate-800">{row.condition}</p>
+                        <p className="text-[15px] text-slate-700">→ {row.action}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Síntesis</h3>
+                  <div className="mt-2 space-y-1 text-[16px] font-medium leading-relaxed text-slate-800">
+                    {ethicsLessonA7.synthesis.map((line, idx) => <p key={`a7-synth-${idx}`}>{line}</p>)}
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isIntegrationLesson ? (
+              <div className="mx-auto max-w-[760px] p-6 sm:p-10">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{integrationLessonA8.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{integrationLessonA8.title}</h2>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
+                  <p className="text-[15px] leading-relaxed text-slate-700">Durante este módulo revisaste:</p>
+                  <ul className="mt-3 list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-slate-700">
+                    {integrationLessonA8.summary.map((item) => <li key={item}>{item}</li>)}
+                  </ul>
+                  <p className="mt-3 text-[15px] font-medium text-slate-800">Ahora la pregunta no es conceptual. Es operativa.</p>
+                </section>
+
+                <section className="mt-8 space-y-4">
+                  <h3 className="text-lg font-semibold text-slate-900">Autoevaluación breve</h3>
+                  {integrationLessonA8.selfAssessment.map((item, idx) => (
+                    <div key={item.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                      <p className="text-sm font-semibold text-slate-900">{idx + 1}. {item.prompt}</p>
+                      <p className="mt-1 text-[15px] leading-relaxed text-slate-700">{item.question}</p>
+                      <div className="mt-3 flex gap-3">
+                        <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                          <input
+                            type="radio"
+                            name={`integration-${item.id}`}
+                            checked={integrationAnswers[item.id] === "si"}
+                            onChange={() => setIntegrationAnswers((prev) => ({ ...prev, [item.id]: "si" }))}
+                          />
+                          Sí
+                        </label>
+                        <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                          <input
+                            type="radio"
+                            name={`integration-${item.id}`}
+                            checked={integrationAnswers[item.id] === "no"}
+                            onChange={() => setIntegrationAnswers((prev) => ({ ...prev, [item.id]: "no" }))}
+                          />
+                          No
+                        </label>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="text-[15px] font-medium text-slate-800">{integrationLessonA8.assessmentClosing}</p>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5">
+                  <h3 className="text-lg font-semibold text-slate-900">{integrationLessonA8.declaration.heading}</h3>
+                  <p className="mt-2 text-[15px] text-slate-700">{integrationLessonA8.declaration.intro}</p>
+                  <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] text-slate-700">
+                    {integrationLessonA8.declaration.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                  </ul>
+                  <div className="mt-3 space-y-1 text-[15px] font-medium text-slate-800">
+                    {integrationLessonA8.declaration.closing.map((line) => <p key={line}>{line}</p>)}
+                  </div>
+                </section>
+
+                <section className="mt-8 rounded-xl border border-slate-300 bg-white p-5">
+                  <h3 className="text-lg font-semibold text-slate-900">Confirmación antes del quiz</h3>
+                  <label className="mt-3 inline-flex items-start gap-2 text-sm text-slate-700">
+                    <input type="checkbox" checked={integrationConfirmed} onChange={(e) => setIntegrationConfirmed(e.target.checked)} className="mt-0.5" />
+                    <span>{integrationLessonA8.confirmationLabel}</span>
+                  </label>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      disabled={!integrationConfirmed}
+                      onClick={() => quizSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                      className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                    >
+                      {integrationLessonA8.actionLabel}
+                    </button>
+                  </div>
+                </section>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : isConsultiveSalesLesson ? (
+              <div className="mx-auto max-w-[760px] p-6 sm:p-8">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{consultiveSalesLessonB1.label}</p>
+                <h2 className="mt-2 text-3xl font-semibold leading-tight text-slate-950">{consultiveSalesLessonB1.title}</h2>
+                <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{consultiveSalesLessonB1.tension}</p>
+
+                <div className="mt-6 space-y-2 text-[16px] leading-relaxed text-slate-700">
+                  {consultiveSalesLessonB1.intro.map((line) => <p key={line}>{line}</p>)}
+                </div>
+
+                <div className="mt-8 space-y-8">
+                  <section>
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.conceptual.heading}</h3>
+                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{consultiveSalesLessonB1.conceptual.intro}</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {consultiveSalesLessonB1.conceptual.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.difference.heading}</h3>
+                    <div className="mt-3 grid gap-4 md:grid-cols-2">
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-700">Venta transaccional</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-slate-700">
+                          {consultiveSalesLessonB1.difference.transactional.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                        </ul>
+                      </div>
+                      <div className="rounded-xl border border-slate-200 bg-white p-4">
+                        <p className="text-sm font-semibold uppercase tracking-wide text-slate-700">Venta institucional THO</p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-[15px] leading-relaxed text-slate-700">
+                          {consultiveSalesLessonB1.difference.institutional.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                        </ul>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.rector.heading}</h3>
+                    <p className="mt-2 text-[16px] font-semibold text-slate-900">{consultiveSalesLessonB1.rector.statement}</p>
+                    <p className="mt-1 text-[16px] font-medium text-slate-800">{consultiveSalesLessonB1.rector.closing}</p>
+                    <p className="mt-2 text-[16px] leading-relaxed text-slate-700">Aceptar un cliente incompatible puede generar:</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {consultiveSalesLessonB1.rector.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}
+                    </ul>
+                  </section>
+
+                  <section className="rounded-xl border border-slate-200 bg-white p-4">
+                    <h3 className="text-xl font-semibold text-slate-900">{consultiveSalesLessonB1.mindset.heading}</h3>
+                    <ol className="mt-2 list-decimal space-y-1 pl-5 text-[16px] leading-relaxed text-slate-700">
+                      {consultiveSalesLessonB1.mindset.questions.map((question) => <li key={question}>{question}</li>)}
+                    </ol>
+                    <p className="mt-3 text-[16px] font-medium leading-relaxed text-slate-800">{consultiveSalesLessonB1.mindset.closing}</p>
+                  </section>
+                </div>
+
+                <p className="mt-6 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+              </div>
+            ) : (
+              <div className="grid gap-0 md:grid-cols-[1.2fr_0.8fr]">
+                <div className="p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Lección {activeLesson + 1}</p>
+                  <h2 className="mt-1 text-lg font-semibold text-slate-900">{lesson.title}</h2>
+                  <p className={`mt-2 text-base font-medium ${visual.accent}`}>{lesson.subtitle}</p>
+                  <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">Puntos de clarificación</p>
+                    {lesson.bullets.length ? (
+                      <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-700">
+                        {lesson.bullets.map((bullet, idx) => (
+                          <li key={`${lesson.id}-bullet-${idx}`}>{bullet}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-sm text-slate-600">No hay aclaraciones adicionales en esta lección.</p>
+                    )}
+                  </div>
+
+                  {lessonGuide ? (
+                    <div className="mt-4 space-y-3 rounded-xl border border-sky-100 bg-sky-50/70 p-3">
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Por qué importa</p>
+                        <p className="mt-1 text-sm text-slate-700">{lessonGuide.whyItMatters}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Cómo proceder</p>
+                        <p className="mt-1 text-sm text-slate-700">{lessonGuide.whatToDo}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Error frecuente</p>
+                        <p className="mt-1 text-sm text-slate-700">{lessonGuide.commonMistake}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold uppercase tracking-wide text-sky-700">Aprendizajes clave</p>
+                        <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-slate-700">
+                          {lessonGuide.keyLearnings.slice(0, 3).map((item) => (
+                            <li key={`${lesson.id}-${item}`}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <p className="mt-4 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
+                  <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+                </div>
+                <div className="relative min-h-44 bg-slate-50">
+                  <Image src={visual.cover} alt={`Ilustración módulo ${moduleKey}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+                </div>
+              </div>
+            )}
+            <div ref={lessonEndRef} className="h-0 w-0" />
+            <div className="border-t border-slate-200 bg-slate-50/60 p-4">
+              <div className="flex flex-wrap gap-2">
+                <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.max(0, v - 1))} disabled={activeLesson <= 0}>Anterior</button>
+                <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.min(lessons.length - 1, v + 1))} disabled={activeLesson >= lessons.length - 1}>Siguiente</button>
+                {isLessonDone(lesson.id) ? (
+                  <span className="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800">Lección completada</span>
+                ) : canMarkLesson ? (
+                  <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
+                    Marcar como completada
+                  </button>
+                ) : (
+                  <span className="rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Completa lectura + tiempo mínimo para habilitar</span>
+                )}
+              </div>
             </div>
           </article>
         ) : null}
 
-        {unitQuiz.length ? (
-          <div className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
+        {unitQuiz.length && allLessonsDone ? (
+          <div ref={quizSectionRef} className="mt-8 rounded-xl border border-indigo-200 bg-indigo-50 p-4">
             <h2 className="text-lg font-semibold text-indigo-900">Evaluación del módulo</h2>
             <p className="mt-1 text-sm text-indigo-900">Debes aprobar para validar este módulo.</p>
             <div className="mt-4 space-y-4">
@@ -250,6 +1813,15 @@ export default function StudioOnboardingUnitPage() {
           </div>
         ) : null}
 
+        {unitQuiz.length && !allLessonsDone ? (
+          <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <h2 className="text-sm font-semibold text-slate-800">Evaluación del módulo bloqueada temporalmente</h2>
+            <p className="mt-1 text-sm text-slate-700">
+              El quiz aparece al finalizar y completar todas las lecciones del módulo ({completedLessonCount}/{lessons.length}).
+            </p>
+          </div>
+        ) : null}
+
         {failedTopics.length ? (
           <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4">
             <h3 className="text-sm font-semibold text-amber-900">Tópicos a reforzar</h3>
@@ -258,7 +1830,7 @@ export default function StudioOnboardingUnitPage() {
                 const lessonRefItem = topicToLesson(topic, lessons);
                 return (
                   <li key={`${topic}-${idx}`}>
-                    {topic} · {lessonRefItem ? <button type="button" onClick={() => setActiveLesson(Math.max(0, lessons.findIndex((item) => item.id === lessonRefItem.id)))} className="underline underline-offset-2">ir a {lessonRefItem.label}</button> : null}
+                    {`Revisar: ${topicReviewLabel[topic] || topic}`} · {lessonRefItem ? <button type="button" onClick={() => setActiveLesson(Math.max(0, lessons.findIndex((item) => item.id === lessonRefItem.id)))} className="underline underline-offset-2">ir a {lessonRefItem.label}</button> : null}
                   </li>
                 );
               })}
@@ -267,13 +1839,32 @@ export default function StudioOnboardingUnitPage() {
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-2">
-          <button type="button" onClick={completeModule} disabled={saving || !allLessonsDone || status?.status === "failed_max_attempts"} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-            Completar módulo
-          </button>
+          {allLessonsDone ? (
+            <button type="button" onClick={completeModule} disabled={saving || status?.status === "failed_max_attempts"} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+              Completar módulo
+            </button>
+          ) : null}
           <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver</Link>
         </div>
 
         {status?.status === "failed_max_attempts" ? <p className="mt-2 text-sm text-rose-700">Alcanzaste el máximo de intentos. Solicita reset a un superadmin.</p> : null}
+
+        {showReinforceModal && failedTopics.length ? (
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4" role="dialog" aria-modal="true" aria-label="Feedback de evaluación">
+            <div className="w-full max-w-lg rounded-xl border border-slate-200 bg-white p-5 shadow-xl">
+              <h3 className="text-lg font-semibold text-slate-900">Reforzar antes de reintentar</h3>
+              <p className="mt-1 text-sm text-slate-700">No solo incorrecto: revisa estos tópicos del estándar institucional.</p>
+              <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-800">
+                {failedTopics.map((topic) => <li key={`modal-${topic}`}>{`Revisar: ${topicReviewLabel[topic] || topic}`}</li>)}
+              </ul>
+              <div className="mt-4 flex justify-end">
+                <button type="button" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white" onClick={() => setShowReinforceModal(false)}>
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
         <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {onboarding?.last_saved_at || "Sin registro"}</p>
         {message ? <p className="mt-2 text-sm text-slate-700">{message}</p> : null}
       </section>

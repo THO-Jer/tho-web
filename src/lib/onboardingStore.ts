@@ -25,9 +25,9 @@ type ModuleKey = "A" | "B" | "C" | "D";
 
 const TRACK_MODULES: Record<OnboardingTrack, ModuleKey[]> = {
   general: ["A", "B", "C", "D"],
-  sales: ["A", "B", "C", "D"],
-  creative_ops: ["A", "B", "C", "D"],
-  advisory_ops: ["A", "B", "C", "D"],
+  sales: ["A", "B"],
+  creative_ops: ["A", "C"],
+  advisory_ops: ["A", "D"],
 };
 
 const MODULE_MAX_ATTEMPTS = Math.max(1, Number(process.env.ONBOARDING_MAX_ATTEMPTS_DEFAULT || 3));
@@ -116,7 +116,17 @@ function indexByModuleKey(moduleKey: string) {
   return ["A", "B", "C", "D"].indexOf(moduleKey);
 }
 
+function moduleKeyFromUnit(unit: OnboardingUnit, index: number): ModuleKey {
+  if (unit.slug === "identidad-tho") return "A";
+  if (unit.slug === "ventas-tho") return "B";
+  if (unit.slug === "operacion-creativa") return "C";
+  if (unit.slug === "operacion-asesorias") return "D";
+  return moduleKeyByIndex(index);
+}
+
 function getUnitByModuleKey(units: OnboardingUnit[], moduleKey: string) {
+  const bySlug = units.find((unit, index) => moduleKeyFromUnit(unit, index) === moduleKey);
+  if (bySlug) return bySlug;
   const index = indexByModuleKey(moduleKey);
   return index >= 0 ? units[index] : null;
 }
@@ -191,10 +201,10 @@ async function readStateFromSupabase(): Promise<OnboardingState> {
   for (const row of moduleRows) {
     const email = normalizeEmail(row.email);
     if (!moduleStatusByEmail[email]) moduleStatusByEmail[email] = {};
-    moduleStatusByEmail[email][row.module_key] = {
-      moduleKey: row.module_key as ModuleKey,
+    moduleStatusByEmail[email][row.module] = {
+      moduleKey: row.module as ModuleKey,
       status: row.status,
-      attempts: row.attempts,
+      attempts: row.attempts_used,
       maxAttempts: row.max_attempts,
       validatedAt: row.validated_at,
     };
@@ -232,13 +242,26 @@ function getTrackModules(track: OnboardingTrack) {
 
 function getApplicableUnitsByTrack(units: OnboardingUnit[], track: OnboardingTrack) {
   const allowed = new Set(getTrackModules(track));
-  return units.filter((_, i) => allowed.has(moduleKeyByIndex(i)));
+  return units.filter((unit, index) => allowed.has(moduleKeyFromUnit(unit, index)));
 }
 
 function getUnitByTopic(units: OnboardingUnit[], topic: string) {
   const t = topic.toLowerCase();
   const byUnit: Record<string, string[]> = {
-    "identidad-tho": ["identidad", "onboarding"],
+    "identidad-tho": [
+      "identidad",
+      "onboarding",
+      "adaptabilidad_ordenada",
+      "definition_of_done",
+      "metodo_sobre_costumbre",
+      "limites_institucionales",
+      "protocolo_etico",
+      "escalamiento",
+      "marco_agile",
+      "coherencia",
+      "integridad_territorial",
+      "trazabilidad",
+    ],
     "ventas-tho": ["ventas"],
     "operacion-creativa": ["operacion_creativa", "operacion"],
     "operacion-asesorias": ["operacion_asesorias", "seguridad"],
@@ -309,7 +332,12 @@ function summarizeOnboarding(record: OnboardingRecord, state: OnboardingState, r
   const units = getApplicableUnitsByTrack(state.units, record.track);
   const statuses = computeModuleStatuses(record, state);
   const completedSet = new Set(record.completed_units || []);
-  const progress = units.length ? Math.round((units.filter((u) => completedSet.has(u.slug)).length / units.length) * 100) : 0;
+  const requiredLessonTags = units.flatMap((unit, idx) => {
+    const moduleKey = moduleKeyFromUnit(unit, idx);
+    return parseLessonIds(unit.content).map((lessonId) => `${moduleKey}:${lessonId}`);
+  });
+  const completedLessons = requiredLessonTags.filter((tag) => completedSet.has(tag)).length;
+  const progress = requiredLessonTags.length ? Math.round((completedLessons / requiredLessonTags.length) * 100) : 0;
   const completed = statuses.every((status) => status.status === "validated" || ["C", "D"].includes(status.moduleKey));
   return {
     progress,
@@ -345,9 +373,9 @@ async function persistModuleStatus(record: OnboardingRecord, status: ModuleStatu
       row: {
         email,
         track: record.track,
-        module_key: status.moduleKey,
+        module: status.moduleKey,
         status: status.status,
-        attempts: status.attempts,
+        attempts_used: status.attempts,
         max_attempts: status.maxAttempts,
         validated_at: status.validatedAt,
       },
@@ -477,7 +505,9 @@ export async function submitModuleQuiz(email: string, moduleKey: string, answers
   const statuses = computeModuleStatuses(current, state);
   const currentStatus = getModuleStatus(statuses, moduleKey);
   if (!currentStatus) throw new Error("Módulo no aplicable.");
-  if (currentStatus.status === "failed_max_attempts") throw new Error("Se alcanzó el máximo de intentos. Solicita reset de superadmin.");
+  if (currentStatus.status === "failed_max_attempts" || currentStatus.attempts >= currentStatus.maxAttempts) {
+    throw new Error("Se alcanzó el máximo de intentos. Solicita reset de superadmin.");
+  }
 
   const unit = getUnitByModuleKey(state.units, moduleKey);
   if (!unit) throw new Error("Módulo no configurado.");
@@ -509,7 +539,7 @@ export async function submitModuleQuiz(email: string, moduleKey: string, answers
   const nextStatus: ModuleStatus = {
     ...currentStatus,
     attempts,
-    status: passed ? "validated" : attempts >= MODULE_MAX_ATTEMPTS ? "failed_max_attempts" : "in_progress",
+    status: passed ? "validated" : attempts >= currentStatus.maxAttempts ? "failed_max_attempts" : "in_progress",
     validatedAt: passed ? now : undefined,
   };
 

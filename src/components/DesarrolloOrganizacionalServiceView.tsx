@@ -251,13 +251,13 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
           <div className="brand-block-divider mt-3 mb-8 h-[6px] w-36 rounded-sm" />
 
           <div className="esg-level-grid esg-levels-gallery grid gap-5 md:grid-cols-3">
-            <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#818cf8] bg-[linear-gradient(160deg,#eef2ff_0%,#e0e7ff_55%,#c7d2fe_100%)] p-6">
+            <article className="service-feature-card service-feature-card--pink esg-level-card esg-level-card--start relative rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-4 top-4 w-14 opacity-95" />
               <p className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white">● Punto de partida recomendado</p>
               <h4 className="mt-4 text-3xl font-black leading-[1.02] text-slate-900">Scan Cultura y Liderazgo</h4>
-              <p className="mt-3 text-sm text-slate-700">Diagnóstico estratégico inicial para identificar brechas culturales y de liderazgo que afectan la ejecución.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-800">
+              <p className="mt-3 text-sm text-slate-900 dark:text-slate-200">Diagnóstico estratégico inicial para identificar brechas culturales y de liderazgo que afectan la ejecución.</p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-100">
                 <li>• Lectura de cultura actual y cultura objetivo.</li>
                 <li>• Mapa de capacidades de liderazgo críticas.</li>
                 <li>• Recomendaciones tempranas de intervención.</li>
@@ -267,44 +267,44 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
               </button>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#6366f1]/80 bg-[linear-gradient(160deg,#eef2ff_0%,#e0e7ff_58%,#a5b4fc_100%)] p-6">
+            <article className="service-feature-card service-feature-card--pink esg-level-card rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-800">Escala de profundidad estratégica</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Ruta de Transformación y Gestión del Cambio</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-200">
                 <li>• Diseño de frentes de transformación organizacional.</li>
                 <li>• Modelo de liderazgo y gobernanza del cambio.</li>
                 <li>• Indicadores de adopción y desempeño cultural.</li>
                 <li>• Plan de implementación por etapas y hitos críticos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15 dark:bg-slate-900/80 dark:ring-white/15">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Hoja de ruta de transformación.</li>
                   <li>✓ Marco de gobernanza del cambio.</li>
                   <li>✓ Sistema de seguimiento de adopción.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
+              <p className="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#4338ca]/85 bg-[linear-gradient(160deg,#e0e7ff_0%,#a5b4fc_58%,#818cf8_100%)] p-6">
+            <article className="service-feature-card service-feature-card--pink esg-level-card rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-900">Escala de consolidación operativa</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Implementación y Consolidación</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-200">
                 <li>• Acompañamiento a líderes y equipos clave.</li>
                 <li>• Instalación de hábitos de liderazgo y gestión.</li>
                 <li>• Monitoreo de avance cultural y bloqueos.</li>
                 <li>• Ajustes tácticos según aprendizaje organizacional.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-indigo-700/15 dark:bg-slate-900/80 dark:ring-white/15">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Sistema operativo de transformación.</li>
                   <li>✓ Evaluaciones periódicas de madurez organizacional.</li>
                   <li>✓ Mejora continua.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Convierte la estrategia en práctica real.</p>
+              <p className="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">Convierte la estrategia en práctica real.</p>
             </article>
           </div>
         </div>

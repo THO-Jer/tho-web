@@ -125,6 +125,18 @@ function rowToPost(row: BlogPostRow): BlogPost {
   };
 }
 
+
+function toChronologicalTime(post: BlogPost) {
+  const primary = post.publishedAt ? new Date(post.publishedAt).getTime() : Number.NaN;
+  if (!Number.isNaN(primary)) return primary;
+  const fallback = post.updatedAt ? new Date(post.updatedAt).getTime() : 0;
+  return Number.isNaN(fallback) ? 0 : fallback;
+}
+
+function sortPostsByEditorialDate(posts: BlogPost[]) {
+  return [...posts].sort((a, b) => toChronologicalTime(b) - toChronologicalTime(a));
+}
+
 function postToRowInput(post: BlogPost) {
   return {
     slug: post.slug,
@@ -157,11 +169,7 @@ async function readFileStore(): Promise<BlogPost[]> {
   await ensureStore();
   const raw = await fs.readFile(BLOG_PATH, "utf8");
   const parsed = JSON.parse(raw) as BlogPost[];
-  return parsed.sort((a, b) => {
-    const aTime = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-    const bTime = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-    return bTime - aTime;
-  });
+  return sortPostsByEditorialDate(parsed);
 }
 
 async function writeFileStore(posts: BlogPost[]) {
@@ -229,7 +237,7 @@ export async function listAllPosts() {
         order: "updated_at.desc",
       });
       const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
-      return rows.map(rowToPost);
+      return sortPostsByEditorialDate(rows.map(rowToPost));
     } catch (error) {
       if (isMissingSupabaseTableError(error)) {
         return readFileStore();
@@ -242,7 +250,7 @@ export async function listAllPosts() {
           order: "updated_at.desc",
         });
         const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`)) as Omit<BlogPostRow, "category">[];
-        return rows.map((row) => rowToPost({ ...(row as BlogPostRow), category: null }));
+        return sortPostsByEditorialDate(rows.map((row) => rowToPost({ ...(row as BlogPostRow), category: null })));
       }
 
       throw error;
@@ -254,7 +262,7 @@ export async function listAllPosts() {
 
 export async function listPublishedPosts() {
   const posts = await listAllPosts();
-  return posts.filter((post) => post.status === "published");
+  return sortPostsByEditorialDate(posts.filter((post) => post.status === "published"));
 }
 
 export async function getPublishedPostBySlug(slug: string) {

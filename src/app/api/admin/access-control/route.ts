@@ -30,6 +30,7 @@ function withSuperAdmins(authorizedUsers: Array<{
   permissions: { canBlog: boolean; canCrm: boolean; canIncidents: boolean; canOnboarding: boolean };
   updatedAt: string;
   role?: string;
+  team?: "sales" | "creative_ops" | "advisory_ops" | "general";
   blocked?: boolean;
 }>) {
   const byEmail = new Map(authorizedUsers.map((user) => [user.email, user]));
@@ -47,6 +48,7 @@ function withSuperAdmins(authorizedUsers: Array<{
         },
         updatedAt: new Date().toISOString(),
         role: "superadmin",
+        team: "general",
         blocked: false,
       });
     }
@@ -99,6 +101,7 @@ export async function POST(req: NextRequest) {
         email,
         provider: (payload.provider || "google") as StudioUserProvider,
         role: isStudioSuperAdmin(email) ? "superadmin" : (payload.role || "member"),
+        team: payload.team || "general",
         active: payload.active !== false,
         permissions: {
           canBlog: Boolean(payload.permissions?.canBlog),
@@ -119,6 +122,7 @@ export async function POST(req: NextRequest) {
         email,
         provider: (payload.provider || "google") as StudioUserProvider,
         role: isStudioSuperAdmin(email) ? "superadmin" : (payload.role || "member"),
+        team: payload.team || "general",
         active: payload.active !== false,
         permissions: {
           canBlog: Boolean(payload.permissions?.canBlog),

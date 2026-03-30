@@ -251,13 +251,13 @@ export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts
           <div className="brand-block-divider mt-3 mb-8 h-[6px] w-36 rounded-sm" />
 
           <div className="esg-level-grid esg-levels-gallery grid gap-5 md:grid-cols-3">
-            <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#f59e0b] bg-[linear-gradient(160deg,#fff7ed_0%,#ffedd5_55%,#fed7aa_100%)] p-6">
+            <article className="service-feature-card service-feature-card--orange esg-level-card esg-level-card--start relative rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-4 top-4 w-14 opacity-95" />
               <p className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white">● Punto de partida recomendado</p>
               <h4 className="mt-4 text-3xl font-black leading-[1.02] text-slate-900">Mapa de Riesgos Socioambientales</h4>
-              <p className="mt-3 text-sm text-slate-700">Diagnóstico estratégico inicial para organizaciones que necesitan claridad territorial inmediata.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-800">
+              <p className="mt-3 text-sm text-slate-900 dark:text-slate-200">Diagnóstico estratégico inicial para organizaciones que necesitan claridad territorial inmediata.</p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-100">
                 <li>• Mapeo inicial de actores y dinámicas territoriales.</li>
                 <li>• Identificación de riesgos sociales, reputacionales y operacionales.</li>
                 <li>• Recomendaciones tempranas de relacionamiento.</li>
@@ -267,44 +267,44 @@ export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts
               </button>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#fb923c]/80 bg-[linear-gradient(160deg,#fff7ed_0%,#ffedd5_58%,#fdba74_100%)] p-6">
+            <article className="service-feature-card service-feature-card--orange esg-level-card rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-orange-800">Escala de profundidad estratégica</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Estrategia Territorial y Gobernanza</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-200">
                 <li>• Diseño de estrategia por segmentos de actores.</li>
                 <li>• Protocolos de coordinación y vocerías.</li>
                 <li>• Indicadores de gestión territorial.</li>
                 <li>• Plan de implementación con hitos críticos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15 dark:bg-slate-900/80 dark:ring-white/15">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Hoja de ruta territorial.</li>
                   <li>✓ Marco de gobernanza comunitaria.</li>
                   <li>✓ Sistema de seguimiento de compromisos.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
+              <p className="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#ea580c]/85 bg-[linear-gradient(160deg,#ffedd5_0%,#fdba74_58%,#fb923c_100%)] p-6">
+            <article className="service-feature-card service-feature-card--orange esg-level-card rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-orange-900">Escala de consolidación operativa</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Implementación y Seguimiento</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-200">
                 <li>• Acompañamiento en terreno y mesa interna.</li>
                 <li>• Instalación de capacidades de relacionamiento.</li>
                 <li>• Monitoreo de señales tempranas y acuerdos.</li>
                 <li>• Ajustes tácticos según evolución territorial.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-orange-700/15 dark:bg-slate-900/80 dark:ring-white/15">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Sistema operativo de relacionamiento.</li>
                   <li>✓ Evaluaciones periódicas en territorio.</li>
                   <li>✓ Mejora continua.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Convierte la estrategia en práctica real.</p>
+              <p className="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">Convierte la estrategia en práctica real.</p>
             </article>
           </div>
         </div>
@@ -320,23 +320,23 @@ export function RelacionamientoServiceView({ relatedPosts = [] }: { relatedPosts
               <div className="grid gap-4">
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cuándo conviene partir por aquí?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay presión por definir prioridades rápidamente y aún no existe base común entre áreas para diseñar una ruta completa.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Cuando hay conflictividad emergente o incertidumbre territorial y el proyecto necesita una lectura temprana para decidir con criterio.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué decisión habilita?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Te permite decidir con evidencia si avanzar a una hoja de ruta integral o focalizar recursos en brechas críticas de corto plazo.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Permite definir si conviene abrir una estrategia territorial completa o intervenir primero en actores/riesgos críticos para proteger continuidad operativa.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué NO es?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">No es una versión “ligera” del servicio completo: es un instrumento estratégico para reducir incertidumbre y ordenar la conversación ejecutiva.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">No es una campaña comunicacional ni gestión reactiva de crisis: es una lectura estratégica para ordenar decisiones antes de escalar conflicto.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Qué información necesito para iniciarlo?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Basta con entrevistas clave, información regulatoria relevante y los principales riesgos/iniciativas ya identificados por la organización.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">Se recomienda contar con contexto del proyecto, antecedentes de relacionamiento previo y actores/zonas sensibles ya detectados por el equipo.</p>
               </details>
               <details className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80">
                 <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">¿Cómo se conecta con los siguientes niveles?</summary>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">El Flash Audit define prioridades y criterios de decisión. Desde ahí, se escala a gobernanza/roadmap o implementación según brechas y madurez.</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">El mapa inicial entrega prioridades y criterios de acción. Desde ahí se escala a estrategia territorial o implementación en terreno según riesgo y madurez del proyecto.</p>
               </details>
               </div>
             </div>

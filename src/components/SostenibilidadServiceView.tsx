@@ -251,13 +251,13 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
           <div className="brand-block-divider mt-3 mb-8 h-[6px] w-36 rounded-sm" />
 
           <div className="esg-level-grid esg-levels-gallery grid gap-5 md:grid-cols-3">
-            <article className="esg-level-card esg-level-card--start relative rounded-[2.1rem] border border-[#9ac94f] bg-[linear-gradient(160deg,#f7fbe8_0%,#eef7d4_55%,#e5f2c1_100%)] p-6">
+            <article className="service-feature-card service-feature-card--green esg-level-card esg-level-card--start relative rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/ilustraciones/3.png" alt="Ilustración de inicio" className="pointer-events-none absolute right-4 top-4 w-14 opacity-95" />
               <p className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-white">● Punto de partida recomendado</p>
               <h4 className="mt-4 text-3xl font-black leading-[1.02] text-slate-900">Flash Audit ESG</h4>
-              <p className="mt-3 text-sm text-slate-700">Revisión estratégica focalizada para organizaciones que necesitan claridad inmediata.</p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-800">
+              <p className="mt-3 text-sm text-slate-900 dark:text-slate-200">Revisión estratégica focalizada para organizaciones que necesitan claridad inmediata.</p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-100">
                 <li>• Diagnóstico express de materialidad.</li>
                 <li>• Identificación de riesgos reputacionales y regulatorios.</li>
                 <li>• Recomendaciones inmediatas.</li>
@@ -267,44 +267,44 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
               </button>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#88bc2b]/80 bg-[linear-gradient(160deg,#f7fcdc_0%,#eaf7bf_58%,#ddefa7_100%)] p-6">
+            <article className="service-feature-card service-feature-card--green esg-level-card rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-800">Escala de profundidad estratégica</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Hoja de Ruta y Gobernanza</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-200">
                 <li>• Profundización de materialidad.</li>
                 <li>• Diseño de gobernanza.</li>
                 <li>• Indicadores y métricas.</li>
                 <li>• Plan de implementación.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15 dark:bg-slate-900/80 dark:ring-white/15">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Hoja de Ruta ESG.</li>
                   <li>✓ Marco de gobernanza.</li>
                   <li>✓ Sistema de seguimiento.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Ordena la estrategia y alinea áreas.</p>
+              <p className="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">Ordena la estrategia y alinea áreas.</p>
             </article>
 
-            <article className="esg-level-card rounded-[2.1rem] border border-[#6da71d]/85 bg-[linear-gradient(160deg,#f4fbd1_0%,#def0a7_58%,#cfe88d_100%)] p-6">
+            <article className="service-feature-card service-feature-card--green esg-level-card rounded-[2.1rem] p-6 text-slate-900 dark:text-slate-100">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-emerald-900">Escala de consolidación operativa</p>
               <h4 className="mt-2 text-2xl font-black text-slate-900">Implementación y Consolidación</h4>
-              <ul className="mt-4 space-y-2 text-sm text-slate-700">
+              <ul className="mt-4 space-y-2 text-sm text-slate-900 dark:text-slate-200">
                 <li>• Acompañamiento en ejecución.</li>
                 <li>• Instalación de capacidades internas.</li>
                 <li>• Seguimiento de indicadores.</li>
                 <li>• Ajustes estratégicos.</li>
               </ul>
-              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Entregables</p>
-                <ul className="mt-2 space-y-1.5 text-sm text-slate-700">
+              <div className="mt-5 rounded-xl bg-white/70 p-4 ring-1 ring-emerald-700/15 dark:bg-slate-900/80 dark:ring-white/15">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">Entregables</p>
+                <ul className="mt-2 space-y-1.5 text-sm text-slate-900 dark:text-slate-200">
                   <li>✓ Sistema operativo ESG.</li>
                   <li>✓ Evaluaciones periódicas.</li>
                   <li>✓ Mejora continua.</li>
                 </ul>
               </div>
-              <p className="mt-4 text-sm font-medium text-slate-800">Convierte la estrategia en práctica real.</p>
+              <p className="mt-4 text-sm font-medium text-slate-900 dark:text-slate-100">Convierte la estrategia en práctica real.</p>
             </article>
           </div>
         </div>
