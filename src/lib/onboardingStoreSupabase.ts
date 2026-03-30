@@ -306,21 +306,40 @@ export async function upsertOnboardingQuizResultByModule(input: {
 }
 
 export async function insertOnboardingQuizAttempt(input: { quizAttemptsTable: string; row: OnboardingQuizAttemptRow }) {
-  const nextRow = {
-    ...input.row,
+  const rowWithModule = {
+    id: input.row.id,
+    email: input.row.email,
+    track: input.row.track,
     module: input.row.module_key,
+    score: input.row.score,
+    max_score: input.row.max_score,
+    missed_topics: input.row.missed_topics,
+    submitted_at: input.row.submitted_at,
+    passed: input.row.passed,
+  };
+
+  const rowWithModuleKey = {
+    id: input.row.id,
+    email: input.row.email,
+    track: input.row.track,
+    module_key: input.row.module_key,
+    score: input.row.score,
+    max_score: input.row.max_score,
+    missed_topics: input.row.missed_topics,
+    submitted_at: input.row.submitted_at,
+    passed: input.row.passed,
   };
 
   try {
     await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
       method: "POST",
-      body: JSON.stringify([nextRow]),
+      body: JSON.stringify([rowWithModule]),
     });
   } catch (error) {
     if (!isMissingColumnError(error, "module")) throw error;
     await supabaseRequest(`/rest/v1/${input.quizAttemptsTable}`, {
       method: "POST",
-      body: JSON.stringify([input.row]),
+      body: JSON.stringify([rowWithModuleKey]),
     });
   }
 }
