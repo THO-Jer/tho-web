@@ -18,8 +18,22 @@ export function Header() {
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex min-w-0 items-center gap-3" onClick={closeMobileMenu}>
           <div className="relative h-9 w-32">
-            <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" priority />
-            <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" priority />
+            <Image
+              src="/brand/logo-negro.png"
+              alt="The Human Org"
+              fill
+              sizes="128px"
+              className="object-contain logo-light"
+              priority
+            />
+            <Image
+              src="/brand/logo-blanco.png"
+              alt="The Human Org"
+              fill
+              sizes="128px"
+              className="object-contain logo-dark"
+              priority
+            />
           </div>
           <div className="hidden leading-tight sm:block">
             <div className="text-[12px] font-bold uppercase tracking-wide italic dark:text-slate-100">The Human Org</div>

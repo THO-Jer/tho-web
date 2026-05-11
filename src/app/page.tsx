@@ -53,9 +53,19 @@ export default async function HomePage() {
             </p>
 
             <div className="mt-6 flex flex-col items-end gap-3 sm:ml-auto sm:flex-row sm:justify-end">
+              {/* CTA primario — cualitativo, intención de conversación/agendamiento */}
+              <a
+                href="https://bit.ly/bookTHO"
+                target="_blank"
+                rel="noreferrer"
+                className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-sm ring-1 ring-white/40 hover:ring-white"
+              >
+                Conversemos tu caso
+              </a>
+              {/* CTA secundario — exploración */}
               <a
                 href="#servicios"
-                className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
+                className="btn-unified-motion rounded-xl border border-white/60 bg-transparent px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
               >
                 Ver servicios
               </a>
@@ -86,7 +96,7 @@ export default async function HomePage() {
         id="servicios"
         tone="soft"
         title="Nuestros servicios"
-        subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas: Sotenibilidad Corporativa, Relacionamiento Comunitario y Desarrollo Organizacional. Revisa los niveles de cada servicio para decidir si te acompañamos en una línea de trabajo o necesitas integrarlas."
+        subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas: Sostenibilidad Corporativa, Relacionamiento Comunitario y Desarrollo Organizacional. Revisa los niveles de cada servicio para decidir si te acompañamos en una línea de trabajo o necesitas integrarlas."
       >
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-700 shadow-sm md:text-[11px] xl:hidden services-swipe-hint">
           <span className="services-swipe-hint__text">Desliza para ver más servicios</span>
@@ -243,7 +253,7 @@ export default async function HomePage() {
                 rel="noreferrer"
                 className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
               >
-                Agendar conversación
+                Conversemos tu caso
               </a>
               <a
                 href="mailto:hola@tho.cl"

@@ -4,7 +4,7 @@ import { SERVICES } from "@/content/services";
 import { listPublishedPosts } from "@/lib/blogStore";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = "https://tho-web.vercel.app";
+  const base = "https://tho.cl";
   const now = new Date();
   const posts = await listPublishedPosts();
 

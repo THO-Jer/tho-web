@@ -9,7 +9,13 @@ export function Footer() {
         <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
           <div className="flex items-start gap-3">
             <div className="relative mt-0.5 h-10 w-10 shrink-0">
-              <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain" />
+              <Image
+                src="/brand/logo-blanco.png"
+                alt="The Human Org"
+                fill
+                sizes="48px"
+                className="object-contain"
+              />
             </div>
             <div className="text-xs text-slate-300">
               <div className="font-semibold text-slate-100">The Human Org</div>
@@ -57,10 +63,6 @@ export function Footer() {
                 <a className="hover:text-white" href="mailto:hola@tho.cl">
                   Contacto
                 </a>
-                <div aria-hidden className="h-4" />
-                <Link className="hover:text-white" href="/studio">
-                  Interno
-                </Link>
               </div>
             </div>
           </div>

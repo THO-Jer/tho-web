@@ -20,8 +20,22 @@ export function BrandLoader(props?: { message?: string }) {
   return (
     <div className="flex min-h-[42vh] flex-col items-center justify-center gap-5 px-4 text-center">
       <div className="relative h-16 w-44">
-        <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" priority />
-        <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" priority />
+        <Image
+          src="/brand/logo-negro.png"
+          alt="The Human Org"
+          fill
+          sizes="192px"
+          className="object-contain logo-light"
+          priority
+        />
+        <Image
+          src="/brand/logo-blanco.png"
+          alt="The Human Org"
+          fill
+          sizes="192px"
+          className="object-contain logo-dark"
+          priority
+        />
       </div>
 
       <div className="w-full max-w-xs">

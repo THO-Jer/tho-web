@@ -1,6 +1,10 @@
-# THO Web (Next.js)
+# THO Web
 
-Sitio estático + formularios por API routes (Vercel) para The Human Org.
+Sitio público de **The Human Org** + Studio interno. Next.js 16 (App Router) + React 19 + Tailwind v4 + Supabase + Resend.
+
+Deploy en Vercel · dominio `tho.cl`.
+
+---
 
 ## Correr local
 
@@ -11,79 +15,81 @@ npm run dev
 
 Abrir `http://localhost:3000`.
 
-## Imágenes
+Scripts disponibles:
 
-Las imágenes deben estar en `public/` para que Vercel las sirva.
+- `npm run dev` — desarrollo con HMR
+- `npm run build` — build de producción
+- `npm run start` — servir build
+- `npm run lint` — ESLint
 
-- Hero: `public/hero/1.png` (y 2–4)
-- Logos: `public/brand/logo-negro.png`, `logo-blanco.png`, `logo-small.png`
+---
 
-## Tipografías
+## Stack
 
-- **Títulos:** `Thocl-Regular.ttf` (ya incluido como `next/font/local`).
-- **Cuerpo:** **TT Firs Neue** (por ahora está declarado como `font-family: "TT Firs Neue"` con fallbacks).
+- **Framework:** Next.js 16 (App Router, RSC)
+- **UI:** React 19 + Tailwind v4
+- **Auth + Datos:** Supabase (Auth con Microsoft/Azure + tablas `blog_posts`, `blog_editors`, `studio_access`, `incidents`, `onboarding_*`)
+- **Mail:** Resend (formulario de contacto)
+- **CRM:** push a `crm-tho` vía `/api/lead`
+- **Tipografías:** `next/font/local` (Thocl + TT Firs Neue)
 
-Si quieres auto-hospedar TT Firs Neue, súbela a `public/fonts/` y luego la registramos como `next/font/local`.
+---
 
-## Formularios
+## Estructura
 
-El formulario envía a `hola@tho.cl` usando un API route en `src/app/api/contact/route.ts`.
+```
+src/
+├── app/
+│   ├── (rutas públicas: /, /quienes, /servicios, /blog, /etica, ...)
+│   ├── studio/         # área interna autenticada
+│   ├── api/            # API routes (lead, contact, admin, studio/*)
+│   ├── layout.tsx
+│   ├── sitemap.ts
+│   └── robots.ts
+├── components/         # UI components (Header, Footer, BrandLoader, ContactForm, ...)
+├── content/            # contenido tipado (services, posts seed, onboarding, etc.)
+├── lib/                # storage, auth, crm, mail, supabase clients
+docs/                   # documentación operativa
+public/                 # assets estáticos servidos por Vercel
+sql/                    # migraciones SQL de Supabase
+```
 
-Más adelante podemos conectar el envío con tu CRM (endpoint / pipeline) cuando esté listo.
-
+---
 
 ## Variables de entorno (Vercel)
 
 Configura estas variables para salir del modo stub:
 
-- `RESEND_API_KEY`: API key de Resend para envío de correos.
-- `MAIL_FROM`: remitente verificado en Resend (ej: `THO Web <contacto@tu-dominio.com>`).
-- `CRM_ENDPOINT`: endpoint HTTP de tu CRM. Si no se define, usa por defecto `https://crm-tho.vercel.app/api/public/leads`.
-- `LEADS_API_KEY`: clave usada para auth con CRM (se envía como `Authorization: Bearer`, `x-api-key` y también `apiKey` en body como fallback).
-- `CRM_API_KEY` (opcional/legacy): usado solo si no existe `LEADS_API_KEY`.
-- `NEXT_PUBLIC_SUPABASE_URL`: URL del proyecto Supabase (Auth + REST).
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: anon key pública para OTP/email auth.
-- `SUPABASE_SERVICE_ROLE_KEY` (o `SERVICE_ROLE_KEY`): service key para validar allowlist de editores en backend.
-- Tabla `public.blog_editors` en Supabase (ver SQL en `sql/supabase_blog_editors.sql`).
-- En Supabase Auth habilita proveedor **Azure/Microsoft** y agrega redirect URL de este proyecto (`https://tu-dominio/studio/blog` y `http://localhost:3000/studio/blog`).
+| Variable | Rol |
+|---|---|
+| `RESEND_API_KEY` | API key de Resend para envío de correos. |
+| `MAIL_FROM` | Remitente verificado en Resend (ej: `THO Web <contacto@tu-dominio.com>`). |
+| `CRM_ENDPOINT` | Endpoint HTTP del CRM. Default: `https://crm-tho.vercel.app/api/public/leads`. |
+| `LEADS_API_KEY` | Auth al CRM (se envía como `Authorization: Bearer`, `x-api-key` y `apiKey` en body). |
+| `CRM_API_KEY` | Legacy. Solo se usa si no existe `LEADS_API_KEY`. |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key pública para OTP / OAuth. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service key para validar allowlist de editores en backend. |
+| `STUDIO_AUTH_REDIRECT_URL` | URL de retorno post-OAuth (server-side). |
+| `NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL` | Idem, para el cliente. |
 
-Si falta `CRM_ENDPOINT`, la API responde error para evitar perder leads silenciosamente. El mail puede seguir en stub si falta `RESEND_API_KEY`.
+Supabase: requiere tablas `blog_editors`, `blog_posts`, `incidents`, etc. — ver SQL en `sql/`.
 
+En Supabase Auth habilita el proveedor **Azure/Microsoft** y agrega como Redirect URLs `https://tho.cl/studio` (+ `https://tho.cl/studio/auth/callback`) y los equivalentes en `localhost:3000`.
 
-## Verificación rápida de pipeline
+---
 
-En logs de Vercel (función `/api/lead`) filtra por `CRM PUSH` y confirma:
+## Documentación
 
-- request: `[CRM PUSH REQUEST] POST https://crm-tho.vercel.app/api/public/leads email=<...>`
-- response: `[CRM PUSH RESPONSE] 201 ...` (o el error real 4xx/5xx)
-- éxito final: `[LEAD CRM OK] <endpoint> <status>`
+- **[Troubleshooting](./docs/troubleshooting.md)** — errores comunes del pipeline de leads, Studio Auth, persistencia en producción, tipografías.
+- **[Migración Canal Confidencial](./docs/supabase-migration-canal-confidencial.md)** — proceso de migración a Supabase del módulo de incidentes.
+- **[Brochures · upload](./docs/brochures-upload.md)** — cómo subir nuevos brochures.
 
-Si ves `CRM pipeline not configured`, falta `LEADS_API_KEY` (o `CRM_API_KEY` legacy).
+---
 
+## Convenciones
 
-### Error 500 del CRM remoto (caso actual)
-
-Si en Vercel aparece:
-
-`CRM endpoint error (500): {"error":"Server misconfigured: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (or SERVICE_ROLE_KEY) and LEADS_OWNER_USER_ID are required"}`
-
-ese error viene del **servicio CRM** (`crm-tho`), no de esta web.
-Debes configurar esas variables en el proyecto `crm-tho` de Vercel.
-
-Esta web ya está enviando `POST` a `/api/public/leads` con auth (`Bearer`, `x-api-key`, `apiKey`).
-
-### Studio Auth (flujo recomendado)
-
-- El acceso al Studio se inicia en `/studio` con botón **Ingresar con Microsoft**.
-- Una vez autenticado, la sesión habilita cualquier módulo (`/studio/blog`, etc.) sin pedir login nuevamente.
-- Si más adelante quieres Gmail + auto-onboarding (sin insertar correos manualmente), crea una función server-side/post-login que inserte en `blog_editors` según dominio permitido (ej: `@tho.cl`) y rol por defecto.
-
-- En Supabase Auth (URL Configuration), agrega `https://TU_DOMINIO/studio` y `http://localhost:3000/studio` en **Redirect URLs**; si no, Supabase puede caer al `SITE_URL` de otro proyecto (ej. `crm-tho`).
-- En el proveedor Azure/Microsoft, asegúrate de pedir scope `email` (además de `openid profile`) para evitar errores `Error getting user email from external provider`.
-
-
-### Studio Blog persistence (producción)
-
-- En Vercel, el filesystem es efímero/no persistente para este caso; para Studio Blog usa Supabase tabla `blog_posts`.
-- Ejecuta `sql/supabase_blog_posts.sql` en tu proyecto Supabase.
-- Asegura `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (o `SERVICE_ROLE_KEY`) configuradas en el deploy para que el editor guarde en Supabase.
+- Imágenes públicas viven en `public/` y se referencian con paths absolutos (`/brand/logo-negro.png`).
+- Al usar `next/image` con `fill`, **siempre pasa `sizes`** para evitar variantes innecesarias (Next genera srcset hasta 3840px por defecto).
+- Las rutas `/studio/*` están detrás de auth y **no se enlazan públicamente**. Acceso vía URL directa.
+- Contenido editorial (servicios, tickets, onboarding) vive en `src/content/` como TypeScript tipado, no Markdown.

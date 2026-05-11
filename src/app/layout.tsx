@@ -20,7 +20,10 @@ const ttFirsNeue = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tho-web.vercel.app"),
+  metadataBase: new URL("https://tho.cl"),
+  alternates: {
+    canonical: "/",
+  },
   title: {
     default: "The Human Org — Consultoría estratégica",
     template: "%s · The Human Org",
@@ -55,9 +58,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "The Human Org",
-    url: "https://tho-web.vercel.app",
+    url: "https://tho.cl",
     email: "hola@tho.cl",
-    logo: "https://tho-web.vercel.app/logo-black.png",
+    logo: "https://tho.cl/brand/logo-negro.png",
   };
 
   return (

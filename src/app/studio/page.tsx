@@ -163,7 +163,7 @@ export default function StudioIndexPage() {
       return;
     }
 
-    const redirectTarget = publicStudioAuthRedirect || "https://tho-web.vercel.app/studio";
+    const redirectTarget = publicStudioAuthRedirect || "https://tho.cl/studio";
     const supabase = createSupabaseBrowserAuthClient(supabaseUrl, publicSupabaseAnon);
     const providerOptions = provider === "azure"
       ? {
