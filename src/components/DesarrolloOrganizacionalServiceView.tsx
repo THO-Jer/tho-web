@@ -262,7 +262,14 @@ export function DesarrolloOrganizacionalServiceView({ relatedPosts = [] }: { rel
                 <li>• Mapa de capacidades de liderazgo críticas.</li>
                 <li>• Recomendaciones tempranas de intervención.</li>
               </ul>
-              <button type="button" onClick={() => { setOpen(true); setBrochureStatus("idle"); }} className="btn-unified-motion btn-hero-services mt-5 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900">
+              <button
+                type="button"
+                onClick={() => {
+                  setBrochureStatus("idle");
+                  setOpen(true);
+                }}
+                className="btn-unified-motion btn-hero-services mt-5 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900"
+              >
                 Descargar brochure
               </button>
             </article>
