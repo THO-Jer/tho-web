@@ -132,7 +132,8 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
 
     const link = document.createElement("a");
     link.href = BROCHURE_FILE_URL;
-    link.download = "brochure-flash-audit-esg.pdf";
+    link.target = "_blank";
+    link.rel = "noreferrer";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -441,7 +442,11 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
                 {brochureStatus === "sending" ? "Enviando..." : "Descargar brochure"}
               </button>
             </form>
-            {brochureStatus === "ok" ? <p aria-live="polite" className="mt-3 text-sm text-emerald-700">Descarga iniciada. También registramos tu solicitud.</p> : null}
+            {brochureStatus === "ok" ? (
+              <p aria-live="polite" className="mt-3 text-sm text-emerald-700">
+                ¡Listo! Te abrimos el brochure en una pestaña nueva. Si tu navegador la bloqueó, <a href={BROCHURE_FILE_URL} target="_blank" rel="noreferrer" className="font-semibold underline">ábrelo aquí</a>. Registramos tu solicitud.
+              </p>
+            ) : null}
             {brochureStatus === "error" ? <p aria-live="polite" className="mt-3 text-sm text-rose-600">No pudimos procesar tu solicitud, intenta de nuevo.</p> : null}
           </div>
         </div>
