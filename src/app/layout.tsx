@@ -60,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     name: "The Human Org",
     url: "https://tho.cl",
     email: "hola@tho.cl",
-    logo: "https://tho.cl/brand/logo-negro.png",
+    logo: "https://tho.cl/brand/logo-negro.svg",
   };
 
   return (

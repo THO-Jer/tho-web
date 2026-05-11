@@ -101,10 +101,10 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
           })}
         </svg>
 
-        <div className="pointer-events-none absolute left-1/2 top-[63%] z-30 h-24 w-56 -translate-x-1/2 -translate-y-1/2 md:h-36 md:w-[22rem]">
+        <div className="pointer-events-none absolute left-1/2 top-[63%] z-30 h-24 w-24 -translate-x-1/2 -translate-y-1/2 md:h-36 md:w-36">
           <div className="method-logo-glow absolute inset-0 rounded-full" />
-          <Image src="/brand/logo-negro.png" alt="The Human Org" fill className="object-contain logo-light" />
-          <Image src="/brand/logo-blanco.png" alt="The Human Org" fill className="object-contain logo-dark" />
+          <Image src="/brand/logo-negro.svg" alt="The Human Org" fill sizes="(min-width: 768px) 144px, 96px" className="object-contain logo-light" unoptimized />
+          <Image src="/brand/logo-blanco.svg" alt="The Human Org" fill sizes="(min-width: 768px) 144px, 96px" className="object-contain logo-dark" unoptimized />
         </div>
       </div>
     </div>

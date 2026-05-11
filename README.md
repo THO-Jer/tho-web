@@ -89,7 +89,7 @@ En Supabase Auth habilita el proveedor **Azure/Microsoft** y agrega como Redirec
 
 ## Convenciones
 
-- Imágenes públicas viven en `public/` y se referencian con paths absolutos (`/brand/logo-negro.png`).
+- Imágenes públicas viven en `public/` y se referencian con paths absolutos (`/brand/logo-negro.svg`).
 - Al usar `next/image` con `fill`, **siempre pasa `sizes`** para evitar variantes innecesarias (Next genera srcset hasta 3840px por defecto).
 - Las rutas `/studio/*` están detrás de auth y **no se enlazan públicamente**. Acceso vía URL directa.
 - Contenido editorial (servicios, tickets, onboarding) vive en `src/content/` como TypeScript tipado, no Markdown.

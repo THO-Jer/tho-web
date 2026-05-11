@@ -10,11 +10,12 @@ export function Footer() {
           <div className="flex items-start gap-3">
             <div className="relative mt-0.5 h-10 w-10 shrink-0">
               <Image
-                src="/brand/logo-blanco.png"
+                src="/brand/logo-blanco.svg"
                 alt="The Human Org"
                 fill
-                sizes="48px"
+                sizes="40px"
                 className="object-contain"
+                unoptimized
               />
             </div>
             <div className="text-xs text-slate-300">

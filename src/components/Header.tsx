@@ -17,22 +17,24 @@ export function Header() {
     <header className="main-header sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex min-w-0 items-center gap-3" onClick={closeMobileMenu}>
-          <div className="relative h-9 w-32">
+          <div className="relative h-10 w-10 shrink-0">
             <Image
-              src="/brand/logo-negro.png"
+              src="/brand/logo-negro.svg"
               alt="The Human Org"
               fill
-              sizes="128px"
+              sizes="40px"
               className="object-contain logo-light"
               priority
+              unoptimized
             />
             <Image
-              src="/brand/logo-blanco.png"
+              src="/brand/logo-blanco.svg"
               alt="The Human Org"
               fill
-              sizes="128px"
+              sizes="40px"
               className="object-contain logo-dark"
               priority
+              unoptimized
             />
           </div>
           <div className="hidden leading-tight sm:block">

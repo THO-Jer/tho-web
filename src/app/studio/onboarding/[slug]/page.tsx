@@ -1052,7 +1052,7 @@ export default function StudioOnboardingUnitPage() {
         <div className={`rounded-2xl border p-4 ${visual.heroBorder} ${visual.hero}`}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <Image src="/brand/logo-negro.png" alt="THO" width={40} height={40} className="opacity-90" />
+              <Image src="/brand/logo-negro.svg" alt="THO" width={40} height={40} className="opacity-90" unoptimized />
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Programa de Onboarding</div>
                 <h1 className="text-lg font-semibold text-slate-900">{unit.title}</h1>

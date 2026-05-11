@@ -67,5 +67,5 @@ Si en algún momento aparece FOUT (flash of unstyled text), revisa que los `.ttf
 
 - Las imágenes públicas deben vivir en `public/` para que Vercel las sirva con cache de CDN.
 - Hero: `public/hero/*.png`
-- Logos: `public/brand/logo-negro.png`, `logo-blanco.png`, `logo-small.png`
+- Logos: `public/brand/logo-negro.svg`, `logo-blanco.svg` (vector, servidos con `unoptimized` en `next/image`). PNGs antiguos (`logo-negro.png`, `logo-blanco.png`, `logo-small.png`) se mantienen como fallback.
 - Para Next/Image con `fill`, **siempre pasa `sizes`** para evitar que Next genere variantes hasta 3840px de ancho innecesariamente.
