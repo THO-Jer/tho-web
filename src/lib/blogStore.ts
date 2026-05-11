@@ -1,8 +1,3 @@
-import { promises as fs } from "node:fs";
-import path from "node:path";
-
-import { getWritableDataPath } from "@/lib/storagePaths";
-
 export type BlogStatus = "draft" | "published";
 
 export type BlogPost = {
@@ -41,7 +36,6 @@ type BlogPostRow = {
   seo_description: string | null;
 };
 
-const BLOG_PATH = getWritableDataPath("blog", "posts.json");
 const BLOG_TABLE = process.env.BLOG_POSTS_TABLE || "blog_posts";
 
 function getSupabaseEnv() {
@@ -53,14 +47,14 @@ function getSupabaseEnv() {
   return { url, service };
 }
 
-function hasSupabaseStore() {
+function requireSupabaseEnv() {
   const { url, service } = getSupabaseEnv();
-  return Boolean(url && service);
-}
-
-function isMissingSupabaseTableError(error: unknown) {
-  if (!(error instanceof Error)) return false;
-  return error.message.includes("PGRST205") || error.message.includes("Could not find the table");
+  if (!url || !service) {
+    throw new Error(
+      "blogStore: Supabase no configurado. Define NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY para leer/escribir posts.",
+    );
+  }
+  return { url, service };
 }
 
 function getMissingSupabaseColumn(error: unknown) {
@@ -83,8 +77,7 @@ function stripUnsupportedColumns<T extends Record<string, unknown>>(payload: T, 
 }
 
 async function supabaseRequest(pathname: string, init?: RequestInit) {
-  const { url, service } = getSupabaseEnv();
-  if (!url || !service) throw new Error("Supabase store no configurado");
+  const { url, service } = requireSupabaseEnv();
 
   const res = await fetch(`${url}${pathname}`, {
     ...init,
@@ -156,27 +149,6 @@ function postToRowInput(post: BlogPost) {
   };
 }
 
-async function ensureStore() {
-  await fs.mkdir(path.dirname(BLOG_PATH), { recursive: true });
-  try {
-    await fs.access(BLOG_PATH);
-  } catch {
-    await fs.writeFile(BLOG_PATH, "[]", "utf8");
-  }
-}
-
-async function readFileStore(): Promise<BlogPost[]> {
-  await ensureStore();
-  const raw = await fs.readFile(BLOG_PATH, "utf8");
-  const parsed = JSON.parse(raw) as BlogPost[];
-  return sortPostsByEditorialDate(parsed);
-}
-
-async function writeFileStore(posts: BlogPost[]) {
-  await ensureStore();
-  await fs.writeFile(BLOG_PATH, `${JSON.stringify(posts, null, 2)}\n`, "utf8");
-}
-
 function ensureUniqueSlug(baseSlug: string, posts: BlogPost[]) {
   let candidate = baseSlug;
   let counter = 2;
@@ -230,34 +202,26 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
 }
 
 export async function listAllPosts() {
-  if (hasSupabaseStore()) {
-    try {
-      const query = new URLSearchParams({
-        select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+  try {
+    const query = new URLSearchParams({
+      select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+      order: "updated_at.desc",
+    });
+    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
+    return sortPostsByEditorialDate(rows.map(rowToPost));
+  } catch (error) {
+    const missingColumn = getMissingSupabaseColumn(error);
+    if (missingColumn === "category") {
+      const legacyQuery = new URLSearchParams({
+        select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
         order: "updated_at.desc",
       });
-      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
-      return sortPostsByEditorialDate(rows.map(rowToPost));
-    } catch (error) {
-      if (isMissingSupabaseTableError(error)) {
-        return readFileStore();
-      }
-
-      const missingColumn = getMissingSupabaseColumn(error);
-      if (missingColumn === "category") {
-        const legacyQuery = new URLSearchParams({
-          select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-          order: "updated_at.desc",
-        });
-        const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`)) as Omit<BlogPostRow, "category">[];
-        return sortPostsByEditorialDate(rows.map((row) => rowToPost({ ...(row as BlogPostRow), category: null })));
-      }
-
-      throw error;
+      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`)) as Omit<BlogPostRow, "category">[];
+      return sortPostsByEditorialDate(rows.map((row) => rowToPost({ ...(row as BlogPostRow), category: null })));
     }
-  }
 
-  return readFileStore();
+    throw error;
+  }
 }
 
 export async function listPublishedPosts() {
@@ -276,30 +240,25 @@ export async function createPost(input: Partial<BlogPostInput>) {
   const uniqueSlug = ensureUniqueSlug(next.slug, posts);
   const created: BlogPost = { ...next, slug: uniqueSlug, updatedAt: new Date().toISOString() };
 
-  if (hasSupabaseStore()) {
-    try {
+  try {
+    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(postToRowInput(created)),
+    })) as BlogPostRow[];
+    return rowToPost(rows[0]);
+  } catch (error) {
+    if (getMissingSupabaseColumn(error) === "category") {
+      const payload = stripUnsupportedColumns(postToRowInput(created), ["category"]);
       const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
         method: "POST",
         headers: { Prefer: "return=representation" },
-        body: JSON.stringify(postToRowInput(created)),
-      })) as BlogPostRow[];
-      return rowToPost(rows[0]);
-    } catch (error) {
-      if (getMissingSupabaseColumn(error) === "category") {
-        const payload = stripUnsupportedColumns(postToRowInput(created), ["category"]);
-        const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
-          method: "POST",
-          headers: { Prefer: "return=representation" },
-          body: JSON.stringify(payload),
-        })) as Omit<BlogPostRow, "category">[];
-        return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
-      }
-      throw error;
+        body: JSON.stringify(payload),
+      })) as Omit<BlogPostRow, "category">[];
+      return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
     }
+    throw error;
   }
-
-  await writeFileStore([created, ...posts]);
-  return created;
 }
 
 export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
@@ -329,43 +288,36 @@ export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
 
   const updated: BlogPost = { ...merged, updatedAt: new Date().toISOString() };
 
-  if (hasSupabaseStore()) {
-    const query = new URLSearchParams({
-      slug: `eq.${current.slug}`,
-      select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-    });
+  const query = new URLSearchParams({
+    slug: `eq.${current.slug}`,
+    select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+  });
 
-    try {
-      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, {
+  try {
+    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(postToRowInput(updated)),
+    })) as BlogPostRow[];
+    if (!rows.length) throw new Error("Post no encontrado.");
+    return rowToPost(rows[0]);
+  } catch (error) {
+    if (getMissingSupabaseColumn(error) === "category") {
+      const legacyQuery = new URLSearchParams({
+        slug: `eq.${current.slug}`,
+        select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
+      });
+      const payload = stripUnsupportedColumns(postToRowInput(updated), ["category"]);
+      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`, {
         method: "PATCH",
         headers: { Prefer: "return=representation" },
-        body: JSON.stringify(postToRowInput(updated)),
-      })) as BlogPostRow[];
+        body: JSON.stringify(payload),
+      })) as Omit<BlogPostRow, "category">[];
       if (!rows.length) throw new Error("Post no encontrado.");
-      return rowToPost(rows[0]);
-    } catch (error) {
-      if (getMissingSupabaseColumn(error) === "category") {
-        const legacyQuery = new URLSearchParams({
-          slug: `eq.${current.slug}`,
-          select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-        });
-        const payload = stripUnsupportedColumns(postToRowInput(updated), ["category"]);
-        const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`, {
-          method: "PATCH",
-          headers: { Prefer: "return=representation" },
-          body: JSON.stringify(payload),
-        })) as Omit<BlogPostRow, "category">[];
-        if (!rows.length) throw new Error("Post no encontrado.");
-        return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
-      }
-      throw error;
+      return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
     }
+    throw error;
   }
-
-  const clone = [...posts];
-  clone[index] = updated;
-  await writeFileStore(clone);
-  return updated;
 }
 
 export async function deletePost(slug: string) {
@@ -373,12 +325,6 @@ export async function deletePost(slug: string) {
   const target = posts.find((post) => post.slug === slug);
   if (!target) throw new Error("Post no encontrado.");
 
-  if (hasSupabaseStore()) {
-    const query = new URLSearchParams({ slug: `eq.${target.slug}` });
-    await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, { method: "DELETE" });
-    return;
-  }
-
-  const filtered = posts.filter((post) => post.slug !== slug);
-  await writeFileStore(filtered);
+  const query = new URLSearchParams({ slug: `eq.${target.slug}` });
+  await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, { method: "DELETE" });
 }
