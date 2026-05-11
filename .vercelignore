@@ -1,0 +1,5 @@
+# Prevent accidental uploads from local deploys.
+node_modules
+.next
+.git
+coverage
