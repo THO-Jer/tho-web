@@ -17,9 +17,6 @@ type RecordRow = {
   module_status?: ModuleStatus[];
 };
 
-type Unit = { slug: string; title: string; summary: string; durationMinutes: number; content: string[] };
-type QuizQuestion = { id: string; prompt: string; options: string[]; correctIndex?: number; topic: string };
-
 type Attempt = { module_key: string; score: number; max_score: number; submitted_at: string; missed_topics?: string[]; passed?: boolean };
 
 export default function StudioOnboardingAdminPage() {
@@ -27,13 +24,24 @@ export default function StudioOnboardingAdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [rows, setRows] = useState<RecordRow[]>([]);
-  const [overview, setOverview] = useState<Array<Record<string, unknown>>>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
-  const [units, setUnits] = useState<Unit[]>([]);
-  const [quiz, setQuiz] = useState<QuizQuestion[]>([]);
   const [selectedEmail, setSelectedEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [contentDraft, setContentDraft] = useState("{}");
+
+  async function reloadAdminData() {
+    const recordsRes = await fetch("/api/studio/onboarding/admin", { credentials: "include", cache: "no-store" });
+    const recordsData = await recordsRes.json();
+    if (!recordsRes.ok) throw new Error(recordsData.error || "No autorizado.");
+
+    const nextRows = (recordsData.records || []) as RecordRow[];
+    setRows(nextRows);
+    const first = nextRows[0]?.email || "";
+    setSelectedEmail((prev) => {
+      if (!nextRows.length) return "";
+      if (prev && nextRows.some((row) => row.email === prev)) return prev;
+      return first;
+    });
+  }
 
   useEffect(() => {
     const run = async () => {
@@ -42,23 +50,7 @@ export default function StudioOnboardingAdminPage() {
         const sessionRes = await fetch("/api/admin/session", { credentials: "include" });
         const session = await sessionRes.json();
         if (!session.authenticated) return router.replace("/studio");
-
-        const [recordsRes, contentRes] = await Promise.all([
-          fetch("/api/studio/onboarding/admin", { credentials: "include", cache: "no-store" }),
-          fetch("/api/studio/onboarding/admin/content", { credentials: "include", cache: "no-store" }),
-        ]);
-        const recordsData = await recordsRes.json();
-        const contentData = await contentRes.json();
-        if (!recordsRes.ok || !contentRes.ok) throw new Error(recordsData.error || contentData.error || "No autorizado.");
-
-        const nextRows = (recordsData.records || []) as RecordRow[];
-        setRows(nextRows);
-        setOverview((recordsData.overview || []) as Array<Record<string, unknown>>);
-        setUnits((contentData.units || []) as Unit[]);
-        setQuiz((contentData.quiz || []) as QuizQuestion[]);
-        setContentDraft(JSON.stringify({ units: contentData.units || [], quiz: contentData.quiz || [] }, null, 2));
-        const first = nextRows[0]?.email || "";
-        setSelectedEmail((prev) => prev || first);
+        await reloadAdminData();
       } catch (error) {
         setMessage(error instanceof Error ? error.message : "No se pudo cargar panel onboarding.");
       } finally {
@@ -93,31 +85,10 @@ export default function StudioOnboardingAdminPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo resetear módulo.");
+      await reloadAdminData();
       setMessage(`Módulo ${moduleKey} reseteado para ${active.email}.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo resetear módulo.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  async function saveContent() {
-    setSaving(true);
-    try {
-      const payload = JSON.parse(contentDraft) as { units?: unknown; quiz?: unknown };
-      const res = await fetch("/api/studio/onboarding/admin/content", {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "No se pudo guardar contenido.");
-      setUnits((data.units || []) as Unit[]);
-      setQuiz((data.quiz || []) as QuizQuestion[]);
-      setMessage("Contenido onboarding actualizado.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "No se pudo guardar contenido.");
     } finally {
       setSaving(false);
     }
@@ -137,19 +108,11 @@ export default function StudioOnboardingAdminPage() {
             <span className="rounded-md bg-slate-100 px-2 py-1">Usuarios: {rows.length}</span>
             <span className="rounded-md bg-slate-100 px-2 py-1">Completado: {completedCount}</span>
             <span className="rounded-md bg-slate-100 px-2 py-1">Progreso promedio: {avgProgress}%</span>
-            <span className="rounded-md bg-slate-100 px-2 py-1">Quiz preguntas: {quiz.length}</span>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-3 py-2 text-xs hover:bg-slate-50">Volver onboarding</Link>
           </div>
         </section>
-
-        {overview.length ? (
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
-            <h2 className="text-sm font-semibold text-slate-900">Overview (view onboarding_admin_overview)</h2>
-            <pre className="mt-2 max-h-56 overflow-auto rounded bg-slate-50 p-3 text-xs">{JSON.stringify(overview, null, 2)}</pre>
-          </section>
-        ) : null}
 
         <section className="grid gap-4 lg:grid-cols-[320px_1fr]">
           <div className="rounded-2xl border border-slate-200 bg-white p-4">
@@ -193,15 +156,6 @@ export default function StudioOnboardingAdminPage() {
                 </div>
               </div>
             )}
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-slate-200 bg-white p-4">
-          <h2 className="text-sm font-semibold text-slate-900">Editor básico de contenido (JSON)</h2>
-          <textarea value={contentDraft} onChange={(e) => setContentDraft(e.target.value)} rows={14} className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-xs" />
-          <div className="mt-2 flex gap-2">
-            <button type="button" onClick={saveContent} disabled={saving} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">Guardar contenido</button>
-            <span className="self-center text-xs text-slate-500">Unidades activas: {units.length}</span>
           </div>
         </section>
 
