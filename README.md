@@ -64,9 +64,10 @@ Configura estas variables para salir del modo stub:
 |---|---|
 | `RESEND_API_KEY` | API key de Resend para envío de correos. |
 | `MAIL_FROM` | Remitente verificado en Resend (ej: `THO Web <contacto@tu-dominio.com>`). |
-| `CRM_ENDPOINT` | Endpoint HTTP del CRM. Default: `https://crm-tho.vercel.app/api/public/leads`. |
-| `LEADS_API_KEY` | Auth al CRM (se envía como `Authorization: Bearer`, `x-api-key` y `apiKey` en body). |
-| `CRM_API_KEY` | Legacy. Solo se usa si no existe `LEADS_API_KEY`. |
+| `CRM_LEADS_ENDPOINT` | Endpoint HTTP del CRM. Default: `https://crm-tho.vercel.app/api/public/leads`. Compatibilidad: si no existe, se usa `CRM_ENDPOINT`. |
+| `CRM_ENDPOINT` | Legacy. Sólo se usa si no existe `CRM_LEADS_ENDPOINT`. |
+| `LEADS_API_KEY` | Auth al CRM (se envía como `Authorization: Bearer`, `x-api-key` y `apiKey` en body). Debe coincidir con el `LEADS_API_KEY` del proyecto CRM-THO. |
+| `CRM_API_KEY` | Legacy. Sólo se usa si no existe `LEADS_API_KEY`. |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key pública para OTP / OAuth. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Service key para validar allowlist de editores en backend. |

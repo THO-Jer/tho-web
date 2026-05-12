@@ -45,7 +45,10 @@ export class CRMRequestError extends Error {
 const DEFAULT_CRM_ENDPOINT = "https://crm-tho.vercel.app/api/public/leads";
 
 export async function pushToCRM(payload: LeadPayload): Promise<CRMResult> {
-  const endpoint = process.env.CRM_ENDPOINT || DEFAULT_CRM_ENDPOINT;
+  // Soportamos ambos nombres por compatibilidad: CRM_LEADS_ENDPOINT (nuevo, descriptivo)
+  // tiene prioridad sobre CRM_ENDPOINT (legacy). Si ninguno está seteado, fallback al default.
+  const endpoint =
+    process.env.CRM_LEADS_ENDPOINT || process.env.CRM_ENDPOINT || DEFAULT_CRM_ENDPOINT;
   const leadsApiKey = process.env.LEADS_API_KEY || process.env.CRM_API_KEY;
 
   if (!leadsApiKey) {
