@@ -11,6 +11,7 @@ import { ResourcesModal } from "@/components/ResourcesModal";
 import { TrustSlider } from "@/components/TrustSlider";
 import { SocialFloat } from "@/components/SocialFloat";
 import { listPublishedPosts } from "@/lib/blogStore";
+import { BOOK_URL } from "@/lib/links";
 
 function clampWords(text: string, maxWords = 22) {
   const words = text.trim().split(/\s+/);
@@ -55,7 +56,7 @@ export default async function HomePage() {
             <div className="mt-6 flex flex-col items-end gap-3 sm:ml-auto sm:flex-row sm:justify-end">
               {/* CTA primario — cualitativo, intención de conversación/agendamiento */}
               <a
-                href="https://bit.ly/bookTHO"
+                href={BOOK_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-sm ring-1 ring-white/40 hover:ring-white"
@@ -248,7 +249,7 @@ export default async function HomePage() {
             </p>
             <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row">
               <a
-                href="https://bit.ly/bookTHO"
+                href={BOOK_URL}
                 target="_blank"
                 rel="noreferrer"
                 className="btn-unified-motion btn-hero-services rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"

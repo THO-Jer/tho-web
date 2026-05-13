@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useEffect, useId, useMemo, useState } from "react";
 
+import { getServiceBySlug } from "@/content/services";
+import { getUtm } from "@/lib/utm";
+
 type FormStatus = "idle" | "sending" | "ok" | "error";
 
 type RelatedPost = {
@@ -12,7 +15,8 @@ type RelatedPost = {
   tags: string[];
 };
 
-const BROCHURE_FILE_URL = "/downloads/sc-brochure-v1.pdf";
+// Single source of truth: el path al PDF vive en content/services.ts
+const BROCHURE_FILE_URL = getServiceBySlug("sostenibilidad-corporativa")!.brochureFile;
 
 function useRevealItems() {
   return useMemo(
@@ -118,7 +122,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
       message: `Cargo: ${String(form.get("role") || "")}`,
       pageUrl: window.location.href,
       hp: String(form.get("hp") || ""),
-      utm: {},
+      utm: getUtm(),
     };
 
     const res = await fetch("/api/lead", {
@@ -159,7 +163,7 @@ export function SostenibilidadServiceView({ relatedPosts = [] }: { relatedPosts?
       message: `Cargo: ${String(form.get("role") || "")}\n\n${String(form.get("message") || "")}`,
       pageUrl: window.location.href,
       hp: String(form.get("hp") || ""),
-      utm: {},
+      utm: getUtm(),
     };
 
     const res = await fetch("/api/lead", {

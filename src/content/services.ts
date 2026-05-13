@@ -19,6 +19,12 @@ export type Service = {
   teaser: string[];
   pillar: "esg" | "comunidad" | "do";
   leadTicketSlug: string;
+  /**
+   * Path al PDF del brochure del nivel 1. Servido desde /public/downloads/.
+   * Consumido por la service view correspondiente para el modal "Descargar brochure".
+   * Si cambias el nombre del archivo (ej. -v2.pdf), sólo actualiza este campo y subes el archivo.
+   */
+  brochureFile: string;
   levels: ServiceLevel[];
 };
 
@@ -27,6 +33,7 @@ export const SERVICES: Service[] = [
     slug: "sostenibilidad-corporativa",
     navLabel: "Sostenibilidad Corporativa",
     menuLabel: "Sostenibilidad Corporativa",
+    brochureFile: "/downloads/sc-brochure-v1.pdf",
     heroTitle: "Sostenibilidad corporativa con foco en decisión",
     problem:
       "Cuando ESG se vuelve una lista de compliance, se pierde foco en riesgo real, reputación y viabilidad del negocio.",
@@ -83,6 +90,7 @@ export const SERVICES: Service[] = [
     slug: "relacionamiento-comunitario",
     navLabel: "Relacionamiento comunitario",
     menuLabel: "Relacionamiento Comunitario",
+    brochureFile: "/downloads/rc-brochure-v1.pdf",
     heroTitle: "Relacionamiento comunitario para asegurar viabilidad territorial",
     problem:
       "Los proyectos se frenan cuando la lectura territorial llega tarde y la estrategia social no conversa con la operación.",
@@ -132,6 +140,7 @@ export const SERVICES: Service[] = [
     slug: "desarrollo-organizacional",
     navLabel: "Desarrollo organizacional",
     menuLabel: "Desarrollo Organizacional",
+    brochureFile: "/downloads/do-brochure-v1.pdf",
     heroTitle: "Desarrollo organizacional para ejecutar el cambio sin perder tracción",
     problem:
       "Muchas estrategias fallan porque cultura, liderazgo y operación avanzan desalineados.",

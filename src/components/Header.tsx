@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { SERVICES } from "@/content/services";
+import { BOOK_URL } from "@/lib/links";
 
 export function Header() {
   const pathname = usePathname();
@@ -66,7 +67,7 @@ export function Header() {
             </div>
           </div>
           <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Blog</Link>
-          <a href="https://bit.ly/bookTHO" target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
+          <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
             <span className="relative z-10">Agendar</span>
           </a>
         </nav>
@@ -90,7 +91,7 @@ export function Header() {
             </div>
           </details>
           <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Blog</Link>
-          <a href="https://bit.ly/bookTHO" target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
+          <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
             <span className="relative z-10">Agendar</span>
           </a>
         </nav>
@@ -125,7 +126,7 @@ export function Header() {
             <Link href="/quienes" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Quiénes somos</Link>
             <Link href="/nuestra-experiencia" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Nuestra experiencia</Link>
             <Link href="/blog" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Blog</Link>
-            <a href="https://bit.ly/bookTHO" target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient inline-flex justify-center rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
+            <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient inline-flex justify-center rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
               <span className="relative z-10">Agendar</span>
             </a>
           </div>

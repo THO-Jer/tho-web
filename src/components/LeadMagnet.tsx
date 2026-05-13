@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { getUtm } from "@/lib/utm";
+
 const RESOURCE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
 
 export function LeadMagnet() {
@@ -23,7 +25,7 @@ export function LeadMagnet() {
       company: String(form.get("company") || ""),
       pageUrl: window.location.href,
       hp: String(form.get("hp") || ""),
-      utm: {},
+      utm: getUtm(),
     };
 
     const res = await fetch("/api/lead", {
