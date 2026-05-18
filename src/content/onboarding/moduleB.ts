@@ -4,8 +4,9 @@
  * Lecciones ya editorializadas:
  *  - B1 (consultiveSalesLessonB1): Qué significa vender en THO.
  *  - B2 (dualEngineLessonB2): Arquitectura comercial — los dos motores.
+ *  - B3 (pricingLessonB3): Pricing en THO.
  *
- * Las demás lecciones (B3–B7) caen al render genérico hasta que se profundicen.
+ * Las demás lecciones (B4–B7) caen al render genérico hasta que se profundicen.
  */
 
 export type ConsultiveSalesLesson = {
@@ -229,5 +230,212 @@ export const dualEngineLessonB2: DualEngineLesson = {
     "Key Accounts escalan la relación.",
     "Digital es liquidez, no foco.",
     "Confundir motor confunde criterio.",
+  ],
+};
+
+export type PricingLesson = {
+  label: string;
+  title: string;
+  premise: string[];
+  whyUF: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+    rule: {
+      label: string;
+      statement: string;
+      body: string[];
+    };
+  };
+  whatDefinesPrice: {
+    heading: string;
+    bullets: string[];
+    closing: string;
+  };
+  bands: {
+    heading: string;
+    tickets: {
+      heading: string;
+      tagline: string;
+      bullets: string[];
+      priorityHeading: string;
+      priorityTickets: string[];
+      rule: string;
+    };
+    keyAccounts: {
+      heading: string;
+      tagline: string;
+      tableHeaders: { banda: string; range: string; entrega: string };
+      rows: Array<{ banda: string; range: string; entrega: string }>;
+      note: string;
+    };
+    digital: {
+      heading: string;
+      tagline: string;
+      bullets: string[];
+      modules: string;
+      note: string;
+    };
+  };
+  presentation: {
+    heading: string;
+    bullets: string[];
+  };
+  negotiation: {
+    heading: string;
+    objectionLabel: string;
+    objection: string;
+    rules: string[];
+    operatingRule: string;
+    ticketRule: string;
+    packExample: {
+      heading: string;
+      body: string;
+    };
+  };
+  nonNegotiables: {
+    heading: string;
+    bullets: string[];
+  };
+  translation: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+  };
+  synthesis: string[];
+};
+
+export const pricingLessonB3: PricingLesson = {
+  label: "LECCIÓN B3 · Estructura de precios",
+  title: "Pricing en THO",
+  premise: [
+    "El precio en THO no se calcula por hora ni por entregable.",
+    "Se calcula por el compromiso que se está asumiendo.",
+    "Un precio bien construido sostiene calidad, protege al equipo y educa al cliente sobre el valor real del trabajo.",
+    "Un precio mal construido erosiona estándar antes de empezar.",
+  ],
+  whyUF: {
+    heading: "1. Por qué se cobra en UF, no en pesos",
+    intro: "Cotizamos en UF por cuatro razones:",
+    bullets: [
+      "Estándar profesional de servicios chilenos: consultoría seria se cotiza en UF.",
+      "Estabilidad presupuestaria para el cliente: el monto en UF queda explícito, trazable y proyectable.",
+      "Protección inflacionaria al momento de cotizar: cada propuesta nueva refleja el valor actual del trabajo.",
+      "Claridad contractual: deja menos espacio para disputas a futuro.",
+    ],
+    rule: {
+      label: "Regla operativa",
+      statement: "La UF se congela al cierre del contrato.",
+      body: [
+        "Al firmar, la UF queda fijada según el día de elaboración del contrato. Si un cliente cierra a 75 UF/mes cuando la UF está en $38.000, paga 75 × 38.000 = $2.850.000 mensuales durante toda la vigencia, aunque la UF suba o baje en el período.",
+        "Esto le da al cliente predictibilidad presupuestaria; a THO le obliga a calcular bien al momento de cerrar. No se renegocia mes a mes.",
+        "Aplica a todos los servicios de THO: Tickets, Key Accounts y Digital.",
+      ],
+    },
+  },
+  whatDefinesPrice: {
+    heading: "2. Qué define el precio en THO",
+    bullets: [
+      "Profundidad del servicio (no es lo mismo un diagnóstico que un acompañamiento).",
+      "Tiempo requerido para hacerlo bien.",
+      "Nivel de responsabilidad institucional asumida.",
+      "Exposición al riesgo (reputacional, legal, técnico).",
+      "Dedicación operativa necesaria del equipo.",
+    ],
+    closing:
+      "El precio no es una negociación arbitraria. Es la traducción cuantitativa del compromiso que THO asume con el proyecto.",
+  },
+  bands: {
+    heading: "3. Las bandas reales",
+    tickets: {
+      heading: "Motor Tickets",
+      tagline: "Precio total, alcance fijo",
+      bullets: ["Rango: 15–40 UF totales."],
+      priorityHeading: "Tickets prioritarios 2026",
+      priorityTickets: [
+        "Mapa de Riesgos Socioambientales (30 UF, 2 meses).",
+        "Scan de Liderazgo y Cultura (25 UF, 2 meses).",
+        "Flash Audit ESG (30 UF, 3 meses).",
+      ],
+      rule: "El alcance del Ticket no se negocia. Si el cliente necesita algo distinto, se cotiza aparte como otro servicio.",
+    },
+    keyAccounts: {
+      heading: "Motor Key Accounts",
+      tagline: "Banda mensual, alcance co-creado",
+      tableHeaders: { banda: "Banda", range: "Rango", entrega: "Qué se entrega" },
+      rows: [
+        { banda: "ALTO", range: "100–120 UF/mes", entrega: "Alcance completo, equipo senior, reportes ejecutivos" },
+        { banda: "MEDIO", range: "75–90 UF/mes", entrega: "Alcance estándar, equipo mixto, reportes regulares" },
+        { banda: "BAJO", range: "50–65 UF/mes", entrega: "Alcance básico, equipo junior, reportes mínimos" },
+        { banda: "MUY BAJO", range: "<50 UF/mes", entrega: "Ya no es Key Account → ofrecer Ticket o servicio digital" },
+      ],
+      note: "El rango objetivo es 75–120 UF/mes. La banda BAJO es un ajuste defensivo, no aspiracional.",
+    },
+    digital: {
+      heading: "Línea digital",
+      tagline: "Recurrente mensual, no foco",
+      bullets: [
+        "Base 1 · Presencia: desde 10 UF/mes.",
+        "Base 2 · Narrativa: desde 20 UF/mes.",
+        "Base 3 · Ecosistema: desde 30 UF/mes.",
+      ],
+      modules:
+        "Módulos complementarios activables (Manuales, Análisis, Campañas, Talleres): 3–30 UF según módulo.",
+      note: "'Desde' significa piso, no precio cerrado. Si el volumen real lo justifica, se ajusta hacia arriba.",
+    },
+  },
+  presentation: {
+    heading: "4. Cómo se presenta un precio",
+    bullets: [
+      'No es "costo". Es "inversión para lograr [objetivo específico que el cliente declaró]".',
+      "Se presenta con criterio, no con tabla impresa.",
+      "No se justifica defensivamente. Si hay que justificar mucho el precio, lo que falló es la propuesta, no el monto.",
+      "El precio no se menciona en la primera reunión salvo que el cliente pregunte directamente. Antes hay que validar que entiende el valor.",
+    ],
+  },
+  negotiation: {
+    heading: "5. Negociación profesional",
+    objectionLabel: "Objeción típica",
+    objection: '"Es muy caro."',
+    rules: [
+      "No bajar el precio inmediatamente. Es la peor reacción posible.",
+      "No compararse con consultoras más baratas. No competimos por precio.",
+      'Preguntar primero: "¿Cuál es el presupuesto que tienen disponible?"',
+      'Replantear alcance: "Con ese presupuesto, esto es lo que podemos hacer: [alcance reducido]. ¿Eso les sirve?"',
+      'Ofrecer fases: "Si necesitan el alcance completo, podemos trabajar por fases. Fase 1: 3 meses por [precio]. Si funciona, seguimos con Fase 2."',
+    ],
+    operatingRule: "Regla operativa: el alcance se ajusta antes que el monto.",
+    ticketRule:
+      "Para Tickets: el alcance no se ajusta. Si el cliente quiere algo distinto, se cotiza aparte. Mantener la integridad del producto empaquetado.",
+    packExample: {
+      heading: "Sobre packs",
+      body: "Cuando un cliente contrata dos servicios simultáneamente — por ejemplo RC (75 UF/mes) e Instagram (20 UF/mes) — se cierra como pack a 85 UF/mes en lugar de 95 UF/mes. El ahorro de 10 UF no es un descuento comercial: refleja la eficiencia real de coordinar ambos servicios bajo un mismo equipo.",
+    },
+  },
+  nonNegotiables: {
+    heading: "6. No-negociables del pricing",
+    bullets: [
+      "No se promete profundidad sin la dedicación que corresponde.",
+      'No se baja el precio para "ganar el proyecto". Ganar mal es perder mejor.',
+      "No se cobra menos de lo que requiere sostener calidad.",
+      'Si un cliente quiere lo que THO no puede sostener al precio que ofrece, decir "no" también es una decisión profesional.',
+    ],
+  },
+  translation: {
+    heading: "7. Traducción operativa",
+    intro: "Antes de proponer un precio:",
+    bullets: [
+      "Identifica el motor que aplica (Ticket / Key Account / Digital).",
+      "Ubica al cliente en la banda que corresponde según presupuesto, alcance esperado y exposición al riesgo.",
+      "Si el cliente está bajo la banda mínima del motor: cambia el motor, no bajes el precio.",
+      "Si pide descuento sin reducir alcance: discute explícitamente qué se reduce. Sin contraparte no hay descuento.",
+      "Registra toda propuesta de precio en el CRM: qué se ofreció, qué se cerró, con qué ajuste, por qué.",
+    ],
+  },
+  synthesis: [
+    "El precio no se justifica. Se sostiene.",
+    "El alcance se ajusta antes que el monto.",
+    '"Muy caro" suele ser un problema de propuesta, no de precio.',
+    "Cobrar mal hoy es perder estándar mañana.",
   ],
 };
