@@ -5,8 +5,9 @@
  *  - B1 (consultiveSalesLessonB1): Qué significa vender en THO.
  *  - B2 (dualEngineLessonB2): Arquitectura comercial — los dos motores.
  *  - B3 (pricingLessonB3): Pricing en THO.
+ *  - B4 (qualificationLessonB4): Calificación de cliente.
  *
- * Las demás lecciones (B4–B7) caen al render genérico hasta que se profundicen.
+ * Las demás lecciones (B5–B7) caen al render genérico hasta que se profundicen.
  */
 
 export type ConsultiveSalesLesson = {
@@ -437,5 +438,230 @@ export const pricingLessonB3: PricingLesson = {
     "El alcance se ajusta antes que el monto.",
     '"Muy caro" suele ser un problema de propuesta, no de precio.',
     "Cobrar mal hoy es perder estándar mañana.",
+  ],
+};
+
+export type QualificationTier = "IDEAL" | "VIABLE" | "NO CALIFICADO";
+
+export type QualificationLesson = {
+  label: string;
+  title: string;
+  premise: string[];
+  whyQualify: {
+    heading: string;
+    intro: string;
+    listIntro: string;
+    listBullets: string[];
+  };
+  culturalFilter: {
+    heading: string;
+    intro: string;
+    questions: Array<{ name: string; question: string }>;
+    warningOne: string;
+    warningMany: string;
+  };
+  motorProfiles: {
+    heading: string;
+    intro: string;
+    keyAccounts: {
+      heading: string;
+      tagline: string;
+      tiers: Array<{ name: QualificationTier; profile: string }>;
+    };
+    tickets: {
+      heading: string;
+      tagline: string;
+      tiers: Array<{ name: QualificationTier; profile: string }>;
+    };
+  };
+  redFlags: {
+    heading: string;
+    intro: string;
+    phases: Array<{ heading: string; bullets: string[] }>;
+    closing: string;
+  };
+  exit: {
+    heading: string;
+    intro: string;
+    indicators: string[];
+    framing: string;
+    quote: string;
+    closing: string;
+  };
+  translation: {
+    heading: string;
+    bullets: string[];
+  };
+  synthesis: string[];
+};
+
+export const qualificationLessonB4: QualificationLesson = {
+  label: "LECCIÓN B4 · Diagnóstico de cliente",
+  title: "Calificación: calidad antes que volumen",
+  premise: [
+    "THO no busca cualquier cliente. Busca cliente compatible.",
+    "Vender mal cliente erosiona estándar, equipo y reputación más rápido que no vender.",
+    "Calificar antes de proponer no es elitismo. Es protección operativa.",
+    'Decir "no" también es una decisión profesional.',
+  ],
+  whyQualify: {
+    heading: "1. Por qué calificar antes de vender",
+    intro:
+      'Cada propuesta cuesta tiempo, energía y atención que no se recuperan. Si el cliente no es compatible, el costo no es solo perder la venta: es desgastar al equipo y deteriorar el estándar institucional al intentar "hacerlo funcionar".',
+    listIntro: "Calificar bien hace tres cosas:",
+    listBullets: [
+      "Protege la viabilidad operativa del equipo.",
+      "Sostiene el estándar profesional en cada contrato.",
+      "Permite priorizar el tiempo entre los prospectos que sí van a cerrar bien.",
+    ],
+  },
+  culturalFilter: {
+    heading: "2. Las 5 preguntas mínimas (fit cultural, todo cliente)",
+    intro:
+      "Antes de evaluar ajuste a un motor específico, todo cliente debe pasar el filtro cultural. Estas cinco condiciones aplican siempre:",
+    questions: [
+      {
+        name: "Liderazgo claro",
+        question:
+          '¿Hay alguien que efectivamente decide y se compromete con el proceso, o todo se diluye en "lo vemos con el equipo"?',
+      },
+      {
+        name: "Disposición a documentar",
+        question:
+          "¿Aceptan que las decisiones queden por escrito, o esperan acuerdos verbales que después se reinterpretan?",
+      },
+      {
+        name: "Aceptación de trazabilidad",
+        question:
+          "¿Entienden que el trabajo se sostiene con evidencia y registro, o esperan resultados sin proceso visible?",
+      },
+      {
+        name: "Foco en método sobre resultado rápido",
+        question:
+          '¿Valoran el cómo o solo el qué? Cliente que solo quiere "el deliverable ya" no es compatible con THO.',
+      },
+      {
+        name: "Responsable interno definido",
+        question:
+          "¿Hay una contraparte clara con tiempo asignado, o nos van a dejar trabajando solos sin interlocutor?",
+      },
+    ],
+    warningOne: "Si falla una: alerta amarilla.",
+    warningMany: "Si fallan dos o más: el cliente no califica para THO en ningún motor.",
+  },
+  motorProfiles: {
+    heading: "3. Perfiles por motor",
+    intro:
+      "Pasado el filtro cultural, el perfil se afina según el motor que aplica. Lo que es IDEAL en Tickets no es lo mismo que IDEAL en Key Accounts.",
+    keyAccounts: {
+      heading: "Motor Key Accounts",
+      tagline: "Foco estratégico",
+      tiers: [
+        {
+          name: "IDEAL",
+          profile:
+            "Presupuesto aprobado o flexible · decisor accesible y comprometido · problema urgente y costoso de no resolver · valoran expertise sobre precio · hay embajador interno que conoce y confía en THO.",
+        },
+        {
+          name: "VIABLE",
+          profile:
+            "Presupuesto existe pero requiere aprobación · decisor identificado pero con intermediarios · problema reconocido pero no urgente · sensibles a precio pero entienden valor · contacto tibio (referencia de 2º grado).",
+        },
+        {
+          name: "NO CALIFICADO",
+          profile:
+            '"Curiosidad" sin dolor real · presupuesto incierto o inexistente · no está claro quién decide · buscan "lo más barato" · contacto frío sin contexto compartido.',
+        },
+      ],
+    },
+    tickets: {
+      heading: "Motor Tickets",
+      tagline: "Puerta de entrada",
+      tiers: [
+        {
+          name: "IDEAL",
+          profile:
+            "Problema específico y acotado · presupuesto pequeño pero real (20–40 UF disponibles) · decisión rápida posible (1–2 semanas) · entienden que es diagnóstico/fase 1, no solución completa · potencial de escalamiento a Nivel 1–2.",
+        },
+        {
+          name: "VIABLE",
+          profile:
+            "Curiosidad genuina (no solo cotizar) · presupuesto probable pero no confirmado · necesitan validar internamente (2–3 semanas) · abiertos a discutir alcance.",
+        },
+        {
+          name: "NO CALIFICADO",
+          profile:
+            "Buscan solución completa con presupuesto de Ticket · no tienen presupuesto · requieren licitación o proceso formal largo · expectativas poco realistas (estrategia + implementación en 2 meses por 20 UF).",
+        },
+      ],
+    },
+  },
+  redFlags: {
+    heading: "4. Red flags durante el ciclo",
+    intro:
+      "La calificación no es solo al inicio. El comportamiento durante el proceso también señala fit (o falta de fit).",
+    phases: [
+      {
+        heading: "En Reunión 1",
+        bullets: [
+          "Solo curiosidad, sin dolor real articulable.",
+          'No pueden describir qué significaría "éxito" para ellos.',
+          'Mencionan "estamos viendo varias opciones" sin contexto (RFP encubierto).',
+          "Decisor no está presente y tampoco vendrá.",
+        ],
+      },
+      {
+        heading: "En seguimiento",
+        bullets: [
+          "No contestan en 4+ semanas sin explicación.",
+          "Piden ajustes constantes sin avanzar.",
+          "Cambian de interlocutor sin contexto.",
+          'Dicen "sí" a todo pero no avanzan.',
+        ],
+      },
+      {
+        heading: "En Reunión 2",
+        bullets: [
+          "Decisor sigue sin estar.",
+          'Preguntan por "otras opciones más baratas".',
+          "Cuestionan metodología básica.",
+          "No tienen presupuesto claro a estas alturas.",
+        ],
+      },
+    ],
+    closing:
+      "Un red flag aislado puede gestionarse. Tres o más concentrados: el cliente no va a cerrar bien.",
+  },
+  exit: {
+    heading: "5. Cuándo retirarse",
+    intro:
+      "Hay momentos en que la decisión profesional es soltar el prospecto. Indicadores claros:",
+    indicators: [
+      "Han pasado 3+ meses sin avance real.",
+      "El cliente te ve como commodity, no valora expertise.",
+      "Su presupuesto es menos del 50% del mínimo viable para el motor que aplica.",
+      'Tus tripas dicen "esto no va" — y suelen tener razón.',
+    ],
+    framing: "Retirarse no es portazo. Es pausa elegante:",
+    quote:
+      '"Agradezco mucho el tiempo que nos han dado. Siento que en este momento el timing o el fit no está del todo. Les propongo dejar esto en pausa y si más adelante tiene sentido, retomamos."',
+    closing:
+      "Mantener relación cordial con clientes no calificados es estratégico: pueden calificar después.",
+  },
+  translation: {
+    heading: "6. Traducción operativa",
+    bullets: [
+      "Antes de invertir tiempo en una propuesta, califica.",
+      "Registra la calificación en el CRM con justificación breve (no solo la categoría).",
+      '"No calificado" no es "rechazado": es "no es momento" o "no es fit con THO".',
+      "Si el cliente está borderline (VIABLE bajo), define qué necesitarían cambiar para subir de tier antes de comprometer un Key Account. Para Tickets, VIABLE bajo es aceptable si entienden el alcance.",
+      "Si las tripas y la evaluación se contradicen, gana lo que tenga más evidencia. Pero documenta la duda.",
+    ],
+  },
+  synthesis: [
+    "Calificar protege más de lo que parece.",
+    "Cliente incompatible erosiona estándar mucho antes del cierre.",
+    'Decir "no" también es decisión profesional.',
+    "El fit cultural es prerequisito; el fit por motor es ajuste fino.",
   ],
 };
