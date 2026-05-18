@@ -17,6 +17,7 @@ import { LessonA6 } from "@/components/onboarding/lessons/LessonA6";
 import { LessonA7 } from "@/components/onboarding/lessons/LessonA7";
 import { LessonA8, type IntegrationAnswers } from "@/components/onboarding/lessons/LessonA8";
 import { LessonB1 } from "@/components/onboarding/lessons/LessonB1";
+import { LessonB2 } from "@/components/onboarding/lessons/LessonB2";
 import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
 import {
   getLessonGuide,
@@ -254,8 +255,13 @@ export default function StudioOnboardingUnitPage() {
       }
     }
 
-    if (moduleKey === "B" && lesson.id === "B1") {
-      return <LessonB1 {...shellProps} />;
+    if (moduleKey === "B") {
+      switch (lesson.id) {
+        case "B1":
+          return <LessonB1 {...shellProps} />;
+        case "B2":
+          return <LessonB2 {...shellProps} />;
+      }
     }
 
     return (
