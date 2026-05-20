@@ -12,6 +12,7 @@ export type LessonGuide = {
 };
 
 export const topicReviewLabel: Record<string, string> = {
+  // Módulo A
   adaptabilidad_ordenada: "Adaptabilidad ordenada",
   definition_of_done: "Definition of Done",
   metodo_sobre_costumbre: "Método sobre costumbre",
@@ -22,6 +23,17 @@ export const topicReviewLabel: Record<string, string> = {
   coherencia: "Coherencia institucional",
   integridad_territorial: "Integridad territorial",
   trazabilidad: "Trazabilidad",
+  // Módulo B
+  ventas_consultiva: "Venta consultiva",
+  ventas_motores: "Motores comerciales",
+  ventas_funnel: "Funnel Ticket → Key Account",
+  ventas_uf: "Pricing en UF y congelamiento",
+  ventas_pricing: "Negociación de precio",
+  ventas_calificacion: "Calificación y retirada",
+  ventas_crm: "Disciplina del CRM",
+  ventas_etica: "Tres no fundamentales",
+  ventas_objeciones: "Manejo ético de objeciones",
+  ventas_cierre: "Cierre y formalización",
 };
 
 export const moduleALessonGuides: Record<string, LessonGuide> = {

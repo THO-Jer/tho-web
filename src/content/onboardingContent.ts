@@ -216,4 +216,161 @@ export const defaultOnboardingQuiz: OnboardingQuizQuestion[] = [
     correctIndex: 1,
     topic: "trazabilidad",
   },
+
+  // =====================================================
+  // MÓDULO B — Ventas en THO (10 preguntas)
+  // =====================================================
+  // Todos los topics empiezan con "ventas_*" para que el unitTopicMap los
+  // enganche al slug "ventas-tho". Cada topic mapea a una lección específica
+  // del módulo B vía topicToLesson() en src/lib/onboarding.ts.
+  {
+    id: "b-q1",
+    prompt:
+      "Un cliente llega con una solicitud específica de servicios y pide propuesta rápida. ¿Qué refleja mejor el estándar de venta consultiva en THO?",
+    options: [
+      "Enviar la propuesta lo más rápido posible sin más matices, para no perder oportunidad.",
+      "Entregar la propuesta con el contexto disponible, explicitando la necesidad de un diagnóstico inicial para afinarla.",
+      "Ofrecer un descuento por respuesta rápida.",
+      "Derivar el pedido al ticket más cercano.",
+    ],
+    correctIndex: 1,
+    topic: "ventas_consultiva",
+  },
+  {
+    id: "b-q2",
+    prompt:
+      "Un prospecto tiene presupuesto pequeño pero real y pide una intervención de Relacionamiento Comunitario acotada. ¿Qué motor activa?",
+    options: [
+      "Key Account, aunque el presupuesto esté por debajo de la banda mínima.",
+      "Ticket de Mapa de Riesgos Socioambientales como puerta de entrada.",
+      "Servicio digital Base 1.",
+      "Declinar sin ofrecer alternativa.",
+    ],
+    correctIndex: 1,
+    topic: "ventas_motores",
+  },
+  {
+    id: "b-q3",
+    prompt: "¿En qué momento se hace el pitch de escalamiento (Ticket → Key Account) con un cliente?",
+    options: [
+      "Desde la primera reunión de venta del Ticket.",
+      "En el primer mes de ejecución del Ticket.",
+      "Al final del Ticket, en la entrega de resultados.",
+      "Cuando el cliente lo pida sin que THO lo proponga.",
+    ],
+    correctIndex: 2,
+    topic: "ventas_funnel",
+  },
+  {
+    id: "b-q4",
+    prompt:
+      "Un cliente firma un contrato Key Account a 75 UF/mes en marzo. Para junio, la UF subió 3%. ¿Qué paga el cliente?",
+    options: [
+      "La nueva UF mensual ajustada al alza.",
+      "El valor en pesos calculado al día de firma del contrato, sin ajuste.",
+      "Renegociación obligatoria al cambiar la UF.",
+      "Promedio entre la UF de firma y la UF actual.",
+    ],
+    correctIndex: 1,
+    topic: "ventas_uf",
+  },
+  {
+    id: "b-q5",
+    prompt: "Un cliente dice que la propuesta está fuera de su presupuesto. ¿Qué corresponde según el estándar THO?",
+    options: [
+      "Bajar el precio inmediatamente para asegurar el cierre.",
+      "Compararse con consultoras más baratas para justificar.",
+      "Ajustar alcance antes que monto, o cambiar de motor.",
+      "Mantener el precio sin discutir nada.",
+    ],
+    correctIndex: 2,
+    topic: "ventas_pricing",
+  },
+  {
+    id: "b-q6",
+    prompt:
+      "Han pasado 3 meses con un prospecto sin avance real, el cliente te ve como commodity y su presupuesto es menos del 50% del mínimo viable. ¿Qué acción profesional corresponde?",
+    options: [
+      "Insistir con argumentos de urgencia para forzar el cierre.",
+      "Bajar el precio al mínimo viable para no perder la venta.",
+      "Pausar o cerrar elegantemente la conversación.",
+      "Trabajar gratis los primeros meses para construir relación.",
+    ],
+    correctIndex: 2,
+    topic: "ventas_calificacion",
+  },
+  {
+    id: "b-q7",
+    prompt:
+      "Tuviste una conversación con un cliente que cambió el alcance del contrato, pero no quedó en CRM. ¿Qué refleja mejor el estándar THO?",
+    options: [
+      "Si fue una conversación informal, no es necesario registrarla.",
+      "La conversación, para efectos de análisis, no ocurrió.",
+      "Basta con recordarla mentalmente.",
+      "Se puede registrar después si surge un conflicto.",
+    ],
+    correctIndex: 1,
+    topic: "ventas_crm",
+  },
+  {
+    id: "b-q8",
+    prompt:
+      "Un cliente exige que ocultemos un riesgo regulatorio relevante en la propuesta para acelerar la aprobación interna. ¿Qué corresponde?",
+    options: [
+      "Omitir el riesgo y avanzar con el cierre.",
+      "Explicitar el riesgo aunque eso pueda significar perder la venta.",
+      "Mencionarlo en términos vagos para no perder al cliente.",
+      "Ajustar la propuesta al lenguaje del cliente sin alterar contenido.",
+    ],
+    correctIndex: 1,
+    topic: "ventas_etica",
+  },
+  {
+    id: "b-q9",
+    prompt: 'Un prospecto dice "ya trabajamos con otra consultora". ¿Cuál es la respuesta éticamente coherente?',
+    options: [
+      "Descalificar al competidor mencionando que cobra menos por menos calidad.",
+      "Sugerir que están mal acompañados sin conocer el contexto.",
+      "Preguntar genuinamente cómo les ha ido, compartir un recurso de valor (lead magnet, contenido relevante) y ofrecer complementariedad si detectas vacíos.",
+      "Esperar a que terminen ese contrato para volver a contactar.",
+    ],
+    correctIndex: 2,
+    topic: "ventas_objeciones",
+  },
+  {
+    id: "b-q10",
+    prompt:
+      "Un cliente Key Account propone pagar mediante boleta de honorarios para simplificar el trámite. ¿Qué corresponde?",
+    options: [
+      "Aceptar para facilitar el cierre.",
+      "Aceptar solo el primer mes y después emitir factura.",
+      "Declinar: THO siempre emite factura (exenta), nunca boleta de honorarios.",
+      "Pedir orden de compra adicional.",
+    ],
+    correctIndex: 2,
+    topic: "ventas_cierre",
+  },
+
+  // =====================================================
+  // MÓDULO C — Operación Creativa (pendiente)
+  // =====================================================
+  // TODO: agregar 10 preguntas cuando se editorialice el módulo C.
+  // Patrón a seguir (mismo que B):
+  //   - 10 preguntas, una por lección aproximadamente.
+  //   - Topics empezando en "operacion_creativa_*" o "operacion_*" para que
+  //     unitTopicMap las enganche al slug "operacion-creativa".
+  //   - Recordar agregar entradas equivalentes en topicReviewLabel
+  //     (src/content/onboarding/lessonGuides.ts) y refinar topicToLesson
+  //     (src/lib/onboarding.ts) para mapear cada topic a su lección.
+
+  // =====================================================
+  // MÓDULO D — Operación Asesorías (pendiente)
+  // =====================================================
+  // TODO: agregar 10 preguntas cuando se editorialice el módulo D.
+  // Patrón a seguir (mismo que B):
+  //   - 10 preguntas, una por lección aproximadamente.
+  //   - Topics empezando en "operacion_asesorias_*" o "seguridad_*" para que
+  //     unitTopicMap las enganche al slug "operacion-asesorias".
+  //   - Recordar agregar entradas equivalentes en topicReviewLabel y
+  //     refinar topicToLesson para mapear cada topic a su lección.
 ];

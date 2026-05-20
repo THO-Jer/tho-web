@@ -111,15 +111,31 @@ export function unitTopicMap(slug: string, topic: string) {
 
 export function topicToLesson(topic: string, lessons: Array<{ id: string; label: string }>) {
   const t = topic.toLowerCase();
-  if (t.startsWith("adaptabilidad_ordenada") || t.startsWith("marco_agile")) return lessons.find((l) => l.id === "A5" || l.id === "A4") || lessons[0];
-  if (t.startsWith("definition_of_done") || t.startsWith("metodo_sobre_costumbre")) return lessons.find((l) => l.id === "A3") || lessons[0];
-  if (t.startsWith("limites_institucionales")) return lessons.find((l) => l.id === "A6") || lessons[0];
-  if (t.startsWith("protocolo_etico") || t.startsWith("escalamiento")) return lessons.find((l) => l.id === "A7") || lessons[0];
-  if (t.startsWith("coherencia") || t.startsWith("integridad_territorial") || t.startsWith("trazabilidad")) return lessons.find((l) => l.id === "Reflexión guiada sugerida") || lessons[0];
-  if (t.startsWith("identidad") || t.startsWith("onboarding")) return lessons.find((l) => l.id.startsWith("A")) || lessons[0];
-  if (t.startsWith("ventas")) return lessons.find((l) => l.id.startsWith("B")) || lessons[0];
-  if (t.startsWith("operacion_creativa") || t.startsWith("operacion")) return lessons.find((l) => l.id.startsWith("C")) || lessons[0];
-  if (t.startsWith("operacion_asesorias") || t.startsWith("seguridad")) return lessons.find((l) => l.id.startsWith("D")) || lessons[0];
+  const findById = (id: string) => lessons.find((l) => l.id === id);
+  const firstOfModule = (prefix: string) => lessons.find((l) => l.id.startsWith(prefix));
+
+  // Módulo A — topics existentes
+  if (t.startsWith("adaptabilidad_ordenada") || t.startsWith("marco_agile")) return findById("A5") || findById("A4") || lessons[0];
+  if (t.startsWith("definition_of_done") || t.startsWith("metodo_sobre_costumbre")) return findById("A3") || lessons[0];
+  if (t.startsWith("limites_institucionales")) return findById("A6") || lessons[0];
+  if (t.startsWith("protocolo_etico") || t.startsWith("escalamiento")) return findById("A7") || lessons[0];
+  if (t.startsWith("coherencia") || t.startsWith("integridad_territorial") || t.startsWith("trazabilidad")) return findById("Reflexión guiada sugerida") || lessons[0];
+  if (t.startsWith("identidad") || t.startsWith("onboarding")) return firstOfModule("A") || lessons[0];
+
+  // Módulo B — mapeo específico por topic (refinado tras editorialización)
+  if (t === "ventas_consultiva") return findById("B1") || firstOfModule("B") || lessons[0];
+  if (t === "ventas_motores" || t === "ventas_funnel") return findById("B2") || firstOfModule("B") || lessons[0];
+  if (t === "ventas_uf" || t === "ventas_pricing") return findById("B3") || firstOfModule("B") || lessons[0];
+  if (t === "ventas_calificacion") return findById("B4") || firstOfModule("B") || lessons[0];
+  if (t === "ventas_crm") return findById("B5") || firstOfModule("B") || lessons[0];
+  if (t === "ventas_etica" || t === "ventas_objeciones") return findById("B6") || firstOfModule("B") || lessons[0];
+  if (t === "ventas_cierre") return findById("B7") || firstOfModule("B") || lessons[0];
+  if (t.startsWith("ventas")) return firstOfModule("B") || lessons[0];
+
+  // Módulos C y D — fallback genérico hasta que se editorialicen y se refine
+  if (t.startsWith("operacion_creativa") || t.startsWith("operacion")) return firstOfModule("C") || lessons[0];
+  if (t.startsWith("operacion_asesorias") || t.startsWith("seguridad")) return firstOfModule("D") || lessons[0];
+
   return lessons[0];
 }
 
