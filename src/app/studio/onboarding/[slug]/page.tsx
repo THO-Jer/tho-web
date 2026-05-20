@@ -20,6 +20,9 @@ import { LessonB1 } from "@/components/onboarding/lessons/LessonB1";
 import { LessonB2 } from "@/components/onboarding/lessons/LessonB2";
 import { LessonB3 } from "@/components/onboarding/lessons/LessonB3";
 import { LessonB4 } from "@/components/onboarding/lessons/LessonB4";
+import { LessonB5 } from "@/components/onboarding/lessons/LessonB5";
+import { LessonB6 } from "@/components/onboarding/lessons/LessonB6";
+import { LessonB7 } from "@/components/onboarding/lessons/LessonB7";
 import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
 import {
   getLessonGuide,
@@ -267,6 +270,12 @@ export default function StudioOnboardingUnitPage() {
           return <LessonB3 {...shellProps} />;
         case "B4":
           return <LessonB4 {...shellProps} />;
+        case "B5":
+          return <LessonB5 {...shellProps} />;
+        case "B6":
+          return <LessonB6 {...shellProps} />;
+        case "B7":
+          return <LessonB7 {...shellProps} />;
       }
     }
 

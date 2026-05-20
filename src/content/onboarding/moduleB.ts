@@ -6,8 +6,11 @@
  *  - B2 (dualEngineLessonB2): Arquitectura comercial — los dos motores.
  *  - B3 (pricingLessonB3): Pricing en THO.
  *  - B4 (qualificationLessonB4): Calificación de cliente.
+ *  - B5 (crmLessonB5): CRM en THO.
+ *  - B6 (commercialEthicsLessonB6): Ética comercial.
+ *  - B7 (commercialClosingLessonB7): Cierre y formalización.
  *
- * Las demás lecciones (B5–B7) caen al render genérico hasta que se profundicen.
+ * Módulo B completo en cobertura hand-crafted.
  */
 
 export type ConsultiveSalesLesson = {
@@ -652,10 +655,9 @@ export const qualificationLessonB4: QualificationLesson = {
     heading: "6. Traducción operativa",
     bullets: [
       "Antes de invertir tiempo en una propuesta, califica.",
-      "Registra la calificación en el CRM con justificación breve (no solo la categoría).",
       '"No calificado" no es "rechazado": es "no es momento" o "no es fit con THO".',
       "Si el cliente está borderline (VIABLE bajo), define qué necesitarían cambiar para subir de tier antes de comprometer un Key Account. Para Tickets, VIABLE bajo es aceptable si entienden el alcance.",
-      "Si las tripas y la evaluación se contradicen, gana lo que tenga más evidencia. Pero documenta la duda.",
+      "Si las tripas y la evaluación se contradicen, gana lo que tenga más evidencia. Pero documenta la duda internamente para revisarla después.",
     ],
   },
   synthesis: [
@@ -663,5 +665,599 @@ export const qualificationLessonB4: QualificationLesson = {
     "Cliente incompatible erosiona estándar mucho antes del cierre.",
     'Decir "no" también es decisión profesional.',
     "El fit cultural es prerequisito; el fit por motor es ajuste fino.",
+  ],
+};
+
+export type CRMLesson = {
+  label: string;
+  title: string;
+  premise: string[];
+  whatIsIt: {
+    heading: string;
+    body: string[];
+  };
+  whyExists: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+    rule: {
+      label: string;
+      statement: string;
+      body: string;
+    };
+  };
+  twoSides: {
+    heading: string;
+    intro: string;
+    commercial: {
+      heading: string;
+      tagline: string;
+      tabs: string[];
+    };
+    accounting: {
+      heading: string;
+      tagline: string;
+      tabs: Array<{ name: string; description: string }>;
+    };
+    closing: string;
+  };
+  pipelineStates: {
+    heading: string;
+    intro: string;
+    activeStates: string[];
+    leadOrigin: string;
+    closureLabel: string;
+    closure: string;
+  };
+  rules: {
+    heading: string;
+    bullets: string[];
+  };
+  translation: {
+    heading: string;
+    bullets: string[];
+  };
+  synthesis: string[];
+};
+
+export const crmLessonB5: CRMLesson = {
+  label: "LECCIÓN B5 · Sistema operativo",
+  title: "CRM en THO: memoria institucional",
+  premise: [
+    "El CRM en THO no es una herramienta. Es el sistema operativo de la organización.",
+    "Atraviesa lo comercial, lo financiero y lo contable.",
+    "Sin registro no hay continuidad, accountability ni base para decidir.",
+    "Y la ley operativa es directa: si no está registrado, no existe.",
+  ],
+  whatIsIt: {
+    heading: "1. Qué es el CRM en THO",
+    body: [
+      "No es una agenda de contactos. Tampoco una hoja de cálculo de pipeline.",
+      "Es la memoria institucional: el lugar donde queda todo lo que la organización necesita recordar para operar, mejorar y sostenerse cuando alguien se ausenta o se va.",
+      "Cuando una persona sale, sus relaciones, decisiones y proyectos no deben salir con ella. Eso es lo que el CRM protege.",
+    ],
+  },
+  whyExists: {
+    heading: "2. Por qué existe",
+    intro: "Sin CRM:",
+    bullets: [
+      "No hay continuidad cuando alguien se ausenta o sale.",
+      "No hay accountability sobre decisiones tomadas.",
+      "No hay base para aprender (¿qué funcionó? ¿qué no?).",
+      "La organización depende de la memoria personal de cada uno — y eso es frágil.",
+    ],
+    rule: {
+      label: "Regla operativa",
+      statement: "Si no está registrado, no existe.",
+      body: "No es retórica. Es ley operativa. Una conversación que cambió el alcance de un contrato y no quedó en CRM, no ocurrió. Una propuesta que se mandó sin registrar el monto exacto, no se mandó. Un cobro que no entró al contable, no se hizo.",
+    },
+  },
+  twoSides: {
+    heading: "3. Los dos lados del CRM",
+    intro: "El CRM en THO tiene dos lados que se complementan:",
+    commercial: {
+      heading: "Lado Comercial/Financiero",
+      tagline: "Qué se vende y qué se ejecuta",
+      tabs: [
+        "Pipeline (prospectos en curso).",
+        "Tickets actuales (en ejecución).",
+        "Key Accounts (cuentas activas).",
+        "Historial de cierres (ganados y perdidos).",
+        "Reportes (gráficos por período consultado).",
+      ],
+    },
+    accounting: {
+      heading: "Lado Contable",
+      tagline: "Qué se declara y formaliza",
+      tabs: [
+        {
+          name: "EERR (Estado de Resultados)",
+          description: "Alimentado por facturas emitidas, facturas recibidas, honorarios, retiros y caja chica.",
+        },
+        {
+          name: "Conciliación",
+          description: "Cruce contable-bancario.",
+        },
+      ],
+    },
+    closing:
+      "Los dos lados se complementan: lo comercial/financiero muestra la actividad y el flujo; lo contable formaliza, ordena y deja la base para operación renta anual.",
+  },
+  pipelineStates: {
+    heading: "4. Los estados del pipeline",
+    intro: "Todo prospecto se mueve por una secuencia estándar de estados activos:",
+    activeStates: [
+      "Lead nuevo",
+      "Contactado",
+      "Reunión agendada",
+      "Propuesta enviada",
+      "Negociación",
+    ],
+    leadOrigin: "Los leads nuevos caen automáticamente desde los lead magnets de tho.cl.",
+    closureLabel: "Cierre",
+    closure:
+      'Tras Negociación, el prospecto se cierra: ganado o perdido. En ambos casos pasa a "Historial de cierres" y deja de aparecer en pipeline activo.',
+  },
+  rules: {
+    heading: "5. Reglas operativas",
+    bullets: [
+      "El estado del pipeline se actualiza después de cada interacción, no semanalmente.",
+      "Toda propuesta enviada queda con su versión y monto exacto.",
+      "El CRM debe estar siempre consultable. Cada persona es responsable de mantener al día su parte.",
+      "Antes de las reuniones trimestrales de evaluación, el CRM debe reflejar el estado real — sin lagunas ni notas pendientes acumuladas.",
+      "Cuando hay cambio de interlocutor con un prospecto, queda registrado con fecha y motivo.",
+      "Las notas relevantes de cada reunión quedan en CRM, no en libretas personales.",
+    ],
+  },
+  translation: {
+    heading: "6. Traducción operativa",
+    bullets: [
+      "Antes de contactar a un prospecto, revisa CRM. ¿Hubo contacto previo? ¿Con quién? ¿Cómo quedó?",
+      "Después de cada reunión, actualiza estado + próximo paso + notas relevantes el mismo día.",
+      "Toda transacción (factura emitida, factura recibida, honorario, retiro, caja chica) entra al lado contable sin esperar.",
+      "Si vas a tomar una decisión sobre un cliente, asegúrate de que la información en la que te basas esté en CRM, no solo en tu cabeza.",
+      "Si tienes que justificar algo retroactivamente y no está en CRM, asume que vas a tener que reconstruirlo desde cero.",
+    ],
+  },
+  synthesis: [
+    "El CRM no es burocracia. Es memoria institucional.",
+    '"Si no está registrado, no existe" es ley operativa.',
+    "Lo comercial/financiero muestra el movimiento. Lo contable lo formaliza.",
+    "Registrar no es trabajo extra. Es parte del trabajo.",
+  ],
+};
+
+export type CommercialEthicsLesson = {
+  label: string;
+  title: string;
+  premise: string[];
+  fundamentals: {
+    heading: string;
+    intro: string;
+    items: Array<{ statement: string; explanation: string }>;
+    closing: string;
+  };
+  whyEthicsProtects: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+  };
+  objections: {
+    heading: string;
+    intro: string;
+    trapLabel: string;
+    ethicalLabel: string;
+    items: Array<{ objection: string; trap: string; ethical: string }>;
+  };
+  neverDo: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+  };
+  whenToDecline: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+    closing: string;
+  };
+  translation: {
+    heading: string;
+    bullets: string[];
+  };
+  synthesis: string[];
+};
+
+export const commercialEthicsLessonB6: CommercialEthicsLesson = {
+  label: "LECCIÓN B6 · Límites en la venta",
+  title: "Ética comercial en THO",
+  premise: [
+    "En THO la venta no se separa del método.",
+    "Lo que se promete tiene que ser sostenible con el estándar interno, sin atajos, sin fricción oculta, sin compromisos que el equipo no puede cumplir.",
+    "La ética comercial no es un valor decorativo. Es lo que diferencia una venta que escala de una venta que destruye relaciones.",
+  ],
+  fundamentals: {
+    heading: '1. Los tres "no" fundamentales',
+    intro: "Toda venta en THO se sostiene sobre tres negativas explícitas:",
+    items: [
+      {
+        statement: "No se promete rapidez sin método.",
+        explanation:
+          "Acelerar entregables comprometiendo etapas críticas erosiona el resultado y expone al equipo a fallar.",
+      },
+      {
+        statement: "No se ofrece profundidad no sostenible.",
+        explanation:
+          "Si el alcance ofrecido requiere capacidad que no tenemos o supuestos que no podemos verificar, no se ofrece — se acota.",
+      },
+      {
+        statement: "No se ocultan riesgos.",
+        explanation:
+          "Si durante la conversación detectamos tensiones críticas (regulatorias, reputacionales, operativas), se explicitan. Cerrar omitiendo es cerrar mal.",
+      },
+    ],
+    closing:
+      "Estas tres negativas existen porque protegen lo mismo: la viabilidad del trabajo después de la firma. Vender bien es vender lo que se puede sostener.",
+  },
+  whyEthicsProtects: {
+    heading: "2. Por qué la ética comercial protege más de lo que parece",
+    intro: 'No es un asunto de imagen ni de "ser buena gente". La ética comercial es operativa:',
+    bullets: [
+      "Protege la relación con el cliente: la confianza ganada en la venta sostiene los conflictos inevitables de la ejecución.",
+      "Protege al equipo: no acepta compromisos que destruyan capacidad o moral.",
+      "Protege la reputación institucional: el mercado de consultoría es chico, especialmente en regiones — todo se sabe.",
+      "Protege la integridad del método: si vendemos mal, ejecutamos mal. La venta es la primera entrega.",
+    ],
+  },
+  objections: {
+    heading: "3. Manejo ético de objeciones",
+    intro:
+      "Las objeciones tácticas ya están cubiertas en B3 (cómo responder). Aquí está la dimensión ética: la trampa típica que hay que evitar y la respuesta coherente con el estándar.",
+    trapLabel: "Trampa",
+    ethicalLabel: "Respuesta ética",
+    items: [
+      {
+        objection: '"Es muy caro."',
+        trap: "Bajar el precio defensivamente para ganar el proyecto.",
+        ethical:
+          "Ajustar alcance antes que monto. Si el presupuesto del cliente está fuera de banda, cambiar de motor o pausar conversación.",
+      },
+      {
+        objection: '"Necesitamos pensarlo."',
+        trap: 'Forzar la decisión con tácticas de urgencia ("solo esta semana", "tenemos otros clientes esperando").',
+        ethical:
+          "Aceptar el espacio. Preguntar si hay algo específico que aclarar; si no, agendar reconexión sin presionar.",
+      },
+      {
+        objection: '"Ya trabajamos con otra consultora."',
+        trap: "Descalificar al competidor o sugerir que están mal acompañados.",
+        ethical:
+          "Preguntar genuinamente cómo les ha ido. Si están conformes, no insistir. Si hay vacíos, ofrecer complementariedad, no reemplazo agresivo.",
+      },
+      {
+        objection: '"No es el momento."',
+        trap: "Insistir con argumentos diseñados para que reconsideren.",
+        ethical:
+          "Aceptar la respuesta. Preguntar si tiene sentido reconectar en una fecha específica y registrarlo.",
+      },
+      {
+        objection: '"Necesitamos aprobación de [superior]."',
+        trap:
+          'Presionar al interlocutor para que "convenza" internamente, o forzar el contacto directo con el superior sin permiso.',
+        ethical:
+          "Preguntar qué necesita el interlocutor para facilitar esa aprobación (documento ejecutivo, reunión adicional, ajuste de alcance). Trabajar con su proceso interno, no contra él.",
+      },
+    ],
+  },
+  neverDo: {
+    heading: "4. Lo que nunca se hace en venta THO",
+    intro: "Aunque hayan razones aparentes, estas prácticas están fuera del estándar:",
+    bullets: [
+      'Crear urgencia artificial ("oferta solo esta semana", "tenemos pocas vacantes").',
+      "Prometer resultados garantizados que dependen del cliente como si fueran del consultor.",
+      "Inflar entregables o exagerar capacidad operativa real.",
+      "Usar comparaciones desleales con competidores nombrados o implícitos.",
+      "Usar al cliente como caso de éxito antes de tiempo. Antes de mencionar testimonios, casos o citas en propuestas o redes, el permiso del cliente debe ser explícito (formulario de satisfacción completado, autorización verbal explícita o grabación con consentimiento).",
+      "Aceptar compromisos que destruyen al equipo: timelines imposibles, alcance ambiguo, dedicación incompatible con la capacidad real.",
+    ],
+  },
+  whenToDecline: {
+    heading: "5. Cuándo declinar una venta",
+    intro:
+      "Hay condiciones en las que la decisión profesional es no cerrar, aunque la venta esté disponible:",
+    bullets: [
+      "Cuando el cliente exige que ocultemos un riesgo relevante (regulatorio, comunitario, reputacional).",
+      "Cuando el alcance pedido es inviable al precio ofrecido y el cliente no flexibiliza ni en alcance ni en plazo.",
+      "Cuando el cliente pretende usar el contrato para legitimar algo que no creemos (greenwashing, narrativa engañosa, validación cosmética).",
+      "Cuando hay conflicto de interés que no podemos resolver con transparencia interna.",
+    ],
+    closing: "Declinar bien es parte del trabajo, no un fracaso comercial.",
+  },
+  translation: {
+    heading: "6. Traducción operativa",
+    bullets: [
+      "Antes de cerrar, pregúntate: ¿esta promesa la puedo sostener con método?",
+      "Si la respuesta es no, ajusta alcance, plazo o precio. No cierres mal.",
+      "Si el cliente presiona por un compromiso inviable, explicítalo. Es mejor perder la venta que cerrarla mal.",
+      "Después de cada cierre, deja constancia de qué se prometió exactamente — para que ejecución no tenga que adivinar.",
+      "Si después de cerrado detectas una promesa difícil de sostener, plantéalo internamente lo antes posible.",
+    ],
+  },
+  synthesis: [
+    "Vender ético es vender sostenible.",
+    'El "no" que protege estándar vale más que el "sí" que lo erosiona.',
+    "Ganar mal es perder mejor.",
+    "La reputación se construye en cómo se vende, no solo en cómo se entrega.",
+  ],
+};
+
+export type CommercialClosingLesson = {
+  label: string;
+  title: string;
+  premise: string[];
+  threeDocuments: {
+    heading: string;
+    intro: string;
+    documents: Array<{ name: string; tagline: string; body: string[] }>;
+  };
+  contractContents: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+    closing: string;
+  };
+  byMotor: {
+    heading: string;
+    keyAccounts: {
+      heading: string;
+      tagline: string;
+      bullets: string[];
+    };
+    tickets: {
+      heading: string;
+      tagline: string;
+      bullets: string[];
+    };
+    digital: {
+      heading: string;
+      tagline: string;
+      bullets: string[];
+    };
+  };
+  kickoff: {
+    heading: string;
+    intro: string;
+    coversHeading: string;
+    covers: string[];
+    prepHeading: string;
+    prep: string[];
+    closing: string;
+  };
+  renewal: {
+    heading: string;
+    intro: string;
+    annual: {
+      heading: string;
+      timeline: Array<{ month: string; action: string }>;
+    };
+    short: {
+      heading: string;
+      body: string;
+    };
+    ticketsLine: string;
+    digitalLine: string;
+    upsell: {
+      heading: string;
+      yesIntro: string;
+      yes: string[];
+      noIntro: string;
+      no: string[];
+      how: string;
+    };
+  };
+  commonErrors: {
+    heading: string;
+    intro: string;
+    bullets: string[];
+  };
+  translation: {
+    heading: string;
+    bullets: string[];
+  };
+  synthesis: string[];
+};
+
+export const commercialClosingLessonB7: CommercialClosingLesson = {
+  label: "LECCIÓN B7 · Cierre y formalización",
+  title: "Cierre profesional en THO",
+  premise: [
+    "El cierre es la primera entrega.",
+    "Lo que queda explícito al formalizar define cómo se ejecuta; lo que queda implícito se vuelve conflicto.",
+    "Un cierre claro reduce más fricción operativa que cualquier protocolo posterior.",
+  ],
+  threeDocuments: {
+    heading: "1. Los tres documentos de formalización",
+    intro:
+      "Cerrar bien implica saber qué documento usar en cada momento. THO trabaja con tres documentos distintos, con propósitos y niveles de explicitud diferentes:",
+    documents: [
+      {
+        name: "Propuesta",
+        tagline: "Orientación de valor",
+        body: [
+          "Comunica qué valor entrega THO y da una idea del alcance, sin entrar en granularidad.",
+          "Esa contención es deliberada y operativa: clientes con malas prácticas han tomado propuestas de THO para apretar a otros consultores en precio. La propuesta orienta, no es manual de implementación.",
+        ],
+      },
+      {
+        name: "Cotización",
+        tagline: "Detalle comercial acotado",
+        body: [
+          "Más enfocada que una propuesta. Sirve para servicios puntuales o solicitudes específicas donde lo que importa es precio, alcance específico y plazo.",
+          "Más concreta en términos comerciales, sin la arquitectura completa de una propuesta estratégica.",
+        ],
+      },
+      {
+        name: "Contrato / Acuerdo de Trabajo",
+        tagline: "Documento vinculante",
+        body: [
+          "Es el único de los tres con detalle granular y compromiso legal.",
+          "Si el cliente extiende contrato, lo usamos. Si no, THO extiende un Acuerdo de Trabajo. Aquí entra todo el detalle que la propuesta deja en alto nivel.",
+        ],
+      },
+    ],
+  },
+  contractContents: {
+    heading: "2. Qué incluye un contrato (no una propuesta)",
+    intro: "El detalle explícito vive en el contrato/acuerdo, no en la propuesta. El documento no debería firmarse si le falta alguno de estos elementos:",
+    bullets: [
+      "Alcance detallado: qué se hace, con qué profundidad, en qué tiempo.",
+      "Supuestos y exclusiones explícitas.",
+      "Hitos y entregables con fechas.",
+      "Responsables por cada lado, con nombre.",
+      "Formato de seguimiento: frecuencia de reuniones, cómo se comunican cambios.",
+      "Precio en UF, congelado al día de firma.",
+      "Duración y condiciones de renovación.",
+      "Condiciones de término: qué pasa si alguna parte necesita salir.",
+      "Firmas del decisor real, no de intermediario.",
+    ],
+    closing:
+      "Si algún elemento queda ambiguo o pendiente, el documento no está listo. La ambigüedad de hoy es el conflicto de mañana.",
+  },
+  byMotor: {
+    heading: "3. Reglas por motor",
+    keyAccounts: {
+      heading: "Motor Key Accounts",
+      tagline: "Contrato robusto, fee mensual",
+      bullets: [
+        "El contrato puede venir del cliente o ser extendido por THO si el cliente no ofrece uno.",
+        "Puede firmarse incluso después de iniciar operaciones, pero siempre se notifica al cliente la necesidad de formalizarlo. Trabajar sin contrato eventualmente debe evitarse.",
+        "Forma de pago según el sistema del cliente (Orden de Compra, Hoja de Entrada de Servicio, etc.) — siempre contra factura. THO emite, cliente paga.",
+        "Aceptamos ciclos de pago del cliente, pero preferimos fee mensual (incluso prorrateando el valor total dividido en los meses de asesoría).",
+        "THO jamás acepta boleta de honorarios como modalidad de cobro. THO es empresa y extiende factura exenta.",
+        "Kick-off siempre, sin excepciones.",
+      ],
+    },
+    tickets: {
+      heading: "Motor Tickets",
+      tagline: "Acuerdo de trabajo simple, pago fraccionado",
+      bullets: [
+        "Si el cliente no ofrece contrato, THO extiende un Acuerdo de Trabajo.",
+        "Para Tickets que corresponden al Nivel 1 de la ruta de servicios (ESG, DO, RC), el cobro se fracciona: entre 20% y 50% al inicio y lo que reste al cierre del proceso.",
+        "Inicia con kick-off; termina con reunión de entrega de reporte al cliente.",
+      ],
+    },
+    digital: {
+      heading: "Línea digital",
+      tagline: "Acuerdo de trabajo recurrente",
+      bullets: [
+        "THO extiende un Acuerdo de Trabajo con renovación automática a menos que el cliente notifique la suspensión dentro del plazo acordado.",
+        "Forma de pago según el ciclo del cliente, manteniendo siempre ciclo mensual (algunos pagan al contado, otros a 30 días — no es ideal, pero así operan algunas empresas).",
+        "Siempre se extiende factura — sin excepciones.",
+        "Siempre hay reunión de planificación de contenidos al inicio del primer mes y revisión periódica del paquete.",
+      ],
+    },
+  },
+  kickoff: {
+    heading: "4. El kick-off",
+    intro:
+      "El kick-off no es ceremonia. Es el momento donde la propuesta se vuelve operación. Aplica a los tres motores.",
+    coversHeading: "Tiene que cubrir",
+    covers: [
+      "Presentación formal del equipo THO que va a trabajar con el cliente.",
+      "Recapitular objetivos y alcance acordados — que todos estemos en la misma página.",
+      "Definir metodología de trabajo concreta.",
+      "Acordar canales de comunicación (qué va por mail, qué por reunión, qué por chat).",
+      "Calendarizar las próximas reuniones del primer mes.",
+      "Definir primeros pasos concretos.",
+    ],
+    prepHeading: "Preparación previa",
+    prep: [
+      "Cronograma detallado del proyecto.",
+      "Plan de trabajo del primer mes.",
+      "Materiales de diagnóstico iniciales si aplican (especialmente para Tickets de diagnóstico).",
+    ],
+    closing:
+      "Un kick-off bien hecho da el tono de toda la relación. Un kick-off improvisado predice una ejecución improvisada.",
+  },
+  renewal: {
+    heading: "5. Renovación y crecimiento",
+    intro: "El ciclo de renovación se anticipa, no se espera.",
+    annual: {
+      heading: "Key Accounts anuales",
+      timeline: [
+        {
+          month: "Mes 9",
+          action:
+            "Evaluación interna THO: ¿cómo ha ido? ¿cumplimos lo prometido? ¿hay base real para continuar? Preparar propuesta de continuidad.",
+        },
+        {
+          month: "Mes 10",
+          action:
+            "Reunión de evaluación con cliente. Presentar resultados, aprendizajes, riesgos residuales. Sondear interés en renovar.",
+        },
+        {
+          month: "Mes 11",
+          action:
+            "Propuesta de renovación ajustada al nuevo contexto. Negociación (generalmente más rápida que venta inicial porque ya hay confianza).",
+        },
+        {
+          month: "Mes 12",
+          action: "Cierre de renovación y definición de objetivos para el año 2.",
+        },
+      ],
+    },
+    short: {
+      heading: "Key Accounts cortas (6 meses o menos)",
+      body: "Se conversa la renovación en el último mes y luego antes de cerrar. No se atosiga con preguntas antes — parecemos desesperados.",
+    },
+    ticketsLine: "Tickets no se renuevan: se escalan (a Nivel 1–2 o Key Account) o terminan al entregar el reporte.",
+    digitalLine:
+      "Digital se renueva automáticamente salvo notificación. La revisión sustantiva del paquete (cambio de nivel, módulos adicionales) se acuerda explícitamente, no es automática.",
+    upsell: {
+      heading: "Upsell y cross-sell",
+      yesIntro: "Cuándo sí ofrecer",
+      yes: [
+        "Cuando el cliente pregunta por otros servicios.",
+        "Cuando identificas una necesidad complementaria con hallazgos concretos del trabajo.",
+        "Cuando se cumplieron los objetivos del contrato vigente y hay base para profundizar.",
+      ],
+      noIntro: "Cuándo no",
+      no: [
+        "Al inicio del contrato, antes de demostrar valor.",
+        "Cuando hay tensiones operativas pendientes.",
+        "Cuando el cliente todavía no entiende qué se está haciendo.",
+      ],
+      how:
+        'Cómo: presentar como "siguiente fase natural" basado en hallazgos concretos. Si hay pack, ofrecer ahorro por eficiencia operativa, no por descuento comercial.',
+    },
+  },
+  commonErrors: {
+    heading: "6. Errores frecuentes en el cierre",
+    intro: "Patrones que generan problemas evitables:",
+    bullets: [
+      'Dejar campos abiertos ("a definir más adelante") en alcance, precio o plazos en el contrato.',
+      "Olvidar exclusiones explícitas en el contrato — generan conflicto durante la ejecución.",
+      'Saltarse el kick-off "porque el cliente está apurado".',
+      "Iniciar trabajo sin documentar por mail que se está iniciando y que se formalizará un contrato o acuerdo en paralelo. La lógica THO es de confianza, pero la documentación mínima protege a ambas partes.",
+      "Enviar contrato a un email genérico (info@) en lugar del decisor que firma.",
+      "Aceptar boleta de honorarios como modalidad de cobro: THO siempre extiende factura.",
+    ],
+  },
+  translation: {
+    heading: "7. Traducción operativa",
+    bullets: [
+      "La propuesta da el marco; la cotización aterriza; el contrato/acuerdo vincula. Cada documento tiene su nivel propio de explicitud.",
+      "Antes de iniciar trabajo, deja constancia por mail de que se está iniciando y que se formalizará contrato/acuerdo en paralelo.",
+      "El kick-off es no-negociable. Sin kick-off, no se empieza la ejecución sustantiva.",
+      "Toda promesa hecha durante la venta queda explícita en el contrato/acuerdo. Si no se puede explicitar, se renegocia o se retira.",
+      "Para Key Accounts anuales, agenda la conversación de renovación al mes 9. Para KA cortas (6 meses o menos), al último mes — sin atosigar antes.",
+      "Si detectas durante la ejecución una ambigüedad relevante en el contrato, plantéala antes de que se vuelva problema.",
+    ],
+  },
+  synthesis: [
+    "La formalización es la primera entrega.",
+    "Propuesta, cotización y contrato son tres documentos distintos. No los confundas.",
+    "Un contrato claro reduce más fricción que cualquier protocolo posterior.",
+    "La confianza permite iniciar; el documento protege a todos.",
+    "La renovación se anticipa, pero no se atosiga.",
   ],
 };
