@@ -19,7 +19,9 @@ export type StudioUserPermissions = {
   canOnboarding: boolean;
 };
 
-export type StudioTeam = "sales" | "creative_ops" | "advisory_ops" | "general";
+// Rama/área de la organización (track de onboarding). Es un id libre: además
+// de las ramas base admite ramas creadas en el panel admin de onboarding.
+export type StudioTeam = string;
 
 export type StudioAuthorizedUser = {
   email: string;
@@ -136,9 +138,10 @@ function normalizeProvider(provider: unknown): StudioUserProvider {
 }
 
 function normalizeTeam(input: unknown): StudioTeam {
-  const team = String(input || "general").trim();
-  if (["sales", "creative_ops", "advisory_ops", "general"].includes(team)) return team as StudioTeam;
-  return "general";
+  // Cualquier rama definida en el panel de onboarding es válida; no se
+  // restringe a las 4 ramas base.
+  const team = String(input || "").trim();
+  return team || "general";
 }
 
 function normalizePermissions(input: Partial<StudioUserPermissions> | undefined): StudioUserPermissions {

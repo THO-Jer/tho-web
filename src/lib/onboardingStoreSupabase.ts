@@ -79,9 +79,10 @@ function isMissingColumnError(error: unknown, column: string) {
 }
 
 function normalizeTrack(value: unknown): OnboardingRecord["track"] {
-  const track = String(value || "general").trim();
-  if (["sales", "creative_ops", "advisory_ops", "general"].includes(track)) return track as OnboardingRecord["track"];
-  return "general";
+  // El track es la rama/área del usuario: un id libre. Además de las ramas base
+  // (sales, creative_ops, advisory_ops, general) admite ramas creadas en el panel.
+  const track = String(value || "").trim();
+  return track || "general";
 }
 
 function recordFromProgressRow(row: Record<string, unknown>): OnboardingRecord {
@@ -409,18 +410,16 @@ export async function resetOnboardingModuleStatus(input: {
   }
 }
 
-export async function getStudioRoleTeamByEmail(email: string) {
+export async function getStudioRoleTeamByEmail(email: string): Promise<string> {
   const normalized = String(email || "").trim().toLowerCase();
-  if (!normalized) return "general" as const;
+  if (!normalized) return "general";
 
   const roleTable = process.env.STUDIO_ROLES_TABLE || "studio_roles";
   const rows = await supabaseRequest(`/rest/v1/${roleTable}?select=team&email=eq.${encodeURIComponent(normalized)}&limit=1`).catch(() => []);
-  if (!Array.isArray(rows) || !rows.length) return "general" as const;
+  if (!Array.isArray(rows) || !rows.length) return "general";
 
+  // El team puede ser cualquier rama definida en el panel admin de onboarding;
+  // no se restringe a las 4 ramas base.
   const team = String((rows[0] as Record<string, unknown>).team || "general").trim();
-  if (["sales", "creative_ops", "advisory_ops", "general"].includes(team)) {
-    return team as "sales" | "creative_ops" | "advisory_ops" | "general";
-  }
-
-  return "general" as const;
+  return team || "general";
 }

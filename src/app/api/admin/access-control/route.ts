@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { isStudioSuperAdmin, readSession } from "@/lib/adminAuth";
+import { getModuleVisibilityConfig } from "@/lib/onboardingStore";
 import {
   blockEmail,
   listAccessRequests,
@@ -30,7 +31,7 @@ function withSuperAdmins(authorizedUsers: Array<{
   permissions: { canBlog: boolean; canCrm: boolean; canIncidents: boolean; canOnboarding: boolean };
   updatedAt: string;
   role?: string;
-  team?: "sales" | "creative_ops" | "advisory_ops" | "general";
+  team?: string;
   blocked?: boolean;
 }>) {
   const byEmail = new Map(authorizedUsers.map((user) => [user.email, user]));
@@ -62,14 +63,18 @@ export async function GET(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   if (!session.canManageAccess) return NextResponse.json({ error: "Solo superadmin puede gestionar accesos." }, { status: 403 });
 
-  const [blockedEmails, logs, authorizedUsersRaw, accessRequests] = await Promise.all([
+  const [blockedEmails, logs, authorizedUsersRaw, accessRequests, visibility] = await Promise.all([
     listBlockedEmails(),
     listStudioLoginLogs(250),
     listAuthorizedUsers(),
     listAccessRequests(),
+    getModuleVisibilityConfig().catch(() => ({ branches: [], userOverrides: {} })),
   ]);
   const authorizedUsers = withSuperAdmins(authorizedUsersRaw);
-  return NextResponse.json({ blockedEmails, logs, authorizedUsers, accessRequests });
+  // Ramas disponibles para asignar como track de onboarding (incluye las nuevas
+  // creadas en el panel admin de onboarding).
+  const branches = (visibility.branches || []).map((branch) => ({ id: branch.id, label: branch.label }));
+  return NextResponse.json({ blockedEmails, logs, authorizedUsers, accessRequests, branches });
 }
 
 export async function POST(req: NextRequest) {

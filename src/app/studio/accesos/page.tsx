@@ -8,7 +8,17 @@ import { BrandLoader } from "@/components/BrandLoader";
 
 type LoginLog = { at: string; email: string; provider: string; ip?: string };
 type Permissions = { canBlog: boolean; canCrm: boolean; canIncidents: boolean; canOnboarding: boolean };
-type Team = "sales" | "creative_ops" | "advisory_ops" | "general";
+// La rama/track es un id libre: incluye las ramas creadas en el panel de onboarding.
+type Team = string;
+type Branch = { id: string; label: string };
+
+// Ramas base usadas como respaldo si aún no se carga la config de onboarding.
+const FALLBACK_BRANCHES: Branch[] = [
+  { id: "general", label: "General" },
+  { id: "sales", label: "Ventas" },
+  { id: "creative_ops", label: "Operación Creativa" },
+  { id: "advisory_ops", label: "Operación Asesorías" },
+];
 
 type AuthorizedUser = {
   email: string;
@@ -53,6 +63,7 @@ export default function StudioAccesosPage() {
   const [logs, setLogs] = useState<LoginLog[]>([]);
   const [authorized, setAuthorized] = useState<AuthorizedUser[]>([]);
   const [requests, setRequests] = useState<AccessRequest[]>([]);
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [rowEditors, setRowEditors] = useState<Record<string, RowEditorState>>({});
   const [emailInput, setEmailInput] = useState("");
   const [grantProvider, setGrantProvider] = useState<"google" | "azure" | "any">("google");
@@ -93,6 +104,7 @@ export default function StudioAccesosPage() {
       setLogs(data.logs || []);
       setAuthorized(users);
       setRequests(data.accessRequests || []);
+      setBranches((data.branches || []) as Branch[]);
       hydrateEditors(users);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error cargando datos.");
@@ -194,6 +206,16 @@ export default function StudioAccesosPage() {
     }
   }
 
+  // Opciones de rama para los selectores. Si el valor actual ya no existe como
+  // rama, igual se muestra para no perder el dato al editar.
+  function teamOptions(current: string): Branch[] {
+    const list = branches.length ? branches : FALLBACK_BRANCHES;
+    if (current && !list.some((branch) => branch.id === current)) {
+      return [...list, { id: current, label: `${current} (rama sin definir)` }];
+    }
+    return list;
+  }
+
   if (checking) return <main className="studio-shell min-h-screen bg-tho-bg px-4 py-10"><BrandLoader message="Cargando control de accesos..." /></main>;
 
   return (
@@ -221,11 +243,10 @@ export default function StudioAccesosPage() {
               <option value="azure">Microsoft</option>
               <option value="any">Cualquiera</option>
             </select>
-            <select value={grantTeam} onChange={(e) => setGrantTeam(e.target.value as Team)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-              <option value="general">Track: General</option>
-              <option value="sales">Track: Sales</option>
-              <option value="creative_ops">Track: Creative Ops</option>
-              <option value="advisory_ops">Track: Advisory Ops</option>
+            <select value={grantTeam} onChange={(e) => setGrantTeam(e.target.value)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+              {teamOptions(grantTeam).map((branch) => (
+                <option key={branch.id} value={branch.id}>Rama: {branch.label}</option>
+              ))}
             </select>
           </div>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
@@ -286,13 +307,12 @@ export default function StudioAccesosPage() {
                     </select>
                     <select
                       value={row.team}
-                      onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, team: e.target.value as Team } }))}
+                      onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, team: e.target.value } }))}
                       className="rounded-lg border border-slate-300 px-2 py-1 text-xs"
                     >
-                      <option value="general">General</option>
-                      <option value="sales">Sales</option>
-                      <option value="creative_ops">Creative Ops</option>
-                      <option value="advisory_ops">Advisory Ops</option>
+                      {teamOptions(row.team).map((branch) => (
+                        <option key={branch.id} value={branch.id}>{branch.label}</option>
+                      ))}
                     </select>
                     <div className="md:col-span-2 flex flex-wrap gap-3 text-xs">
                       <label className="inline-flex items-center gap-2"><input type="checkbox" checked={row.canBlog} onChange={(e) => setRowEditors((prev) => ({ ...prev, [user.email]: { ...row, canBlog: e.target.checked } }))} /> Blog</label>

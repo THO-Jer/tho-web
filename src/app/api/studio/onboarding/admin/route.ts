@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { readSession } from "@/lib/adminAuth";
-import { canManageOnboarding, getAdminOverview, getUserQuizAttempts, listOnboardingRecords, resetModuleForUser } from "@/lib/onboardingStore";
+import {
+  canManageOnboarding,
+  getAdminOverview,
+  getModuleCatalog,
+  getModuleVisibilityConfig,
+  getUserQuizAttempts,
+  listOnboardingRecords,
+  resetModuleForUser,
+  setModuleVisibilityConfig,
+  type ModuleVisibilityConfig,
+} from "@/lib/onboardingStore";
 import { sendMail } from "@/lib/mail";
 
 export const dynamic = "force-dynamic";
@@ -19,12 +29,14 @@ export async function GET(req: NextRequest) {
   const track = String(url.searchParams.get("track") || "").trim();
   const moduleKey = String(url.searchParams.get("moduleKey") || "").trim();
 
-  const [records, overview, attempts] = await Promise.all([
+  const [records, overview, attempts, visibility, moduleCatalog] = await Promise.all([
     listOnboardingRecords(),
     getAdminOverview(),
     email && track ? getUserQuizAttempts(email, track, moduleKey || undefined) : Promise.resolve([]),
+    getModuleVisibilityConfig(),
+    getModuleCatalog(),
   ]);
-  return NextResponse.json({ records, overview, attempts });
+  return NextResponse.json({ records, overview, attempts, visibility, moduleCatalog });
 }
 
 export async function POST(req: NextRequest) {
@@ -36,7 +48,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const payload = (await req.json()) as { action?: string; email?: string; track?: "sales" | "creative_ops" | "advisory_ops" | "general"; moduleKey?: string };
+    const payload = (await req.json()) as {
+      action?: string;
+      email?: string;
+      track?: string;
+      moduleKey?: string;
+      visibility?: ModuleVisibilityConfig;
+    };
     const action = String(payload.action || "");
 
     if (action === "send_reminder") {
@@ -52,11 +70,23 @@ export async function POST(req: NextRequest) {
 
     if (action === "reset_module") {
       const email = String(payload.email || "").trim().toLowerCase();
-      const track = payload.track || "general";
+      const track = String(payload.track || "general").trim() || "general";
       const moduleKey = String(payload.moduleKey || "").trim();
       if (!email || !moduleKey) return NextResponse.json({ error: "Debes indicar email, track y módulo." }, { status: 400 });
       await resetModuleForUser(email, track, moduleKey);
       return NextResponse.json({ ok: true });
+    }
+
+    if (action === "save_module_visibility") {
+      const visibility = payload.visibility;
+      if (!visibility || !Array.isArray(visibility.branches)) {
+        return NextResponse.json({ error: "Configuración de visibilidad inválida." }, { status: 400 });
+      }
+      const saved = await setModuleVisibilityConfig({
+        branches: visibility.branches,
+        userOverrides: visibility.userOverrides || {},
+      });
+      return NextResponse.json({ ok: true, visibility: saved });
     }
 
     return NextResponse.json({ error: "Acción inválida." }, { status: 400 });

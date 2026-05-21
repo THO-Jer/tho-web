@@ -34,7 +34,7 @@ type ModuleStatusView = {
 
 type ApiResponse = {
   config: { required: boolean; blockInternal: boolean; store: string; persistenceNote: string; passScore?: number; maxAttempts?: number; minLessonTimeSeconds?: number };
-  track: "sales" | "creative_ops" | "advisory_ops" | "general";
+  track: string;
   units: OnboardingUnit[];
   onboarding: OnboardingData;
 };

@@ -19,16 +19,55 @@ import {
 } from "@/lib/onboardingStoreSupabase";
 import { getWritableDataPath } from "@/lib/storagePaths";
 
-export type OnboardingTrack = "sales" | "creative_ops" | "advisory_ops" | "general";
+// La rama/área de la organización a la que pertenece el usuario (su "track").
+// Es un id libre: además de las 4 ramas base se pueden crear ramas nuevas
+// desde el panel admin de onboarding.
+export type OnboardingTrack = string;
 
-type ModuleKey = "A" | "B" | "C" | "D";
+// Clave de módulo (A, B, C, ...). Es string para escalar a módulos futuros.
+type ModuleKey = string;
 
-const TRACK_MODULES: Record<OnboardingTrack, ModuleKey[]> = {
-  general: ["A", "B", "C", "D"],
-  sales: ["A", "B"],
-  creative_ops: ["A", "C"],
-  advisory_ops: ["A", "D"],
+/**
+ * Configuración editable de visibilidad de módulos del onboarding.
+ *
+ * - branches: ramas/áreas de la organización, cada una con el set de módulos
+ *   que ven sus integrantes por defecto.
+ * - userOverrides: excepción puntual por usuario (heredar de su rama, asignar
+ *   otra rama, o un set de módulos a medida).
+ *
+ * Se persiste en onboarding.json (el mismo store de contenido que units/quiz),
+ * por lo que aplica tanto en modo JSON como Supabase.
+ */
+export type OnboardingBranch = {
+  id: string;
+  label: string;
+  modules: ModuleKey[];
 };
+
+export type OnboardingUserOverride = {
+  mode: "inherit" | "branch" | "custom";
+  branchId?: string;
+  modules?: ModuleKey[];
+};
+
+export type ModuleVisibilityConfig = {
+  branches: OnboardingBranch[];
+  userOverrides: Record<string, OnboardingUserOverride>;
+};
+
+const DEFAULT_BRANCHES: OnboardingBranch[] = [
+  { id: "general", label: "General", modules: ["A", "B", "C", "D"] },
+  { id: "sales", label: "Ventas", modules: ["A", "B"] },
+  { id: "creative_ops", label: "Operación Creativa", modules: ["A", "C"] },
+  { id: "advisory_ops", label: "Operación Asesorías", modules: ["A", "D"] },
+];
+
+function defaultModuleVisibility(): ModuleVisibilityConfig {
+  return {
+    branches: DEFAULT_BRANCHES.map((branch) => ({ ...branch, modules: [...branch.modules] })),
+    userOverrides: {},
+  };
+}
 
 const MODULE_MAX_ATTEMPTS = Math.max(1, Number(process.env.ONBOARDING_MAX_ATTEMPTS_DEFAULT || 3));
 const PASS_SCORE_PERCENT = Number(process.env.ONBOARDING_PASS_PERCENT || process.env.ONBOARDING_PASS_SCORE_PERCENT || 80);
@@ -88,6 +127,7 @@ type OnboardingState = {
   units: OnboardingUnit[];
   quiz: OnboardingQuizQuestion[];
   records: OnboardingRecord[];
+  moduleVisibility: ModuleVisibilityConfig;
   moduleStatusByEmail: Record<string, Record<string, ModuleStatus>>;
   quizAttemptsByEmail: Record<string, Array<{ module_key: string; score: number; max_score: number; missed_topics: string[]; submitted_at: string }>>;
 };
@@ -109,11 +149,14 @@ function parseBool(value: string | undefined, fallback: boolean) {
 }
 
 function moduleKeyByIndex(index: number): ModuleKey {
-  return (["A", "B", "C", "D"][index] || "A") as ModuleKey;
+  // A, B, C, ... Z — escala a módulos futuros más allá de los 4 iniciales.
+  if (index >= 0 && index < 26) return String.fromCharCode(65 + index);
+  return "A";
 }
 
 function indexByModuleKey(moduleKey: string) {
-  return ["A", "B", "C", "D"].indexOf(moduleKey);
+  const code = String(moduleKey || "").trim().toUpperCase().charCodeAt(0) - 65;
+  return code >= 0 && code < 26 ? code : -1;
 }
 
 function moduleKeyFromUnit(unit: OnboardingUnit, index: number): ModuleKey {
@@ -164,11 +207,53 @@ async function ensureStore() {
       units: defaultOnboardingUnits,
       quiz: defaultOnboardingQuiz,
       records: [],
+      moduleVisibility: defaultModuleVisibility(),
       moduleStatusByEmail: {},
       quizAttemptsByEmail: {},
     };
     await fs.writeFile(ONBOARDING_PATH, `${JSON.stringify(initial, null, 2)}\n`, "utf8");
   }
+}
+
+function coerceModuleVisibility(raw: unknown): ModuleVisibilityConfig {
+  const value = (raw && typeof raw === "object" ? raw : {}) as Partial<ModuleVisibilityConfig>;
+  const branches: OnboardingBranch[] = Array.isArray(value.branches)
+    ? value.branches
+        .map((branch) => {
+          const id = String((branch as OnboardingBranch)?.id || "").trim();
+          if (!id) return null;
+          return {
+            id,
+            label: String((branch as OnboardingBranch)?.label || id).trim() || id,
+            modules: Array.isArray((branch as OnboardingBranch)?.modules)
+              ? (branch as OnboardingBranch).modules.map((m) => String(m).trim()).filter(Boolean)
+              : [],
+          } as OnboardingBranch;
+        })
+        .filter((branch): branch is OnboardingBranch => Boolean(branch))
+    : [];
+
+  const userOverrides: Record<string, OnboardingUserOverride> = {};
+  if (value.userOverrides && typeof value.userOverrides === "object") {
+    for (const [email, override] of Object.entries(value.userOverrides as Record<string, OnboardingUserOverride>)) {
+      const key = normalizeEmail(email);
+      if (!key || !override || typeof override !== "object") continue;
+      const mode = override.mode === "branch" || override.mode === "custom" ? override.mode : "inherit";
+      userOverrides[key] = {
+        mode,
+        branchId: override.branchId ? String(override.branchId).trim() : undefined,
+        modules: Array.isArray(override.modules) ? override.modules.map((m) => String(m).trim()).filter(Boolean) : undefined,
+      };
+    }
+  }
+
+  const config: ModuleVisibilityConfig = branches.length ? { branches, userOverrides } : defaultModuleVisibility();
+  if (branches.length) config.userOverrides = userOverrides;
+  // La rama "general" siempre debe existir como fallback de resolución.
+  if (!config.branches.some((branch) => branch.id === "general")) {
+    config.branches.unshift({ id: "general", label: "General", modules: ["A", "B", "C", "D"] });
+  }
+  return config;
 }
 
 async function readStateFromJson(): Promise<OnboardingState> {
@@ -179,6 +264,7 @@ async function readStateFromJson(): Promise<OnboardingState> {
     units: Array.isArray(parsed.units) && parsed.units.length ? (parsed.units as OnboardingUnit[]) : defaultOnboardingUnits,
     quiz: Array.isArray(parsed.quiz) && parsed.quiz.length ? (parsed.quiz as OnboardingQuizQuestion[]) : defaultOnboardingQuiz,
     records: Array.isArray(parsed.records) ? (parsed.records as OnboardingRecord[]) : [],
+    moduleVisibility: coerceModuleVisibility(parsed.moduleVisibility),
     moduleStatusByEmail: parsed.moduleStatusByEmail || {},
     quizAttemptsByEmail: parsed.quizAttemptsByEmail || {},
   };
@@ -227,6 +313,7 @@ async function readStateFromSupabase(): Promise<OnboardingState> {
     units: content.units,
     quiz: content.quiz,
     records,
+    moduleVisibility: content.moduleVisibility,
     moduleStatusByEmail,
     quizAttemptsByEmail,
   };
@@ -236,13 +323,39 @@ async function readState() {
   return hasSupabaseStore() ? readStateFromSupabase() : readStateFromJson();
 }
 
-function getTrackModules(track: OnboardingTrack) {
-  return TRACK_MODULES[track] || TRACK_MODULES.general;
+/** Todas las claves de módulo existentes, en orden canónico (orden de units). */
+function getAllModuleKeys(units: OnboardingUnit[]): ModuleKey[] {
+  const keys = units.map((unit, index) => moduleKeyFromUnit(unit, index));
+  return keys.filter((key, index) => keys.indexOf(key) === index);
 }
 
-function getApplicableUnitsByTrack(units: OnboardingUnit[], track: OnboardingTrack) {
-  const allowed = new Set(getTrackModules(track));
-  return units.filter((unit, index) => allowed.has(moduleKeyFromUnit(unit, index)));
+/**
+ * Resuelve el set de módulos visibles para un usuario, en orden canónico.
+ * Prioridad: override por usuario (custom o rama) > rama del track > "general".
+ */
+function resolveModulesForUser(email: string, track: OnboardingTrack, state: OnboardingState): ModuleKey[] {
+  const config = state.moduleVisibility || defaultModuleVisibility();
+  const allKeys = getAllModuleKeys(state.units);
+  const override = config.userOverrides?.[normalizeEmail(email)];
+
+  let modules: ModuleKey[];
+  if (override?.mode === "custom") {
+    modules = override.modules || [];
+  } else {
+    const branchId = override?.mode === "branch" && override.branchId ? override.branchId : track;
+    const branch =
+      config.branches.find((item) => item.id === branchId) ||
+      config.branches.find((item) => item.id === "general");
+    modules = branch?.modules || allKeys;
+  }
+
+  const allowed = new Set(modules);
+  return allKeys.filter((key) => allowed.has(key));
+}
+
+function getApplicableUnitsForUser(state: OnboardingState, email: string, track: OnboardingTrack) {
+  const allowed = new Set(resolveModulesForUser(email, track, state));
+  return state.units.filter((unit, index) => allowed.has(moduleKeyFromUnit(unit, index)));
 }
 
 function getUnitByTopic(units: OnboardingUnit[], topic: string) {
@@ -280,22 +393,24 @@ function parseLessonIds(content: string[]) {
   });
 }
 
-function defaultModuleStatus(moduleKey: ModuleKey): ModuleStatus {
-  return { moduleKey, status: moduleKey === "A" ? "in_progress" : "locked", attempts: 0, maxAttempts: MODULE_MAX_ATTEMPTS };
+function defaultModuleStatus(moduleKey: ModuleKey, isFirst: boolean): ModuleStatus {
+  return { moduleKey, status: isFirst ? "in_progress" : "locked", attempts: 0, maxAttempts: MODULE_MAX_ATTEMPTS };
 }
 
 function computeModuleStatuses(record: OnboardingRecord, state: OnboardingState): ModuleStatus[] {
   const email = normalizeEmail(record.email);
   const stored = state.moduleStatusByEmail[email] || {};
-  const modules = getTrackModules(record.track);
-  const statuses: ModuleStatus[] = modules.map((moduleKey) => {
+  const modules = resolveModulesForUser(record.email, record.track, state);
+  const statuses: ModuleStatus[] = modules.map((moduleKey, index) => {
     const row = stored[moduleKey];
-    return row || defaultModuleStatus(moduleKey);
+    return row || defaultModuleStatus(moduleKey, index === 0);
   });
 
+  // Desbloqueo secuencial: el primer módulo del set queda activo y cada módulo
+  // siguiente se abre al validar el anterior. Ya no se asume que el primero es "A".
   let hasValidatedPrevious = true;
-  return statuses.map((status) => {
-    if (status.moduleKey === "A") {
+  return statuses.map((status, index) => {
+    if (index === 0) {
       hasValidatedPrevious = status.status === "validated";
       return status;
     }
@@ -319,17 +434,22 @@ function getAccessFlags(statuses: ModuleStatus[], email: string, role?: string) 
   const isBypass = role === "superadmin" && normalized === "jeremias@tho.cl";
   if (isBypass) return { blog: true, incidents: true, crmStudio: true };
 
-  const aValidated = getModuleStatus(statuses, "A")?.status === "validated";
-  const bValidated = getModuleStatus(statuses, "B")?.status === "validated";
+  // El control de acceso ya no depende de módulos fijos (A/B): se calcula sobre
+  // el set de módulos efectivamente asignado al usuario.
+  // - blog / incidentes: se habilitan al validar el primer módulo de su ruta.
+  // - CRM interno: requiere completar todo el onboarding asignado.
+  // Si el usuario no tiene módulos asignados, no hay nada que bloquear.
+  const firstValidated = statuses.length === 0 || statuses[0]?.status === "validated";
+  const allValidated = statuses.every((status) => status.status === "validated");
   return {
-    blog: aValidated,
-    incidents: aValidated,
-    crmStudio: aValidated && bValidated,
+    blog: firstValidated,
+    incidents: firstValidated,
+    crmStudio: allValidated,
   };
 }
 
 function summarizeOnboarding(record: OnboardingRecord, state: OnboardingState, role?: string): OnboardingSummary {
-  const units = getApplicableUnitsByTrack(state.units, record.track);
+  const units = getApplicableUnitsForUser(state, record.email, record.track);
   const statuses = computeModuleStatuses(record, state);
   const completedSet = new Set(record.completed_units || []);
   const requiredLessonTags = units.flatMap((unit, idx) => {
@@ -338,7 +458,7 @@ function summarizeOnboarding(record: OnboardingRecord, state: OnboardingState, r
   });
   const completedLessons = requiredLessonTags.filter((tag) => completedSet.has(tag)).length;
   const progress = requiredLessonTags.length ? Math.round((completedLessons / requiredLessonTags.length) * 100) : 0;
-  const completed = statuses.every((status) => status.status === "validated" || ["C", "D"].includes(status.moduleKey));
+  const completed = statuses.length > 0 && statuses.every((status) => status.status === "validated");
   return {
     progress,
     completed,
@@ -617,13 +737,13 @@ export function getRecommendationsFromTopics(units: OnboardingUnit[], topics: st
 export async function getApplicableOnboardingUnits(email: string) {
   const state = await readState();
   const record = await getOrCreateOnboardingRecord(email);
-  return getApplicableUnitsByTrack(state.units, record.track);
+  return getApplicableUnitsForUser(state, record.email, record.track);
 }
 
 export async function getOnboardingSnapshot(email: string, role?: string) {
   const state = await readState();
   const record = await getOrCreateOnboardingRecord(email);
-  const units = getApplicableUnitsByTrack(state.units, record.track);
+  const units = getApplicableUnitsForUser(state, record.email, record.track);
   const summary = summarizeOnboarding(record, state, role);
   const quiz = await getQuizForParticipant();
   const quizResults = hasSupabaseStore()
@@ -665,13 +785,78 @@ export async function getUserQuizAttempts(email: string, track: string, moduleKe
 export async function resetModuleForUser(email: string, track: OnboardingTrack, moduleKey: string) {
   const normalized = normalizeEmail(email);
   if (!normalized) throw new Error("Email inválido.");
-  if (!["A", "B", "C", "D"].includes(moduleKey)) throw new Error("Módulo inválido.");
+  if (!String(moduleKey || "").trim()) throw new Error("Módulo inválido.");
   if (hasSupabaseStore()) {
     await resetOnboardingModuleStatus({ moduleStatusTable: ONBOARDING_MODULE_STATUS_TABLE, email: normalized, track, moduleKey });
     return;
   }
   const state = await readStateFromJson();
   if (!state.moduleStatusByEmail[normalized]) state.moduleStatusByEmail[normalized] = {};
-  state.moduleStatusByEmail[normalized][moduleKey] = { moduleKey: moduleKey as ModuleKey, status: "in_progress", attempts: 0, maxAttempts: MODULE_MAX_ATTEMPTS };
+  state.moduleStatusByEmail[normalized][moduleKey] = { moduleKey, status: "in_progress", attempts: 0, maxAttempts: MODULE_MAX_ATTEMPTS };
   await writeStateToJson(state);
+}
+
+/**
+ * Catálogo de módulos disponibles (derivado de las units de contenido).
+ * Escala automáticamente: al agregar un módulo nuevo aparece aquí y queda
+ * disponible para asignar a las ramas desde el panel admin.
+ */
+export async function getModuleCatalog() {
+  const state = await readState();
+  return state.units.map((unit, index) => ({
+    key: moduleKeyFromUnit(unit, index),
+    title: unit.title,
+    slug: unit.slug,
+  }));
+}
+
+/** Devuelve la configuración editable de visibilidad de módulos. */
+export async function getModuleVisibilityConfig(): Promise<ModuleVisibilityConfig> {
+  const state = await readStateFromJson();
+  return state.moduleVisibility;
+}
+
+/**
+ * Persiste la configuración de visibilidad de módulos.
+ * Sanitiza ramas (ids únicos, módulos válidos), garantiza la rama "general"
+ * y descarta overrides de usuario que no cambian nada (mode "inherit").
+ */
+export async function setModuleVisibilityConfig(input: ModuleVisibilityConfig): Promise<ModuleVisibilityConfig> {
+  const state = await readStateFromJson();
+  const validKeys = new Set(getAllModuleKeys(state.units));
+  const sanitizeModules = (modules?: ModuleKey[]) =>
+    Array.from(new Set((modules || []).map((m) => String(m).trim()))).filter((m) => validKeys.has(m));
+
+  const seenIds = new Set<string>();
+  const branches: OnboardingBranch[] = [];
+  for (const raw of input.branches || []) {
+    const id = String(raw?.id || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+    if (!id || seenIds.has(id)) continue;
+    seenIds.add(id);
+    branches.push({ id, label: String(raw?.label || id).trim() || id, modules: sanitizeModules(raw?.modules) });
+  }
+  if (!branches.some((branch) => branch.id === "general")) {
+    branches.unshift({ id: "general", label: "General", modules: getAllModuleKeys(state.units) });
+  }
+  const branchIds = new Set(branches.map((branch) => branch.id));
+
+  const userOverrides: Record<string, OnboardingUserOverride> = {};
+  for (const [emailRaw, raw] of Object.entries(input.userOverrides || {})) {
+    const email = normalizeEmail(emailRaw);
+    if (!email || !raw) continue;
+    if (raw.mode === "branch" && raw.branchId && branchIds.has(raw.branchId)) {
+      userOverrides[email] = { mode: "branch", branchId: raw.branchId };
+    } else if (raw.mode === "custom") {
+      userOverrides[email] = { mode: "custom", modules: sanitizeModules(raw.modules) };
+    }
+    // mode "inherit" (o inválido) no se almacena: el usuario sigue su rama.
+  }
+
+  state.moduleVisibility = { branches, userOverrides };
+  await writeStateToJson(state);
+  return state.moduleVisibility;
 }
