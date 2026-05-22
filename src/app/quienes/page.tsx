@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { CORE_TEAM, EXTENDED_TEAM } from "@/content/team";
 
 const BACKGROUND_IMAGES = [
   "/ilustraciones/2.png",
@@ -139,6 +140,67 @@ export default function QuienesPage() {
                   En The Human Org reconocemos estas trayectorias y sabemos que la expertise que cada uno trae profundiza
                   el propósito de la consultora.
                 </p>
+              </div>
+            </section>
+
+            {/* ── Sección equipo ── ligeramente más ancha que las secciones adyacentes */}
+            <section className="relative w-full px-4 py-14 md:py-20" data-reveal>
+              <div className="mx-auto max-w-7xl">
+                <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">El equipo</h2>
+                <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
+                <p className="mt-6 mb-10 max-w-xl text-base leading-relaxed text-slate-700 md:text-lg">
+                  Personas con trayectorias distintas que comparten una misma tesis: los procesos exitosos tienen a las personas al centro.
+                </p>
+
+                {/* Fila principal — equipo fijo */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
+                  {CORE_TEAM.map((member) => (
+                    <div key={member.slug} className="team-card" style={{ height: "280px" }}>
+                      <div className="team-card-photo" style={{ backgroundColor: member.color }}>
+                        <span className="absolute inset-0 flex select-none items-center justify-center text-2xl font-medium text-white/90">
+                          {member.initials}
+                        </span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/team/${member.slug}_tho.png`}
+                          alt={member.name}
+                          className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition-opacity duration-300"
+                          onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                      </div>
+                      <div className="team-card-overlay">
+                        <p className="text-sm font-medium leading-snug text-white">{member.name}</p>
+                        <p className="mt-1 text-xs leading-snug text-white/75">{member.role}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Fila secundaria — equipo extendido */}
+                <div className="mt-3 grid grid-cols-2 gap-3 md:mt-4 md:grid-cols-4 md:gap-4">
+                  {EXTENDED_TEAM.map((member) => (
+                    <div key={member.slug} className="team-card" style={{ height: "210px" }}>
+                      <div className="team-card-photo" style={{ backgroundColor: member.color }}>
+                        <span className="absolute inset-0 flex select-none items-center justify-center text-xl font-medium text-white/90">
+                          {member.initials}
+                        </span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/team/${member.slug}_tho.png`}
+                          alt={member.name}
+                          className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition-opacity duration-300"
+                          onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                      </div>
+                      <div className="team-card-overlay">
+                        <p className="text-xs font-medium leading-snug text-white">{member.name}</p>
+                        <p className="mt-1 text-[10px] leading-snug text-white/75">{member.role}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
 

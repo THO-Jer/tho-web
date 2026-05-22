@@ -1454,3 +1454,54 @@ body {
     animation: none;
   }
 }
+
+
+/* ── Team cards (sección equipo en /quienes) ── */
+.team-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  cursor: default;
+  isolation: isolate;
+  transition: transform 0.32s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.team-card:hover {
+  transform: scale(1.04);
+  z-index: 3;
+}
+
+.team-card-photo {
+  position: absolute;
+  inset: 0;
+  filter: grayscale(1) brightness(0.84);
+  transition: filter 0.42s ease;
+}
+
+.team-card:hover .team-card-photo {
+  filter: grayscale(0) brightness(1);
+}
+
+.team-card-overlay {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 2.75rem 0.875rem 0.875rem;
+  background: linear-gradient(to top, rgba(8, 10, 20, 0.78) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.32s ease;
+}
+
+.team-card:hover .team-card-overlay {
+  opacity: 1;
+}
+
+/* En dispositivos táctiles (sin hover) siempre mostrar color y texto */
+@media (hover: none) {
+  .team-card-photo {
+    filter: grayscale(0) brightness(1);
+  }
+  .team-card-overlay {
+    opacity: 1;
+  }
+}
