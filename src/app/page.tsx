@@ -99,11 +99,9 @@ export default async function HomePage() {
         title="Nuestros servicios"
         subtitle="Resolvemos problemas críticos a través de tres líneas estratégicas: Sostenibilidad Corporativa, Relacionamiento Comunitario y Desarrollo Organizacional. Revisa los niveles de cada servicio para decidir si te acompañamos en una línea de trabajo o necesitas integrarlas."
       >
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wide text-slate-700 shadow-sm md:text-[11px] xl:hidden services-swipe-hint">
-          <span className="services-swipe-hint__text">Desliza para ver más servicios</span>
-          <span className="services-swipe-hint__arrow" aria-hidden>→</span>
-        </div>
-        <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 xl:grid xl:grid-cols-3 xl:overflow-visible">
+        <div className="relative xl:static">
+          <div className="services-fade-edge pointer-events-none absolute right-0 top-0 z-10 h-full w-24 xl:hidden" aria-hidden />
+          <div className="services-gallery flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 xl:grid xl:grid-cols-3 xl:overflow-visible">
           {SERVICES.map((service) => {
             const meta = PILLAR_META[service.pillar];
             const cardTone =
@@ -114,7 +112,7 @@ export default async function HomePage() {
                   : "service-feature-card--pink";
 
             return (
-              <article key={service.slug} className={`service-feature-card ${cardTone} min-w-[86vw] sm:min-w-[72vw] md:min-w-[52vw] xl:min-w-0 snap-center`}>
+              <article key={service.slug} className={`service-feature-card ${cardTone} min-w-[80vw] sm:min-w-[70vw] md:min-w-[50vw] xl:min-w-0 snap-center`}>
                 <div className="service-pill-contrast inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide">
                   <span className={`h-2 w-2 rounded-full ${meta.accentDot}`} />
                   {service.menuLabel}
@@ -138,6 +136,7 @@ export default async function HomePage() {
               </article>
             );
           })}
+          </div>
         </div>
       </Section>
 
