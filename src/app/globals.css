@@ -755,8 +755,19 @@ body {
   backdrop-filter: none;
 }
 
-.method-arc-label {
-  color: #0f172a;
+@keyframes method-desc-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.method-desc-content {
+  animation: method-desc-in 0.22s ease both;
 }
 
 .method-logo-glow {
@@ -925,10 +936,6 @@ body {
 
   .method-arc-fade-sides {
     background: linear-gradient(90deg, rgba(21, 21, 21, 0.94), rgba(21, 21, 21, 0));
-  }
-
-  .method-arc-label {
-    color: #f8fafc;
   }
 
   .method-logo-glow {
