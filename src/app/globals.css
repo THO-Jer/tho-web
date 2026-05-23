@@ -758,7 +758,7 @@ body {
 @keyframes method-desc-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -767,7 +767,7 @@ body {
 }
 
 .method-desc-content {
-  animation: method-desc-in 0.22s ease both;
+  animation: method-desc-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .method-logo-glow {

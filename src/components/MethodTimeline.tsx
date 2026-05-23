@@ -59,18 +59,18 @@ export default function MethodTimeline({ steps }: { steps: Step[] }) {
 
   return (
     <div className="method-arc-shell relative -mb-32 overflow-visible pb-2 pt-1 md:-mb-44 md:pb-0">
-      {/* Description panel — fixed height to prevent layout shift */}
+      {/* Description panel — fixed height prevents layout shift */}
       <div className="relative z-40 mx-auto mb-3 max-w-5xl px-1 md:mb-2">
-        <div className="method-hover-panel min-h-[7.5rem] rounded-[1.7rem] p-3 md:min-h-[9rem] md:p-4">
+        <div className="method-hover-panel min-h-[6rem] rounded-[1.7rem] p-3 md:min-h-[7rem] md:p-4">
           {current ? (
-            <div key={active} className="method-desc-content">
+            <div key={active} className="method-desc-content text-center">
               <div
                 className="text-[11px] font-bold uppercase tracking-[0.17em]"
                 style={{ color: `rgb(${BRAND_RGB[active]})` }}
               >
-                {current.n} — {current.title}
+                {current.title}
               </div>
-              <p className="mt-2 max-w-3xl text-sm text-slate-700 md:text-base">{current.desc}</p>
+              <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-700 md:text-base">{current.desc}</p>
             </div>
           ) : null}
         </div>
