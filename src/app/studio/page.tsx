@@ -62,6 +62,15 @@ const modules: ModuleItem[] = [
     external: false,
     allowed: (p) => Boolean(p?.canIncidents),
   },
+  {
+    key: "dinamicas",
+    title: "Dinámicas",
+    desc: "Gestión de dinámicas interactivas para eventos internos y externos: pecera de deseos, encuestas y más.",
+    href: "/studio/dinamicas",
+    status: "Nuevo",
+    external: false,
+    allowed: () => true,
+  },
 ];
 
 export default function StudioIndexPage() {
