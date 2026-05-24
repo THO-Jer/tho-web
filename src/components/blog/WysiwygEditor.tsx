@@ -163,12 +163,13 @@ const SlashCommandList = forwardRef<SlashListHandle, SlashListProps>(
               key={item.id}
               type="button"
               onMouseDown={(e) => {
-                // Prevent the editor from losing focus before the click fires.
-                // Without this, ProseMirror's blur → Suggestion onExit removes
-                // the popup before onClick can execute.
+                // Fire the command on mousedown, before the browser can move
+                // focus away from the editor and trigger Suggestion's onExit.
+                // Using onClick is too late — by then the editor has blurred
+                // and the popup may already be destroyed.
                 e.preventDefault();
+                command(item);
               }}
-              onClick={() => command(item)}
               style={{
                 display: "flex",
                 alignItems: "center",
