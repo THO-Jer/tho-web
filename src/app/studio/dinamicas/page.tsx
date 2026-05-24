@@ -26,6 +26,15 @@ const DINAMICAS: Dinamica[] = [
     estado: "activa",
     evento: "aniversario_2026",
   },
+  {
+    key: "clima",
+    title: "Encuesta de clima organizacional",
+    desc: "Pulso periódico del equipo en cinco dimensiones: bienestar, equipo, liderazgo, propósito y crecimiento. Respuestas anónimas, resultados agregados.",
+    href: "/studio/dinamicas/clima",
+    tipo: "interna",
+    estado: "activa",
+    evento: "recurrente",
+  },
 ];
 
 const TIPO_LABEL: Record<Dinamica["tipo"], string> = {
