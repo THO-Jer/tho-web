@@ -14,6 +14,7 @@ type SessionData = {
 export default function StudioCanalConfidencialPreparacionPage() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
+  const [understood, setUnderstood] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
@@ -53,8 +54,24 @@ export default function StudioCanalConfidencialPreparacionPage() {
           </p>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Link href="/studio/canal-confidencial/reportar" className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">
+        <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <input
+            type="checkbox"
+            checked={understood}
+            onChange={(e) => setUnderstood(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-slate-900"
+          />
+          <span className="text-sm text-slate-700">
+            Entiendo que este canal es confidencial, que el proceso tiene etapas formales y que mi relato se resguardará sin modificaciones.
+          </span>
+        </label>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href={understood ? "/studio/canal-confidencial/reportar" : "#"}
+            aria-disabled={!understood}
+            className={`rounded-lg px-4 py-2 text-sm font-semibold text-white transition-opacity ${understood ? "bg-slate-900 hover:bg-slate-800" : "pointer-events-none bg-slate-400 opacity-60"}`}
+          >
             Continuar al formulario
           </Link>
           <Link href="/studio/canal-confidencial" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">

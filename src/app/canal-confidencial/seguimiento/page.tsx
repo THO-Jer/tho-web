@@ -74,11 +74,36 @@ export default function SeguimientoIncidentePage() {
         </form>
 
         {snapshot ? (
-          <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-            <p><strong>Estado:</strong> {snapshot.status}</p>
-            <p><strong>Fase del proceso:</strong> {snapshot.process_phase}</p>
-            <p><strong>Última actualización:</strong> {new Date(snapshot.last_updated_at).toLocaleString()}</p>
-            <p className="mt-2 text-xs text-slate-500">{snapshot.institutional_note}</p>
+          <div className="mt-5 space-y-3">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div>
+                  <span className="text-xs font-semibold uppercase text-slate-500">Estado</span>
+                  <p className="mt-0.5 font-semibold text-slate-900">{snapshot.status}</p>
+                </div>
+                <div>
+                  <span className="text-xs font-semibold uppercase text-slate-500">Fase del proceso</span>
+                  <p className="mt-0.5 font-semibold text-slate-900">{snapshot.process_phase || "Por definir"}</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="text-xs font-semibold uppercase text-slate-500">Última actualización</span>
+                  <p className="mt-0.5 text-slate-700">{new Date(snapshot.last_updated_at).toLocaleString()}</p>
+                </div>
+              </div>
+              {snapshot.institutional_note ? (
+                <p className="mt-3 border-t border-slate-200 pt-3 text-xs text-slate-600">{snapshot.institutional_note}</p>
+              ) : null}
+            </div>
+
+            <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-700">
+              <p className="font-semibold text-slate-800">¿Qué significa este estado?</p>
+              <div className="mt-2 text-xs text-slate-600">
+                {snapshot.status === "Recibido" && <p>Tu reporte fue recibido correctamente. El comité lo revisará para determinar su admisibilidad.</p>}
+                {snapshot.status === "En revisión" && <p>El comité está analizando los antecedentes del caso. Este proceso puede tomar varios días hábiles.</p>}
+                {snapshot.status === "Derivado" && <p>El caso ha sido derivado a la instancia correspondiente para continuar con el proceso formal.</p>}
+                {snapshot.status === "Cerrado" && <p>El proceso ha concluido. Si dejaste contacto, el equipo pudo haberte comunicado los resultados.</p>}
+              </div>
+            </div>
           </div>
         ) : null}
 

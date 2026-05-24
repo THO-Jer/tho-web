@@ -68,7 +68,7 @@ export default function StudioCanalConfidencialLandingPage() {
             Consultar un caso existente
           </Link>
           {showCommitteeAccess ? (
-            <Link href="/studio/incidentes" className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-100">
+            <Link href="/studio/canal-confidencial/panel" className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-900 hover:bg-emerald-100">
               Acceso Comité (panel interno)
             </Link>
           ) : null}

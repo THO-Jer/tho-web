@@ -23,6 +23,7 @@ export default function StudioCanalConfidencialReportarPage() {
   const [trackingCode, setTrackingCode] = useState("");
   const [trackingPin, setTrackingPin] = useState("");
   const [error, setError] = useState("");
+  const [copiedField, setCopiedField] = useState<"code" | "pin" | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/session", { credentials: "include" })
@@ -68,10 +69,12 @@ export default function StudioCanalConfidencialReportarPage() {
     }
   }
 
-  async function onCopy(value: string) {
+  async function onCopy(value: string, field: "code" | "pin") {
     if (!value) return;
     try {
       await navigator.clipboard.writeText(value);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 2000);
     } catch {
       // no-op
     }
@@ -107,7 +110,13 @@ export default function StudioCanalConfidencialReportarPage() {
 
           <label className="grid gap-1">
             <span className="text-xs font-semibold text-slate-600">Descripción *</span>
-            <textarea name="description" required rows={6} className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+            <textarea
+              name="description"
+              required
+              rows={6}
+              placeholder="Describe con el mayor detalle posible: ¿qué ocurrió?, ¿cuándo y dónde?, ¿hay testigos o antecedentes previos?"
+              className="rounded-xl border border-slate-300 px-3 py-2 text-sm"
+            />
           </label>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -122,8 +131,8 @@ export default function StudioCanalConfidencialReportarPage() {
           </div>
 
           <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Adjuntos (opcional · pdf, imágenes, doc/docx · máx. 10MB)</span>
-            <input name="evidence_file" type="file" className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
+            <span className="text-xs font-semibold text-slate-600">Adjuntos (opcional · pdf, imágenes, doc/docx · máx. 10MB por archivo)</span>
+            <input name="evidence_file" type="file" multiple className="rounded-xl border border-slate-300 px-3 py-2 text-sm" />
           </label>
 
           <label className="inline-flex items-center gap-2 text-sm text-slate-700">
@@ -146,7 +155,7 @@ export default function StudioCanalConfidencialReportarPage() {
           <button
             type="submit"
             disabled={sending}
-            className="btn-unified-motion inline-flex w-fit rounded-xl border border-rose-800 bg-rose-700 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-rose-800 disabled:opacity-60"
+            className="btn-unified-motion inline-flex w-fit rounded-xl border border-slate-800 bg-slate-900 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
           >
             {sending ? "Enviando..." : "Enviar reporte"}
           </button>
@@ -159,11 +168,11 @@ export default function StudioCanalConfidencialReportarPage() {
             <p className="mt-1">PIN de seguimiento: <strong>{trackingPin}</strong></p>
             <p className="mt-1 text-xs">{incidentsCopy.pinOneTimeWarning}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" onClick={() => onCopy(trackingCode)} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold">
-                Copiar código
+              <button type="button" onClick={() => onCopy(trackingCode, "code")} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold transition-colors">
+                {copiedField === "code" ? "¡Copiado!" : "Copiar código"}
               </button>
-              <button type="button" onClick={() => onCopy(trackingPin)} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold">
-                Copiar PIN
+              <button type="button" onClick={() => onCopy(trackingPin, "pin")} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold transition-colors">
+                {copiedField === "pin" ? "¡Copiado!" : "Copiar PIN"}
               </button>
               <button type="button" onClick={onAcknowledgeAndClear} className="rounded-md border border-emerald-300 px-3 py-1.5 font-semibold">
                 Entiendo / Continuar
