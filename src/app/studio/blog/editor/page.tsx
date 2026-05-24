@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { BrandLoader } from "@/components/BrandLoader";
-import { BlogContent, getToc } from "@/components/blog/BlogContent";
+import { getToc } from "@/components/blog/BlogContent";
 import { WysiwygEditor, type WysiwygEditorHandle } from "@/components/blog/WysiwygEditor";
 
 type BlogPost = {
@@ -136,7 +136,6 @@ export default function BlogStudioPage() {
   const [message, setMessage] = useState("");
   const [blockedByOnboarding, setBlockedByOnboarding] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showPreview, setShowPreview] = useState(true);
   const [repoPickerMode, setRepoPickerMode] = useState<"cover" | "inline" | null>(null);
   const [pickerSource, setPickerSource] = useState<"repo" | "storage">("repo");
   const [repoTree, setRepoTree] = useState<RepoTreeNode[]>([]);
@@ -533,10 +532,11 @@ export default function BlogStudioPage() {
             <fieldset disabled={!authenticated || loading} className="contents">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-xl font-semibold text-slate-900">{editingSlug ? `Editar: ${editingSlug}` : "Nuevo post"}</h2>
-                <label className="inline-flex items-center gap-2 text-xs text-slate-600">
-                  <input type="checkbox" checked={showPreview} onChange={(e) => setShowPreview(e.target.checked)} />
-                  Preview en vivo
-                </label>
+                {editingSlug && form.status === "published" && (
+                  <a href={`/blog/${editingSlug}`} target="_blank" rel="noreferrer" className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">
+                    Ver en blog →
+                  </a>
+                )}
               </div>
 
               <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
@@ -583,7 +583,15 @@ export default function BlogStudioPage() {
                     <button type="button" onClick={() => openRepoPicker("cover", "storage")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen de Storage</button>
                     <label htmlFor="cover-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Examinar...</label>
                   </div>
-                  {form.coverImage ? <p className="mt-2 text-xs text-slate-600">Actual: {form.coverImage}</p> : null}
+                  {form.coverImage ? (
+                    <div className="mt-3 flex items-start gap-3">
+                      <img src={form.coverImage} alt={form.coverImageAlt || "Portada"} className="h-20 w-32 rounded-lg border border-slate-200 object-cover" />
+                      <div className="min-w-0">
+                        <p className="truncate text-xs text-slate-500">{form.coverImage}</p>
+                        <button type="button" onClick={() => setForm((prev) => ({ ...prev, coverImage: "", coverImageAlt: "" }))} className="mt-1 text-xs text-rose-600 hover:underline">Quitar portada</button>
+                      </div>
+                    </div>
+                  ) : null}
                   {lastUploadedUrl ? (
                     <p className="mt-1 text-xs text-emerald-700">
                       Última URL subida: <a className="underline" href={lastUploadedUrl} target="_blank" rel="noreferrer">{lastUploadedUrl}</a>
@@ -599,19 +607,6 @@ export default function BlogStudioPage() {
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="SEO title" value={form.seoTitle} onChange={(e) => setForm({ ...form, seoTitle: e.target.value })} />
                 <textarea className="min-h-20 rounded-lg border border-slate-300 px-3 py-2" placeholder="SEO description" value={form.seoDescription} onChange={(e) => setForm({ ...form, seoDescription: e.target.value })} />
               </div>
-
-              {showPreview ? (
-                <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Preview en vivo</div>
-                  <div className="rounded-xl bg-white p-4">
-                    <h3 className="text-2xl font-semibold text-slate-900">{form.title || "Título del artículo"}</h3>
-                    <p className="mt-2 text-sm text-slate-600">{form.excerpt || "Extracto del artículo"}</p>
-                    <div className="mt-5 border-t border-slate-100 pt-4">
-                      <BlogContent content={form.content || "# Empieza a escribir\n\nAgrega bloques para previsualizar el contenido."} />
-                    </div>
-                  </div>
-                </div>
-              ) : null}
 
               <div className="mt-4 flex gap-3">
                 <button disabled={!canSubmit || loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.99] disabled:opacity-50" type="submit">{loading ? "Guardando..." : editingSlug ? "Guardar cambios" : "Crear post"}</button>
