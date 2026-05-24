@@ -15,73 +15,90 @@ const logos = [
   { src: "/confian/9.svg", alt: "Organización cliente 9" },
 ];
 
-const SCROLL_SPEED = 0.5; // px per frame
+const SPEED = 0.5; // px per frame
 
 export function TrustSlider() {
   // Duplicate logos for seamless infinite loop
   const items = [...logos, ...logos];
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const offsetRef = useRef(0);        // current translateX in px (≤ 0)
+  const halfWidthRef = useRef(0);
+  const drag = useRef({ active: false, startX: 0, startOffset: 0 });
   const rafRef = useRef<number | null>(null);
-  const drag = useRef({ active: false, startX: 0, startScroll: 0 });
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const track = trackRef.current;
+    if (!track) return;
 
-    const step = () => {
-      if (!drag.current.active) {
-        container.scrollLeft += SCROLL_SPEED;
-        // Seamless loop: when we've scrolled one full set, jump back
-        const half = container.scrollWidth / 2;
-        if (container.scrollLeft >= half) {
-          container.scrollLeft -= half;
+    // Wait one frame so the DOM has rendered and scrollWidth is accurate
+    const init = () => {
+      halfWidthRef.current = track.scrollWidth / 2;
+
+      const step = () => {
+        if (!drag.current.active) {
+          offsetRef.current -= SPEED;
+          // Seamless loop: once we've shifted one full set, jump back
+          if (offsetRef.current <= -halfWidthRef.current) {
+            offsetRef.current += halfWidthRef.current;
+          }
+          track.style.transform = `translateX(${offsetRef.current}px)`;
         }
-      }
+        rafRef.current = requestAnimationFrame(step);
+      };
+
       rafRef.current = requestAnimationFrame(step);
     };
 
-    rafRef.current = requestAnimationFrame(step);
+    const timer = setTimeout(init, 50);
     return () => {
+      clearTimeout(timer);
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
   }, []);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    const container = containerRef.current;
-    if (!container) return;
-    drag.current = { active: true, startX: e.clientX, startScroll: container.scrollLeft };
-    container.setPointerCapture(e.pointerId);
+    e.preventDefault();
+    drag.current = { active: true, startX: e.clientX, startOffset: offsetRef.current };
+    containerRef.current?.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!drag.current.active) return;
-    const container = containerRef.current;
-    if (!container) return;
+    const track = trackRef.current;
+    if (!track) return;
 
     const delta = e.clientX - drag.current.startX;
-    let next = drag.current.startScroll - delta;
+    let next = drag.current.startOffset + delta;
 
-    // Keep within the loopable range
-    const half = container.scrollWidth / 2;
-    next = ((next % half) + half) % half;
-    container.scrollLeft = next;
+    // Wrap to keep offset in (-halfWidth, 0]
+    const half = halfWidthRef.current;
+    if (half > 0) {
+      next = next % half;
+      if (next > 0) next -= half;
+    }
+
+    offsetRef.current = next;
+    track.style.transform = `translateX(${next}px)`;
   };
 
-  const onPointerUp = () => {
-    drag.current.active = false;
-  };
+  const stopDrag = () => { drag.current.active = false; };
 
   return (
     <div
       ref={containerRef}
-      className="trust-slider py-5"
+      className="trust-slider overflow-hidden py-5"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerLeave={onPointerUp}
+      onPointerUp={stopDrag}
+      onPointerLeave={stopDrag}
+      onPointerCancel={stopDrag}
     >
-      <div className="trust-track flex w-max items-center gap-2 px-3 md:gap-3 md:px-4">
+      <div
+        ref={trackRef}
+        className="trust-track flex w-max items-center gap-2 px-3 md:gap-3 md:px-4"
+      >
         {items.map((logo, idx) => (
           <div
             key={`${logo.src}-${idx}`}

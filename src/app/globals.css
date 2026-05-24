@@ -615,19 +615,10 @@ body {
   border: 0;
   background: transparent;
   box-shadow: none;
-  /* Scroll container — scrollbar stays hidden */
-  overflow-x: scroll;
-  overflow-y: hidden;
-  scrollbar-width: none;       /* Firefox */
-  -ms-overflow-style: none;    /* IE / Edge */
   cursor: grab;
-  scroll-behavior: auto;       /* Instant jumps for seamless loop */
   user-select: none;
   -webkit-user-select: none;
-}
-
-.trust-slider::-webkit-scrollbar {
-  display: none;               /* Chrome / Safari */
+  touch-action: none;          /* Let JS handle touch — prevents browser scroll interference */
 }
 
 .trust-slider:active {
@@ -635,7 +626,8 @@ body {
 }
 
 .trust-track {
-  /* No CSS animation — scroll is driven by JS */
+  /* No CSS animation — position driven by JS via transform */
+  will-change: transform;
 }
 
 .trust-logo-slot {
