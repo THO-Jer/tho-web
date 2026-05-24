@@ -1,11 +1,12 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { BrandLoader } from "@/components/BrandLoader";
 import { BlogContent, getToc } from "@/components/blog/BlogContent";
+import { WysiwygEditor, type WysiwygEditorHandle } from "@/components/blog/WysiwygEditor";
 
 type BlogPost = {
   slug: string;
@@ -123,6 +124,7 @@ function renderRepoTree(nodes: RepoTreeNode[], onPick: (path: string) => void, d
 
 export default function BlogStudioPage() {
   const router = useRouter();
+  const editorRef = useRef<WysiwygEditorHandle>(null);
   const [selectedSlug, setSelectedSlug] = useState("");
   const [startFresh, setStartFresh] = useState(false);
   const [email, setEmail] = useState("");
@@ -283,31 +285,8 @@ export default function BlogStudioPage() {
     setForm((prev) => ({ ...prev, minutes: String(smartMinutes) }));
   }
 
-  function insertTemplate(type: "h2" | "h3" | "quote" | "divider" | "image" | "youtube" | "pdf") {
-    const snippets: Record<typeof type, string> = {
-      h2: "\n\n## Nuevo subtítulo\n\n",
-      h3: "\n\n### Sub-sección\n\n",
-      quote: "\n\n> Cita destacada\n\n",
-      divider: "\n\n---\n\n",
-      image: "\n\n![Texto alternativo](/uploads/blog/tu-imagen.jpg)\n\n",
-      youtube: "\n\nhttps://www.youtube.com/watch?v=VIDEO_ID\n\n",
-      pdf: "\n\nhttps://tu-dominio.com/archivo.pdf\n\n",
-    };
-    setForm((prev) => ({ ...prev, content: `${prev.content}${snippets[type]}` }));
-  }
-
-
-  function insertLink() {
-    const text = window.prompt("Texto del enlace", "Ver más");
-    const url = window.prompt("URL del enlace", "https://");
-    if (!text || !url) return;
-    const snippet = `\n\n[${text}](${url})\n\n`;
-    setForm((prev) => ({ ...prev, content: `${prev.content}${snippet}` }));
-  }
-
   function insertInternalLink(post: BlogPost) {
-    const snippet = `\n\n[Leer también: ${post.title}](/blog/${post.slug})\n\n`;
-    setForm((prev) => ({ ...prev, content: `${prev.content}${snippet}` }));
+    editorRef.current?.insertLink(`Leer también: ${post.title}`, `/blog/${post.slug}`);
     setMessage(`Link interno insertado: /blog/${post.slug}`);
   }
 
@@ -325,11 +304,13 @@ export default function BlogStudioPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo subir la imagen");
 
+      if (mode === "inline") {
+        editorRef.current?.insertImage(String(data.url || ""), file.name);
+      }
       setForm((prev) => ({
         ...prev,
         coverImage: mode === "cover" ? data.url : prev.coverImage || data.url,
         coverImageAlt: mode === "cover" && !prev.coverImageAlt ? file.name : prev.coverImageAlt,
-        content: mode === "inline" ? `${prev.content}\n\n![${file.name}](${data.url})\n\n` : prev.content,
       }));
 
       setLastUploadedUrl(String(data.url || ""));
@@ -396,12 +377,8 @@ export default function BlogStudioPage() {
       setMessage(`Portada seleccionada: ${path}`);
     } else if (repoPickerMode === "inline") {
       const filename = path.split("/").pop() || "Imagen";
-      const alt = filename.replace(/\.[a-z0-9]+$/i, "").replace(/[\-_]+/g, " ");
-      setForm((prev) => ({ ...prev, content: `${prev.content}
-
-![${alt}](${path})
-
-` }));
+      const alt = filename.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ");
+      editorRef.current?.insertImage(path, alt);
       setMessage(`Imagen insertada: ${path}`);
     }
     setRepoPickerMode(null);
@@ -562,19 +539,12 @@ export default function BlogStudioPage() {
                 </label>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
-                <button type="button" onClick={() => insertTemplate("h2")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H2</button>
-                <button type="button" onClick={() => insertTemplate("h3")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">H3</button>
-                <button type="button" onClick={() => insertTemplate("quote")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cita</button>
-                <button type="button" onClick={() => insertTemplate("divider")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Separador</button>
-                <button type="button" onClick={() => openRepoPicker("inline", "repo")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen repo</button>
-                <button type="button" onClick={() => openRepoPicker("inline", "storage")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen storage</button>
-                <label htmlFor="inline-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Imagen subir</label>
-                <button type="button" onClick={() => insertTemplate("youtube")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">YouTube</button>
-                <button type="button" onClick={() => insertTemplate("pdf")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">PDF</button>
-                <button type="button" onClick={insertLink} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Link</button>
-                <button type="button" onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}**texto en negrita**` }))} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Negrita</button>
-                <button type="button" onClick={() => setForm((prev) => ({ ...prev, content: `${prev.content}*texto en cursiva*` }))} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Cursiva</button>
+              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                <span className="text-xs text-slate-400">Imágenes:</span>
+                <button type="button" onClick={() => openRepoPicker("inline", "repo")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Desde repo</button>
+                <button type="button" onClick={() => openRepoPicker("inline", "storage")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Desde Storage</button>
+                <label htmlFor="inline-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Subir archivo</label>
+                <span className="ml-auto text-xs text-slate-400">Escribe <kbd className="rounded border border-slate-200 bg-white px-1 font-mono">/</kbd> en el editor para insertar bloques</span>
               </div>
 
               <input id="cover-upload-input" type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadCover} />
@@ -584,7 +554,14 @@ export default function BlogStudioPage() {
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Slug (opcional)" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} />
                 <textarea className="min-h-20 rounded-lg border border-slate-300 px-3 py-2" placeholder="Extracto (resumen simple)" value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} />
-                <textarea className="min-h-56 rounded-lg border border-slate-300 px-3 py-2" placeholder="Contenido del artículo" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} />
+                <div className="rounded-lg border border-slate-300 px-3 py-3">
+                  <WysiwygEditor
+                    ref={editorRef}
+                    value={form.content}
+                    onChange={(content) => setForm((prev) => ({ ...prev, content }))}
+                    disabled={!authenticated || loading}
+                  />
+                </div>
 
                 <div className="grid gap-3 md:grid-cols-2">
                   <div className="space-y-1">

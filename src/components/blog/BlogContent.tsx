@@ -1,6 +1,52 @@
 import Image from "next/image";
+import { type ReactNode } from "react";
 
 type Props = { content: string };
+
+// ── Inline markdown parser ────────────────────────────────────────────────
+// Handles **bold**, *italic*, [link](url) within paragraph text.
+function parseInline(text: string): ReactNode {
+  const parts: ReactNode[] = [];
+  let remaining = text;
+  let key = 0;
+
+  while (remaining.length > 0) {
+    const boldMatch = remaining.match(/\*\*(.+?)\*\*/);
+    const italicMatch = remaining.match(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/);
+    const linkMatch = remaining.match(/\[(.+?)\]\((.+?)\)/);
+
+    type MatchEntry = { type: "bold" | "italic" | "link"; match: RegExpMatchArray };
+    const candidates: MatchEntry[] = [];
+    if (boldMatch) candidates.push({ type: "bold", match: boldMatch });
+    if (italicMatch) candidates.push({ type: "italic", match: italicMatch });
+    if (linkMatch) candidates.push({ type: "link", match: linkMatch });
+
+    if (candidates.length === 0) { parts.push(remaining); break; }
+
+    candidates.sort((a, b) => (a.match.index ?? 0) - (b.match.index ?? 0));
+    const first = candidates[0];
+    const idx = first.match.index ?? 0;
+
+    if (idx > 0) parts.push(remaining.slice(0, idx));
+
+    if (first.type === "bold") {
+      parts.push(<strong key={key++}>{first.match[1]}</strong>);
+    } else if (first.type === "italic") {
+      parts.push(<em key={key++}>{first.match[1]}</em>);
+    } else if (first.type === "link") {
+      const isInternal = /^\//.test(first.match[2]);
+      parts.push(
+        <a key={key++} href={first.match[2]}
+          className="text-slate-900 underline underline-offset-2 hover:opacity-70"
+          {...(isInternal ? {} : { target: "_blank", rel: "noreferrer" })}>
+          {first.match[1]}
+        </a>
+      );
+    }
+    remaining = remaining.slice(idx + first.match[0].length);
+  }
+  return <>{parts}</>;
+}
 
 type TocItem = { id: string; text: string; level: 2 | 3 };
 
@@ -131,7 +177,7 @@ function renderBlock(block: string, index: number) {
 
   return (
     <p key={index} className="mt-5 leading-7 text-slate-700">
-      {lines.join(" ")}
+      {parseInline(lines.join(" "))}
     </p>
   );
 }

@@ -9,10 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tiptap/extension-image": "^2.14.0",
+    "@tiptap/extension-link": "^2.14.0",
+    "@tiptap/extension-placeholder": "^2.14.0",
+    "@tiptap/react": "^2.14.0",
+    "@tiptap/starter-kit": "^2.14.0",
+    "@tiptap/suggestion": "^2.14.0",
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "resend": "^6.9.2"
+    "resend": "^6.9.2",
+    "tiptap-markdown": "^0.8.10"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
