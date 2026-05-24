@@ -13,8 +13,35 @@ import { Markdown } from "tiptap-markdown";
 import TiptapImage from "@tiptap/extension-image";
 import TiptapLink from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import TextAlign from "@tiptap/extension-text-align";
+import Underline from "@tiptap/extension-underline";
 import { Extension, type Editor, type Range } from "@tiptap/core";
 import Suggestion, { type SuggestionProps, type SuggestionKeyDownProps } from "@tiptap/suggestion";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Custom Image node — extends the base with size and align attributes.
+// These are editor-visual only: size constrains the preview canvas,
+// align shifts the image left/center/right. Neither persists to markdown
+// (plain markdown has no image sizing syntax), so they reset on reload.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CustomImage = TiptapImage.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      size: {
+        default: "full",
+        parseHTML: (el) => el.getAttribute("data-size") ?? "full",
+        renderHTML: (attrs) => ({ "data-size": attrs.size ?? "full" }),
+      },
+      align: {
+        default: "center",
+        parseHTML: (el) => el.getAttribute("data-align") ?? "center",
+        renderHTML: (attrs) => ({ "data-align": attrs.align ?? "center" }),
+      },
+    };
+  },
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Slash-command items
@@ -163,10 +190,8 @@ const SlashCommandList = forwardRef<SlashListHandle, SlashListProps>(
               key={item.id}
               type="button"
               onMouseDown={(e) => {
-                // Fire the command on mousedown, before the browser can move
-                // focus away from the editor and trigger Suggestion's onExit.
-                // Using onClick is too late — by then the editor has blurred
-                // and the popup may already be destroyed.
+                // Fire on mousedown so the command runs before the editor
+                // blurs and Suggestion's onExit destroys the popup.
                 e.preventDefault();
                 command(item);
               }}
@@ -301,6 +326,14 @@ interface WysiwygEditorProps {
   disabled?: boolean;
 }
 
+// Helper: returns "left" | "center" | "right" for the current selection.
+// TextAlign stores the value as an attribute on paragraph/heading nodes.
+function getTextAlign(editor: Editor): "left" | "center" | "right" {
+  if (editor.isActive({ textAlign: "center" })) return "center";
+  if (editor.isActive({ textAlign: "right" })) return "right";
+  return "left";
+}
+
 export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>(
   ({ value, onChange, disabled = false }, ref) => {
     // Keep a stable ref to onChange so the useEditor closure never goes stale.
@@ -317,11 +350,13 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
           bulletListMarker: "-",
           transformPastedText: true,
         }),
-        TiptapImage.configure({ inline: false, allowBase64: false }),
+        CustomImage.configure({ inline: false, allowBase64: false }),
         TiptapLink.configure({ openOnClick: false, autolink: false, linkOnPaste: false }),
         Placeholder.configure({
           placeholder: 'Escribe "/" para insertar un bloque, o empieza a escribir...',
         }),
+        TextAlign.configure({ types: ["heading", "paragraph"] }),
+        Underline,
         SlashCommandExtension,
       ],
       content: value,
@@ -335,7 +370,6 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
 
     // If the component unmounts while the slash menu is open, Tiptap's Suggestion
     // plugin does NOT call onExit, so the popup div stays in document.body.
-    // Clean it up here to avoid the leak.
     useEffect(() => {
       return () => {
         document.querySelectorAll("[data-slash-popup]").forEach((el) => el.remove());
@@ -363,9 +397,8 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
         editor?.chain().focus().setImage({ src, alt }).run();
       },
       insertLink: (text, url) => {
-        // Insert the linked text, then immediately unset the link mark and add a
-        // trailing space — otherwise the cursor stays "inside" the link and the
-        // next characters the user types become part of the hyperlink.
+        // Insert linked text then immediately exit the link mark so the cursor
+        // lands in plain text rather than staying "inside" the hyperlink.
         editor
           ?.chain()
           .focus()
@@ -379,69 +412,152 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
     return (
       <div className="wysiwyg-root">
         {editor && (
-          <BubbleMenu editor={editor} tippyOptions={{ duration: 100, placement: "top" }}>
-            <div className="wysiwyg-bubble-menu">
-              <button
-                type="button"
-                title="Negrita (Ctrl+B)"
-                onClick={() => editor.chain().focus().toggleBold().run()}
-                className={`wysiwyg-bubble-btn${editor.isActive("bold") ? " wysiwyg-bubble-btn--active" : ""}`}
-              >
-                <strong>B</strong>
-              </button>
-              <button
-                type="button"
-                title="Cursiva (Ctrl+I)"
-                onClick={() => editor.chain().focus().toggleItalic().run()}
-                className={`wysiwyg-bubble-btn${editor.isActive("italic") ? " wysiwyg-bubble-btn--active" : ""}`}
-              >
-                <em>I</em>
-              </button>
-              <div className="wysiwyg-bubble-divider" />
-              {editor.isActive("link") ? (
-                <button type="button" title="Quitar enlace" onClick={() => editor.chain().focus().unsetLink().run()} className="wysiwyg-bubble-btn">
-                  🔗✕
-                </button>
-              ) : (
+          <>
+            {/* ── Text bubble menu ─────────────────────────────────────────── */}
+            <BubbleMenu
+              editor={editor}
+              shouldShow={({ state }) => !state.selection.empty && !editor.isActive("image")}
+              tippyOptions={{ duration: 100, placement: "top" }}
+            >
+              <div className="wysiwyg-bubble-menu">
                 <button
                   type="button"
-                  title="Insertar enlace"
-                  onClick={() => {
-                    const url = window.prompt("URL del enlace");
-                    if (url) editor.chain().focus().setLink({ href: url }).run();
-                  }}
-                  className="wysiwyg-bubble-btn"
+                  title="Negrita (Ctrl+B)"
+                  onClick={() => editor.chain().focus().toggleBold().run()}
+                  className={`wysiwyg-bubble-btn${editor.isActive("bold") ? " wysiwyg-bubble-btn--active" : ""}`}
                 >
-                  🔗
+                  <strong>B</strong>
                 </button>
-              )}
-              <div className="wysiwyg-bubble-divider" />
-              <button
-                type="button"
-                title="H2"
-                onClick={() =>
-                  editor.isActive("heading", { level: 2 })
-                    ? editor.chain().focus().setParagraph().run()
-                    : editor.chain().focus().setNode("heading", { level: 2 }).run()
-                }
-                className={`wysiwyg-bubble-btn${editor.isActive("heading", { level: 2 }) ? " wysiwyg-bubble-btn--active" : ""}`}
-              >
-                H₂
-              </button>
-              <button
-                type="button"
-                title="H3"
-                onClick={() =>
-                  editor.isActive("heading", { level: 3 })
-                    ? editor.chain().focus().setParagraph().run()
-                    : editor.chain().focus().setNode("heading", { level: 3 }).run()
-                }
-                className={`wysiwyg-bubble-btn${editor.isActive("heading", { level: 3 }) ? " wysiwyg-bubble-btn--active" : ""}`}
-              >
-                H₃
-              </button>
-            </div>
-          </BubbleMenu>
+                <button
+                  type="button"
+                  title="Cursiva (Ctrl+I)"
+                  onClick={() => editor.chain().focus().toggleItalic().run()}
+                  className={`wysiwyg-bubble-btn${editor.isActive("italic") ? " wysiwyg-bubble-btn--active" : ""}`}
+                >
+                  <em>I</em>
+                </button>
+                <button
+                  type="button"
+                  title="Subrayado (Ctrl+U)"
+                  onClick={() => editor.chain().focus().toggleUnderline().run()}
+                  className={`wysiwyg-bubble-btn${editor.isActive("underline") ? " wysiwyg-bubble-btn--active" : ""}`}
+                >
+                  <u>U</u>
+                </button>
+
+                <div className="wysiwyg-bubble-divider" />
+
+                {editor.isActive("link") ? (
+                  <button type="button" title="Quitar enlace" onClick={() => editor.chain().focus().unsetLink().run()} className="wysiwyg-bubble-btn">
+                    🔗✕
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    title="Insertar enlace"
+                    onClick={() => {
+                      const url = window.prompt("URL del enlace");
+                      if (url) editor.chain().focus().setLink({ href: url }).run();
+                    }}
+                    className="wysiwyg-bubble-btn"
+                  >
+                    🔗
+                  </button>
+                )}
+
+                <div className="wysiwyg-bubble-divider" />
+
+                <button
+                  type="button"
+                  title="H2"
+                  onClick={() =>
+                    editor.isActive("heading", { level: 2 })
+                      ? editor.chain().focus().setParagraph().run()
+                      : editor.chain().focus().setNode("heading", { level: 2 }).run()
+                  }
+                  className={`wysiwyg-bubble-btn${editor.isActive("heading", { level: 2 }) ? " wysiwyg-bubble-btn--active" : ""}`}
+                >
+                  H₂
+                </button>
+                <button
+                  type="button"
+                  title="H3"
+                  onClick={() =>
+                    editor.isActive("heading", { level: 3 })
+                      ? editor.chain().focus().setParagraph().run()
+                      : editor.chain().focus().setNode("heading", { level: 3 }).run()
+                  }
+                  className={`wysiwyg-bubble-btn${editor.isActive("heading", { level: 3 }) ? " wysiwyg-bubble-btn--active" : ""}`}
+                >
+                  H₃
+                </button>
+
+                <div className="wysiwyg-bubble-divider" />
+
+                {/* Text alignment */}
+                {(["left", "center", "right"] as const).map((align) => (
+                  <button
+                    key={align}
+                    type="button"
+                    title={align === "left" ? "Izquierda" : align === "center" ? "Centrado" : "Derecha"}
+                    onClick={() => editor.chain().focus().setTextAlign(align).run()}
+                    className={`wysiwyg-bubble-btn${getTextAlign(editor) === align ? " wysiwyg-bubble-btn--active" : ""}`}
+                  >
+                    {align === "left" ? "←" : align === "center" ? "↔" : "→"}
+                  </button>
+                ))}
+              </div>
+            </BubbleMenu>
+
+            {/* ── Image bubble menu ────────────────────────────────────────── */}
+            <BubbleMenu
+              editor={editor}
+              shouldShow={({ editor: e }) => e.isActive("image")}
+              tippyOptions={{ duration: 100, placement: "bottom" }}
+            >
+              <div className="wysiwyg-bubble-menu">
+                {/* Size */}
+                {(["small", "medium", "full"] as const).map((size) => {
+                  const current = editor.getAttributes("image").size ?? "full";
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      title={size === "small" ? "Pequeña (33%)" : size === "medium" ? "Mediana (60%)" : "Completa"}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        editor.chain().focus().updateAttributes("image", { size }).run();
+                      }}
+                      className={`wysiwyg-bubble-btn${current === size ? " wysiwyg-bubble-btn--active" : ""}`}
+                    >
+                      {size === "small" ? "S" : size === "medium" ? "M" : "L"}
+                    </button>
+                  );
+                })}
+
+                <div className="wysiwyg-bubble-divider" />
+
+                {/* Alignment */}
+                {(["left", "center", "right"] as const).map((align) => {
+                  const current = editor.getAttributes("image").align ?? "center";
+                  return (
+                    <button
+                      key={align}
+                      type="button"
+                      title={align === "left" ? "Alinear izquierda" : align === "center" ? "Centrar" : "Alinear derecha"}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        editor.chain().focus().updateAttributes("image", { align }).run();
+                      }}
+                      className={`wysiwyg-bubble-btn${current === align ? " wysiwyg-bubble-btn--active" : ""}`}
+                    >
+                      {align === "left" ? "←" : align === "center" ? "↔" : "→"}
+                    </button>
+                  );
+                })}
+              </div>
+            </BubbleMenu>
+          </>
         )}
         <EditorContent editor={editor} className="wysiwyg-content" />
       </div>
