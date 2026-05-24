@@ -53,12 +53,12 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Lectura de deseos: solo para admins autenticados de Studio
+// Lectura de deseos: solo para admins con canManageAccess
 export async function GET(req: NextRequest) {
   const { readSession } = await import("@/lib/adminAuth");
   const session = await readSession(req);
-  if (!session) {
-    return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  if (!session || (!session.canManageAccess && !session.isSuperAdmin)) {
+    return NextResponse.json({ error: "No autorizado." }, { status: 403 });
   }
 
   const { url, serviceKey } = getSupabaseEnv();

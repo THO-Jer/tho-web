@@ -13,6 +13,7 @@ type StudioPermissions = {
   canCrm: boolean;
   canIncidents: boolean;
   canOnboarding?: boolean;
+  canManageAccess?: boolean;
 };
 
 type ModuleItem = {
@@ -78,7 +79,7 @@ const modules: ModuleItem[] = [
     href: "/studio/dinamicas",
     status: "Nuevo",
     external: false,
-    allowed: () => true,
+    allowed: (p) => Boolean(p?.canManageAccess),
   },
 ];
 
@@ -132,7 +133,7 @@ export default function StudioIndexPage() {
       const data = await res.json();
       if (data.authenticated) {
         setEmail(data.email ?? null);
-        setPermissions(data.permissions ?? null);
+        setPermissions(data.permissions ? { ...data.permissions, canManageAccess: Boolean(data.canManageAccess) } : null);
 
         try {
           const onboardingRes = await fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" });

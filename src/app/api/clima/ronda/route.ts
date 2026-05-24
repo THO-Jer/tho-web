@@ -46,10 +46,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// POST — crear nueva ronda (solo admin)
+// POST — crear nueva ronda (solo admin con canManageAccess)
 export async function POST(req: NextRequest) {
   const session = await readSession(req);
-  if (!session) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  if (!session || (!session.canManageAccess && !session.isSuperAdmin)) {
+    return NextResponse.json({ error: "No autorizado." }, { status: 403 });
+  }
 
   const body = await req.json();
   const nombre = String(body?.nombre || "").trim();
@@ -88,10 +90,12 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ronda: data[0] });
 }
 
-// PATCH — cerrar ronda activa (solo admin)
+// PATCH — cerrar ronda activa (solo admin con canManageAccess)
 export async function PATCH(req: NextRequest) {
   const session = await readSession(req);
-  if (!session) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  if (!session || (!session.canManageAccess && !session.isSuperAdmin)) {
+    return NextResponse.json({ error: "No autorizado." }, { status: 403 });
+  }
 
   const body = await req.json();
   const rondaId = String(body?.rondaId || "").trim();

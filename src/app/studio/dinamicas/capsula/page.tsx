@@ -35,7 +35,7 @@ export default function StudioCapsulePage() {
     fetch("/api/admin/session", { credentials: "include" })
       .then((r) => r.json())
       .then((data) => {
-        if (data.authenticated) {
+        if (data.authenticated && data.canManageAccess) {
           setAuthorized(true);
         } else {
           router.replace("/studio");

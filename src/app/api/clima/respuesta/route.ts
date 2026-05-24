@@ -60,10 +60,12 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ ok: true });
 }
 
-// GET — leer resultados agregados (solo admin)
+// GET — leer resultados agregados (solo admin con canManageAccess)
 export async function GET(req: NextRequest) {
   const session = await readSession(req);
-  if (!session) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
+  if (!session || (!session.canManageAccess && !session.isSuperAdmin)) {
+    return NextResponse.json({ error: "No autorizado." }, { status: 403 });
+  }
 
   const rondaId = req.nextUrl.searchParams.get("rondaId");
   if (!rondaId) return NextResponse.json({ error: "rondaId requerido." }, { status: 400 });
