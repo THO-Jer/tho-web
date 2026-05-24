@@ -6,6 +6,21 @@ import { IncidentStatus, UrgencyLevel, getIncidentById, recordIncidentEvent, res
 export const dynamic = "force-dynamic";
 
 const VALID_STATUS: IncidentStatus[] = ["Recibido", "En revisión", "Derivado", "Cerrado"];
+
+export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const session = await readSession(_req);
+  if (!session || !session.canIncidents || !session.isSuperAdmin) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+  try {
+    const params = await context.params;
+    const incident = await getIncidentById(params.id);
+    if (!incident) return NextResponse.json({ error: "Caso no encontrado." }, { status: 404 });
+    return NextResponse.json({ incident });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "No se pudo obtener el caso." }, { status: 500 });
+  }
+}
 const VALID_URGENCY: UrgencyLevel[] = ["Bajo", "Medio", "Alto"];
 
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {

@@ -330,105 +330,134 @@ export default function CanalConfidencialPanelPage() {
               </div>
             </section>
 
-            <section className="rounded-2xl border border-slate-200 bg-white p-5">
-              {!active || !triage ? <p className="text-sm text-slate-600">Selecciona un caso para ver detalle.</p> : (
-                <div className="grid gap-4">
-                  <div>
-                    <h2 className="text-xl font-semibold text-slate-900">{active.case_code}</h2>
-                    <div className="mt-1 text-xs text-slate-500">Tracking: {active.tracking_code}</div>
-                  </div>
+            <section className="grid gap-4 overflow-auto">
+              {!active || !triage ? (
+                <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                  <p className="text-sm text-slate-500">Selecciona un caso de la lista para ver el detalle.</p>
+                </div>
+              ) : (
+                <>
+                  {/* ── Cabecera del caso ── */}
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h2 className="text-xl font-bold text-slate-900">{active.case_code}</h2>
+                        <p className="mt-0.5 text-xs text-slate-400">Seguimiento: {active.tracking_code}</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${URGENCY_BADGE[active.urgency_level]}`}>{active.urgency_level}</span>
+                        <span className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{active.status}</span>
+                        <button
+                          type="button"
+                          onClick={() => window.open(`/studio/canal-confidencial/panel/print/${active.id}`, "_blank")}
+                          className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold hover:bg-slate-50"
+                        >
+                          Exportar PDF
+                        </button>
+                      </div>
+                    </div>
 
-                  <div className="grid gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 sm:grid-cols-2">
-                    <div><strong>Tipo:</strong> {active.type}</div>
-                    <div><strong>Fecha evento:</strong> {active.event_date}</div>
-                    <div><strong>Anónimo:</strong> {active.anonymous ? "Sí" : "No"}</div>
-                    <div><strong>Contacto:</strong> {active.reporter_email || "No informado"}</div>
-                    <div><strong>Creado:</strong> {new Date(active.created_at).toLocaleString()}</div>
-                    <div><strong>Actualizado:</strong> {new Date(active.last_updated_at).toLocaleString()}</div>
-                    <div className="flex items-center gap-2 sm:col-span-2">
-                      <strong>Urgencia actual:</strong>
-                      <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${URGENCY_BADGE[active.urgency_level]}`}>{active.urgency_level}</span>
+                    <div className="mt-4 grid gap-2 text-sm text-slate-700 sm:grid-cols-2">
+                      <div><span className="font-semibold">Tipo:</span> {active.type}</div>
+                      <div><span className="font-semibold">Fecha del evento:</span> {active.event_date}</div>
+                      <div><span className="font-semibold">Modalidad:</span> {active.anonymous ? "Anónimo" : "Identificado"}</div>
+                      <div><span className="font-semibold">Contacto:</span> {active.reporter_email || "No informado"}</div>
+                      <div><span className="font-semibold">Fase actual:</span> {active.process_phase || "—"}</div>
+                      <div><span className="font-semibold">Actualizado:</span> {new Date(active.last_updated_at).toLocaleString()}</div>
                     </div>
                   </div>
 
-                  <div>
-                    <h3 className="text-sm font-semibold text-slate-800">Descripción</h3>
-                    <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{active.description}</p>
+                  {/* ── Relato original ── */}
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Relato original</h3>
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{active.description}</p>
                   </div>
 
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <label className="grid gap-1">
-                      <span className="text-xs font-semibold text-slate-600">Estado</span>
-                      <select value={triage.status} onChange={(e) => setTriage((prev) => prev ? { ...prev, status: e.target.value as Incident["status"] } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                        {STATUSES.map((status) => <option key={status} value={status}>{status}</option>)}
-                      </select>
-                    </label>
-                    <label className="grid gap-1">
-                      <span className="text-xs font-semibold text-slate-600">Fase del proceso</span>
-                      <select value={triage.process_phase} onChange={(e) => setTriage((prev) => prev ? { ...prev, process_phase: e.target.value } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                        {PROCESS_PHASES.map((phase) => <option key={phase} value={phase}>{phase || "— Sin fase —"}</option>)}
-                      </select>
-                    </label>
-                    <label className="grid gap-1">
-                      <span className="text-xs font-semibold text-slate-600">Urgencia</span>
-                      <select value={triage.urgency_level} onChange={(e) => setTriage((prev) => prev ? { ...prev, urgency_level: e.target.value as Incident["urgency_level"] } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                        {URGENCIES.map((urgency) => <option key={urgency} value={urgency}>{urgency}</option>)}
-                      </select>
-                    </label>
-                    <label className="grid gap-1">
-                      <span className="text-xs font-semibold text-slate-600">Responsable comité</span>
-                      <input value={triage.director_only_notes} onChange={(e) => setTriage((prev) => prev ? { ...prev, director_only_notes: e.target.value } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="nombre o correo" />
-                    </label>
-                    <label className="grid gap-1 sm:col-span-2">
-                      <span className="text-xs font-semibold text-slate-600">Notas internas del comité</span>
-                      <textarea value={triage.director_notes} onChange={(e) => setTriage((prev) => prev ? { ...prev, director_notes: e.target.value } : prev)} rows={4} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                    </label>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={saveTriage} disabled={loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
-                      Guardar triage
-                    </button>
-                    <button type="button" onClick={() => runAction("mark_atendible")} disabled={loading} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
-                      Marcar atendible
-                    </button>
-                    <button type="button" onClick={() => requestAction("mark_no_atendible")} disabled={loading} className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900 hover:bg-amber-100">
-                      Marcar no atendible
-                    </button>
-                    <button type="button" onClick={() => requestAction("reset_pin")} disabled={loading} className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-800 hover:bg-rose-100">
-                      Resetear PIN
-                    </button>
-                    <button type="button" onClick={() => loadIncidents()} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50" disabled={loading}>
-                      Recargar
-                    </button>
-                  </div>
-
-                  {!active.anonymous ? (
-                    <div className="rounded-xl border border-slate-200 p-3">
-                      <h3 className="text-sm font-semibold text-slate-800">Solicitar información adicional</h3>
-                      <textarea value={requestInfoText} onChange={(e) => setRequestInfoText(e.target.value)} rows={3} placeholder="Detalle de la información requerida" className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
-                      <button type="button" onClick={() => runAction("request_info")} disabled={loading} className="mt-2 rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
-                        Solicitar información adicional
+                  {/* ── Triage del comité ── */}
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Triage del comité</h3>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      <label className="grid gap-1">
+                        <span className="text-xs font-semibold text-slate-600">Estado</span>
+                        <select value={triage.status} onChange={(e) => setTriage((prev) => prev ? { ...prev, status: e.target.value as Incident["status"] } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                          {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                      </label>
+                      <label className="grid gap-1">
+                        <span className="text-xs font-semibold text-slate-600">Fase del proceso</span>
+                        <select value={triage.process_phase} onChange={(e) => setTriage((prev) => prev ? { ...prev, process_phase: e.target.value } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                          {PROCESS_PHASES.map((phase) => <option key={phase} value={phase}>{phase || "— Sin fase —"}</option>)}
+                        </select>
+                      </label>
+                      <label className="grid gap-1">
+                        <span className="text-xs font-semibold text-slate-600">Urgencia</span>
+                        <select value={triage.urgency_level} onChange={(e) => setTriage((prev) => prev ? { ...prev, urgency_level: e.target.value as Incident["urgency_level"] } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                          {URGENCIES.map((u) => <option key={u} value={u}>{u}</option>)}
+                        </select>
+                      </label>
+                      <label className="grid gap-1">
+                        <span className="text-xs font-semibold text-slate-600">Responsable comité</span>
+                        <input value={triage.director_only_notes} onChange={(e) => setTriage((prev) => prev ? { ...prev, director_only_notes: e.target.value } : prev)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="nombre o correo" />
+                      </label>
+                      <label className="grid gap-1 sm:col-span-2">
+                        <span className="text-xs font-semibold text-slate-600">Notas internas</span>
+                        <textarea value={triage.director_notes} onChange={(e) => setTriage((prev) => prev ? { ...prev, director_notes: e.target.value } : prev)} rows={4} className="rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                      </label>
+                    </div>
+                    <div className="mt-3">
+                      <button type="button" onClick={saveTriage} disabled={loading} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60">
+                        Guardar triage
                       </button>
                     </div>
-                  ) : (
-                    <p className="text-xs text-slate-500">Caso anónimo: no se puede solicitar información adicional por contacto directo.</p>
-                  )}
+                  </div>
 
-                  {message ? <p className="text-sm text-slate-600">{message}</p> : null}
-
-                  {newPin ? (
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
-                      Nuevo PIN (mostrar una sola vez): <strong>{newPin}</strong>
+                  {/* ── Acciones del comité ── */}
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Acciones del comité</h3>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button type="button" onClick={() => runAction("mark_atendible")} disabled={loading} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">
+                        Marcar atendible
+                      </button>
+                      <button type="button" onClick={() => requestAction("mark_no_atendible")} disabled={loading} className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900 hover:bg-amber-100">
+                        Marcar no atendible
+                      </button>
+                      <button type="button" onClick={() => requestAction("reset_pin")} disabled={loading} className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-800 hover:bg-rose-100">
+                        Resetear PIN
+                      </button>
+                      <button type="button" onClick={() => loadIncidents()} className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50" disabled={loading}>
+                        Recargar
+                      </button>
                     </div>
-                  ) : null}
 
+                    {!active.anonymous ? (
+                      <div className="mt-4 border-t border-slate-100 pt-4">
+                        <p className="text-xs font-semibold text-slate-600">Solicitar información adicional</p>
+                        <textarea value={requestInfoText} onChange={(e) => setRequestInfoText(e.target.value)} rows={3} placeholder="Detalle de la información requerida" className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" />
+                        <button type="button" onClick={() => runAction("request_info")} disabled={loading} className="mt-2 rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
+                          Enviar solicitud
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="mt-3 text-xs text-slate-400">Caso anónimo: no se puede solicitar información adicional por contacto directo.</p>
+                    )}
+
+                    {message ? (
+                      <p className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">{message}</p>
+                    ) : null}
+                    {newPin ? (
+                      <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                        Nuevo PIN (mostrar una sola vez): <strong>{newPin}</strong>
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* ── Adjuntos ── */}
                   {active.attachments?.length ? (
-                    <div>
-                      <h3 className="text-sm font-semibold text-slate-800">Adjuntos</h3>
-                      <div className="mt-2 grid gap-2">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Adjuntos ({active.attachments.length})</h3>
+                      <div className="mt-3 flex flex-wrap gap-2">
                         {active.attachments.map((url, idx) => (
-                          <a key={`${url}-${idx}`} href={url} target="_blank" rel="noreferrer" className="inline-flex w-fit rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
+                          <a key={`${url}-${idx}`} href={url} target="_blank" rel="noreferrer" className="inline-flex rounded-md border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
                             Ver adjunto {active.attachments && active.attachments.length > 1 ? `#${idx + 1}` : ""}
                           </a>
                         ))}
@@ -436,20 +465,26 @@ export default function CanalConfidencialPanelPage() {
                     </div>
                   ) : null}
 
-                  <div>
-                    <h3 className="text-sm font-semibold text-slate-800">Timeline</h3>
-                    <div className="mt-2 grid gap-2">
+                  {/* ── Timeline ── */}
+                  <div className="rounded-2xl border border-slate-200 bg-white p-5">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Timeline ({active.audit_log.length} eventos)</h3>
+                    <div className="mt-3 space-y-3">
                       {active.audit_log.map((row, idx) => (
-                        <div key={`${row.at}-${idx}`} className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-700">
-                          <strong>{new Date(row.at).toLocaleString()}</strong> · {row.action} · {row.actor}
-                          {row.actor_email ? ` (${row.actor_email})` : ""}
-                          {row.actor_kind ? ` · ${row.actor_kind}` : ""}
-                          {row.detail ? ` · ${row.detail}` : ""}
+                        <div key={`${row.at}-${idx}`} className="flex gap-3">
+                          <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-slate-300" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-slate-800">{row.action}</p>
+                            {row.detail ? <p className="mt-0.5 text-sm text-slate-600">{row.detail}</p> : null}
+                            <p className="mt-0.5 text-xs text-slate-400">
+                              {new Date(row.at).toLocaleString()} · {row.actor}
+                              {row.actor_email ? ` (${row.actor_email})` : ""}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
+                </>
               )}
             </section>
           </div>

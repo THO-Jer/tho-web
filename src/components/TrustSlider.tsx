@@ -97,12 +97,12 @@ export function TrustSlider() {
     >
       <div
         ref={trackRef}
-        className="trust-track flex w-max items-center gap-2 px-3 md:gap-3 md:px-4"
+        className="trust-track flex w-max items-center gap-1 px-2 md:gap-2 md:px-3"
       >
         {items.map((logo, idx) => (
           <div
             key={`${logo.src}-${idx}`}
-            className="trust-logo-slot relative h-[74px] w-[190px] shrink-0 md:h-[84px] md:w-[220px]"
+            className="trust-logo-slot relative h-[58px] w-[150px] shrink-0 md:h-[68px] md:w-[175px]"
           >
             <Image
               src={logo.src}
