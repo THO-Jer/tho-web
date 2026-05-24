@@ -70,16 +70,6 @@ const SLASH_ITEMS: SlashItem[] = [
       editor?.chain().focus().deleteRange(range).setHorizontalRule().run(),
   },
   {
-    id: "image",
-    label: "Imagen (URL)",
-    description: "Insertar imagen desde URL",
-    icon: "🖼",
-    command: ({ editor, range }) => {
-      const url = window.prompt("URL de la imagen");
-      if (url) editor?.chain().focus().deleteRange(range).setImage({ src: url }).run();
-    },
-  },
-  {
     id: "youtube",
     label: "YouTube",
     description: "Embeber video de YouTube",
@@ -172,6 +162,12 @@ const SlashCommandList = forwardRef<SlashListHandle, SlashListProps>(
             <button
               key={item.id}
               type="button"
+              onMouseDown={(e) => {
+                // Prevent the editor from losing focus before the click fires.
+                // Without this, ProseMirror's blur → Suggestion onExit removes
+                // the popup before onClick can execute.
+                e.preventDefault();
+              }}
               onClick={() => command(item)}
               style={{
                 display: "flex",
