@@ -13,8 +13,8 @@ import { Markdown } from "tiptap-markdown";
 import TiptapImage from "@tiptap/extension-image";
 import TiptapLink from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Extension } from "@tiptap/core";
-import Suggestion from "@tiptap/suggestion";
+import { Extension, type Editor, type Range } from "@tiptap/core";
+import Suggestion, { type SuggestionProps, type SuggestionKeyDownProps } from "@tiptap/suggestion";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Slash-command items
@@ -25,7 +25,7 @@ type SlashItem = {
   label: string;
   description: string;
   icon: string;
-  command: (args: { editor: ReturnType<typeof useEditor>; range: { from: number; to: number } }) => void;
+  command: (args: { editor: Editor; range: Range }) => void;
 };
 
 const SLASH_ITEMS: SlashItem[] = [
@@ -233,57 +233,46 @@ const SlashCommandExtension = Extension.create({
           let renderer: ReactRenderer<SlashListHandle>;
           let el: HTMLDivElement;
 
+          const position = (props: SuggestionProps<SlashItem>) => {
+            const rect = props.clientRect?.();
+            if (rect && el) {
+              el.style.top = `${rect.bottom + 6}px`;
+              el.style.left = `${Math.min(rect.left, window.innerWidth - 260)}px`;
+            }
+          };
+
           return {
-            onStart(props: Record<string, unknown>) {
-              const items = props.items as SlashItem[];
+            onStart(props: SuggestionProps<SlashItem>) {
               renderer = new ReactRenderer(SlashCommandList, {
                 props: {
-                  items,
+                  items: props.items,
                   command: (item: SlashItem) =>
-                    (props.command as (args: { editor: unknown; range: unknown; props: unknown }) => void)({
-                      editor: props.editor,
-                      range: props.range,
-                      props: item,
-                    }),
+                    props.command({ editor: props.editor, range: props.range, props: item }),
                 },
-                editor: props.editor as Parameters<typeof ReactRenderer>[1]["editor"],
+                editor: props.editor,
               });
 
               el = document.createElement("div");
               el.style.cssText = "position:fixed;z-index:9999;";
               document.body.appendChild(el);
               el.appendChild(renderer.element);
-
-              const rect = (props.clientRect as (() => DOMRect | null) | null)?.();
-              if (rect) {
-                el.style.top = `${rect.bottom + 6}px`;
-                el.style.left = `${Math.min(rect.left, window.innerWidth - 260)}px`;
-              }
+              position(props);
             },
-            onUpdate(props: Record<string, unknown>) {
-              const items = props.items as SlashItem[];
+            onUpdate(props: SuggestionProps<SlashItem>) {
               renderer.updateProps({
-                items,
+                items: props.items,
                 command: (item: SlashItem) =>
-                  (props.command as (args: { editor: unknown; range: unknown; props: unknown }) => void)({
-                    editor: props.editor,
-                    range: props.range,
-                    props: item,
-                  }),
+                  props.command({ editor: props.editor, range: props.range, props: item }),
               });
-              const rect = (props.clientRect as (() => DOMRect | null) | null)?.();
-              if (rect) {
-                el.style.top = `${rect.bottom + 6}px`;
-                el.style.left = `${Math.min(rect.left, window.innerWidth - 260)}px`;
-              }
+              position(props);
             },
-            onKeyDown(props: Record<string, unknown>) {
-              if ((props.event as KeyboardEvent).key === "Escape") {
+            onKeyDown(props: SuggestionKeyDownProps) {
+              if (props.event.key === "Escape") {
                 el?.remove();
                 renderer?.destroy();
                 return true;
               }
-              return renderer.ref?.onKeyDown(props as { event: KeyboardEvent }) ?? false;
+              return renderer.ref?.onKeyDown({ event: props.event }) ?? false;
             },
             onExit() {
               el?.remove();
@@ -291,15 +280,7 @@ const SlashCommandExtension = Extension.create({
             },
           };
         },
-        command: ({
-          editor,
-          range,
-          props,
-        }: {
-          editor: ReturnType<typeof useEditor>;
-          range: { from: number; to: number };
-          props: SlashItem;
-        }) => {
+        command: ({ editor, range, props }: { editor: Editor; range: Range; props: SlashItem }) => {
           props.command({ editor, range });
         },
       }),
