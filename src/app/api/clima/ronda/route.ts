@@ -7,17 +7,16 @@ export const dynamic = "force-dynamic";
 function getSupabase() {
   const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/\/$/, "");
   const serviceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
-  const anonKey = (process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").trim();
-  return { url, serviceKey, anonKey };
+  return { url, serviceKey };
 }
 
-// GET — devuelve lista de rondas (admin) o solo la ronda activa (público)
+// GET — devuelve lista de rondas (admin con canManageAccess) o solo la ronda activa (cualquier otro)
 export async function GET(req: NextRequest) {
-  const { url, serviceKey, anonKey } = getSupabase();
+  const { url, serviceKey } = getSupabase();
   if (!url) return NextResponse.json({ error: "Config error." }, { status: 500 });
 
   const session = await readSession(req);
-  const isAdmin = Boolean(session);
+  const isAdmin = Boolean(session && (session.canManageAccess || session.isSuperAdmin));
 
   if (isAdmin) {
     // Admin: todas las rondas
@@ -32,11 +31,11 @@ export async function GET(req: NextRequest) {
     const rondas = await res.json();
     return NextResponse.json({ rondas });
   } else {
-    // Público: solo ronda activa (para saber si hay encuesta abierta)
+    // Miembro o visitante: solo la ronda activa (para saber si hay encuesta abierta)
     const res = await fetch(
       `${url}/rest/v1/clima_ronda?estado=eq.activa&order=created_at.desc&limit=1&select=id,nombre,estado,created_at`,
       {
-        headers: { apikey: anonKey, Authorization: `Bearer ${anonKey}` },
+        headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
         cache: "no-store",
       }
     );
