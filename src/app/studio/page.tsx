@@ -23,6 +23,7 @@ type ModuleItem = {
   href: string;
   status: string;
   external: boolean;
+  hideIfUnauthorized?: boolean;
   allowed: (perm: StudioPermissions | null) => boolean;
 };
 
@@ -79,6 +80,7 @@ const modules: ModuleItem[] = [
     href: "/studio/dinamicas",
     status: "Nuevo",
     external: false,
+    hideIfUnauthorized: true,
     allowed: (p) => Boolean(p?.canManageAccess),
   },
 ];
@@ -259,7 +261,7 @@ export default function StudioIndexPage() {
           ) : null}
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {modules.map((item) => {
+            {modules.filter((item) => !(item.hideIfUnauthorized && !item.allowed(permissions))).map((item) => {
               const isSuperAdmin = role === "superadmin";
               const onboardingAllowedPaths = ["/studio/onboarding", "/studio/canal-confidencial"];
               const blockedByOnboardingBase = onboardingRequired && onboardingBlockInternal && !onboardingCompleted && !isSuperAdmin && !onboardingAllowedPaths.includes(item.href);
