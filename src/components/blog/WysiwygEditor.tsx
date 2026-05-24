@@ -24,19 +24,44 @@ import { Extension, type Editor, type Range } from "@tiptap/core";
 // Both are editor-only (plain markdown has no sizing syntax).
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Image title encoding helpers
+//
+// Both size and alignment are stored in the markdown image title attribute so
+// they survive the save → load cycle and BlogContent can apply them.
+//
+// Format: "[size]:[align]"  e.g. "small:left", "medium:right", "full:right"
+// Defaults (full + center) are encoded as null → no title in the markdown.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type ImgSize  = "small" | "medium" | "full";
+type ImgAlign = "left"  | "center" | "right";
+
+function parseImgTitle(title: string | null): { size: ImgSize; align: ImgAlign } {
+  if (!title) return { size: "full", align: "center" };
+  const [s, a] = title.split(":");
+  const size  = (s === "small" || s === "medium") ? s : "full";
+  const align = (a === "left"  || a === "right")  ? a : "center";
+  return { size, align };
+}
+
+function encodeImgTitle(size: ImgSize, align: ImgAlign): string | null {
+  if (size === "full" && align === "center") return null;
+  if (align === "center") return size;           // "small" | "medium"
+  if (size  === "full")   return `full:${align}`; // "full:left" | "full:right"
+  return `${size}:${align}`;                      // "small:left" etc.
+}
+
 const CustomImage = TiptapImage.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      size: {
-        default: "full",
-        parseHTML: (el) => el.getAttribute("data-size") ?? "full",
-        renderHTML: (attrs) => ({ "data-size": attrs.size ?? "full" }),
-      },
-      align: {
-        default: "center",
-        parseHTML: (el) => el.getAttribute("data-align") ?? "center",
-        renderHTML: (attrs) => ({ "data-align": attrs.align ?? "center" }),
+      // title encodes "[size]:[align]" — serialized by tiptap-markdown as
+      // ![alt](src "small:left"), readable by both editor CSS and BlogContent.
+      title: {
+        default: null,
+        parseHTML: (el) => el.getAttribute("title") ?? null,
+        renderHTML: (attrs) => attrs.title ? { title: attrs.title } : {},
       },
     };
   },
@@ -482,37 +507,44 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
               tippyOptions={{ duration: 100, placement: "bottom" }}
             >
               <div className="wysiwyg-bubble-menu">
-                {(["small", "medium", "full"] as const).map((size) => {
-                  const current = editor.getAttributes("image").size ?? "full";
-                  return (
-                    <button key={size} type="button"
-                      title={size === "small" ? "Pequeña (33%)" : size === "medium" ? "Mediana (60%)" : "Completa"}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        editor.chain().focus().updateAttributes("image", { size }).run();
-                      }}
-                      className={`wysiwyg-bubble-btn${current === size ? " wysiwyg-bubble-btn--active" : ""}`}>
-                      {size === "small" ? "S" : size === "medium" ? "M" : "L"}
-                    </button>
+                {(() => {
+                  const { size: curSize, align: curAlign } = parseImgTitle(
+                    editor.getAttributes("image").title ?? null
                   );
-                })}
-
-                <div className="wysiwyg-bubble-divider" />
-
-                {(["left", "center", "right"] as const).map((align) => {
-                  const current = editor.getAttributes("image").align ?? "center";
                   return (
-                    <button key={align} type="button"
-                      title={align === "left" ? "Alinear izquierda" : align === "center" ? "Centrar" : "Alinear derecha"}
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        editor.chain().focus().updateAttributes("image", { align }).run();
-                      }}
-                      className={`wysiwyg-bubble-btn${current === align ? " wysiwyg-bubble-btn--active" : ""}`}>
-                      {align === "left" ? "←" : align === "center" ? "↔" : "→"}
-                    </button>
+                    <>
+                      {(["small", "medium", "full"] as const).map((size) => (
+                        <button key={size} type="button"
+                          title={size === "small" ? "Pequeña (33%)" : size === "medium" ? "Mediana (60%)" : "Completa"}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            editor.chain().focus().updateAttributes("image", {
+                              title: encodeImgTitle(size, curAlign),
+                            }).run();
+                          }}
+                          className={`wysiwyg-bubble-btn${curSize === size ? " wysiwyg-bubble-btn--active" : ""}`}>
+                          {size === "small" ? "S" : size === "medium" ? "M" : "L"}
+                        </button>
+                      ))}
+
+                      <div className="wysiwyg-bubble-divider" />
+
+                      {(["left", "center", "right"] as const).map((align) => (
+                        <button key={align} type="button"
+                          title={align === "left" ? "Alinear izquierda" : align === "center" ? "Centrar" : "Alinear derecha"}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            editor.chain().focus().updateAttributes("image", {
+                              title: encodeImgTitle(curSize, align),
+                            }).run();
+                          }}
+                          className={`wysiwyg-bubble-btn${curAlign === align ? " wysiwyg-bubble-btn--active" : ""}`}>
+                          {align === "left" ? "←" : align === "center" ? "↔" : "→"}
+                        </button>
+                      ))}
+                    </>
                   );
-                })}
+                })()}
               </div>
             </BubbleMenu>
           </>

@@ -158,11 +158,21 @@ function renderBlock(block: string, index: number) {
     );
   }
 
-  const imageMatch = first.match(/^!\[(.*?)\]\((.*?)\)$/);
+  // Title encodes "[size]:[align]" set from the editor, e.g. "small:left".
+  // Defaults (full + center) are omitted → no title in the markdown.
+  const imageMatch = first.match(/^!\[(.*?)\]\((.*?)(?:\s+"(.*?)")?\)$/);
   if (imageMatch) {
-    const [, alt, src] = imageMatch;
+    const [, alt, src, imgTitle] = imageMatch;
+    const [sizeToken, alignToken] = (imgTitle ?? "").split(":");
+    const size  = sizeToken  === "small"  || sizeToken  === "medium" ? sizeToken  : "full";
+    const align = alignToken === "left"   || alignToken === "right"  ? alignToken : "center";
+
+    const widthClass = size  === "small"  ? "w-1/3" : size  === "medium" ? "w-3/5" : "w-full";
+    const alignClass = align === "left"   ? "ml-0 mr-auto"
+                     : align === "right"  ? "ml-auto mr-0"
+                     : "mx-auto";
     return (
-      <figure key={index} className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+      <figure key={index} className={`mt-8 ${widthClass} ${alignClass} overflow-hidden rounded-2xl border border-slate-200 bg-slate-50`}>
         <div className="relative aspect-[16/9] w-full">
           <Image src={src} alt={alt || "Imagen del artículo"} fill className="object-cover" />
         </div>
