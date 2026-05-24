@@ -1543,8 +1543,20 @@ body {
 .wysiwyg-root .ProseMirror img {
   border-radius: 0.75rem;
   max-width: 100%;
+  max-height: 280px;      /* prevent a single image from dominating the canvas */
+  width: auto;
+  display: block;
   margin-top: 1.5rem;
+  margin-left: auto;
+  margin-right: auto;
   border: 1px solid #e2e8f0;
+  cursor: default;
+}
+
+/* Visual ring when the image node is selected in ProseMirror */
+.wysiwyg-root .ProseMirror img.ProseMirror-selectednode {
+  outline: 2px solid #1e71b8;
+  outline-offset: 2px;
 }
 
 .wysiwyg-root .ProseMirror a { color: #0f172a; text-decoration: underline; text-underline-offset: 2px; }
@@ -1595,6 +1607,7 @@ body {
   .wysiwyg-root .ProseMirror blockquote { background: #1e293b; color: #94a3b8; border-left-color: #475569; }
   .wysiwyg-root .ProseMirror hr { border-top-color: #334155; }
   .wysiwyg-root .ProseMirror img { border-color: #334155; }
+  .wysiwyg-root .ProseMirror img.ProseMirror-selectednode { outline-color: #7cc0ff; }
   .wysiwyg-root .ProseMirror a { color: #7cc0ff; }
   .wysiwyg-bubble-menu { background: #1e293b; border-color: #334155; }
   .wysiwyg-bubble-btn { color: #cbd5e1; }

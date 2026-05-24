@@ -254,6 +254,7 @@ const SlashCommandExtension = Extension.create({
 
               el = document.createElement("div");
               el.style.cssText = "position:fixed;z-index:9999;";
+              el.dataset.slashPopup = "1";
               document.body.appendChild(el);
               el.appendChild(renderer.element);
               position(props);
@@ -305,6 +306,11 @@ interface WysiwygEditorProps {
 
 export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>(
   ({ value, onChange, disabled = false }, ref) => {
+    // Keep a stable ref to onChange so the useEditor closure never goes stale.
+    // useEditor captures callbacks at mount time and doesn't re-run when props change.
+    const onChangeRef = useRef(onChange);
+    useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+
     const editor = useEditor({
       extensions: [
         StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
@@ -326,9 +332,18 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
       onUpdate: ({ editor: e }) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const md = (e.storage.markdown as any).getMarkdown() as string;
-        onChange(md);
+        onChangeRef.current(md);
       },
     });
+
+    // If the component unmounts while the slash menu is open, Tiptap's Suggestion
+    // plugin does NOT call onExit, so the popup div stays in document.body.
+    // Clean it up here to avoid the leak.
+    useEffect(() => {
+      return () => {
+        document.querySelectorAll("[data-slash-popup]").forEach((el) => el.remove());
+      };
+    }, []);
 
     // Sync when a different post is loaded externally (fillForm)
     const prevValueRef = useRef(value);
@@ -351,10 +366,15 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
         editor?.chain().focus().setImage({ src, alt }).run();
       },
       insertLink: (text, url) => {
+        // Insert the linked text, then immediately unset the link mark and add a
+        // trailing space — otherwise the cursor stays "inside" the link and the
+        // next characters the user types become part of the hyperlink.
         editor
           ?.chain()
           .focus()
           .insertContent({ type: "text", text, marks: [{ type: "link", attrs: { href: url } }] })
+          .unsetMark("link")
+          .insertContent(" ")
           .run();
       },
     }));

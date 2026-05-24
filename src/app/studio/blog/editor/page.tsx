@@ -539,12 +539,14 @@ export default function BlogStudioPage() {
                 )}
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-                <span className="text-xs text-slate-400">Imágenes:</span>
-                <button type="button" onClick={() => openRepoPicker("inline", "repo")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Desde repo</button>
-                <button type="button" onClick={() => openRepoPicker("inline", "storage")} className="rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Desde Storage</button>
-                <label htmlFor="inline-upload-input" className="cursor-pointer rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs">Subir archivo</label>
-                <span className="ml-auto text-xs text-slate-400">Escribe <kbd className="rounded border border-slate-200 bg-white px-1 font-mono">/</kbd> en el editor para insertar bloques</span>
+              <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50 px-3 py-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs font-medium text-blue-700">🖼 Insertar imagen en el texto</span>
+                  <button type="button" onClick={() => openRepoPicker("inline", "repo")} className="rounded-md border border-blue-200 bg-white px-2.5 py-1 text-xs text-slate-700 hover:bg-blue-50">Desde repo</button>
+                  <button type="button" onClick={() => openRepoPicker("inline", "storage")} className="rounded-md border border-blue-200 bg-white px-2.5 py-1 text-xs text-slate-700 hover:bg-blue-50">Desde Storage</button>
+                  <label htmlFor="inline-upload-input" className="cursor-pointer rounded-md border border-blue-200 bg-white px-2.5 py-1 text-xs text-slate-700 hover:bg-blue-50">Subir archivo</label>
+                  <span className="ml-auto text-xs text-blue-600/70">Se inserta donde esté el cursor · también puedes usar <kbd className="rounded border border-blue-200 bg-white px-1 font-mono">/</kbd></span>
+                </div>
               </div>
 
               <input id="cover-upload-input" type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onUploadCover} />
@@ -574,10 +576,14 @@ export default function BlogStudioPage() {
                   </select>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <div className="text-xs font-semibold text-slate-700">Imagen principal (cabecera/tarjeta)</div>
-                  <p className="mt-1 text-xs text-slate-500">Elige una del repo o súbela desde tu computador.</p>
-                  <p className="mt-1 text-[11px] text-slate-500">La subida envía la imagen a Supabase Storage y retorna una URL pública lista para usar en el post. No se guarda en <code>/public</code> ni hace commit al repositorio Git.</p>
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-base">🏷</span>
+                    <span className="text-xs font-semibold text-amber-900">Portada del post</span>
+                    <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] font-medium text-amber-800">cabecera · tarjeta · og:image</span>
+                  </div>
+                  <p className="mt-1 text-xs text-amber-800/80">Esta imagen NO va dentro del artículo. Es la que aparece en la lista del blog, redes sociales y como cabecera del post.</p>
+                  <p className="mt-1 text-[11px] text-amber-700/70">La subida envía la imagen a Supabase Storage. No se guarda en <code>/public</code> ni hace commit al repo.</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button type="button" onClick={() => openRepoPicker("cover", "repo")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen del repo</button>
                     <button type="button" onClick={() => openRepoPicker("cover", "storage")} className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs">Usar imagen de Storage</button>
@@ -621,7 +627,7 @@ export default function BlogStudioPage() {
               <ul className="mt-3 space-y-2 text-sm">
                 <li>{form.title ? "✅" : "⚠️"} Título definido</li>
                 <li>{form.excerpt.length > 80 ? "✅" : "⚠️"} Extracto claro (&gt;80 caracteres)</li>
-                <li>{form.coverImage ? "✅" : "⚠️"} Imagen principal</li>
+                <li>{form.coverImage ? "✅" : "⚠️"} Portada del post</li>
                 <li>{form.seoTitle ? "✅" : "⚠️"} SEO title</li>
                 <li>{form.seoDescription ? "✅" : "⚠️"} SEO description</li>
                 <li>{toc.length ? "✅" : "⚠️"} Secciones para índice (H2/H3)</li>
