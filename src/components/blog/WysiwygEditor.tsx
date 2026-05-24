@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Markdown } from "tiptap-markdown";
@@ -335,16 +336,16 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
       <div className="wysiwyg-root">
 
         {/* ── Slash command menu ─────────────────────────────────────────
-            Rendered in JSX (same React tree / root) so synthetic events
-            work correctly with React 19. Previously used ReactRenderer
-            which creates a separate React root — that breaks onMouseDown
-            event handling in React 19. */}
-        {slash && filteredItems.length > 0 && (
+            Portal to document.body so the div sits outside ProseMirror's
+            DOM subtree (prevents the React/ProseMirror insertBefore clash)
+            while still belonging to the same React root (so React 19
+            synthetic events like onMouseDown fire correctly). */}
+        {slash && filteredItems.length > 0 && typeof document !== "undefined" && createPortal(
           <div
             style={{
               position: "fixed",
               top: slash.y + 6,
-              left: Math.min(slash.x, (typeof window !== "undefined" ? window.innerWidth : 1200) - 260),
+              left: Math.min(slash.x, window.innerWidth - 260),
               zIndex: 9999,
               background: "white",
               border: "1px solid #e2e8f0",
@@ -396,7 +397,8 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
                 </div>
               </button>
             ))}
-          </div>
+          </div>,
+          document.body
         )}
 
         {editor && (
