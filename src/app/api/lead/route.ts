@@ -40,6 +40,103 @@ function leadTypeLabel(type: LeadPayload["type"]) {
   return "Formulario web";
 }
 
+function row(label: string, value: string | undefined) {
+  const v = value || "-";
+  return `
+    <tr>
+      <td style="padding:6px 12px 6px 0;color:#94a3b8;font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap;vertical-align:top;">${label}</td>
+      <td style="padding:6px 0;color:#f1f5f9;font-size:14px;vertical-align:top;word-break:break-all;">${v}</td>
+    </tr>`;
+}
+
+function buildMailHtml(payload: LeadPayload, typeLabel: string): string {
+  const utmEntries = Object.entries(payload.utm || {})
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(" · ") || "-";
+
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nuevo lead — THO</title>
+</head>
+<body style="margin:0;padding:0;background:#0f1117;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0f1117;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;">
+
+          <!-- Brand divider top -->
+          <tr>
+            <td style="height:5px;border-radius:4px 4px 0 0;background:linear-gradient(90deg,#d13ca2 0 20%,#1e71b8 20% 40%,#fa7f33 40% 60%,#f2b705 60% 80%,#93bf24 80% 100%);"></td>
+          </tr>
+
+          <!-- Card -->
+          <tr>
+            <td style="background:#161b24;border:1px solid rgba(71,85,105,0.45);border-top:0;border-radius:0 0 12px 12px;padding:32px 32px 28px;">
+
+              <!-- Logo / Header -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:24px;">
+                <tr>
+                  <td>
+                    <span style="font-size:20px;font-weight:800;letter-spacing:-0.04em;color:#f8fafc;">THO</span>
+                    <span style="font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#475569;margin-left:10px;">Notificación interna</span>
+                  </td>
+                  <td align="right">
+                    <span style="display:inline-block;background:rgba(147,191,36,0.15);color:#93bf24;font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid rgba(147,191,36,0.35);">${typeLabel}</span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Title -->
+              <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;letter-spacing:-0.04em;color:#f8fafc;line-height:1.1;">Nuevo lead capturado</h1>
+              ${payload.eventLabel ? `<p style="margin:0 0 24px;font-size:14px;color:#64748b;">${payload.eventLabel}</p>` : `<p style="margin:0 0 24px;"></p>`}
+
+              <!-- Contact info -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e2535;border-radius:8px;padding:4px 16px;margin-bottom:20px;">
+                <tbody>
+                  ${row("Nombre", payload.name)}
+                  ${row("Email", payload.email)}
+                  ${row("Empresa", payload.company)}
+                  ${row("Teléfono", payload.phone)}
+                  ${payload.message ? row("Mensaje", payload.message) : ""}
+                </tbody>
+              </table>
+
+              <!-- Divider -->
+              <div style="height:1px;background:rgba(71,85,105,0.4);margin:20px 0;"></div>
+
+              <!-- Origin context -->
+              <p style="margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#475569;">Contexto de origen</p>
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e2535;border-radius:8px;padding:4px 16px;margin-bottom:20px;">
+                <tbody>
+                  ${row("Source", payload.source)}
+                  ${row("Resource", payload.resourceName || payload.resourceId)}
+                  ${row("Servicio", payload.serviceName || payload.serviceSlug)}
+                  ${row("Nivel", payload.levelName || payload.levelId)}
+                  ${row("Ticket", payload.ticket)}
+                  ${row("URL", payload.pageUrl)}
+                  ${row("UTM", utmEntries)}
+                </tbody>
+              </table>
+
+              <!-- Footer -->
+              <p style="margin:28px 0 0;font-size:11px;color:#334155;text-align:center;">
+                Este correo fue generado automáticamente por <strong style="color:#475569;">tho.cl</strong>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+
 function buildMail(payload: LeadPayload) {
   const context = [
     payload.eventLabel,
@@ -52,11 +149,12 @@ function buildMail(payload: LeadPayload) {
     .join(" · ");
 
   const subjectSuffix = context ? ` (${context})` : "";
+  const typeLabel = leadTypeLabel(payload.type);
 
   const lines = [
     "Nuevo lead capturado",
     "",
-    `Tipo: ${leadTypeLabel(payload.type)}`,
+    `Tipo: ${typeLabel}`,
     `Evento: ${payload.eventLabel || "-"}`,
     `Nombre: ${payload.name || "-"}`,
     `Email: ${payload.email || "-"}`,
@@ -79,8 +177,9 @@ function buildMail(payload: LeadPayload) {
   ];
 
   return {
-    subject: `Nuevo lead — ${leadTypeLabel(payload.type)}${subjectSuffix}`,
+    subject: `Nuevo lead — ${typeLabel}${subjectSuffix}`,
     text: lines.join("\n"),
+    html: buildMailHtml(payload, typeLabel),
   };
 }
 
@@ -103,6 +202,7 @@ export async function POST(req: Request) {
         to: "hola@tho.cl",
         subject: mail.subject,
         text: mail.text,
+        html: mail.html,
       }),
       pushToCRM(payload),
     ]);
