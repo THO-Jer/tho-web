@@ -67,7 +67,16 @@ export default function StudioClimaPage() {
     if (!authorized) return;
     fetch("/api/clima/ronda", { credentials: "include" })
       .then((r) => r.json())
-      .then((data) => setRonda(data.ronda || null))
+      .then((data) => {
+        if (data.ronda !== undefined) {
+          setRonda(data.ronda || null);
+        } else if (Array.isArray(data.rondas)) {
+          // Admins reciben lista completa — buscar la ronda activa
+          setRonda(data.rondas.find((r: Ronda) => r.estado === "activa") || null);
+        } else {
+          setRonda(null);
+        }
+      })
       .catch(() => setRonda(null))
       .finally(() => setLoadingRonda(false));
   }, [authorized]);
