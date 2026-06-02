@@ -11,7 +11,7 @@
  *   para una lección, usando moduleALessonGuides como base.
  */
 
-import { moduleALessonGuides, moduleCLessonGuides, type LessonGuide } from "@/content/onboarding/lessonGuides";
+import { moduleALessonGuides, moduleCLessonGuides, moduleDLessonGuides, type LessonGuide } from "@/content/onboarding/lessonGuides";
 
 export type Lesson = {
   id: string;
@@ -144,7 +144,17 @@ export function topicToLesson(topic: string, lessons: Array<{ id: string; label:
   if (t === "creativa_continuidad") return findById("C9") || firstOfModule("C") || lessons[0];
   if (t.startsWith("creativa") || t.startsWith("operacion_creativa") || t.startsWith("operacion")) return firstOfModule("C") || lessons[0];
 
-  // Módulo D — fallback genérico hasta que se editorialice
+  // Módulo D — mapeo específico por topic
+  if (t === "asesorias_que_es") return findById("D1") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_marcos") return findById("D2") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_estructura") return findById("D3") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_diagnostico") return findById("D4") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_diseno") return findById("D5") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_dod") return findById("D6") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_trazabilidad") return findById("D7") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_etica") return findById("D8") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_formacion") return findById("D9") || firstOfModule("D") || lessons[0];
+  if (t === "asesorias_alertas") return findById("D10") || firstOfModule("D") || lessons[0];
   if (t.startsWith("operacion_asesorias") || t.startsWith("seguridad")) return firstOfModule("D") || lessons[0];
 
   return lessons[0];
@@ -153,6 +163,7 @@ export function topicToLesson(topic: string, lessons: Array<{ id: string; label:
 export function getLessonGuide(moduleKey: string, lesson: Lesson): LessonGuide {
   if (moduleKey === "A" && moduleALessonGuides[lesson.id]) return moduleALessonGuides[lesson.id];
   if (moduleKey === "C" && moduleCLessonGuides[lesson.id]) return moduleCLessonGuides[lesson.id];
+  if (moduleKey === "D" && moduleDLessonGuides[lesson.id]) return moduleDLessonGuides[lesson.id];
   return {
     whyItMatters: `Esta lección define criterio operativo para ${moduleKey}.`,
     whatToDo: "Traduce el contenido en una acción concreta, registra decisión y responsable.",

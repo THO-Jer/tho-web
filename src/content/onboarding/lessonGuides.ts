@@ -36,6 +36,17 @@ export const topicReviewLabel: Record<string, string> = {
   ventas_cierre: "Cierre y formalización",
   // Módulo C
   creativa_scrum: "Scrum adaptado a THO",
+  // Módulo D (se añade aquí para topicReviewLabel)
+  asesorias_que_es: "Qué significa asesorar en THO",
+  asesorias_marcos: "Marcos conceptuales mínimos",
+  asesorias_estructura: "Estructura de una intervención",
+  asesorias_diagnostico: "Diagnóstico interpretativo",
+  asesorias_diseno: "Diseño estratégico",
+  asesorias_dod: "DoD en asesorías",
+  asesorias_trazabilidad: "Documentación y trazabilidad",
+  asesorias_etica: "Ética en asesorías",
+  asesorias_formacion: "Formación avanzada",
+  asesorias_alertas: "Señales de alerta",
   creativa_estructura: "Estructura documental en Teams",
   creativa_excel: "Excel anual como eje organizador",
   creativa_kickoff: "Kickoff y brief general",
@@ -158,5 +169,74 @@ export const moduleCLessonGuides: Record<string, LessonGuide> = {
     whatToDo: "Al cerrar cada pieza y cada período, aplica el test de continuidad. Si falla, el trabajo no está terminado.",
     commonMistake: "Confundir compromiso personal con continuidad institucional: el trabajo debe funcionar sin la persona que lo hizo.",
     keyLearnings: ["Conozco el test de continuidad", "Sé qué construye y qué destruye continuidad", "Aplico la regla final: sin trazabilidad no está done"],
+  },
+};
+
+export const moduleDLessonGuides: Record<string, LessonGuide> = {
+  D1: {
+    whyItMatters: "Define el encuadre completo del trabajo de asesoría en THO: no ejecutar tareas, no validar decisiones ya tomadas, sino intervenir sistemas complejos con método.",
+    whatToDo: "Antes de cada asesoría, verifica: ¿estás diagnosticando o validando? ¿Tu recomendación considera cultura, poder e incentivos o solo la lógica formal del problema?",
+    commonMistake: "Tratar la asesoría como producción de documentos. El valor está en el criterio aplicado, no en el objeto entregado.",
+    keyLearnings: ["Distingo asesorar de ejecutar o validar", "Identifico las 6 dimensiones de un sistema organizacional", "Sé qué significa 'hacer visible la complejidad'"],
+  },
+  D2: {
+    whyItMatters: "Sin marcos explícitos, el criterio es no auditable. Los marcos protegen institucionalmente y mejoran la calidad del análisis.",
+    whatToDo: "Al iniciar un diagnóstico, identifica cuál de los cuatro marcos es más relevante para el contexto. Nómbralo en el documento.",
+    commonMistake: "Aplicar los cuatro marcos mecánicamente en lugar de seleccionar el más pertinente según el tipo de problema.",
+    keyLearnings: ["Puedo explicar los 4 marcos base", "Sé cuándo es más relevante cada uno", "Entiendo cómo se superponen en la práctica"],
+  },
+  D3: {
+    whyItMatters: "La secuencia protege la calidad del trabajo. Saltarse fases acumula riesgos que aparecen más tarde.",
+    whatToDo: "Al iniciar una intervención, mapea en qué fase estás y qué produce esa fase. No avances a la siguiente sin el insumo correspondiente.",
+    commonMistake: "Saltarse el diagnóstico por presión de tiempo y llegar al diseño sin saber cuál es el problema real.",
+    keyLearnings: ["Conozco las 6 fases y qué produce cada una", "Sé cuándo el cliente está en cada fase", "Identifico la pregunta clave de cada etapa"],
+  },
+  D4: {
+    whyItMatters: "Un diagnóstico descriptivo acumula datos pero no produce claridad. Solo la interpretación estructura la información para que el cliente pueda actuar.",
+    whatToDo: "Al finalizar el diagnóstico, verifica que tienes una hipótesis sobre causas, evidencia que la respalde y actores críticos identificados.",
+    commonMistake: "Presentar al cliente un informe lleno de información sin una hipótesis central que la articule.",
+    keyLearnings: ["Distingo diagnóstico descriptivo de interpretativo", "Conozco las herramientas disponibles", "Sé qué debe producir un diagnóstico completo"],
+  },
+  D5: {
+    whyItMatters: "El diseño que presenta solo una alternativa desplaza la decisión de quien debe tomarla y expone a THO si la implementación no funciona.",
+    whatToDo: "Presenta siempre dos o más alternativas con supuestos, ventajas, limitaciones y riesgos explícitos. Deja la decisión al cliente.",
+    commonMistake: "Presentar 'la solución óptima' en lugar de alternativas con implicaciones claras.",
+    keyLearnings: ["Conozco los 5 principios del diseño estratégico", "Sé estructurar cada alternativa con sus 5 componentes", "Identifico los 4 tipos de riesgo a evaluar"],
+  },
+  D6: {
+    whyItMatters: "Un entregable sin los 6 elementos del DoD puede parecer completo y no lo es. El cliente recibe información pero no puede actuar sobre ella.",
+    whatToDo: "Antes de enviar cualquier entregable al cliente, verifica los 6 elementos. Si falta uno, no está listo.",
+    commonMistake: "Entregar informes detallados sin próximos pasos ni responsables definidos. El trabajo termina en el documento.",
+    keyLearnings: ["Conozco los 6 elementos del DoD en asesorías", "Identifico el ejemplo de falla de cada elemento", "Aplico el estándar independientemente del tamaño del entregable"],
+  },
+  D7: {
+    whyItMatters: "Sin trazabilidad, THO no puede defender su criterio ante conflictos ni garantizar continuidad cuando el equipo cambia.",
+    whatToDo: "Registra en tiempo real: decisiones con criterio, cambios de alcance, riesgos identificados y acuerdos con el cliente.",
+    commonMistake: "Documentar al final del proyecto cuando el contexto y los detalles ya se perdieron.",
+    keyLearnings: ["Sé qué registrar en una asesoría", "Conozco el estándar de trazabilidad THO", "Distingo documentación obligatoria de valor agregado"],
+  },
+  D8: {
+    whyItMatters: "La independencia de criterio es el activo central de THO. Sin ella, el trabajo pierde su valor diferencial.",
+    whatToDo: "Si sientes presión para exagerar, omitir o ajustar conclusiones, nómbralo explícitamente antes de ceder.",
+    commonMistake: "Omitir riesgos porque el cliente no quiere escucharlos, justificándolo como 'proteger la relación'.",
+    keyLearnings: ["Conozco las 3 prohibiciones éticas", "Sé identificar cuándo debo declinar", "Entiendo por qué la independencia es el activo central de THO"],
+  },
+  D9: {
+    whyItMatters: "La base instalada en este módulo es condición necesaria pero no suficiente. La profundización define la capacidad de THO para abordar proyectos de mayor complejidad.",
+    whatToDo: "Identifica qué track es más relevante para tus proyectos actuales y coordina la profundización con el director.",
+    commonMistake: "Asumir que la formación avanzada es optativa o diferible indefinidamente.",
+    keyLearnings: ["Conozco los 5 tracks de profundización", "Sé cuál es más relevante para mi rol", "Entiendo la lógica de especialización gradual en THO"],
+  },
+  D10: {
+    whyItMatters: "Una señal de alerta ignorada no desaparece; se acumula y escala. El costo de nombrarla a tiempo siempre es menor.",
+    whatToDo: "Al detectar cualquiera de las 5 señales, nómbrala explícitamente al cliente o al equipo. No continúes en silencio.",
+    commonMistake: "Racionalizar señales de alerta como 'parte del proceso' para evitar conversaciones difíciles.",
+    keyLearnings: ["Conozco las 5 señales de riesgo metodológico", "Sé cuál es la respuesta correcta ante cada una", "Entiendo que nombrar lo incómodo es parte del estándar profesional"],
+  },
+  "Cierre del módulo": {
+    whyItMatters: "El cierre consolida el criterio del módulo: asesorar es mejorar decisiones organizacionales, no producir documentos.",
+    whatToDo: "Identifica en qué proyectos actuales puedes aplicar el DoD, la trazabilidad y los marcos conceptuales de este módulo.",
+    commonMistake: "Completar el módulo sin traducir el contenido en compromisos operativos concretos para el trabajo real.",
+    keyLearnings: ["Tengo claro qué significa asesorar en THO", "Sé qué aplico desde el día uno y qué viene en formación avanzada", "Identifico mi próximo paso de desarrollo en asesorías"],
   },
 };

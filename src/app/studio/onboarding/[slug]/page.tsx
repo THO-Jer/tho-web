@@ -32,6 +32,17 @@ import { LessonC6 } from "@/components/onboarding/lessons/LessonC6";
 import { LessonC7 } from "@/components/onboarding/lessons/LessonC7";
 import { LessonC8 } from "@/components/onboarding/lessons/LessonC8";
 import { LessonC9 } from "@/components/onboarding/lessons/LessonC9";
+import { LessonD1 } from "@/components/onboarding/lessons/LessonD1";
+import { LessonD2 } from "@/components/onboarding/lessons/LessonD2";
+import { LessonD3 } from "@/components/onboarding/lessons/LessonD3";
+import { LessonD4 } from "@/components/onboarding/lessons/LessonD4";
+import { LessonD5 } from "@/components/onboarding/lessons/LessonD5";
+import { LessonD6 } from "@/components/onboarding/lessons/LessonD6";
+import { LessonD7 } from "@/components/onboarding/lessons/LessonD7";
+import { LessonD8 } from "@/components/onboarding/lessons/LessonD8";
+import { LessonD9 } from "@/components/onboarding/lessons/LessonD9";
+import { LessonD10 } from "@/components/onboarding/lessons/LessonD10";
+import { LessonDCierre } from "@/components/onboarding/lessons/LessonDCierre";
 import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
 import {
   getLessonGuide,
@@ -308,6 +319,33 @@ export default function StudioOnboardingUnitPage() {
           return <LessonC8 {...shellProps} />;
         case "C9":
           return <LessonC9 {...shellProps} />;
+      }
+    }
+
+    if (moduleKey === "D") {
+      switch (lesson.id) {
+        case "D1":
+          return <LessonD1 {...shellProps} />;
+        case "D2":
+          return <LessonD2 {...shellProps} />;
+        case "D3":
+          return <LessonD3 {...shellProps} />;
+        case "D4":
+          return <LessonD4 {...shellProps} />;
+        case "D5":
+          return <LessonD5 {...shellProps} />;
+        case "D6":
+          return <LessonD6 {...shellProps} />;
+        case "D7":
+          return <LessonD7 {...shellProps} />;
+        case "D8":
+          return <LessonD8 {...shellProps} />;
+        case "D9":
+          return <LessonD9 {...shellProps} />;
+        case "D10":
+          return <LessonD10 {...shellProps} />;
+        case "Cierre del módulo":
+          return <LessonDCierre {...shellProps} />;
       }
     }
 
