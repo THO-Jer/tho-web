@@ -11,7 +11,7 @@
  *   para una lección, usando moduleALessonGuides como base.
  */
 
-import { moduleALessonGuides, type LessonGuide } from "@/content/onboarding/lessonGuides";
+import { moduleALessonGuides, moduleCLessonGuides, type LessonGuide } from "@/content/onboarding/lessonGuides";
 
 export type Lesson = {
   id: string;
@@ -103,7 +103,7 @@ export function unitTopicMap(slug: string, topic: string) {
       "trazabilidad",
     ],
     "ventas-tho": ["ventas"],
-    "operacion-creativa": ["operacion_creativa", "operacion"],
+    "operacion-creativa": ["operacion_creativa", "creativa", "operacion"],
     "operacion-asesorias": ["operacion_asesorias", "seguridad"],
   };
   return (byUnit[slug] || []).some((prefix) => t.startsWith(prefix));
@@ -132,8 +132,19 @@ export function topicToLesson(topic: string, lessons: Array<{ id: string; label:
   if (t === "ventas_cierre") return findById("B7") || firstOfModule("B") || lessons[0];
   if (t.startsWith("ventas")) return firstOfModule("B") || lessons[0];
 
-  // Módulos C y D — fallback genérico hasta que se editorialicen y se refine
-  if (t.startsWith("operacion_creativa") || t.startsWith("operacion")) return firstOfModule("C") || lessons[0];
+  // Módulo C — mapeo específico por topic
+  if (t === "creativa_scrum") return findById("C1") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_estructura") return findById("C2") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_excel") return findById("C3") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_kickoff") return findById("C4") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_produccion") return findById("C5") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_dod") return findById("C6") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_cierre") return findById("C7") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_sensible") return findById("C8") || firstOfModule("C") || lessons[0];
+  if (t === "creativa_continuidad") return findById("C9") || firstOfModule("C") || lessons[0];
+  if (t.startsWith("creativa") || t.startsWith("operacion_creativa") || t.startsWith("operacion")) return firstOfModule("C") || lessons[0];
+
+  // Módulo D — fallback genérico hasta que se editorialice
   if (t.startsWith("operacion_asesorias") || t.startsWith("seguridad")) return firstOfModule("D") || lessons[0];
 
   return lessons[0];
@@ -141,6 +152,7 @@ export function topicToLesson(topic: string, lessons: Array<{ id: string; label:
 
 export function getLessonGuide(moduleKey: string, lesson: Lesson): LessonGuide {
   if (moduleKey === "A" && moduleALessonGuides[lesson.id]) return moduleALessonGuides[lesson.id];
+  if (moduleKey === "C" && moduleCLessonGuides[lesson.id]) return moduleCLessonGuides[lesson.id];
   return {
     whyItMatters: `Esta lección define criterio operativo para ${moduleKey}.`,
     whatToDo: "Traduce el contenido en una acción concreta, registra decisión y responsable.",

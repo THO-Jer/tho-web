@@ -352,16 +352,128 @@ export const defaultOnboardingQuiz: OnboardingQuizQuestion[] = [
   },
 
   // =====================================================
-  // MÓDULO C — Operación Creativa (pendiente)
+  // MÓDULO C — Operación Creativa
   // =====================================================
-  // TODO: agregar 10 preguntas cuando se editorialice el módulo C.
-  // Patrón a seguir (mismo que B):
-  //   - 10 preguntas, una por lección aproximadamente.
-  //   - Topics empezando en "operacion_creativa_*" o "operacion_*" para que
-  //     unitTopicMap las enganche al slug "operacion-creativa".
-  //   - Recordar agregar entradas equivalentes en topicReviewLabel
-  //     (src/content/onboarding/lessonGuides.ts) y refinar topicToLesson
-  //     (src/lib/onboarding.ts) para mapear cada topic a su lección.
+  {
+    id: "c-q1",
+    prompt: "En THO, ¿cuál es el propósito real de aplicar principios Scrum en operación creativa?",
+    options: [
+      "Tener reuniones diarias de sincronización obligatorias.",
+      "Asegurar orden, visibilidad y control de riesgo operativo con ciclos cortos y roles definidos.",
+      "Usar el tablero Kanban solo cuando el proyecto es grande.",
+      "Cumplir con una exigencia metodológica formal sin impacto práctico.",
+    ],
+    correctIndex: 1,
+    topic: "creativa_scrum",
+  },
+  {
+    id: "c-q2",
+    prompt: "Un cliente pide producir piezas de Instagram antes de validar los lineamientos de marca. ¿Qué corresponde?",
+    options: [
+      "Producir igual para no perder tiempo, ajustando después si hay cambios.",
+      "Producir una pieza de prueba para que el cliente vea el estilo.",
+      "Detener la producción: validar el brief general es el primer paso obligatorio.",
+      "Usar referencias del trabajo anterior del cliente como base suficiente.",
+    ],
+    correctIndex: 2,
+    topic: "creativa_kickoff",
+  },
+  {
+    id: "c-q3",
+    prompt: "El Excel anual tiene un Post 7 registrado, pero no hay carpeta 'Post 7' en 02_publicaciones. ¿Qué situación describe esto?",
+    options: [
+      "Error menor: se puede buscar el archivo en el escritorio del diseñador.",
+      "Quiebre de la correspondencia obligatoria Excel–carpeta: el ciclo operativo no está cerrado.",
+      "Situación normal si la pieza aún está en producción.",
+      "Solo es problema si el cliente pregunta por la pieza.",
+    ],
+    correctIndex: 1,
+    topic: "creativa_excel",
+  },
+  {
+    id: "c-q4",
+    prompt: "¿Cuál de estas acciones quiebra el estándar de la estructura documental en Teams?",
+    options: [
+      "Crear una carpeta 02_publicaciones dentro de XX_Instagram.",
+      "Guardar archivos finales en el escritorio del computador para trabajar más rápido.",
+      "Actualizar el Excel anual al publicar cada pieza.",
+      "Nombrar la carpeta del año activo como '2026'.",
+    ],
+    correctIndex: 1,
+    topic: "creativa_estructura",
+  },
+  {
+    id: "c-q5",
+    prompt: "Una pieza tiene excelente calidad estética, está aprobada por el cliente, pero no tiene número en el Excel ni está en la carpeta correcta. Según la DoD creativa, ¿está terminada?",
+    options: [
+      "Sí, porque el cliente la aprobó.",
+      "Sí, si se publica en el plazo acordado.",
+      "No: no cumple los criterios de numeración correcta ni almacenamiento correcto.",
+      "Depende de si hay urgencia de publicación.",
+    ],
+    correctIndex: 2,
+    topic: "creativa_dod",
+  },
+  {
+    id: "c-q6",
+    prompt: "El cliente envía feedback sobre una pieza por WhatsApp a tres personas distintas del equipo, con comentarios contradictorios. ¿Qué corresponde según el estándar THO?",
+    options: [
+      "Aplicar el feedback de quien tiene más jerarquía en el cliente.",
+      "Hacer un promedio de los comentarios y aplicar los más repetidos.",
+      "Solicitar al Product Owner que consolide el feedback en un solo canal antes de aplicar cambios.",
+      "Responder a todos por WhatsApp confirmando los cambios que corresponden.",
+    ],
+    correctIndex: 2,
+    topic: "creativa_produccion",
+  },
+  {
+    id: "c-q7",
+    prompt: "Una pieza se publicó correctamente. ¿Cuál es el siguiente paso obligatorio según el protocolo de cierre?",
+    options: [
+      "Comenzar inmediatamente la siguiente pieza para mantener el ritmo.",
+      "Registrar el enlace publicado en el Excel y verificar el orden documental de la carpeta.",
+      "Enviar el enlace al cliente por WhatsApp para confirmación.",
+      "Archivar la carpeta del post en 99_archivo.",
+    ],
+    correctIndex: 1,
+    topic: "creativa_cierre",
+  },
+  {
+    id: "c-q8",
+    prompt: "Un integrante del equipo necesita trabajar desde casa y sube fotos no publicadas del cliente a su Google Drive personal. ¿Cómo describe mejor el estándar THO esta situación?",
+    options: [
+      "Aceptable si el acceso es solo temporal y la información no se comparte.",
+      "Quiebre del protocolo de información sensible: el material debe estar solo en Teams.",
+      "Aceptable si el integrante usa su correo corporativo.",
+      "Solo es problema si el cliente se entera.",
+    ],
+    correctIndex: 1,
+    topic: "creativa_sensible",
+  },
+  {
+    id: "c-q9",
+    prompt: "Un nuevo integrante se incorpora a un proyecto activo. Al entrar a Teams, no puede entender el estado del proyecto ni qué piezas están aprobadas. ¿Qué indica esto?",
+    options: [
+      "Que el nuevo integrante necesita más tiempo de adaptación.",
+      "Que el proyecto no tiene continuidad operativa suficiente.",
+      "Que Teams no es una herramienta adecuada para ese tipo de proyecto.",
+      "Que falta una reunión de traspaso presencial.",
+    ],
+    correctIndex: 1,
+    topic: "creativa_continuidad",
+  },
+  {
+    id: "c-q10",
+    prompt: "Al inicio de un proyecto creativo nuevo no hay Product Owner definido del lado del cliente. ¿Qué refleja mejor el estándar THO?",
+    options: [
+      "Se puede iniciar la producción y definir el Product Owner en la primera revisión.",
+      "Se puede avanzar con feedback de varias personas del cliente hasta que nombren a uno.",
+      "Es una señal de alerta: no se debe iniciar producción sin Product Owner funcional.",
+      "El equipo THO asume la función de Product Owner internamente.",
+    ],
+    correctIndex: 2,
+    topic: "creativa_kickoff",
+  },
 
   // =====================================================
   // MÓDULO D — Operación Asesorías (pendiente)

@@ -23,6 +23,15 @@ import { LessonB4 } from "@/components/onboarding/lessons/LessonB4";
 import { LessonB5 } from "@/components/onboarding/lessons/LessonB5";
 import { LessonB6 } from "@/components/onboarding/lessons/LessonB6";
 import { LessonB7 } from "@/components/onboarding/lessons/LessonB7";
+import { LessonC1 } from "@/components/onboarding/lessons/LessonC1";
+import { LessonC2 } from "@/components/onboarding/lessons/LessonC2";
+import { LessonC3 } from "@/components/onboarding/lessons/LessonC3";
+import { LessonC4 } from "@/components/onboarding/lessons/LessonC4";
+import { LessonC5 } from "@/components/onboarding/lessons/LessonC5";
+import { LessonC6 } from "@/components/onboarding/lessons/LessonC6";
+import { LessonC7 } from "@/components/onboarding/lessons/LessonC7";
+import { LessonC8 } from "@/components/onboarding/lessons/LessonC8";
+import { LessonC9 } from "@/components/onboarding/lessons/LessonC9";
 import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
 import {
   getLessonGuide,
@@ -276,6 +285,29 @@ export default function StudioOnboardingUnitPage() {
           return <LessonB6 {...shellProps} />;
         case "B7":
           return <LessonB7 {...shellProps} />;
+      }
+    }
+
+    if (moduleKey === "C") {
+      switch (lesson.id) {
+        case "C1":
+          return <LessonC1 {...shellProps} />;
+        case "C2":
+          return <LessonC2 {...shellProps} />;
+        case "C3":
+          return <LessonC3 {...shellProps} />;
+        case "C4":
+          return <LessonC4 {...shellProps} />;
+        case "C5":
+          return <LessonC5 {...shellProps} />;
+        case "C6":
+          return <LessonC6 {...shellProps} />;
+        case "C7":
+          return <LessonC7 {...shellProps} />;
+        case "C8":
+          return <LessonC8 {...shellProps} />;
+        case "C9":
+          return <LessonC9 {...shellProps} />;
       }
     }
 
