@@ -10,9 +10,9 @@ import { SynthesisBox } from "@/components/onboarding/SynthesisBox";
  * Estructura:
  *  1. Premisa.
  *  2. Reglas de producción (BulletSection con closing).
- *  3. Checklist de revisión interna (lista numerada en card).
- *  4. Callout regla feedback del cliente.
- *  5. Control de versiones (BulletSection con closing).
+ *  3. Revisión interna — checklist en card numerada.
+ *  4. Callout: feedback consolidado por PO · canal formal Teams.
+ *  5. Versiones en carpeta (sin nomenclatura cerrada; estado en Kanban).
  *  6. Síntesis.
  */
 export function LessonC5({
@@ -68,7 +68,7 @@ export function LessonC5({
         )}
       </div>
 
-      {/* Control de versiones */}
+      {/* Versiones sin nomenclatura cerrada */}
       <BulletSection
         className="mt-8"
         tone="card"

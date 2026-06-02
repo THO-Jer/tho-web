@@ -8,11 +8,11 @@ import { SynthesisBox } from "@/components/onboarding/SynthesisBox";
  * C1 · Marco metodológico — "Scrum adaptado a THO"
  *
  * Estructura:
- *  1. Premisa (3 líneas).
- *  2. Principios Scrum que sí aplicamos (BulletSection).
- *  3. Tabla de roles Scrum de referencia vs. equivalente THO (3 cols).
- *  4. Adaptación a THO (BulletSection con closing).
- *  5. Callout regla Kanban.
+ *  1. Premisa (qué es Scrum + por qué THO lo adapta).
+ *  2. Principios que sí aplicamos (BulletSection).
+ *  3. Tabla de roles con equivalente THO actual (nota de escala incluida).
+ *  4. Por qué los roles se superponen hoy (BulletSection con closing).
+ *  5. Callout Kanban en Planner · 3 depósitos.
  *  6. Traducción operativa (BulletSection).
  *  7. Síntesis.
  */
@@ -54,7 +54,7 @@ export function LessonC1({
           <div className="hidden border-b border-slate-200 bg-slate-100 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600 sm:grid sm:grid-cols-3 sm:gap-2">
             <p>Rol Scrum</p>
             <p>Función original</p>
-            <p>Equivalente en THO</p>
+            <p>En THO hoy</p>
           </div>
           <div className="divide-y divide-slate-200">
             {d.rolesTable.rows.map((row) => (
@@ -68,7 +68,7 @@ export function LessonC1({
         </div>
       </section>
 
-      {/* Adaptación a THO */}
+      {/* Por qué se superponen hoy */}
       <BulletSection
         className="mt-8"
         heading={d.thoAdaptation.heading}
@@ -77,7 +77,7 @@ export function LessonC1({
         closing={d.thoAdaptation.closing}
       />
 
-      {/* Callout Kanban */}
+      {/* Callout Kanban · 3 depósitos */}
       <div className="mt-8 rounded-xl border border-violet-200 bg-violet-50 p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-violet-700">{d.kanbanRule.label}</p>
         <p className="mt-1 text-[17px] font-semibold leading-snug text-slate-900">{d.kanbanRule.statement}</p>

@@ -8,9 +8,9 @@ import { SynthesisBox } from "@/components/onboarding/SynthesisBox";
  *
  * Estructura:
  *  1. Premisa.
- *  2. Los 7 criterios DoD (tabla criterio + pregunta).
- *  3. Grid 2 columnas: Estética vs. Método.
- *  4. Callout riesgo pieza a medias.
+ *  2. Criterios DoD (tabla criterio + pregunta de validación).
+ *  3. Grid 2 columnas: Sin método vs. Con método.
+ *  4. Callout riesgo pieza a medias (con referencia explícita a Kanban y Excel).
  *  5. Síntesis.
  */
 export function LessonC6({
@@ -34,7 +34,7 @@ export function LessonC6({
     >
       <LessonIntro paragraphs={d.premise} keyPrefix="c6-premise" />
 
-      {/* 7 criterios DoD */}
+      {/* Criterios DoD */}
       <section className="mt-8">
         <h3 className="text-xl font-semibold text-slate-900">{d.dodCriteria.heading}</h3>
         <p className="mt-2 text-[16px] leading-relaxed text-slate-700">{d.dodCriteria.intro}</p>
@@ -54,7 +54,7 @@ export function LessonC6({
         </div>
       </section>
 
-      {/* Grid Estética vs. Método */}
+      {/* Grid Sin método / Con método */}
       <section className="mt-8">
         <h3 className="text-xl font-semibold text-slate-900">{d.aestheticsVsMethod.heading}</h3>
         <div className="mt-3 grid gap-4 md:grid-cols-2">

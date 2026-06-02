@@ -1,5 +1,4 @@
 import { continuityCLessonC9 } from "@/content/onboarding/moduleC";
-import { BulletSection } from "@/components/onboarding/BulletSection";
 import { LessonIntro } from "@/components/onboarding/LessonIntro";
 import { LessonShell } from "@/components/onboarding/LessonShell";
 import { SynthesisBox } from "@/components/onboarding/SynthesisBox";
@@ -9,10 +8,10 @@ import { SynthesisBox } from "@/components/onboarding/SynthesisBox";
  *
  * Estructura:
  *  1. Premisa.
- *  2. El test de continuidad (lista numerada en card).
+ *  2. Test de continuidad (lista numerada en card) — referencia explícita a Kanban vs. Excel.
  *  3. Grid 2 columnas: Qué destruye / Qué construye continuidad.
  *  4. Callout regla final Módulo C.
- *  5. Síntesis.
+ *  5. Síntesis (Excel = publicado; Kanban = estado de proceso).
  */
 export function LessonC9({
   elapsedSeconds,

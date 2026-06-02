@@ -8,9 +8,9 @@ import { SynthesisBox } from "@/components/onboarding/SynthesisBox";
  * C7 · Cierre y aprendizaje — "Cierre de piezas y documentación de aprendizajes"
  *
  * Estructura:
- *  1. Premisa.
- *  2. Pasos de cierre (cards apiladas step + detail).
- *  3. Protocolo de aprendizajes (BulletSection con intro y closing).
+ *  1. Premisa (Kanban + Excel + carpeta).
+ *  2. Pasos de cierre — cards numeradas (incluye paso Kanban y cierre colaborativo Excel).
+ *  3. Protocolo de aprendizajes (canales formales: Teams chat + acta en Recursos).
  *  4. Callout regla de continuidad.
  *  5. Síntesis.
  */
