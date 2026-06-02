@@ -376,7 +376,7 @@ function getUnitByTopic(units: OnboardingUnit[], topic: string) {
       "trazabilidad",
     ],
     "ventas-tho": ["ventas"],
-    "operacion-creativa": ["operacion_creativa", "operacion"],
+    "operacion-creativa": ["operacion_creativa", "creativa", "operacion"],
     "operacion-asesorias": ["operacion_asesorias", "seguridad"],
   };
   return units.find((unit) => (byUnit[unit.slug] || []).some((prefix) => t.startsWith(prefix)));

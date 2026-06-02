@@ -71,15 +71,15 @@ export const scrumAdaptationLessonC1: ScrumAdaptationLesson = {
   },
   rolesTable: {
     heading: "Roles de referencia y su lógica en THO",
-    intro: "Scrum define tres roles. En THO existen aunque aún no seamos suficientemente grandes para cumplir el marco completo:",
+    intro: "Scrum define tres roles. En THO los tres existen aunque aún no seamos suficientemente grandes para cumplir el marco completo. El PO y el SM son roles internos de THO — no del cliente:",
     rows: [
       {
-        role: "Product Owner",
-        function: "Consolida decisiones sobre qué producir. Administra el backlog y es el puente entre el cliente y el equipo.",
-        thoEquivalent: "Hoy: director de THO. Consolida feedback del cliente, aprueba dirección y protege al equipo de interrupciones externas.",
+        role: "Product Owner (PO)",
+        function: "Consolida decisiones sobre qué producir. Administra el backlog y es el puente entre la contraparte del cliente y el equipo.",
+        thoEquivalent: "Hoy: director de THO. Consolida feedback de la contraparte, aprueba dirección, protege al equipo. Nota: 'contraparte' es el contacto del cliente; el PO es siempre interno THO.",
       },
       {
-        role: "Scrum Master",
+        role: "Scrum Master (SM)",
         function: "Cuida el proceso, elimina obstáculos y protege al equipo de interrupciones externas.",
         thoEquivalent: "Hoy: también el director de THO. A medida que el equipo crece, esta función puede distribuirse.",
       },
@@ -369,7 +369,7 @@ export const kickoffLessonC4: KickoffLesson = {
       "El brief general define la estrategia, tono y personalidad del cliente. Todo tributa a él.",
       "Videos (reels) y gráficas complejas (carruseles, piezas de múltiple formato) pueden tener un brief específico según la complejidad del producto.",
       "El brief específico no reemplaza al general: lo complementa. El criterio creativo siempre responde a estrategia, tono y personalidad del cliente.",
-      "El PO es quien lleva la alineación de elementos gráficos con el cliente, consolida criterios y protege al equipo de correcciones contradictorias.",
+      "El PO (rol interno de THO) es quien lleva la alineación de elementos gráficos con la contraparte del cliente, consolida criterios y protege al equipo de correcciones contradictorias.",
     ],
   },
   kickoffChecklist: {
@@ -393,8 +393,8 @@ export const kickoffLessonC4: KickoffLesson = {
         why: "Define el tiempo disponible para producción, revisión y aprobación.",
       },
       {
-        item: "Responsable de consolidar feedback (PO) identificado",
-        why: "Sin PO funcional, el feedback llega fragmentado y genera trabajo contradictorio.",
+        item: "PO interno de THO activo y contraparte del cliente identificada",
+        why: "El PO (THO) consolida el feedback de la contraparte. Sin esta cadena clara, el feedback llega fragmentado y genera trabajo contradictorio.",
       },
     ],
   },
@@ -407,7 +407,7 @@ export const kickoffLessonC4: KickoffLesson = {
       "El cliente da feedback por múltiples canales sin que nadie lo consolide.",
       "Se pide producir antes de definir quién aprueba la versión final.",
     ],
-    closing: "El PO es quien gestiona estas tensiones hacia el cliente. El equipo creativo produce; el PO consolida y protege.",
+    closing: "El PO (interno THO) es quien gestiona estas tensiones con la contraparte del cliente. El equipo creativo produce; el PO consolida y protege.",
   },
   synthesis: [
     "El inicio establece criterios; el brief general es el ideal pero no siempre existe desde el día uno.",
@@ -463,10 +463,10 @@ export const productionReviewLessonC5: ProductionReviewLesson = {
   },
   clientFeedbackRule: {
     label: "Regla · Feedback del cliente",
-    statement: "El feedback del cliente siempre lo consolida el Product Owner.",
+    statement: "El feedback de la contraparte siempre lo consolida el PO (interno THO).",
     body: [
       "No se aplican cambios desde feedback fragmentado de múltiples personas del cliente.",
-      "El PO es quien filtra, consolida y comunica al equipo. Esto protege de versiones contradictorias.",
+      "El PO filtra, consolida y comunica al equipo creativo. Esto protege de versiones contradictorias.",
       "El canal formal de coordinación es el chat del cliente en Teams o, si es una coordinación específica, el chat de Teams correspondiente.",
     ],
   },
