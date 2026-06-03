@@ -723,7 +723,7 @@ export async function submitModuleQuiz(email: string, moduleKey: string, answers
     });
   } else {
     if (!state.quizAttemptsByEmail[nextRecord.email]) state.quizAttemptsByEmail[nextRecord.email] = [];
-    state.quizAttemptsByEmail[nextRecord.email].unshift({ module_key: moduleKey, score, max_score: total, missed_topics: Array.from(new Set(missedTopics)), submitted_at: now });
+    state.quizAttemptsByEmail[nextRecord.email].unshift({ module_key: moduleKey, score, max_score: total, missed_topics: Array.from(new Set(missedTopics)), submitted_at: now, passed });
     await writeStateToJson(state);
   }
 

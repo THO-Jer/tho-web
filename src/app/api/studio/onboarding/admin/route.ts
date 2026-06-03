@@ -6,6 +6,7 @@ import {
   getAdminOverview,
   getModuleCatalog,
   getModuleVisibilityConfig,
+  getOnboardingConfig,
   getUserQuizAttempts,
   listOnboardingRecords,
   resetModuleForUser,
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
     getModuleVisibilityConfig(),
     getModuleCatalog(),
   ]);
-  return NextResponse.json({ records, overview, attempts, visibility, moduleCatalog });
+  return NextResponse.json({ records, overview, attempts, visibility, moduleCatalog, config: getOnboardingConfig() });
 }
 
 export async function POST(req: NextRequest) {

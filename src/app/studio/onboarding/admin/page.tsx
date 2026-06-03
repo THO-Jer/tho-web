@@ -19,6 +19,7 @@ type RecordRow = {
 };
 
 type Attempt = { module_key: string; score: number; max_score: number; submitted_at: string; missed_topics?: string[]; passed?: boolean };
+type Config = { passScore: number };
 
 type ModuleCatalogItem = { key: string; title: string; slug: string };
 type Branch = { id: string; label: string; modules: string[] };
@@ -34,6 +35,7 @@ export default function StudioOnboardingAdminPage() {
   const [savingVisibility, setSavingVisibility] = useState(false);
   const [rows, setRows] = useState<RecordRow[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [config, setConfig] = useState<Config>({ passScore: 80 });
   const [selectedEmail, setSelectedEmail] = useState("");
   const [message, setMessage] = useState("");
   const [visibility, setVisibility] = useState<Visibility>(EMPTY_VISIBILITY);
@@ -49,6 +51,7 @@ export default function StudioOnboardingAdminPage() {
     const nextRows = (recordsData.records || []) as RecordRow[];
     setRows(nextRows);
     setModuleCatalog((recordsData.moduleCatalog || []) as ModuleCatalogItem[]);
+    if (recordsData.config?.passScore) setConfig({ passScore: Number(recordsData.config.passScore) });
     const vis = recordsData.visibility as Visibility | undefined;
     if (vis && Array.isArray(vis.branches)) {
       setVisibility({ branches: vis.branches, userOverrides: vis.userOverrides || {} });
@@ -201,6 +204,12 @@ export default function StudioOnboardingAdminPage() {
       else userOverrides[key] = next;
       return { ...prev, userOverrides };
     });
+  }
+
+  function attemptPassed(attempt: Attempt): boolean {
+    if (typeof attempt.passed === "boolean") return attempt.passed;
+    if (!attempt.max_score) return false;
+    return Math.round((attempt.score / attempt.max_score) * 100) >= config.passScore;
   }
 
   const completedCount = rows.filter((row) => Boolean(row.completed_at)).length;
@@ -417,7 +426,7 @@ export default function StudioOnboardingAdminPage() {
                   const failedTopics = Array.from(
                     new Set(
                       attempts
-                        .filter((a) => !a.passed)
+                        .filter((a) => !attemptPassed(a))
                         .flatMap((a) => a.missed_topics || [])
                     )
                   );
@@ -446,8 +455,8 @@ export default function StudioOnboardingAdminPage() {
                           <span className="font-semibold text-slate-800">
                             Módulo {attempt.module_key} · {attempt.score}/{attempt.max_score} pts
                           </span>
-                          <span className={`rounded px-1.5 py-0.5 font-semibold ${attempt.passed ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
-                            {attempt.passed ? "Aprobado" : "No aprobado"}
+                          <span className={`rounded px-1.5 py-0.5 font-semibold ${attemptPassed(attempt) ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+                            {attemptPassed(attempt) ? "Aprobado" : "No aprobado"}
                           </span>
                         </div>
                         <p className="mt-0.5 text-slate-500">{new Date(attempt.submitted_at).toLocaleString("es-CL")}</p>
