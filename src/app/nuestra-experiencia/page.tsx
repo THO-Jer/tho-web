@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+/* ── TIMELINE DATA ─────────────────────────────────────────────────────── */
+
 type Era = {
   id: string;
   year: string;
@@ -68,30 +70,97 @@ const ERAS: Era[] = [
   },
 ];
 
+/* ── PROJECTS DATA ─────────────────────────────────────────────────────── */
+
+type Project = {
+  id: string;
+  client: string;
+  title: string;
+  tag: string;
+  tagColor: string;
+  since: string;
+  summary: string;
+  detail: string;
+};
+
+const PROJECTS: Project[] = [
+  {
+    id: "cchc",
+    client: "CChC Concepción",
+    title: "Estrategia de Relacionamiento Comunitario",
+    tag: "Comunidad",
+    tagColor: "#1e71b8",
+    since: "Desde 2023",
+    summary:
+      "Acompañamiento continuo al vínculo entre el gremio de la construcción y las comunidades del Gran Concepción.",
+    detail:
+      "Desde el segundo semestre de 2023 acompañamos el relacionamiento con las comunidades del Gran Concepción. Desde encuentros iniciales hasta la elaboración de documentos de consenso sobre desarrollo urbano, generamos confianza mediante programas que permiten vínculos auténticos entre el gremio y las organizaciones sociocomunitarias. Entre esos programas se cuentan la Escuela Itinerante, los Encuentros de Diseño Participativo y el documento Visión 2050.",
+  },
+  {
+    id: "indama",
+    client: "INDAMA S.A.",
+    title: "Revista Interna",
+    tag: "Comunicación",
+    tagColor: "#d13ca2",
+    since: "2024",
+    summary:
+      "Revista trimestral para fortalecer la cultura organizacional desde adentro.",
+    detail:
+      "Acompañamos a INDAMA en la promoción de su cultura organizacional mediante una revista trimestral que abordaba los eventos, cambios y proyecciones más importantes para la empresa. Celebraciones como aniversarios, trabajadores con larga trayectoria, fiestas patrias e inauguración de nueva tecnología fueron contenidos valorados a lo largo del proceso.",
+  },
+  {
+    id: "paleoandes",
+    client: "Paleo Andes",
+    title: "Fortalecimiento Organizacional",
+    tag: "Desarrollo org.",
+    tagColor: "#93bf24",
+    since: "Desde 2026",
+    summary:
+      "Proceso de actualización de la arquitectura interna para una empresa de arqueología y paleontología.",
+    detail:
+      "Luego de un acercamiento en torno a la sostenibilidad en 2025, en 2026 iniciamos un proceso de fortalecimiento con foco en la arquitectura organizacional. La revisión del organigrama, el manual de cargos y las matrices de gestión interna permite mayor alineación, el desarrollo de una cultura organizacional sólida y un despliegue más coordinado de las distintas funciones de la empresa.",
+  },
+  {
+    id: "iap2",
+    client: "IAP2 Latinoamérica",
+    title: "Training en Participación Pública",
+    tag: "Formación",
+    tagColor: "#fa7f33",
+    since: "Desde 2025",
+    summary:
+      "Formaciones certificadas en el Enfoque IAP2 para organizaciones y empresas de la región.",
+    detail:
+      "Con la certificación internacional de nuestro director como entrenador IAP2, realizamos formaciones a distintas organizaciones y empresas en el Enfoque IAP2 para la Participación Pública. Esta alianza ha permitido una internacionalización del trabajo de THO y un intercambio de experiencias que enriquece cada asesoría.",
+  },
+];
+
+/* ── PAGE ──────────────────────────────────────────────────────────────── */
+
 export default function NuestraExperienciaPage() {
   const [activeId, setActiveId] = useState(ERAS[0].id);
-  const [visible, setVisible] = useState(false);
-  const prevIdRef = useRef(activeId);
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [panelVisible, setPanelVisible] = useState(false);
+  const [openProject, setOpenProject] = useState<string | null>(null);
 
   const activeEra = ERAS.find((e) => e.id === activeId) ?? ERAS[0];
 
   function selectEra(id: string) {
     if (id === activeId) return;
-    setVisible(false);
+    setPanelVisible(false);
     setTimeout(() => {
-      prevIdRef.current = id;
       setActiveId(id);
-      setVisible(true);
+      setPanelVisible(true);
     }, 180);
   }
 
+  function toggleProject(id: string) {
+    setOpenProject((prev) => (prev === id ? null : id));
+  }
+
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 80);
+    const t = setTimeout(() => setPanelVisible(true), 80);
     return () => clearTimeout(t);
   }, []);
 
-  // Reveal header elements on mount
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>("[data-exp-reveal]");
     els.forEach((el, i) => {
@@ -104,7 +173,8 @@ export default function NuestraExperienciaPage() {
       <Header />
 
       <main id="contenido" className="exp2-page">
-        {/* Page header */}
+
+        {/* ── Page header ── */}
         <div className="exp2-hero">
           <div className="exp2-hero-inner">
             <p className="exp2-eyebrow" data-exp-reveal>Trayectoria</p>
@@ -117,23 +187,21 @@ export default function NuestraExperienciaPage() {
           </div>
         </div>
 
-        {/* Timeline */}
+        {/* ── Timeline ── */}
         <div className="exp2-layout">
-          {/* Left: year nav */}
           <nav className="exp2-nav" aria-label="Períodos">
             <ol className="exp2-nav-list">
               {ERAS.map((era, i) => {
                 const isActive = era.id === activeId;
                 return (
                   <li key={era.id} className="exp2-nav-item">
-                    {/* connector line */}
                     {i < ERAS.length - 1 && (
                       <span className="exp2-connector" aria-hidden />
                     )}
                     <button
                       onClick={() => selectEra(era.id)}
                       className={`exp2-nav-btn${isActive ? " is-active" : ""}`}
-                      style={isActive ? { "--era-accent": era.accent } as React.CSSProperties : undefined}
+                      style={isActive ? ({ "--era-accent": era.accent } as React.CSSProperties) : undefined}
                       aria-current={isActive ? "true" : undefined}
                     >
                       <span
@@ -141,8 +209,10 @@ export default function NuestraExperienciaPage() {
                         style={isActive ? { background: era.accent } : undefined}
                         aria-hidden
                       />
-                      <span className="exp2-nav-year">{era.year}</span>
-                      <span className="exp2-nav-label">{era.label}</span>
+                      <span className="exp2-nav-text">
+                        <span className="exp2-nav-year">{era.year}</span>
+                        <span className="exp2-nav-label">{era.label}</span>
+                      </span>
                     </button>
                   </li>
                 );
@@ -150,21 +220,14 @@ export default function NuestraExperienciaPage() {
             </ol>
           </nav>
 
-          {/* Right: content panel */}
-          <div
-            ref={contentRef}
-            className={`exp2-panel${visible ? " is-visible" : ""}`}
-          >
+          <div className={`exp2-panel${panelVisible ? " is-visible" : ""}`}>
             <div
               className="exp2-panel-accent"
               style={{ background: activeEra.accent }}
               aria-hidden
             />
             <div className="exp2-panel-body">
-              <p
-                className="exp2-panel-year"
-                style={{ color: activeEra.accent }}
-              >
+              <p className="exp2-panel-year" style={{ color: activeEra.accent }}>
                 {activeEra.year}
               </p>
               <h2 className="exp2-panel-heading font-tho-title">
@@ -179,11 +242,76 @@ export default function NuestraExperienciaPage() {
           </div>
         </div>
 
-        {/* Hidden SEO: all content in DOM */}
+        {/* ── Projects ── */}
+        <section className="exp2-projects-section">
+          <div className="exp2-projects-inner">
+            <div className="exp2-projects-header" data-exp-reveal>
+              <p className="exp2-eyebrow">Proyectos destacados</p>
+              <h2 className="exp2-section-title font-tho-title">
+                Trabajo que habla por sí solo
+              </h2>
+            </div>
+
+            <div className="exp2-projects-grid">
+              {PROJECTS.map((project) => {
+                const isOpen = openProject === project.id;
+                return (
+                  <article
+                    key={project.id}
+                    className={`exp2-card${isOpen ? " is-open" : ""}`}
+                  >
+                    <button
+                      className="exp2-card-trigger"
+                      onClick={() => toggleProject(project.id)}
+                      aria-expanded={isOpen}
+                    >
+                      <div className="exp2-card-top">
+                        <span
+                          className="exp2-card-tag"
+                          style={{ color: project.tagColor, borderColor: project.tagColor + "40", background: project.tagColor + "10" }}
+                        >
+                          {project.tag}
+                        </span>
+                        <span className="exp2-card-since">{project.since}</span>
+                      </div>
+                      <p className="exp2-card-client">{project.client}</p>
+                      <h3 className="exp2-card-title">{project.title}</h3>
+                      <p className="exp2-card-summary">{project.summary}</p>
+                      <div className="exp2-card-chevron" aria-hidden>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path
+                            d="M4 6l4 4 4-4"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    </button>
+
+                    <div className="exp2-card-detail" aria-hidden={!isOpen}>
+                      <div
+                        className="exp2-card-detail-bar"
+                        style={{ background: project.tagColor }}
+                      />
+                      <p>{project.detail}</p>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* SEO: all content in DOM */}
         <div className="sr-only" aria-hidden="true">
           {ERAS.map((era) =>
             era.body.map((p) => <p key={`seo-${era.id}-${p.slice(0, 20)}`}>{p}</p>)
           )}
+          {PROJECTS.map((p) => (
+            <p key={`seo-proj-${p.id}`}>{p.detail}</p>
+          ))}
         </div>
       </main>
 
