@@ -4,15 +4,16 @@ import Image from "next/image";
 import { useRef, useEffect } from "react";
 
 const logos = [
-  { src: "/confian/1.svg", alt: "Organización cliente 1" },
-  { src: "/confian/2.svg", alt: "Organización cliente 2" },
-  { src: "/confian/3.svg", alt: "Organización cliente 3" },
-  { src: "/confian/4.svg", alt: "Organización cliente 4" },
-  { src: "/confian/5.svg", alt: "Organización cliente 5" },
-  { src: "/confian/6.svg", alt: "Organización cliente 6" },
-  { src: "/confian/7.svg", alt: "Organización cliente 7" },
-  { src: "/confian/8.svg", alt: "Organización cliente 8" },
-  { src: "/confian/9.svg", alt: "Organización cliente 9" },
+  { src: "/confian/1.svg",  alt: "Barbería Club34",                   href: "https://instagram.com/club34barberia" },
+  { src: "/confian/2.svg",  alt: "INDAMA S.A.",                       href: "https://indama.cl" },
+  { src: "/confian/3.svg",  alt: "Conce Con Todos",                   href: "https://instagram.com/concecontodos" },
+  { src: "/confian/4.svg",  alt: "Cámara Chilena de la Construcción", href: "https://conceconstruye.cl" },
+  { src: "/confian/5.svg",  alt: "Círculo de Mujeres CChC" },
+  { src: "/confian/6.svg",  alt: "Credyhogar",                        href: "https://instagram.com/credyhogar" },
+  { src: "/confian/7.svg",  alt: "Vanrom",                            href: "https://instagram.com/empresas_vanrom" },
+  { src: "/confian/8.svg",  alt: "IAP2 Latinoamérica",                href: "https://iap2latinoamerica.org" },
+  { src: "/confian/9.svg",  alt: "Melissa Valenzuela Contadora" },
+  { src: "/confian/10.svg", alt: "PaleoAndes",                        href: "https://paleoandes.cl" },
 ];
 
 const SPEED = 0.5; // px per frame
@@ -25,7 +26,7 @@ export function TrustSlider() {
   const trackRef = useRef<HTMLDivElement>(null);
   const offsetRef = useRef(0);        // current translateX in px (≤ 0)
   const halfWidthRef = useRef(0);
-  const drag = useRef({ active: false, startX: 0, startOffset: 0 });
+  const drag = useRef({ active: false, startX: 0, startOffset: 0, moved: false });
   const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -60,12 +61,13 @@ export function TrustSlider() {
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
-    drag.current = { active: true, startX: e.clientX, startOffset: offsetRef.current };
+    drag.current = { active: true, startX: e.clientX, startOffset: offsetRef.current, moved: false };
     containerRef.current?.setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!drag.current.active) return;
+    if (Math.abs(e.clientX - drag.current.startX) > 4) drag.current.moved = true;
     const track = trackRef.current;
     if (!track) return;
 
@@ -99,20 +101,50 @@ export function TrustSlider() {
         ref={trackRef}
         className="trust-track flex w-max items-center gap-1 px-2 md:gap-2 md:px-3"
       >
-        {items.map((logo, idx) => (
-          <div
-            key={`${logo.src}-${idx}`}
-            className="trust-logo-slot relative h-[58px] w-[150px] shrink-0 md:h-[68px] md:w-[175px]"
-          >
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              fill
-              className="trust-logo-card object-contain"
-              draggable={false}
-            />
-          </div>
-        ))}
+        {items.map((logo, idx) => {
+          const slot = (
+            <div
+              key={`${logo.src}-${idx}`}
+              className="trust-logo-slot relative h-[58px] w-[150px] shrink-0 md:h-[68px] md:w-[175px]"
+            >
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                fill
+                className="trust-logo-card object-contain"
+                draggable={false}
+              />
+            </div>
+          );
+
+          if (!logo.href) return slot;
+
+          return (
+            <a
+              key={`${logo.src}-${idx}`}
+              href={logo.href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={logo.alt}
+              onPointerUp={() => {
+                if (drag.current.moved) return;
+                window.open(logo.href, "_blank", "noreferrer");
+              }}
+              onClick={(e) => e.preventDefault()}
+              className="shrink-0"
+            >
+              <div className="trust-logo-slot relative h-[58px] w-[150px] md:h-[68px] md:w-[175px]">
+                <Image
+                  src={logo.src}
+                  alt={logo.alt}
+                  fill
+                  className="trust-logo-card object-contain"
+                  draggable={false}
+                />
+              </div>
+            </a>
+          );
+        })}
       </div>
     </div>
   );
