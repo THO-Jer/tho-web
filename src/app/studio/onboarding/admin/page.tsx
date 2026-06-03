@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { BrandLoader } from "@/components/BrandLoader";
+import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
 
 type ModuleStatus = { moduleKey: string; status: string; attempts: number; maxAttempts: number };
 type RecordRow = {
@@ -411,16 +412,57 @@ export default function StudioOnboardingAdminPage() {
                     {!(active.module_status || []).length ? <li className="text-xs text-slate-500">Sin módulos asignados.</li> : null}
                   </ul>
                 </div>
+                {/* Temas débiles: tópicos fallados en al menos un intento no aprobado */}
+                {(() => {
+                  const failedTopics = Array.from(
+                    new Set(
+                      attempts
+                        .filter((a) => !a.passed)
+                        .flatMap((a) => a.missed_topics || [])
+                    )
+                  );
+                  if (!failedTopics.length) return null;
+                  return (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                      <h4 className="text-sm font-semibold text-amber-900">Temas con errores (intentos fallidos)</h4>
+                      <p className="mt-1 text-xs text-amber-700">Tópicos donde este usuario ha respondido incorrectamente al menos una vez sin aprobar el módulo.</p>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {failedTopics.map((topic) => (
+                          <span key={topic} className="rounded-md bg-amber-100 border border-amber-200 px-2 py-0.5 text-xs text-amber-900">
+                            {topicReviewLabel[topic] || topic}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div>
                   <h4 className="text-sm font-semibold text-slate-800">Histórico de intentos</h4>
-                  <ul className="mt-1 max-h-40 space-y-1 overflow-auto text-xs text-slate-600">
+                  <div className="mt-1 max-h-64 space-y-2 overflow-auto">
                     {attempts.map((attempt, idx) => (
-                      <li key={`${attempt.module_key}-${attempt.submitted_at}-${idx}`}>
-                        {attempt.submitted_at} · Módulo {attempt.module_key} · {attempt.score}/{attempt.max_score} {attempt.passed ? "(aprobado)" : ""}
-                      </li>
+                      <div key={`${attempt.module_key}-${attempt.submitted_at}-${idx}`} className="rounded-lg border border-slate-200 p-2.5 text-xs">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-semibold text-slate-800">
+                            Módulo {attempt.module_key} · {attempt.score}/{attempt.max_score} pts
+                          </span>
+                          <span className={`rounded px-1.5 py-0.5 font-semibold ${attempt.passed ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
+                            {attempt.passed ? "Aprobado" : "No aprobado"}
+                          </span>
+                        </div>
+                        <p className="mt-0.5 text-slate-500">{new Date(attempt.submitted_at).toLocaleString("es-CL")}</p>
+                        {(attempt.missed_topics || []).length > 0 && (
+                          <div className="mt-1.5">
+                            <span className="text-slate-500">Errores: </span>
+                            <span className="text-rose-700">
+                              {(attempt.missed_topics || []).map((t) => topicReviewLabel[t] || t).join(", ")}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     ))}
-                    {!attempts.length ? <li>Sin intentos registrados.</li> : null}
-                  </ul>
+                    {!attempts.length ? <p className="text-xs text-slate-500">Sin intentos registrados.</p> : null}
+                  </div>
                 </div>
               </div>
             )}
