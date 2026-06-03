@@ -129,7 +129,7 @@ type OnboardingState = {
   records: OnboardingRecord[];
   moduleVisibility: ModuleVisibilityConfig;
   moduleStatusByEmail: Record<string, Record<string, ModuleStatus>>;
-  quizAttemptsByEmail: Record<string, Array<{ module_key: string; score: number; max_score: number; missed_topics: string[]; submitted_at: string }>>;
+  quizAttemptsByEmail: Record<string, Array<{ module_key: string; score: number; max_score: number; missed_topics: string[]; submitted_at: string; passed?: boolean }>>;
 };
 
 function hasSupabaseStore() {
