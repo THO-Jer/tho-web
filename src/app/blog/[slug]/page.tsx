@@ -31,6 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
+    keywords: post.tags,
     alternates: { canonical },
     openGraph: {
       type: "article",
@@ -77,13 +78,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     dateModified: post.updatedAt,
     image: post.coverImage ? [`${SITE}${post.coverImage}`] : undefined,
     mainEntityOfPage: `${SITE}/blog/${post.slug}`,
+    keywords: post.tags.join(", ") || undefined,
+    articleSection: post.tags[0] ?? undefined,
+    inLanguage: "es-CL",
     author: {
       "@type": "Organization",
       name: "The Human Org",
+      url: SITE,
     },
     publisher: {
       "@type": "Organization",
       name: "The Human Org",
+      url: SITE,
+      logo: { "@type": "ImageObject", url: `${SITE}/brand/logo-negro.svg` },
     },
   };
 
