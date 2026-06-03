@@ -423,3 +423,36 @@ export async function getStudioRoleTeamByEmail(email: string): Promise<string> {
   const team = String((rows[0] as Record<string, unknown>).team || "general").trim();
   return team || "general";
 }
+
+const ONBOARDING_CONFIG_TABLE = process.env.ONBOARDING_CONFIG_TABLE || "onboarding_config";
+const VISIBILITY_KEY = "module_visibility";
+
+/**
+ * Lee la configuración de visibilidad de módulos desde Supabase.
+ * Devuelve null si la tabla no existe o la clave no está presente.
+ */
+export async function getModuleVisibilityFromSupabase(): Promise<unknown | null> {
+  try {
+    const rows = await supabaseRequest(
+      `/rest/v1/${ONBOARDING_CONFIG_TABLE}?select=value&key=eq.${encodeURIComponent(VISIBILITY_KEY)}&limit=1`,
+    );
+    if (!Array.isArray(rows) || !rows.length) return null;
+    return (rows[0] as Record<string, unknown>).value ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Persiste la configuración de visibilidad de módulos en Supabase.
+ */
+export async function setModuleVisibilityToSupabase(value: unknown): Promise<void> {
+  await supabaseRequest(
+    `/rest/v1/${ONBOARDING_CONFIG_TABLE}?on_conflict=key`,
+    {
+      method: "POST",
+      headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify([{ key: VISIBILITY_KEY, value, updated_at: new Date().toISOString() }]),
+    },
+  );
+}

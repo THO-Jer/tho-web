@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { defaultOnboardingQuiz, defaultOnboardingUnits, OnboardingQuizQuestion, OnboardingUnit } from "@/content/onboardingContent";
 import {
+  getModuleVisibilityFromSupabase,
   getOnboardingAdminOverviewRows,
   getOnboardingModuleStatusRows,
   getOnboardingQuizAttemptRows,
@@ -13,6 +14,7 @@ import {
   listOnboardingSupabaseRecords,
   OnboardingModuleState,
   resetOnboardingModuleStatus,
+  setModuleVisibilityToSupabase,
   upsertOnboardingModuleStatus,
   upsertOnboardingQuizResultByModule,
   upsertOnboardingSupabaseProgress,
@@ -825,8 +827,15 @@ export async function getModuleCatalog() {
   }));
 }
 
-/** Devuelve la configuración editable de visibilidad de módulos. */
+/**
+ * Devuelve la configuración editable de visibilidad de módulos.
+ * Prioridad: Supabase (si disponible) > JSON local.
+ */
 export async function getModuleVisibilityConfig(): Promise<ModuleVisibilityConfig> {
+  if (hasSupabaseStore()) {
+    const raw = await getModuleVisibilityFromSupabase();
+    if (raw !== null) return coerceModuleVisibility(raw);
+  }
   const state = await readStateFromJson();
   return state.moduleVisibility;
 }
@@ -835,6 +844,8 @@ export async function getModuleVisibilityConfig(): Promise<ModuleVisibilityConfi
  * Persiste la configuración de visibilidad de módulos.
  * Sanitiza ramas (ids únicos, módulos válidos), garantiza la rama "general"
  * y descarta overrides de usuario que no cambian nada (mode "inherit").
+ * Escribe en Supabase si está disponible; siempre escribe también en JSON local
+ * como respaldo para lectura de units/quiz.
  */
 export async function setModuleVisibilityConfig(input: ModuleVisibilityConfig): Promise<ModuleVisibilityConfig> {
   const state = await readStateFromJson();
@@ -871,7 +882,15 @@ export async function setModuleVisibilityConfig(input: ModuleVisibilityConfig): 
     // mode "inherit" (o inválido) no se almacena: el usuario sigue su rama.
   }
 
-  state.moduleVisibility = { branches, userOverrides };
+  const visibility: ModuleVisibilityConfig = { branches, userOverrides };
+
+  if (hasSupabaseStore()) {
+    await setModuleVisibilityToSupabase(visibility);
+  }
+
+  // Siempre persiste en JSON también (lo usa readStateFromJson para units/quiz).
+  state.moduleVisibility = visibility;
   await writeStateToJson(state);
-  return state.moduleVisibility;
+
+  return visibility;
 }
