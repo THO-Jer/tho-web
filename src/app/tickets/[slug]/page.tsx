@@ -5,8 +5,9 @@ import { ContactForm } from "@/components/ContactForm";
 import { TICKETS } from "@/content/tickets";
 import { PILLAR_META } from "@/lib/brand";
 
-export default function TicketDetailPage({ params }: { params: { slug: string } }) {
-  const ticket = TICKETS.find((t) => t.slug === params.slug);
+export default async function TicketDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const ticket = TICKETS.find((t) => t.slug === slug);
   if (!ticket) return notFound();
   const meta = PILLAR_META[ticket.pillar];
 

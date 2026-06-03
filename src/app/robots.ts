@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/studio", "/studio/", "/api/"],
+        disallow: ["/studio", "/studio/", "/api/", "/deseos", "/canal-confidencial"],
       },
     ],
     sitemap: "https://tho.cl/sitemap.xml",
