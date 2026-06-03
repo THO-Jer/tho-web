@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 
 type Item = { id: number; col: number; src: string };
 
@@ -10,10 +10,30 @@ const items: Item[] = Array.from({ length: 12 }, (_, i) => ({
   src: `/accion/${String(i + 1).padStart(2, "0")}.png`,
 }));
 
+/** Carga las imágenes solo cuando la galería entra al viewport */
+function useGalleryVisible() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, visible };
+}
+
 export function ActionGallery() {
   const [hoveredCol, setHoveredCol] = useState<number | null>(null);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [active, setActive] = useState<Item | null>(null);
+  const { ref, visible } = useGalleryVisible();
 
   const grouped = useMemo(
     () => [0, 1, 2].map((col) => items.filter((item) => item.col === col)),
@@ -21,7 +41,7 @@ export function ActionGallery() {
   );
 
   return (
-    <div className="tho-action-main relative overflow-hidden rounded-[2rem] p-1 md:p-2">
+    <div ref={ref} className="tho-action-main relative overflow-hidden rounded-[2rem] p-1 md:p-2">
       <div className="tho-action-fade pointer-events-none absolute inset-0 z-10 rounded-[2rem]" />
       <div className="tho-action-boxes relative mx-auto h-[460px] w-full max-w-[1200px] md:h-[620px]">
         {grouped.map((columnItems, colIdx) => {
@@ -43,18 +63,12 @@ export function ActionGallery() {
                   <button
                     type="button"
                     key={item.id}
-                    onMouseEnter={() => {
-                      setHoveredCol(colIdx);
-                      setHoveredId(item.id);
-                    }}
-                    onMouseLeave={() => {
-                      setHoveredCol(null);
-                      setHoveredId(null);
-                    }}
+                    onMouseEnter={() => { setHoveredCol(colIdx); setHoveredId(item.id); }}
+                    onMouseLeave={() => { setHoveredCol(null); setHoveredId(null); }}
                     onClick={() => setActive(item)}
                     className={`tho-photo-box ${direction} ${paused ? "paused" : ""} ${dimmed ? "opacity-35" : ""} ${isHovered ? "is-hovered" : ""}`}
                     style={{
-                      backgroundImage: `url(${item.src})`,
+                      backgroundImage: visible ? `url(${item.src})` : undefined,
                       animationDuration: `${duration}s`,
                       animationDelay: `${(idx / 4) * -duration}s`,
                     }}

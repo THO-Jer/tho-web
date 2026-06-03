@@ -1,7 +1,31 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { CRMRequestError, type LeadPayload, pushToCRM } from "@/lib/crm";
 import { sendMail } from "@/lib/mail";
+
+// ---------------------------------------------------------------------------
+// Rate limiting en memoria: máximo 5 envíos por IP cada 10 minutos.
+// En memoria = se resetea al reiniciar el servidor, suficiente para Vercel
+// serverless (cada instancia mantiene su propio contador).
+// ---------------------------------------------------------------------------
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutos
+
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipHits.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    ipHits.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  entry.count += 1;
+  if (entry.count > RATE_LIMIT_MAX) return true;
+  return false;
+}
 
 function clean(value: unknown) {
   return String(value || "").trim();
@@ -183,8 +207,20 @@ function buildMail(payload: LeadPayload) {
   };
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      req.headers.get("x-real-ip") ??
+      "unknown";
+
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { ok: false, error: "Too many requests" },
+        { status: 429 }
+      );
+    }
+
     const body = (await req.json()) as Record<string, unknown>;
 
     if (body.hp) return NextResponse.json({ ok: true });

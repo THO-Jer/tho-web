@@ -10,6 +10,8 @@ import { listPublishedPosts } from "@/lib/blogStore";
 
 const SITE = "https://tho.cl";
 
+export const revalidate = 3600; // regenerar cada hora
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const service = getServiceBySlug(slug);
