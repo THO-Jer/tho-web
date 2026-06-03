@@ -18,10 +18,11 @@ import { moduleALessonGuides, moduleCLessonGuides, moduleDLessonGuides, type Les
 // ---------------------------------------------------------------------------
 
 export type ModuleVisibilityBranch = { id: string; modules: string[] };
-export type ModuleVisibilityOverride =
-  | { mode: "branch"; branchId: string }
-  | { mode: "custom"; modules: string[] }
-  | { mode: "inherit" };
+export type ModuleVisibilityOverride = {
+  mode: "branch" | "custom" | "inherit";
+  branchId?: string;
+  modules?: string[];
+};
 
 export type ModuleVisibilityConfig = {
   branches: ModuleVisibilityBranch[];
