@@ -76,12 +76,10 @@ export const defaultOnboardingUnits: OnboardingUnit[] = [
     content: [
       "D1 — Qué significa asesorar en THO: no es ejecutar tareas ni validar decisiones tomadas. Es intervenir sistemas organizacionales complejos con método, considerando cultura, poder, incentivos, emociones, historia y entorno.",
       "D2 — Fundamentos conceptuales mínimos: THO asesora desde marcos explícitos, no desde intuición aislada. Bases mínimas: gestión del cambio, relacionamiento comunitario, doble materialidad y teoría de actores/poder.",
-      "Gestión del cambio: las organizaciones no cambian solo por estrategia escrita; cambian cuando evolucionan incentivos, prácticas y narrativas. Relacionamiento comunitario: ignorar la red territorial de actores incrementa conflicto.",
-      "Doble materialidad y poder: las decisiones empresariales impactan el entorno y el entorno impacta la empresa; además, toda decisión distribuye efectos y nunca es neutra. Este módulo instala base conceptual; la profundización ocurre en módulos avanzados.",
       "D3 — Estructura de una intervención: delimitación de problema, diagnóstico interpretativo, identificación de riesgos, diseño de alternativas, toma de decisión y acompañamiento cuando corresponda.",
       "D4 — Diagnóstico: interpretar con criterio, no acumular información. Puede incluir entrevistas, revisión documental, análisis de gobernanza, análisis territorial e identificación de tensiones internas. Debe producir claridad, no más complejidad.",
       "D5 — Diseño estratégico: explicitar supuestos, presentar escenarios, evaluar riesgos secundarios y proponer alternativas claras. Una buena asesoría no elimina la incertidumbre: la hace visible.",
-      "D6 — Estándar mínimo de entregables (DoD en asesorías): contexto, evidencia o hipótesis explícita, análisis estructurado, decisión/recomendación concreta, riesgos asociados y próximos pasos con responsable + plazo.",
+      "D6 — DoD en asesorías: piso mínimo universal (identificación, responsable, almacenamiento, trazabilidad de origen) aplicable a todo entregable; criterios específicos de 'hecho' se pactan en la propuesta según tipo de entregable.",
       "D7 — Documentación y trazabilidad: toda decisión relevante debe registrarse y poder reconstruirse. La trazabilidad protege frente a conflictos, cambios de criterio y malentendidos.",
       "D8 — Ética en asesorías: no exagerar conclusiones, no omitir riesgos para agradar, no ajustar diagnóstico para que sea políticamente cómodo. La legitimidad de THO se sostiene en la claridad.",
       "D9 — Formación avanzada: profundizaciones posteriores en gestión del cambio, doble materialidad, relacionamiento comunitario, análisis organizacional y metodologías participativas.",
@@ -472,13 +470,126 @@ export const defaultOnboardingQuiz: OnboardingQuizQuestion[] = [
   },
 
   // =====================================================
-  // MÓDULO D — Operación Asesorías (pendiente)
+  // MÓDULO D — Operación Asesorías
   // =====================================================
-  // TODO: agregar 10 preguntas cuando se editorialice el módulo D.
-  // Patrón a seguir (mismo que B):
-  //   - 10 preguntas, una por lección aproximadamente.
-  //   - Topics empezando en "operacion_asesorias_*" o "seguridad_*" para que
-  //     unitTopicMap las enganche al slug "operacion-asesorias".
-  //   - Recordar agregar entradas equivalentes en topicReviewLabel y
-  //     refinar topicToLesson para mapear cada topic a su lección.
+  {
+    id: "d-q1",
+    prompt: "Un cliente pide a THO que ejecute un plan de comunicación que él mismo ya diseñó. ¿Cómo describe mejor el estándar de asesoría en THO esta situación?",
+    options: [
+      "Es asesoría válida: THO aporta capacidad de ejecución.",
+      "Es producción, no asesoría: THO ejecutaría sin intervenir el sistema ni el criterio.",
+      "Depende del presupuesto acordado.",
+      "Es asesoría si THO agrega valor en la implementación.",
+    ],
+    correctIndex: 1,
+    topic: "operacion_asesorias_que_es",
+  },
+  {
+    id: "d-q2",
+    prompt: "Una organización quiere cambiar su estructura interna. El nuevo organigrama ya está diseñado, pero el equipo directivo está fracturado y los incentivos no han cambiado. ¿Qué marco conceptual es más relevante para diagnosticar por qué el cambio probablemente fracasará?",
+    options: [
+      "Doble materialidad: el cambio afecta el entorno.",
+      "Gestión del cambio: los incentivos sostienen el estado actual.",
+      "Relacionamiento comunitario: hay actores externos involucrados.",
+      "Teoría de actores: hay múltiples partes con intereses distintos.",
+    ],
+    correctIndex: 1,
+    topic: "operacion_asesorias_marcos",
+  },
+  {
+    id: "d-q3",
+    prompt: "Un cliente quiere pasar directamente al diseño de alternativas sin haber completado el diagnóstico. ¿Qué corresponde según el estándar THO?",
+    options: [
+      "Aceptar: el cliente conoce mejor su organización.",
+      "Diseñar alternativas con los supuestos disponibles y aclarar las limitaciones.",
+      "Explicitar el riesgo: sin diagnóstico, el diseño se basa en hipótesis no verificadas.",
+      "Proponer un diagnóstico exprés de una hora.",
+    ],
+    correctIndex: 2,
+    topic: "operacion_asesorias_estructura",
+  },
+  {
+    id: "d-q4",
+    prompt: "Al finalizar la fase de diagnóstico, THO entrega un informe con muchos datos ordenados por área. El cliente dice que la información es correcta pero no sabe qué hacer con ella. ¿Qué indica esto?",
+    options: [
+      "Que el cliente necesita más tiempo para procesar.",
+      "Que el diagnóstico fue descriptivo pero no interpretativo: falta la hipótesis central.",
+      "Que se necesita una reunión adicional de presentación.",
+      "Que el cliente no es el público correcto para el informe.",
+    ],
+    correctIndex: 1,
+    topic: "operacion_asesorias_diagnostico",
+  },
+  {
+    id: "d-q5",
+    prompt: "THO presenta al cliente una sola recomendación, presentada como 'la solución óptima'. ¿Cuál es el principal problema metodológico de este enfoque?",
+    options: [
+      "Ninguno, si la recomendación está bien fundamentada.",
+      "Puede agotar al cliente con demasiadas opciones.",
+      "Desplaza la decisión del cliente hacia THO, asumiendo THO la responsabilidad de las consecuencias.",
+      "Es aceptable si el cliente pidió una recomendación directa.",
+    ],
+    correctIndex: 2,
+    topic: "operacion_asesorias_diseno",
+  },
+  {
+    id: "d-q6",
+    prompt: "THO entrega a un cliente un organigrama sin número de versión, sin nombre de quien lo revisó y guardado en el escritorio del diseñador. ¿Qué condición del estándar THO incumple?",
+    options: [
+      "El DoD específico acordado en la propuesta.",
+      "El piso mínimo universal: falta identificación, responsable y almacenamiento correcto.",
+      "El estándar de entregables analítico-decisionales.",
+      "Solo incumple si el cliente lo solicita formalmente.",
+    ],
+    correctIndex: 1,
+    topic: "operacion_asesorias_dod",
+  },
+  {
+    id: "d-q7",
+    prompt: "Tres semanas después de una reunión clave, surge un conflicto con el cliente sobre qué se acordó. No hay registro de la reunión. ¿Qué establece el estándar de trazabilidad THO sobre esta situación?",
+    options: [
+      "Se reconstruye lo acordado con las memorias del equipo.",
+      "El cliente tiene razón por defecto si no hay registro.",
+      "Lo que no quedó registrado, en caso de conflicto, no existió.",
+      "Se busca el mail más cercano a la fecha como respaldo.",
+    ],
+    correctIndex: 2,
+    topic: "operacion_asesorias_trazabilidad",
+  },
+  {
+    id: "d-q8",
+    prompt: "Durante una asesoría, THO detecta que sus conclusiones incomodarán a un actor clave del cliente. El cliente sugiere suavizar el diagnóstico para facilitar la implementación. ¿Qué corresponde?",
+    options: [
+      "Suavizar la redacción manteniendo el fondo.",
+      "Ajustar el diagnóstico: la implementación exitosa es el objetivo final.",
+      "Sostener las conclusiones: ajustar el diagnóstico por comodidad política destruye la independencia de criterio.",
+      "Presentar dos versiones del informe, una para circulación interna y otra oficial.",
+    ],
+    correctIndex: 2,
+    topic: "operacion_asesorias_etica",
+  },
+  {
+    id: "d-q9",
+    prompt: "En el mes 3 de una asesoría, el cliente pide incorporar análisis de doble materialidad, que no estaba en el alcance original. ¿Cuál es la señal de alerta que activa esto y la respuesta correcta?",
+    options: [
+      "Señal de confianza; incorporarlo sin más trámite para fortalecer la relación.",
+      "Señal de alerta de cambio de alcance sin decisión explícita; pausar y formalizar si se incorpora.",
+      "No es señal de alerta: el cliente puede pedir cambios en cualquier momento.",
+      "Señal de oportunidad comercial; cotizar el nuevo alcance informalmente.",
+    ],
+    correctIndex: 1,
+    topic: "operacion_asesorias_alertas",
+  },
+  {
+    id: "d-q10",
+    prompt: "Un asesor de THO termina su participación en un proyecto. El siguiente integrante que retoma el trabajo no puede reconstruir el estado de la asesoría ni las decisiones tomadas. ¿Qué establece el estándar THO sobre esto?",
+    options: [
+      "Es normal: hay una curva de adaptación al retomar proyectos.",
+      "Se resuelve con una reunión de traspaso presencial.",
+      "El trabajo no cumplió el estándar de trazabilidad: cualquier integrante debe poder retomar sin intervención de quien lo inició.",
+      "El cliente debe proveer contexto para facilitar el traspaso.",
+    ],
+    correctIndex: 2,
+    topic: "operacion_asesorias_trazabilidad",
+  },
 ];

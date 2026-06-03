@@ -472,80 +472,96 @@ export const strategicDesignLessonD5: StrategicDesignLesson = {
   ],
 };
 
-// ─── D6 · Estándar mínimo de entregables (DoD en asesorías) ───────────────
+// ─── D6 · DoD en asesorías ────────────────────────────────────────────────
 
 export type DodAdvisoryLesson = {
   label: string;
   title: string;
   premise: string[];
-  dodElements: Array<{
-    number: string;
-    name: string;
-    description: string;
-    failureExample: string;
-  }>;
-  dodRule: AdvisoryRuleCallout;
+  universalFloor: {
+    heading: string;
+    intro: string;
+    elements: Array<{ name: string; description: string }>;
+    closing: string;
+  };
+  deliverableTypes: {
+    heading: string;
+    intro: string;
+    types: Array<{ name: string; examples: string; dodNote: string }>;
+  };
+  negotiationRule: AdvisoryRuleCallout;
+  floorRule: AdvisoryRuleCallout;
   synthesis: string[];
 };
 
 export const dodAdvisoryLessonD6: DodAdvisoryLesson = {
-  label: "LECCIÓN D6 · Estándar mínimo de entregables",
-  title: "Definición de Hecho en asesorías",
+  label: "LECCIÓN D6 · DoD en asesorías",
+  title: "Piso mínimo universal + DoD pactada en la propuesta",
   premise: [
-    "Todo entregable de asesoría en THO cumple un estándar mínimo antes de salir al cliente.",
-    "Este estándar no es una lista de verificación burocrática; es la garantía de que el trabajo realmente habilita una decisión mejor.",
-    "Un entregable que no cumple el estándar puede parecer completo y no serlo. La diferencia está en si el cliente puede usar lo que recibió.",
+    "En asesoría, no todos los entregables son iguales: un diagnóstico organizacional, un organigrama, una estrategia de relacionamiento comunitario y una matriz de materialidad son productos completamente distintos con propósitos distintos.",
+    "Aplicar el mismo estándar de calidad a todos ellos por igual no funciona. Lo que sí aplica a todos es un piso mínimo universal: condiciones de trazabilidad, identificación y almacenamiento que ningún entregable puede omitir.",
+    "Sobre ese piso, los criterios específicos de 'hecho' se definen y acuerdan en la propuesta de cada proyecto, antes de producir.",
   ],
-  dodElements: [
-    {
-      number: "01",
-      name: "Contexto",
-      description: "El entregable sitúa al lector: cuál es el problema abordado, desde qué encuadre y con qué alcance.",
-      failureExample: "El cliente recibe un análisis sin saber exactamente qué pregunta está respondiendo.",
-    },
-    {
-      number: "02",
-      name: "Evidencia o hipótesis explícita",
-      description: "Cada conclusión se apoya en datos observados o en hipótesis declaradas como tales. No hay afirmaciones presentadas como hechos sin respaldo.",
-      failureExample: "El informe dice 'el equipo tiene baja moral' sin indicar en qué se basa esa afirmación.",
-    },
-    {
-      number: "03",
-      name: "Análisis estructurado",
-      description: "El razonamiento sigue una lógica visible: de la evidencia a la interpretación, de la interpretación a la conclusión. El cliente puede seguir el hilo.",
-      failureExample: "El documento tiene secciones pero no conecta cómo los datos llevan a las conclusiones.",
-    },
-    {
-      number: "04",
-      name: "Decisión o recomendación concreta",
-      description: "El entregable termina en algo accionable: una recomendación clara, una decisión solicitada o una pregunta que el cliente debe responder.",
-      failureExample: "El informe describe el problema con profundidad pero no dice qué hacer con esa información.",
-    },
-    {
-      number: "05",
-      name: "Riesgos asociados",
-      description: "Las implicaciones negativas posibles están nombradas. El cliente sabe qué puede salir mal.",
-      failureExample: "La recomendación se presenta sin mencionar sus limitaciones o escenarios de falla.",
-    },
-    {
-      number: "06",
-      name: "Próximos pasos con responsable y plazo",
-      description: "El entregable especifica qué sigue, quién lo hace y en qué plazo. Sin esto, el trabajo termina en el documento.",
-      failureExample: "El informe concluye con 'se recomienda avanzar' sin indicar quién, cómo ni cuándo.",
-    },
-  ],
-  dodRule: {
-    label: "Regla del DoD en asesorías",
-    statement: "Un entregable que no cumple los seis elementos no está terminado. Puede estar avanzado; no está listo.",
+  universalFloor: {
+    heading: "Piso mínimo universal (aplica a todo entregable)",
+    intro: "Independientemente del tipo de documento, todo entregable que sale al cliente en THO cumple cuatro condiciones:",
+    elements: [
+      {
+        name: "Identificación",
+        description: "El documento tiene nombre, versión y fecha. Se sabe de qué proyecto es y en qué momento del proceso fue producido.",
+      },
+      {
+        name: "Responsable",
+        description: "Está claro quién lo produjo y quién lo revisó internamente antes de enviarlo al cliente.",
+      },
+      {
+        name: "Almacenamiento correcto",
+        description: "Está guardado en la carpeta del cliente que corresponde, en Teams, con la nomenclatura acordada. No en escritorios ni servicios externos.",
+      },
+      {
+        name: "Trazabilidad de origen",
+        description: "Puede reconstruirse en qué contexto fue solicitado, qué información lo alimentó y qué acuerdo previo lo originó. Si hay propuesta o acuerdo de trabajo, el entregable es coherente con lo que se pactó ahí.",
+      },
+    ],
+    closing: "Si un entregable no cumple estas cuatro condiciones, no está listo independientemente de su calidad de contenido.",
+  },
+  deliverableTypes: {
+    heading: "Tipos de entregable y su lógica de DoD",
+    intro: "Los entregables de asesoría caen en dos categorías con lógicas distintas:",
+    types: [
+      {
+        name: "Entregables analítico-decisionales",
+        examples: "Diagnósticos, informes de recomendación, propuestas estratégicas, evaluaciones de riesgo.",
+        dodNote: "Además del piso mínimo, estos entregables deben tener contexto explícito, evidencia o hipótesis declarada, análisis estructurado, recomendación concreta, riesgos asociados y próximos pasos con responsable y plazo. Son los criterios que habilitan una decisión informada.",
+      },
+      {
+        name: "Entregables instrumentales",
+        examples: "Organigramas, matrices de stakeholders, estrategias de relacionamiento comunitario, matrices de materialidad, calendarios, mapas de proceso.",
+        dodNote: "El DoD específico se pacta en la propuesta según el uso esperado. Un organigrama 'hecho' es distinto según si se usará para comunicación interna, negociación sindical o reporte externo. No hay un estándar único: hay uno acordado.",
+      },
+    ],
+  },
+  negotiationRule: {
+    label: "Regla central",
+    statement: "El DoD específico de cada entregable se define en la propuesta aceptada por el cliente, antes de producir.",
     body: [
-      "El estándar aplica independientemente del tamaño del entregable: una nota de una página y un informe de cuarenta deben cumplir el mismo DoD.",
-      "La excepción son entregables internos de proceso (borradores, notas de trabajo), que están explícitamente marcados como tales.",
+      "Esto protege a THO de revisiones indefinidas: si el cliente aprobó la propuesta y el entregable cumple los criterios acordados, está hecho.",
+      "También protege al cliente: sabe de antemano qué recibirá y bajo qué condiciones puede considerarlo completo.",
+      "Si en el curso del proyecto el alcance cambia y los criterios de aceptación cambian con él, ese cambio se formaliza — no se asume.",
+    ],
+  },
+  floorRule: {
+    label: "Recordatorio del piso",
+    statement: "El DoD pactado en la propuesta siempre opera sobre el piso mínimo, nunca por debajo de él.",
+    body: [
+      "Un cliente no puede acordar en su propuesta recibir documentos sin identificación, sin responsable o sin trazabilidad de origen.",
+      "El piso mínimo es no negociable. El DoD específico sí es negociable.",
     ],
   },
   synthesis: [
-    "DoD en asesorías: contexto + evidencia/hipótesis + análisis + recomendación + riesgos + próximos pasos.",
-    "Un entregable sin estos seis elementos no habilita una decisión; solo informa parcialmente.",
-    "El estándar aplica a todos los entregables que salen al cliente, independientemente del tamaño.",
+    "Piso mínimo universal: identificación + responsable + almacenamiento correcto + trazabilidad de origen.",
+    "DoD específica: se define en la propuesta según el tipo de entregable y su uso esperado.",
+    "El DoD acordado protege a THO de revisiones indefinidas y al cliente de sorpresas.",
   ],
 };
 

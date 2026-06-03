@@ -145,16 +145,16 @@ export function topicToLesson(topic: string, lessons: Array<{ id: string; label:
   if (t.startsWith("creativa") || t.startsWith("operacion_creativa") || t.startsWith("operacion")) return firstOfModule("C") || lessons[0];
 
   // Módulo D — mapeo específico por topic
-  if (t === "asesorias_que_es") return findById("D1") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_marcos") return findById("D2") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_estructura") return findById("D3") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_diagnostico") return findById("D4") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_diseno") return findById("D5") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_dod") return findById("D6") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_trazabilidad") return findById("D7") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_etica") return findById("D8") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_formacion") return findById("D9") || firstOfModule("D") || lessons[0];
-  if (t === "asesorias_alertas") return findById("D10") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_que_es") return findById("D1") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_marcos") return findById("D2") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_estructura") return findById("D3") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_diagnostico") return findById("D4") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_diseno") return findById("D5") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_dod") return findById("D6") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_trazabilidad") return findById("D7") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_etica") return findById("D8") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_formacion") return findById("D9") || firstOfModule("D") || lessons[0];
+  if (t === "operacion_asesorias_alertas") return findById("D10") || firstOfModule("D") || lessons[0];
   if (t.startsWith("operacion_asesorias") || t.startsWith("seguridad")) return firstOfModule("D") || lessons[0];
 
   return lessons[0];
