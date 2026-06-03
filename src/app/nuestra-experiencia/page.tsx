@@ -6,10 +6,7 @@ import { Footer } from "@/components/Footer";
 
 /* ── TYPES ─────────────────────────────────────────────────────────────── */
 
-type Client = {
-  name: string;
-  isNew: boolean;
-};
+type Client = { name: string; isNew: boolean };
 
 type Era = {
   id: string;
@@ -30,6 +27,7 @@ type Project = {
   since: string;
   summary: string;
   detail: string;
+  illustration: string;
 };
 
 /* ── DATA ───────────────────────────────────────────────────────────────── */
@@ -92,6 +90,8 @@ const ERAS: Era[] = [
     clients: [
       { name: "CChC Concepción", isNew: false },
       { name: "Club34", isNew: false },
+      { name: "Conce Con Todos", isNew: false },
+      { name: "IAP2 Latinoamérica", isNew: false },
       { name: "Círculo de Mujeres CChC", isNew: true },
       { name: "CChC Araucanía", isNew: true },
     ],
@@ -104,11 +104,13 @@ const ERAS: Era[] = [
     accent: "#93bf24",
     body: [
       "Trabajamos con Paleo Andes en un proceso de fortalecimiento organizacional y actualización de su arquitectura interna. Sumamos a Credyhogar y Vanrom en contenido digital con foco en las personas detrás de cada operación.",
-      "El equipo incorporó un asesor de relacionamiento comunitario, una diseñadora gráfica y un asesor en desarrollo organizacional. Los servicios cubren hoy el ciclo completo: comunidad, comunicación, organización y sostenibilidad.",
+      "El equipo incorporó un asesor de relacionamiento comunitario, un diseñador gráfico y un asesor en desarrollo organizacional. Los servicios cubren hoy el ciclo completo: comunidad, comunicación, organización y sostenibilidad.",
     ],
     clients: [
       { name: "CChC Concepción", isNew: false },
       { name: "Club34", isNew: false },
+      { name: "Conce Con Todos", isNew: false },
+      { name: "IAP2 Latinoamérica", isNew: false },
       { name: "Credyhogar", isNew: true },
       { name: "Vanrom", isNew: true },
       { name: "Paleo Andes", isNew: true },
@@ -117,50 +119,55 @@ const ERAS: Era[] = [
   },
 ];
 
+// Service colors: orange=comunidad, blue=comunicaciones, pink=desarrollo org., green=sostenibilidad, yellow=formación
 const PROJECTS: Project[] = [
   {
     id: "cchc",
     client: "CChC Concepción",
     title: "Estrategia de Relacionamiento Comunitario",
     tag: "Comunidad",
-    tagColor: "#1e71b8",
+    tagColor: "#fa7f33",
     since: "Desde 2023",
     summary: "Acompañamiento continuo al vínculo entre el gremio y las comunidades del Gran Concepción.",
     detail:
       "Desde el segundo semestre de 2023 acompañamos el relacionamiento con las comunidades del Gran Concepción. Desde encuentros iniciales hasta documentos de consenso sobre desarrollo urbano, generamos confianza a través de programas que permiten vínculos auténticos entre el gremio y las organizaciones sociocomunitarias: la Escuela Itinerante, los Encuentros de Diseño Participativo y el documento Visión 2050.",
+    illustration: "/ilustraciones/5.png",
   },
   {
     id: "indama",
     client: "INDAMA S.A.",
     title: "Revista Interna Trimestral",
-    tag: "Comunicación",
-    tagColor: "#d13ca2",
+    tag: "Comunicaciones",
+    tagColor: "#1e71b8",
     since: "2024",
     summary: "Cultura organizacional desde adentro, a través de una publicación propia.",
     detail:
       "Acompañamos a INDAMA en la promoción de su cultura organizacional mediante una revista trimestral que abordaba eventos, cambios y proyecciones importantes para la empresa. Aniversarios, trabajadores con larga trayectoria, fiestas patrias e inauguración de nueva tecnología fueron contenidos valorados a lo largo del proceso.",
+    illustration: "/ilustraciones/11.png",
   },
   {
     id: "paleoandes",
     client: "Paleo Andes",
     title: "Fortalecimiento Organizacional",
     tag: "Desarrollo org.",
-    tagColor: "#93bf24",
+    tagColor: "#d13ca2",
     since: "Desde 2026",
     summary: "Actualización de la arquitectura interna para una empresa de arqueología y paleontología.",
     detail:
       "Luego de un acercamiento en torno a la sostenibilidad en 2025, en 2026 iniciamos un proceso de fortalecimiento con foco en la arquitectura organizacional. La revisión del organigrama, el manual de cargos y las matrices de gestión interna permite mayor alineación, el desarrollo de una cultura organizacional sólida y un despliegue más coordinado de las distintas funciones.",
+    illustration: "/ilustraciones/2.png",
   },
   {
     id: "iap2",
     client: "IAP2 Latinoamérica",
     title: "Training en Participación Pública",
     tag: "Formación",
-    tagColor: "#fa7f33",
+    tagColor: "#f2b705",
     since: "Desde 2025",
     summary: "Formaciones certificadas en el Enfoque IAP2 para organizaciones y empresas.",
     detail:
       "Con la certificación internacional de nuestro director como entrenador IAP2, realizamos formaciones a distintas organizaciones y empresas en el Enfoque IAP2 para la Participación Pública. Esta alianza ha permitido una internacionalización del trabajo de THO y un intercambio de experiencias que enriquece cada asesoría.",
+    illustration: "/ilustraciones/10.png",
   },
 ];
 
@@ -169,10 +176,11 @@ const PROJECTS: Project[] = [
 export default function NuestraExperienciaPage() {
   const [activeId, setActiveId] = useState(ERAS[0].id);
   const [transitioning, setTransitioning] = useState(false);
-  const [openProject, setOpenProject] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<string>(PROJECTS[0].id);
   const [revealed, setRevealed] = useState(false);
 
   const activeEra = ERAS.find((e) => e.id === activeId) ?? ERAS[0];
+  const activeProject = PROJECTS.find((p) => p.id === selectedProject) ?? PROJECTS[0];
 
   function selectEra(id: string) {
     if (id === activeId || transitioning) return;
@@ -181,10 +189,6 @@ export default function NuestraExperienciaPage() {
       setActiveId(id);
       setTransitioning(false);
     }, 200);
-  }
-
-  function toggleProject(id: string) {
-    setOpenProject((prev) => (prev === id ? null : id));
   }
 
   useEffect(() => {
@@ -203,6 +207,13 @@ export default function NuestraExperienciaPage() {
 
         {/* ── HERO ── */}
         <section className="exp3-hero">
+          {/* Background image */}
+          <div className="exp3-hero-bg" aria-hidden>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/hero/6.png" alt="" className="exp3-hero-bg-img" />
+            <div className="exp3-hero-bg-overlay" />
+          </div>
+
           <div className="exp3-hero-inner">
             <p className={`exp3-eyebrow${revealed ? " is-in" : ""}`}>Trayectoria</p>
             <h1 className={`exp3-title font-tho-title${revealed ? " is-in" : ""}`}>
@@ -212,14 +223,11 @@ export default function NuestraExperienciaPage() {
               Más de una década de trabajo en terreno,<br className="hidden md:block" /> convertida en método y relaciones que duran.
             </p>
           </div>
-          {/* brand bar */}
           <div className="exp3-hero-bar" aria-hidden />
         </section>
 
         {/* ── TIMELINE ── */}
         <section className="exp3-timeline-section">
-
-          {/* Year tabs */}
           <div className="exp3-tabs-wrap">
             <div className="exp3-tabs">
               {ERAS.map((era) => {
@@ -239,40 +247,23 @@ export default function NuestraExperienciaPage() {
             </div>
           </div>
 
-          {/* Panel */}
           <div className="exp3-panel-wrap">
-            {/* Ghost year */}
-            <div
-              className="exp3-ghost-year font-tho-title"
-              aria-hidden
-              style={{ color: activeEra.accent }}
-            >
+            <div className="exp3-ghost-year font-tho-title" aria-hidden style={{ color: activeEra.accent }}>
               {activeEra.year}
             </div>
 
             <div className={`exp3-panel-grid${transitioning ? " is-out" : " is-in"}`}>
-
-              {/* Left: narrative */}
               <div className="exp3-narrative">
-                <div
-                  className="exp3-era-accent-bar"
-                  style={{ background: activeEra.accent }}
-                  aria-hidden
-                />
+                <div className="exp3-era-accent-bar" style={{ background: activeEra.accent }} aria-hidden />
                 <h2 className="exp3-era-label font-tho-title">{activeEra.label}</h2>
                 <div className="exp3-era-body">
-                  {activeEra.body.map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
+                  {activeEra.body.map((p, i) => <p key={i}>{p}</p>)}
                 </div>
               </div>
 
-              {/* Right: clients */}
               <div className="exp3-clients">
                 {activeEra.clients.length === 0 ? (
-                  <div className="exp3-clients-empty">
-                    <p>{activeEra.clientNote}</p>
-                  </div>
+                  <div className="exp3-clients-empty"><p>{activeEra.clientNote}</p></div>
                 ) : (
                   <>
                     {continuingClients.length > 0 && (
@@ -280,9 +271,7 @@ export default function NuestraExperienciaPage() {
                         <p className="exp3-client-group-label">Continúan</p>
                         <div className="exp3-client-chips">
                           {continuingClients.map((c) => (
-                            <span key={c.name} className="exp3-chip exp3-chip--continuing">
-                              {c.name}
-                            </span>
+                            <span key={c.name} className="exp3-chip exp3-chip--continuing">{c.name}</span>
                           ))}
                         </div>
                       </div>
@@ -295,13 +284,7 @@ export default function NuestraExperienciaPage() {
                             <span
                               key={c.name}
                               className="exp3-chip exp3-chip--new"
-                              style={
-                                {
-                                  "--chip-color": activeEra.accent,
-                                  "--chip-bg": activeEra.accent + "15",
-                                  "--chip-border": activeEra.accent + "40",
-                                } as React.CSSProperties
-                              }
+                              style={{ "--chip-color": activeEra.accent, "--chip-bg": activeEra.accent + "15", "--chip-border": activeEra.accent + "40" } as React.CSSProperties}
                             >
                               {c.name}
                             </span>
@@ -315,7 +298,6 @@ export default function NuestraExperienciaPage() {
                   </>
                 )}
               </div>
-
             </div>
           </div>
         </section>
@@ -325,87 +307,72 @@ export default function NuestraExperienciaPage() {
           <div className="exp3-projects-inner">
             <div className="exp3-projects-header">
               <p className="exp3-eyebrow" style={{ color: "#94a3b8" }}>Proyectos destacados</p>
-              <h2 className="exp3-section-title font-tho-title">
-                Trabajo que habla<br />por sí solo
-              </h2>
+              <h2 className="exp3-section-title font-tho-title">Proyectos destacados</h2>
             </div>
 
-            <div className="exp3-projects-grid">
-              {PROJECTS.map((project) => {
-                const isOpen = openProject === project.id;
-                return (
-                  <article
-                    key={project.id}
-                    className={`exp3-card${isOpen ? " is-open" : ""}`}
-                  >
+            {/* Split panel: list left, detail right */}
+            <div className="exp3-split">
+              {/* List */}
+              <div className="exp3-split-list">
+                {PROJECTS.map((project) => {
+                  const isActive = selectedProject === project.id;
+                  return (
                     <button
-                      className="exp3-card-trigger"
-                      onClick={() => toggleProject(project.id)}
-                      aria-expanded={isOpen}
+                      key={project.id}
+                      className={`exp3-split-item${isActive ? " is-active" : ""}`}
+                      style={isActive ? ({ "--item-accent": project.tagColor } as React.CSSProperties) : undefined}
+                      onClick={() => setSelectedProject(project.id)}
+                      aria-pressed={isActive}
                     >
-                      <div className="exp3-card-top">
-                        <span
-                          className="exp3-card-tag"
-                          style={{
-                            color: project.tagColor,
-                            borderColor: project.tagColor + "50",
-                            background: project.tagColor + "12",
-                          }}
-                        >
-                          {project.tag}
-                        </span>
-                        <span className="exp3-card-since">{project.since}</span>
-                      </div>
-                      <p className="exp3-card-client">{project.client}</p>
-                      <h3 className="exp3-card-title">{project.title}</h3>
-                      <p className="exp3-card-summary">{project.summary}</p>
-                      <div className="exp3-card-footer">
-                        <span
-                          className="exp3-card-cta"
-                          style={{ color: project.tagColor }}
-                        >
-                          {isOpen ? "Cerrar" : "Ver detalle"}
-                        </span>
-                        <span
-                          className={`exp3-card-chevron${isOpen ? " is-open" : ""}`}
-                          style={{ color: project.tagColor }}
-                          aria-hidden
-                        >
-                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                            <path
-                              d="M3 5l4 4 4-4"
-                              stroke="currentColor"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                      <span
+                        className="exp3-split-tag"
+                        style={{ color: project.tagColor, background: project.tagColor + "12", borderColor: project.tagColor + "40" }}
+                      >
+                        {project.tag}
+                      </span>
+                      <span className="exp3-split-client">{project.client}</span>
+                      <span className="exp3-split-title">{project.title}</span>
+                      <span className="exp3-split-since">{project.since}</span>
+                      {isActive && (
+                        <span className="exp3-split-arrow" aria-hidden style={{ color: project.tagColor }}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </span>
-                      </div>
+                      )}
                     </button>
+                  );
+                })}
+              </div>
 
-                    <div className={`exp3-card-detail${isOpen ? " is-open" : ""}`}>
-                      <div
-                        className="exp3-card-detail-bar"
-                        style={{ background: project.tagColor }}
-                      />
-                      <p>{project.detail}</p>
-                    </div>
-                  </article>
-                );
-              })}
+              {/* Detail panel */}
+              <div
+                className="exp3-split-detail"
+                style={{ "--detail-accent": activeProject.tagColor } as React.CSSProperties}
+                key={activeProject.id}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={activeProject.illustration} alt="" className="exp3-split-detail-illustration" aria-hidden />
+                <div className="exp3-split-detail-bar" style={{ background: activeProject.tagColor }} />
+                <span
+                  className="exp3-split-detail-tag"
+                  style={{ color: activeProject.tagColor, background: activeProject.tagColor + "12", borderColor: activeProject.tagColor + "40" }}
+                >
+                  {activeProject.tag}
+                </span>
+                <p className="exp3-split-detail-client">{activeProject.client}</p>
+                <h3 className="exp3-split-detail-title font-tho-title">{activeProject.title}</h3>
+                <p className="exp3-split-detail-since">{activeProject.since}</p>
+                <p className="exp3-split-detail-body">{activeProject.detail}</p>
+              </div>
             </div>
           </div>
         </section>
 
         {/* SEO */}
         <div className="sr-only" aria-hidden="true">
-          {ERAS.map((era) =>
-            era.body.map((p, i) => <p key={`seo-${era.id}-${i}`}>{p}</p>)
-          )}
-          {PROJECTS.map((p) => (
-            <p key={`seo-proj-${p.id}`}>{p.detail}</p>
-          ))}
+          {ERAS.map((era) => era.body.map((p, i) => <p key={`seo-${era.id}-${i}`}>{p}</p>))}
+          {PROJECTS.map((p) => <p key={`seo-proj-${p.id}`}>{p.detail}</p>)}
         </div>
       </main>
 
