@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { Footer } from "@/components/Footer";
@@ -5,6 +6,38 @@ import { Header } from "@/components/Header";
 import { ServicePage } from "@/components/ServicePage";
 import { getServiceBySlug, SERVICES } from "@/content/services";
 import { listPublishedPosts } from "@/lib/blogStore";
+
+const SITE = "https://tho.cl";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const service = getServiceBySlug(slug);
+  if (!service) return {};
+
+  const title = `${service.menuLabel} · The Human Org`;
+  const description = service.problem;
+  const canonical = `${SITE}/servicios/${service.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      url: canonical,
+      siteName: "The Human Org",
+      images: [{ url: `${SITE}/og.png`, width: 1200, height: 630, alt: "The Human Org" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [`${SITE}/og.png`],
+    },
+  };
+}
 
 export function generateStaticParams() {
   return SERVICES.map((service) => ({ slug: service.slug }));

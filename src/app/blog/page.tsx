@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { BlogIndexClient } from "@/components/blog/BlogIndexClient";
 import { listPublishedPosts } from "@/lib/blogStore";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // regenerar cada hora
 
 export default async function BlogPage() {
   const posts = await listPublishedPosts();

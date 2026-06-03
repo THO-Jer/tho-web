@@ -10,9 +10,9 @@ import { BlogContent, getToc } from "@/components/blog/BlogContent";
 import { BlogTocClient } from "@/components/blog/BlogTocClient";
 import { getPublishedPostBySlug, listPublishedPosts } from "@/lib/blogStore";
 
-const SITE = "https://tho-web.vercel.app";
+const SITE = "https://tho.cl";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // regenerar cada hora
 
 export async function generateStaticParams() {
   const posts = await listPublishedPosts();

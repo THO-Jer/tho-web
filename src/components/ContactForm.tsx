@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getUtm } from "@/lib/utm";
 
 export function ContactForm(props: { ticket?: string }) {
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
@@ -24,7 +25,7 @@ export function ContactForm(props: { ticket?: string }) {
       ticket: props.ticket,
       pageUrl: window.location.href,
       hp: String(form.get("hp") || ""),
-      utm: {},
+      utm: getUtm(),
     };
 
     try {

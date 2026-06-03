@@ -19,7 +19,7 @@ export function ResourcesModal(props?: { autoOpen?: boolean }) {
 
     const timeoutId = window.setTimeout(() => {
       setOpen(true);
-    }, 0);
+    }, 3500);
 
     return () => window.clearTimeout(timeoutId);
   }, [props?.autoOpen]);
