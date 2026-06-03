@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (!answers.length) return NextResponse.json({ error: "Debes responder al menos una pregunta." }, { status: 400 });
 
     const data = await submitModuleQuiz(session.email, moduleKey, answers);
-    return NextResponse.json({ onboarding: { ...data.record, ...data.summary }, moduleStatus: data.moduleStatus, passed: data.passed, topics_to_reinforce: data.topics_to_reinforce });
+    return NextResponse.json({ onboarding: { ...data.record, ...data.summary }, moduleStatus: data.moduleStatus, passed: data.passed, score: data.score, topics_to_reinforce: data.topics_to_reinforce });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "No se pudo guardar evaluación." }, { status: 400 });
   }

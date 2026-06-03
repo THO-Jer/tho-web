@@ -43,6 +43,25 @@ import { LessonD8 } from "@/components/onboarding/lessons/LessonD8";
 import { LessonD9 } from "@/components/onboarding/lessons/LessonD9";
 import { LessonD10 } from "@/components/onboarding/lessons/LessonD10";
 import { LessonDCierre } from "@/components/onboarding/lessons/LessonDCierre";
+
+type ShellProps = { elapsedSeconds: number; reachedEnd: boolean; minLessonSeconds: number };
+
+/**
+ * Mapa declarativo de lecciones hand-crafted por clave "MÓDULO:ID".
+ * Para agregar un módulo E: solo añadir entradas aquí y crear el componente.
+ * LessonA8 se maneja aparte porque requiere props adicionales de estado.
+ */
+const LESSON_MAP: Record<string, React.ComponentType<ShellProps>> = {
+  "A:A0": LessonA0, "A:A1": LessonA1, "A:A2": LessonA2, "A:A3": LessonA3,
+  "A:A4": LessonA4, "A:A5": LessonA5, "A:A6": LessonA6, "A:A7": LessonA7,
+  "B:B1": LessonB1, "B:B2": LessonB2, "B:B3": LessonB3, "B:B4": LessonB4,
+  "B:B5": LessonB5, "B:B6": LessonB6, "B:B7": LessonB7,
+  "C:C1": LessonC1, "C:C2": LessonC2, "C:C3": LessonC3, "C:C4": LessonC4,
+  "C:C5": LessonC5, "C:C6": LessonC6, "C:C7": LessonC7, "C:C8": LessonC8, "C:C9": LessonC9,
+  "D:D1": LessonD1, "D:D2": LessonD2, "D:D3": LessonD3, "D:D4": LessonD4,
+  "D:D5": LessonD5, "D:D6": LessonD6, "D:D7": LessonD7, "D:D8": LessonD8,
+  "D:D9": LessonD9, "D:D10": LessonD10, "D:DCierre": LessonDCierre,
+};
 import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
 import {
   getLessonGuide,
@@ -101,6 +120,7 @@ export default function StudioOnboardingUnitPage() {
   const [minLessonSeconds, setMinLessonSeconds] = useState(12);
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
   const [showReinforceModal, setShowReinforceModal] = useState(false);
+  const [quizScore, setQuizScore] = useState<number | null>(null);
   const [tick, setTick] = useState(() => Date.now());
   const [integrationAnswers, setIntegrationAnswers] = useState<IntegrationAnswers>({
     pressure: null,
@@ -218,13 +238,17 @@ export default function StudioOnboardingUnitPage() {
       setOnboarding(data.onboarding as Onboarding);
       setFailedTopics(Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []);
       if (data.passed) {
-        setMessage("Módulo validado. Puedes continuar al siguiente.");
-        router.push("/studio/onboarding");
+        const score = typeof data.score === "number" ? data.score : null;
+        setQuizScore(score);
+        setMessage(score !== null ? `Módulo validado con ${score}%. ¡Excelente!` : "Módulo validado. Puedes continuar al siguiente.");
+        setTimeout(() => router.push("/studio/onboarding"), 2200);
       } else {
         const attempts = data?.moduleStatus?.attempts ?? 0;
         const maxAttempts = data?.moduleStatus?.maxAttempts ?? 3;
+        const score = typeof data.score === "number" ? data.score : null;
+        setQuizScore(score);
         setShowReinforceModal(Boolean((Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []).length));
-        setMessage(`No alcanzaste el puntaje mínimo. Intento ${attempts}/${maxAttempts}.`);
+        setMessage(`Obtuviste ${score !== null ? `${score}%` : "puntaje insuficiente"}. Intento ${attempts}/${maxAttempts}.`);
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo completar módulo.");
@@ -241,113 +265,27 @@ export default function StudioOnboardingUnitPage() {
   const lessonProgressPct = lessons.length ? Math.round((completedLessonCount / lessons.length) * 100) : 0;
   const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson) : null;
 
-  // Cada lección hand-crafted se identifica por (moduleKey, lesson.id).
-  // Si una lección no calza con ningún case, cae al fallback GenericLesson.
+  // Resuelve el componente de cada lección via LESSON_MAP.
+  // LessonA8 se trata aparte porque necesita props de estado propios.
   const renderLesson = () => {
     if (!lesson) return null;
+    const shellProps: ShellProps = { elapsedSeconds, reachedEnd, minLessonSeconds };
 
-    const shellProps = { elapsedSeconds, reachedEnd, minLessonSeconds };
-
-    if (moduleKey === "A") {
-      switch (lesson.id) {
-        case "A0":
-          return <LessonA0 {...shellProps} />;
-        case "A1":
-          return <LessonA1 {...shellProps} />;
-        case "A2":
-          return <LessonA2 {...shellProps} />;
-        case "A3":
-          return <LessonA3 {...shellProps} />;
-        case "A4":
-          return <LessonA4 {...shellProps} />;
-        case "A5":
-          return <LessonA5 {...shellProps} />;
-        case "A6":
-          return <LessonA6 {...shellProps} />;
-        case "A7":
-          return <LessonA7 {...shellProps} />;
-        case "Reflexión guiada sugerida":
-          return (
-            <LessonA8
-              {...shellProps}
-              integrationAnswers={integrationAnswers}
-              setIntegrationAnswers={setIntegrationAnswers}
-              integrationConfirmed={integrationConfirmed}
-              setIntegrationConfirmed={setIntegrationConfirmed}
-              onContinueToQuiz={() => quizSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-            />
-          );
-      }
+    if (moduleKey === "A" && lesson.id === "A8") {
+      return (
+        <LessonA8
+          {...shellProps}
+          integrationAnswers={integrationAnswers}
+          setIntegrationAnswers={setIntegrationAnswers}
+          integrationConfirmed={integrationConfirmed}
+          setIntegrationConfirmed={setIntegrationConfirmed}
+          onContinueToQuiz={() => quizSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        />
+      );
     }
 
-    if (moduleKey === "B") {
-      switch (lesson.id) {
-        case "B1":
-          return <LessonB1 {...shellProps} />;
-        case "B2":
-          return <LessonB2 {...shellProps} />;
-        case "B3":
-          return <LessonB3 {...shellProps} />;
-        case "B4":
-          return <LessonB4 {...shellProps} />;
-        case "B5":
-          return <LessonB5 {...shellProps} />;
-        case "B6":
-          return <LessonB6 {...shellProps} />;
-        case "B7":
-          return <LessonB7 {...shellProps} />;
-      }
-    }
-
-    if (moduleKey === "C") {
-      switch (lesson.id) {
-        case "C1":
-          return <LessonC1 {...shellProps} />;
-        case "C2":
-          return <LessonC2 {...shellProps} />;
-        case "C3":
-          return <LessonC3 {...shellProps} />;
-        case "C4":
-          return <LessonC4 {...shellProps} />;
-        case "C5":
-          return <LessonC5 {...shellProps} />;
-        case "C6":
-          return <LessonC6 {...shellProps} />;
-        case "C7":
-          return <LessonC7 {...shellProps} />;
-        case "C8":
-          return <LessonC8 {...shellProps} />;
-        case "C9":
-          return <LessonC9 {...shellProps} />;
-      }
-    }
-
-    if (moduleKey === "D") {
-      switch (lesson.id) {
-        case "D1":
-          return <LessonD1 {...shellProps} />;
-        case "D2":
-          return <LessonD2 {...shellProps} />;
-        case "D3":
-          return <LessonD3 {...shellProps} />;
-        case "D4":
-          return <LessonD4 {...shellProps} />;
-        case "D5":
-          return <LessonD5 {...shellProps} />;
-        case "D6":
-          return <LessonD6 {...shellProps} />;
-        case "D7":
-          return <LessonD7 {...shellProps} />;
-        case "D8":
-          return <LessonD8 {...shellProps} />;
-        case "D9":
-          return <LessonD9 {...shellProps} />;
-        case "D10":
-          return <LessonD10 {...shellProps} />;
-        case "Cierre del módulo":
-          return <LessonDCierre {...shellProps} />;
-      }
-    }
+    const LessonComp = LESSON_MAP[`${moduleKey}:${lesson.id}`];
+    if (LessonComp) return <LessonComp {...shellProps} />;
 
     return (
       <GenericLesson
@@ -388,21 +326,74 @@ export default function StudioOnboardingUnitPage() {
             {renderLesson()}
             <div ref={lessonEndRef} className="h-0 w-0" />
             <div className="border-t border-slate-200 bg-slate-50/60 p-4">
-              <div className="flex flex-wrap gap-2">
-                <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.max(0, v - 1))} disabled={activeLesson <= 0}>Anterior</button>
-                <button type="button" className="rounded-lg border border-slate-300 px-3 py-2 text-xs" onClick={() => setActiveLesson((v) => Math.min(lessons.length - 1, v + 1))} disabled={activeLesson >= lessons.length - 1}>Siguiente</button>
-                {isLessonDone(lesson.id) ? (
-                  <span className="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800">Lección completada</span>
-                ) : canMarkLesson ? (
-                  <button type="button" onClick={() => markLesson(lesson.id)} disabled={saving} className="rounded-lg bg-slate-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-60">
-                    Marcar como completada
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {/* Contexto de posición + botón Anterior */}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-xs disabled:opacity-40"
+                    onClick={() => setActiveLesson((v) => Math.max(0, v - 1))}
+                    disabled={activeLesson <= 0}
+                  >
+                    ← Anterior
                   </button>
-                ) : (
-                  <span className="rounded-lg border border-slate-300 px-3 py-2 text-xs text-slate-500">Completa lectura + tiempo mínimo para habilitar</span>
-                )}
+                  <span className="text-xs text-slate-500">
+                    Lección {activeLesson + 1} de {lessons.length}
+                  </span>
+                </div>
+                {/* CTA principal: único botón de avance */}
+                <div>
+                  {isLessonDone(lesson.id) ? (
+                    activeLesson < lessons.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={() => setActiveLesson((v) => v + 1)}
+                        className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white"
+                      >
+                        Siguiente →
+                      </button>
+                    ) : (
+                      <span className="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-800">
+                        ✓ Todas las lecciones completadas
+                      </span>
+                    )
+                  ) : canMarkLesson ? (
+                    <button
+                      type="button"
+                      onClick={() => markLesson(lesson.id)}
+                      disabled={saving}
+                      className="rounded-lg bg-slate-900 px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+                    >
+                      {saving ? "Guardando…" : activeLesson < lessons.length - 1 ? "Completar y continuar →" : "Completar lección"}
+                    </button>
+                  ) : (
+                    <span className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-400">
+                      Termina de leer para continuar
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </article>
+        ) : null}
+
+        {/* Banner de llamada al quiz — aparece al completar todas las lecciones */}
+        {unitQuiz.length && allLessonsDone ? (
+          <div className="mt-6 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-emerald-900">¡Completaste todas las lecciones!</p>
+                <p className="mt-0.5 text-xs text-emerald-800">Rinde la evaluación del módulo para validarlo.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => quizSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="rounded-lg bg-emerald-700 px-4 py-2 text-xs font-semibold text-white hover:bg-emerald-800"
+              >
+                Ir a la evaluación ↓
+              </button>
+            </div>
+          </div>
         ) : null}
 
         {unitQuiz.length && allLessonsDone ? (

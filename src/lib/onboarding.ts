@@ -60,11 +60,19 @@ export const moduleVisuals: Record<string, ModuleVisual> = {
   },
 };
 
+/** Normaliza IDs de lección que usan strings largos a aliases canónicos cortos. */
+const LESSON_ID_ALIASES: Record<string, string> = {
+  "Reflexión guiada sugerida": "A8",
+  "Cierre del módulo": "DCierre",
+  "Venta consultiva en THO": "B1",
+};
+
 export function parseLessons(content: string[]): Lesson[] {
   return content.map((paragraph, index) => {
     const normalized = paragraph.replace(/\s+/g, " ").trim();
     const match = normalized.match(/^([A-Z]\d+|Reflexión guiada sugerida|Venta consultiva en THO|Cierre del módulo)\s*[—:-]\s*(.+)$/i);
-    const id = match ? String(match[1]).trim() : `L${index + 1}`;
+    const rawId = match ? String(match[1]).trim() : `L${index + 1}`;
+    const id = LESSON_ID_ALIASES[rawId] ?? rawId;
     const label = match ? String(match[1]).trim() : `Lección ${index + 1}`;
     const body = match ? String(match[2]).trim() : normalized;
     const colonIdx = body.indexOf(":");
@@ -119,7 +127,7 @@ export function topicToLesson(topic: string, lessons: Array<{ id: string; label:
   if (t.startsWith("definition_of_done") || t.startsWith("metodo_sobre_costumbre")) return findById("A3") || lessons[0];
   if (t.startsWith("limites_institucionales")) return findById("A6") || lessons[0];
   if (t.startsWith("protocolo_etico") || t.startsWith("escalamiento")) return findById("A7") || lessons[0];
-  if (t.startsWith("coherencia") || t.startsWith("integridad_territorial") || t.startsWith("trazabilidad")) return findById("Reflexión guiada sugerida") || lessons[0];
+  if (t.startsWith("coherencia") || t.startsWith("integridad_territorial") || t.startsWith("trazabilidad")) return findById("A8") || lessons[0];
   if (t.startsWith("identidad") || t.startsWith("onboarding")) return firstOfModule("A") || lessons[0];
 
   // Módulo B — mapeo específico por topic (refinado tras editorialización)

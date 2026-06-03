@@ -105,11 +105,18 @@ export default function StudioOnboardingLandingPage() {
 
   const nextUnit = useMemo(() => {
     if (!data) return units[0];
-    if (data.last_seen_unit && units.some((unit) => unit.slug === data.last_seen_unit)) {
-      return units.find((unit) => unit.slug === data.last_seen_unit) || units[0];
-    }
     const status = new Map((data.module_status || []).map((row) => [row.moduleKey, row.status]));
-    return units.find((unit) => status.get(getModuleKeyFromSlug(unit.slug)) !== "validated") || units[0];
+    // Primer módulo no validado, ignorando last_seen_unit si ya está validado
+    const firstIncomplete = units.find((unit) => status.get(getModuleKeyFromSlug(unit.slug)) !== "validated");
+    if (!firstIncomplete) return units[0]; // todos validados → apuntar al primero para revisión
+    // Dentro del módulo incompleto, preferir last_seen_unit si coincide
+    if (
+      data.last_seen_unit &&
+      data.last_seen_unit === firstIncomplete.slug
+    ) {
+      return firstIncomplete;
+    }
+    return firstIncomplete;
   }, [data, units]);
 
   const totalMinutes = useMemo(() => units.reduce((sum, unit) => sum + (unit.durationMinutes || 0), 0), [units]);

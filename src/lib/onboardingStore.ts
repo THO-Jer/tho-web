@@ -732,6 +732,7 @@ export async function submitModuleQuiz(email: string, moduleKey: string, answers
     summary: summarizeOnboarding(nextRecord, state),
     moduleStatus: nextStatus,
     passed,
+    score,
     topics_to_reinforce: Array.from(new Set(missedTopics)),
   };
 }
