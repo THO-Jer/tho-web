@@ -256,13 +256,27 @@ function coerceModuleVisibility(raw: unknown): ModuleVisibilityConfig {
   return config;
 }
 
+/**
+ * Fusiona las preguntas almacenadas en disco con las del default del código.
+ * - Las preguntas editadas en el admin (presentes en stored) se respetan.
+ * - Las preguntas nuevas en el código que no existen en stored se agregan.
+ * Esto evita que nuevas preguntas de módulos recientes queden invisibles
+ * porque el JSON en disco fue creado antes de que existieran.
+ */
+function mergeQuiz(stored: OnboardingQuizQuestion[]): OnboardingQuizQuestion[] {
+  if (!stored.length) return defaultOnboardingQuiz;
+  const storedIds = new Set(stored.map((q) => q.id));
+  const newFromDefault = defaultOnboardingQuiz.filter((q) => !storedIds.has(q.id));
+  return [...stored, ...newFromDefault];
+}
+
 async function readStateFromJson(): Promise<OnboardingState> {
   await ensureStore();
   const raw = await fs.readFile(ONBOARDING_PATH, "utf8");
   const parsed = JSON.parse(raw) as Partial<OnboardingState>;
   return {
     units: Array.isArray(parsed.units) && parsed.units.length ? (parsed.units as OnboardingUnit[]) : defaultOnboardingUnits,
-    quiz: Array.isArray(parsed.quiz) && parsed.quiz.length ? (parsed.quiz as OnboardingQuizQuestion[]) : defaultOnboardingQuiz,
+    quiz: mergeQuiz(Array.isArray(parsed.quiz) ? (parsed.quiz as OnboardingQuizQuestion[]) : []),
     records: Array.isArray(parsed.records) ? (parsed.records as OnboardingRecord[]) : [],
     moduleVisibility: coerceModuleVisibility(parsed.moduleVisibility),
     moduleStatusByEmail: parsed.moduleStatusByEmail || {},
