@@ -1,9 +1,26 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BlogIndexClient } from "@/components/blog/BlogIndexClient";
 import { listPublishedPosts } from "@/lib/blogStore";
 
 export const revalidate = 3600; // regenerar cada hora
+
+export const metadata: Metadata = {
+  title: "Blog · The Human Org",
+  description:
+    "Análisis y reflexiones desde el terreno: sostenibilidad corporativa, relacionamiento comunitario y desarrollo organizacional.",
+  alternates: { canonical: "https://tho.cl/blog" },
+  openGraph: {
+    type: "website",
+    title: "Blog · The Human Org",
+    description:
+      "Análisis y reflexiones desde el terreno: sostenibilidad corporativa, relacionamiento comunitario y desarrollo organizacional.",
+    url: "https://tho.cl/blog",
+    siteName: "The Human Org",
+    images: [{ url: "https://tho.cl/og.png", width: 1200, height: 630, alt: "The Human Org" }],
+  },
+};
 
 export default async function BlogPage() {
   const posts = await listPublishedPosts();

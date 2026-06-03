@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 
 import { Footer } from "@/components/Footer";
@@ -77,8 +78,30 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
       tags: post.tags,
     }));
 
+  const serviceLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: service.menuLabel,
+    description: service.problem,
+    url: `${SITE}/servicios/${service.slug}`,
+    provider: {
+      "@type": "Organization",
+      name: "The Human Org",
+      url: SITE,
+    },
+    areaServed: {
+      "@type": "Country",
+      name: "Chile",
+    },
+  };
+
   return (
     <div className="min-h-screen bg-tho-bg dark:bg-slate-950">
+      <Script
+        id={`ld-service-${service.slug}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+      />
       <Header />
       <ServicePage service={service} relatedPosts={relatedPosts} />
       <Footer />

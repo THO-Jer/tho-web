@@ -24,7 +24,7 @@ const items = [
     ),
   },
   {
-    href: "http://linkedin.com/company/thocl",
+    href: "https://linkedin.com/company/thocl",
     label: "Síguenos en LinkedIn",
     aria: "Abrir LinkedIn de The Human Org",
     tone: "bg-[#0A66C2]",

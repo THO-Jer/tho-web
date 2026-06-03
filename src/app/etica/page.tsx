@@ -1,5 +1,22 @@
+import type { Metadata } from "next";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "Código de ética · The Human Org",
+  description:
+    "El código de ética que orienta la conducta de The Human Org, sus directores y colaboradores en toda relación profesional.",
+  alternates: { canonical: "https://tho.cl/etica" },
+  openGraph: {
+    type: "website",
+    title: "Código de ética · The Human Org",
+    description:
+      "El código de ética que orienta la conducta de The Human Org, sus directores y colaboradores en toda relación profesional.",
+    url: "https://tho.cl/etica",
+    siteName: "The Human Org",
+    images: [{ url: "https://tho.cl/og.png", width: 1200, height: 630, alt: "The Human Org" }],
+  },
+};
 
 export default function EticaPage() {
   return (
