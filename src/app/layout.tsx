@@ -26,11 +26,20 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   title: {
-    default: "The Human Org — Consultoría estratégica",
+    default: "The Human Org — Consultora estratégica en Concepción",
     template: "%s · The Human Org",
   },
   description:
-    "Consultoría boutique en desarrollo organizacional, relacionamiento comunitario y sostenibilidad corporativa. Rigor, viabilidad y acompañamiento en terreno.",
+    "Consultora boutique en Concepción especializada en desarrollo organizacional, relacionamiento comunitario y sostenibilidad corporativa (ESG). Atendemos clientes en todo Chile, de forma remota o en terreno según el servicio.",
+  keywords: [
+    "consultora concepcion",
+    "consultoría estratégica concepción",
+    "desarrollo organizacional concepción",
+    "relacionamiento comunitario chile",
+    "sostenibilidad corporativa ESG",
+    "consultora ESG chile",
+    "consultoría organizacional biobío",
+  ],
   applicationName: "The Human Org",
   icons: {
     icon: [{ url: "/icon", type: "image/png" }],
@@ -40,16 +49,16 @@ export const metadata: Metadata = {
     type: "website",
     url: "/",
     siteName: "The Human Org",
-    title: "The Human Org — Consultoría estratégica",
+    title: "The Human Org — Consultora estratégica en Concepción",
     description:
-      "Rigor y viabilidad para decisiones complejas: DO, relacionamiento comunitario y sostenibilidad corporativa.",
+      "Consultora en Concepción especializada en ESG, relacionamiento comunitario y desarrollo organizacional. Rigor y viabilidad para decisiones complejas.",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "The Human Org" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "The Human Org — Consultoría estratégica",
+    title: "The Human Org — Consultora estratégica en Concepción",
     description:
-      "Rigor y viabilidad para decisiones complejas: DO, relacionamiento comunitario y sostenibilidad corporativa.",
+      "Consultora en Concepción especializada en ESG, relacionamiento comunitario y desarrollo organizacional. Rigor y viabilidad para decisiones complejas.",
     images: ["/og.png"],
   },
 };
@@ -57,11 +66,32 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const orgLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "ProfessionalService",
     name: "The Human Org",
+    alternateName: "THO",
     url: "https://tho.cl",
     email: "hola@tho.cl",
     logo: "https://tho.cl/brand/logo-negro.svg",
+    image: "https://tho.cl/og.png",
+    description:
+      "Consultora estratégica boutique en Concepción, Chile, especializada en sostenibilidad corporativa (ESG), relacionamiento comunitario y desarrollo organizacional.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Concepción",
+      addressRegion: "Región del Biobío",
+      addressCountry: "CL",
+    },
+    areaServed: { "@type": "Country", name: "Chile" },
+    knowsAbout: [
+      "Sostenibilidad corporativa",
+      "ESG",
+      "Relacionamiento comunitario",
+      "Desarrollo organizacional",
+      "Reporte de sostenibilidad",
+      "Gestión de stakeholders",
+      "Cultura organizacional",
+    ],
+    sameAs: [],
   };
 
   return (

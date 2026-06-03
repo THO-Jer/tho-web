@@ -17,8 +17,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const service = getServiceBySlug(slug);
   if (!service) return {};
 
-  const title = `${service.menuLabel} · The Human Org`;
-  const description = service.problem;
+  const title = `${service.menuLabel} en Concepción · The Human Org`;
+  const description = `${service.problem} Consultoría especializada en Concepción, Chile.`;
   const canonical = `${SITE}/servicios/${service.slug}`;
 
   return {

@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import Script from "next/script";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -13,17 +15,76 @@ import { SocialFloat } from "@/components/SocialFloat";
 import { listPublishedPosts } from "@/lib/blogStore";
 import { BOOK_URL } from "@/lib/links";
 
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  title: "The Human Org — Consultora estratégica en Concepción",
+  description:
+    "Consultora boutique en Concepción especializada en desarrollo organizacional, relacionamiento comunitario y sostenibilidad corporativa (ESG). Atendemos clientes en todo Chile, de forma remota o en terreno según el servicio.",
+};
+
 function clampWords(text: string, maxWords = 22) {
   const words = text.trim().split(/\s+/);
   if (words.length <= maxWords) return text;
   return `${words.slice(0, maxWords).join(" ")} (...)`;
 }
 
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "¿Qué es The Human Org?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The Human Org (THO) es una consultora estratégica boutique con sede en Concepción, Chile, especializada en sostenibilidad corporativa (ESG), relacionamiento comunitario y desarrollo organizacional.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Dónde está ubicada la consultora The Human Org?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The Human Org tiene su sede en Concepción, Región del Biobío, Chile. Opera en todo el país con especial presencia en la macro-zona centro-sur y norte.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿En qué servicios se especializa The Human Org?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "THO trabaja en tres líneas estratégicas: (1) Sostenibilidad Corporativa y reportabilidad ESG bajo estándares GRI, CSRD e IFRS S1/S2; (2) Relacionamiento Comunitario y gestión de stakeholders para proyectos con impacto territorial; (3) Desarrollo Organizacional, incluyendo transformación cultural, liderazgo y gestión del cambio.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Cómo puedo contratar a The Human Org?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Puedes agendar una reunión directamente desde tho.cl usando el botón 'Conversemos tu caso', o escribirnos a hola@tho.cl. El primer contacto es siempre una conversación para entender tu situación específica.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "¿Qué diferencia a THO de otras consultoras en Chile?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "THO es una consultora boutique: el equipo que diseña la propuesta es el mismo que ejecuta en terreno. No tercerizamos ni enviamos analistas sin experiencia. Priorizamos viabilidad real y acompañamiento directo sobre recomendaciones teóricas.",
+      },
+    },
+  ],
+};
+
 export default async function HomePage() {
   const posts = await listPublishedPosts();
 
   return (
     <div className="min-h-screen">
+      <Script
+        id="ld-faq"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
       <Header />
       <SocialFloat />
 
