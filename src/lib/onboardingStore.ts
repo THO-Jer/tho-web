@@ -19,6 +19,7 @@ import {
   upsertOnboardingQuizResultByModule,
   upsertOnboardingSupabaseProgress,
 } from "@/lib/onboardingStoreSupabase";
+import { resolveVisibleModules } from "@/lib/onboarding";
 import { getWritableDataPath } from "@/lib/storagePaths";
 
 // La rama/área de la organización a la que pertenece el usuario (su "track").
@@ -347,26 +348,13 @@ function getAllModuleKeys(units: OnboardingUnit[]): ModuleKey[] {
 
 /**
  * Resuelve el set de módulos visibles para un usuario, en orden canónico.
- * Prioridad: override por usuario (custom o rama) > rama del track > "general".
+ * Delega en resolveVisibleModules (lib/onboarding.ts) para mantener una sola
+ * fuente de verdad compartida con la previsualización del panel admin.
  */
 function resolveModulesForUser(email: string, track: OnboardingTrack, state: OnboardingState): ModuleKey[] {
   const config = state.moduleVisibility || defaultModuleVisibility();
   const allKeys = getAllModuleKeys(state.units);
-  const override = config.userOverrides?.[normalizeEmail(email)];
-
-  let modules: ModuleKey[];
-  if (override?.mode === "custom") {
-    modules = override.modules || [];
-  } else {
-    const branchId = override?.mode === "branch" && override.branchId ? override.branchId : track;
-    const branch =
-      config.branches.find((item) => item.id === branchId) ||
-      config.branches.find((item) => item.id === "general");
-    modules = branch?.modules || allKeys;
-  }
-
-  const allowed = new Set(modules);
-  return allKeys.filter((key) => allowed.has(key));
+  return resolveVisibleModules(normalizeEmail(email), track, config, allKeys);
 }
 
 function getApplicableUnitsForUser(state: OnboardingState, email: string, track: OnboardingTrack) {

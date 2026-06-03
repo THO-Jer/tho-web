@@ -13,6 +13,57 @@
 
 import { moduleALessonGuides, moduleCLessonGuides, moduleDLessonGuides, type LessonGuide } from "@/content/onboarding/lessonGuides";
 
+// ---------------------------------------------------------------------------
+// Resolución de módulos visibles — lógica pura compartida entre servidor y UI
+// ---------------------------------------------------------------------------
+
+export type ModuleVisibilityBranch = { id: string; modules: string[] };
+export type ModuleVisibilityOverride =
+  | { mode: "branch"; branchId: string }
+  | { mode: "custom"; modules: string[] }
+  | { mode: "inherit" };
+
+export type ModuleVisibilityConfig = {
+  branches: ModuleVisibilityBranch[];
+  userOverrides: Record<string, ModuleVisibilityOverride>;
+};
+
+/**
+ * Función pura que resuelve qué módulos ve un usuario dado su email, track y
+ * la configuración de visibilidad. Compartida entre el servidor (onboardingStore)
+ * y la vista de previsualización del panel admin.
+ *
+ * @param email   Email normalizado (lowercase, trim).
+ * @param track   Track/rama del usuario (ej. "general", "sales").
+ * @param config  Configuración de visibilidad de módulos.
+ * @param allKeys Todas las claves de módulo existentes en orden canónico.
+ */
+export function resolveVisibleModules(
+  email: string,
+  track: string,
+  config: ModuleVisibilityConfig,
+  allKeys: string[],
+): string[] {
+  const override = config.userOverrides?.[email.trim().toLowerCase()];
+
+  let modules: string[];
+  if (override?.mode === "custom") {
+    modules = override.modules || [];
+  } else {
+    const branchId =
+      override?.mode === "branch" && override.branchId ? override.branchId : track;
+    const branch =
+      config.branches.find((b) => b.id === branchId) ||
+      config.branches.find((b) => b.id === "general");
+    modules = branch?.modules || allKeys;
+  }
+
+  const allowed = new Set(modules);
+  return allKeys.filter((key) => allowed.has(key));
+}
+
+// ---------------------------------------------------------------------------
+
 export type Lesson = {
   id: string;
   label: string;

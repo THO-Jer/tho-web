@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { BrandLoader } from "@/components/BrandLoader";
 import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
+import { resolveVisibleModules } from "@/lib/onboarding";
 
 type ModuleStatus = { moduleKey: string; status: string; attempts: number; maxAttempts: number };
 type RecordRow = {
@@ -98,17 +99,7 @@ export default function StudioOnboardingAdminPage() {
 
   // Resolución (espejo de la lógica del servidor) para previsualizar qué módulos verá un usuario.
   function resolveModules(email: string, track: string): string[] {
-    const override = visibility.userOverrides[email.trim().toLowerCase()];
-    let modules: string[];
-    if (override?.mode === "custom") {
-      modules = override.modules || [];
-    } else {
-      const branchId = override?.mode === "branch" && override.branchId ? override.branchId : track;
-      const branch = visibility.branches.find((item) => item.id === branchId)
-        || visibility.branches.find((item) => item.id === "general");
-      modules = branch?.modules || moduleKeys;
-    }
-    return moduleKeys.filter((key) => modules.includes(key));
+    return resolveVisibleModules(email, track, visibility, moduleKeys);
   }
 
   async function resetModule(moduleKey: string) {

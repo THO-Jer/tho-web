@@ -27,14 +27,17 @@ export function ContactForm(props: { ticket?: string }) {
       utm: {},
     };
 
-    const res = await fetch("/api/lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    setStatus(res.ok ? "ok" : "error");
-    if (res.ok) (e.currentTarget as HTMLFormElement).reset();
+    try {
+      const res = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      setStatus(res.ok ? "ok" : "error");
+      if (res.ok) (e.currentTarget as HTMLFormElement).reset();
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
