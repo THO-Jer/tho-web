@@ -206,24 +206,23 @@ export default function NuestraExperienciaPage() {
       <main id="contenido">
 
         {/* ── HERO ── */}
-        <section className="exp3-hero">
-          {/* Background image */}
-          <div className="exp3-hero-bg" aria-hidden>
+        <section className="relative min-h-[52vh] overflow-visible text-white md:min-h-[60vh]">
+          <div className="hero-media-fade pointer-events-none absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/hero/6.png" alt="" className="exp3-hero-bg-img" />
-            <div className="exp3-hero-bg-overlay" />
+            <img src="/hero/6.png" alt="" className="absolute inset-0 h-full w-full object-cover opacity-[0.78]" />
+            <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.1)_0%,rgba(15,23,42,0.4)_52%,rgba(15,23,42,0.72)_100%)]" />
           </div>
-
-          <div className="exp3-hero-inner">
-            <p className={`exp3-eyebrow${revealed ? " is-in" : ""}`}>Trayectoria</p>
-            <h1 className={`exp3-title font-tho-title${revealed ? " is-in" : ""}`}>
-              Nuestra<br />experiencia
-            </h1>
-            <p className={`exp3-subtitle${revealed ? " is-in" : ""}`}>
-              Más de una década de trabajo en terreno,<br className="hidden md:block" /> convertida en método y relaciones que duran.
-            </p>
+          <div className="relative mx-auto flex h-full min-h-[52vh] max-w-6xl items-end justify-end px-4 pb-14 pt-8 md:min-h-[60vh] md:pb-16 md:pt-12">
+            <div className="max-w-2xl text-right">
+              <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
+              <h1 className={`mt-4 font-tho-title text-[3rem] leading-[0.95] text-white md:text-[4.4rem]${revealed ? " exp3-title-in" : " exp3-title-out"}`}>
+                Nuestra<br />experiencia
+              </h1>
+              <p className={`mt-4 ml-auto max-w-xl text-base text-white/85 md:text-lg${revealed ? " exp3-title-in" : " exp3-title-out"}`} style={{ transitionDelay: "0.08s" }}>
+                Más de una década de trabajo en terreno, convertida en método y relaciones que duran.
+              </p>
+            </div>
           </div>
-          <div className="exp3-hero-bar" aria-hidden />
         </section>
 
         {/* ── TIMELINE ── */}
