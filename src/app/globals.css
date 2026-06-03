@@ -1880,6 +1880,7 @@ body {
 
 /* Hide mobile-only elements on desktop */
 .exp3-split-item-inline { display: none; }
+.exp3-split-item-bg-illustration { display: none; }
 
 /* Split panel */
 .exp3-split {
@@ -2054,8 +2055,22 @@ body {
   /* On mobile: hide side panel, show inline accordion */
   .exp3-split-detail { display: none; }
   .exp3-split-item-inline { display: block; }
-  /* Arrow always visible on mobile (chevron up/down) */
-  .exp3-split-arrow { display: flex; }
+  /* Illustration: behind text, right side of trigger, low opacity */
+  .exp3-split-item-bg-illustration {
+    display: block;
+    position: absolute;
+    right: 2.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4.5rem;
+    opacity: 0.13;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .exp3-split-item-trigger > *:not(.exp3-split-item-bg-illustration) {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* ─── Dark mode: /nuestra-experiencia ─────────────────────────────────── */

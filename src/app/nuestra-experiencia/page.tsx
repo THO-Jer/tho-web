@@ -146,18 +146,6 @@ const PROJECTS: Project[] = [
     illustration: "/ilustraciones/11.png",
   },
   {
-    id: "paleoandes",
-    client: "Paleo Andes",
-    title: "Fortalecimiento Organizacional",
-    tag: "Desarrollo org.",
-    tagColor: "#d13ca2",
-    since: "Desde 2026",
-    summary: "Actualización de la arquitectura interna para una empresa de arqueología y paleontología.",
-    detail:
-      "Luego de un acercamiento en torno a la sostenibilidad en 2025, en 2026 iniciamos un proceso de fortalecimiento con foco en la arquitectura organizacional. La revisión del organigrama, el manual de cargos y las matrices de gestión interna permite mayor alineación, el desarrollo de una cultura organizacional sólida y un despliegue más coordinado de las distintas funciones.",
-    illustration: "/ilustraciones/2.png",
-  },
-  {
     id: "iap2",
     client: "IAP2 Latinoamérica",
     title: "Training en Participación Pública",
@@ -168,6 +156,18 @@ const PROJECTS: Project[] = [
     detail:
       "Con la certificación internacional de nuestro director como entrenador IAP2, realizamos formaciones a distintas organizaciones y empresas en el Enfoque IAP2 para la Participación Pública. Esta alianza ha permitido una internacionalización del trabajo de THO y un intercambio de experiencias que enriquece cada asesoría.",
     illustration: "/ilustraciones/10.png",
+  },
+  {
+    id: "paleoandes",
+    client: "Paleo Andes",
+    title: "Fortalecimiento Organizacional",
+    tag: "Desarrollo org.",
+    tagColor: "#d13ca2",
+    since: "Desde 2026",
+    summary: "Actualización de la arquitectura interna para una empresa de arqueología y paleontología.",
+    detail:
+      "Luego de un acercamiento en torno a la sostenibilidad en 2025, en 2026 iniciamos un proceso de fortalecimiento con foco en la arquitectura organizacional. La revisión del organigrama, el manual de cargos y las matrices de gestión interna permite mayor alineación, el desarrollo de una cultura organizacional sólida y un despliegue más coordinado de las distintas funciones.",
+    illustration: "/ilustraciones/2.png",
   },
 ];
 
@@ -326,6 +326,8 @@ export default function NuestraExperienciaPage() {
                         onClick={() => setSelectedProject(project.id)}
                         aria-expanded={isActive}
                       >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={project.illustration} alt="" className="exp3-split-item-bg-illustration" aria-hidden />
                         <span
                           className="exp3-split-tag"
                           style={{ color: project.tagColor, background: project.tagColor + "12", borderColor: project.tagColor + "40" }}
@@ -345,8 +347,6 @@ export default function NuestraExperienciaPage() {
                       {/* Inline detail — visible only on mobile when active */}
                       <div className={`exp3-split-item-inline${isActive ? " is-open" : ""}`}>
                         <div className="exp3-split-item-inline-inner">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={project.illustration} alt="" className="exp3-split-detail-illustration" aria-hidden />
                           <div className="exp3-split-detail-bar" style={{ background: project.tagColor }} />
                           <p className="exp3-split-detail-body">{project.detail}</p>
                         </div>
