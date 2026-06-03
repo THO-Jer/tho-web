@@ -309,42 +309,54 @@ export default function NuestraExperienciaPage() {
               <h2 className="exp3-section-title font-tho-title">Proyectos destacados</h2>
             </div>
 
-            {/* Split panel: list left, detail right */}
             <div className="exp3-split">
-              {/* List */}
+              {/* List (desktop: triggers; mobile: accordion items) */}
               <div className="exp3-split-list">
                 {PROJECTS.map((project) => {
                   const isActive = selectedProject === project.id;
                   return (
-                    <button
+                    <div
                       key={project.id}
                       className={`exp3-split-item${isActive ? " is-active" : ""}`}
                       style={isActive ? ({ "--item-accent": project.tagColor } as React.CSSProperties) : undefined}
-                      onClick={() => setSelectedProject(project.id)}
-                      aria-pressed={isActive}
                     >
-                      <span
-                        className="exp3-split-tag"
-                        style={{ color: project.tagColor, background: project.tagColor + "12", borderColor: project.tagColor + "40" }}
+                      {/* Trigger row */}
+                      <button
+                        className="exp3-split-item-trigger"
+                        onClick={() => setSelectedProject(project.id)}
+                        aria-expanded={isActive}
                       >
-                        {project.tag}
-                      </span>
-                      <span className="exp3-split-client">{project.client}</span>
-                      <span className="exp3-split-title">{project.title}</span>
-                      <span className="exp3-split-since">{project.since}</span>
-                      {isActive && (
+                        <span
+                          className="exp3-split-tag"
+                          style={{ color: project.tagColor, background: project.tagColor + "12", borderColor: project.tagColor + "40" }}
+                        >
+                          {project.tag}
+                        </span>
+                        <span className="exp3-split-client">{project.client}</span>
+                        <span className="exp3-split-title">{project.title}</span>
+                        <span className="exp3-split-since">{project.since}</span>
                         <span className="exp3-split-arrow" aria-hidden style={{ color: project.tagColor }}>
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d={isActive ? "M3 10l5-5 5 5" : "M6 3l5 5-5 5"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </span>
-                      )}
-                    </button>
+                      </button>
+
+                      {/* Inline detail — visible only on mobile when active */}
+                      <div className={`exp3-split-item-inline${isActive ? " is-open" : ""}`}>
+                        <div className="exp3-split-item-inline-inner">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={project.illustration} alt="" className="exp3-split-detail-illustration" aria-hidden />
+                          <div className="exp3-split-detail-bar" style={{ background: project.tagColor }} />
+                          <p className="exp3-split-detail-body">{project.detail}</p>
+                        </div>
+                      </div>
+                    </div>
                   );
                 })}
               </div>
 
-              {/* Detail panel */}
+              {/* Side detail panel — desktop only */}
               <div
                 className="exp3-split-detail"
                 style={{ "--detail-accent": activeProject.tagColor } as React.CSSProperties}
