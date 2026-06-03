@@ -76,8 +76,30 @@ export function GenericLesson({
           </div>
         ) : null}
 
-        <p className="mt-4 text-xs text-slate-500">Anti-trampa suave: llega al final y permanece al menos {minLessonSeconds}s en la lección.</p>
-        <div className="mt-1 text-xs text-slate-500">Tiempo actual: {elapsedSeconds}s · Final alcanzado: {reachedEnd ? "sí" : "no"}</div>
+        {/* Indicador de lectura — mismo patrón que LessonShell */}
+        <div className="mt-6 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+          <p className="text-xs font-semibold text-slate-600">
+            {elapsedSeconds >= minLessonSeconds && reachedEnd ? "Lección lista para completar" : "Completando lectura…"}
+          </p>
+          <div className="mt-2 flex items-center gap-3">
+            <div className="flex-1">
+              <div className="mb-1 flex items-center justify-between text-[10px] text-slate-400">
+                <span>Tiempo de lectura</span>
+                <span>{elapsedSeconds >= minLessonSeconds ? "✓" : `${elapsedSeconds}s`}</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-slate-200">
+                <div
+                  className={`h-1.5 rounded-full transition-all duration-1000 ${elapsedSeconds >= minLessonSeconds ? "bg-emerald-500" : "bg-slate-400"}`}
+                  style={{ width: `${Math.min(100, Math.round((elapsedSeconds / minLessonSeconds) * 100))}%` }}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+              <div className={`h-2 w-2 rounded-full ${reachedEnd ? "bg-emerald-500" : "bg-slate-300"}`} />
+              <span>{reachedEnd ? "Scroll ✓" : "Llega al final"}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="relative min-h-44 bg-slate-50">
         <Image src={visual.cover} alt={`Ilustración módulo ${moduleKey}`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />

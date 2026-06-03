@@ -403,12 +403,28 @@ export default function StudioOnboardingAdminPage() {
                 <div>
                   <h4 className="text-sm font-semibold text-slate-800">Estado por módulo</h4>
                   <ul className="mt-1 space-y-2 text-sm text-slate-700">
-                    {(active.module_status || []).map((module) => (
-                      <li key={module.moduleKey} className="flex items-center justify-between gap-2 rounded border border-slate-200 px-3 py-2">
-                        <span>{module.moduleKey}: {module.status} · intentos {module.attempts}/{module.maxAttempts}</span>
-                        <button type="button" onClick={() => resetModule(module.moduleKey)} disabled={saving} className="rounded border border-slate-300 px-2 py-1 text-xs">Reset</button>
-                      </li>
-                    ))}
+                    {(active.module_status || []).map((module) => {
+                      const lessonsDone = active.completed_units
+                        .filter((u) => u.startsWith(`${module.moduleKey}:`))
+                        .map((u) => u.split(":")[1]);
+                      return (
+                        <li key={module.moduleKey} className="rounded border border-slate-200 px-3 py-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium">Módulo {module.moduleKey}: {module.status} · intentos {module.attempts}/{module.maxAttempts}</span>
+                            <button type="button" onClick={() => resetModule(module.moduleKey)} disabled={saving} className="rounded border border-slate-300 px-2 py-1 text-xs">Reset</button>
+                          </div>
+                          {lessonsDone.length > 0 ? (
+                            <div className="mt-1.5 flex flex-wrap gap-1">
+                              {lessonsDone.map((id) => (
+                                <span key={id} className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800">{id}</span>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="mt-1 text-xs text-slate-400">Sin lecciones completadas.</p>
+                          )}
+                        </li>
+                      );
+                    })}
                     {!(active.module_status || []).length ? <li className="text-xs text-slate-500">Sin módulos asignados.</li> : null}
                   </ul>
                 </div>

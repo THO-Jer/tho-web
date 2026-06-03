@@ -114,13 +114,19 @@ export default function StudioOnboardingUnitPage() {
   const [onboarding, setOnboarding] = useState<Onboarding | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [message, setMessage] = useState("");
+  const [lessonError, setLessonError] = useState("");
   const [activeLesson, setActiveLesson] = useState(0);
+  // Clave de localStorage para persistir la lección activa por módulo.
+  // Se inicializa después de conocer el slug (useEffect de carga).
+  const lessonStorageKey = slug ? `tho_onboarding_lesson_${slug}` : null;
   const [lessonStartAt, setLessonStartAt] = useState<number>(Date.now());
   const [reachedEnd, setReachedEnd] = useState(false);
   const [minLessonSeconds, setMinLessonSeconds] = useState(12);
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
   const [showReinforceModal, setShowReinforceModal] = useState(false);
   const [quizScore, setQuizScore] = useState<number | null>(null);
+  const [unlockRequested, setUnlockRequested] = useState(false);
+  const [unlockSending, setUnlockSending] = useState(false);
   const [tick, setTick] = useState(() => Date.now());
   const [integrationAnswers, setIntegrationAnswers] = useState<IntegrationAnswers>({
     pressure: null,
@@ -144,6 +150,14 @@ export default function StudioOnboardingUnitPage() {
         setQuiz((data.quiz || []) as QuizQuestion[]);
         setOnboarding(data.onboarding as Onboarding);
         setMinLessonSeconds(Number(data?.config?.minLessonTimeSeconds || 12));
+        // Restaurar lección activa desde localStorage
+        if (slug) {
+          const saved = localStorage.getItem(`tho_onboarding_lesson_${slug}`);
+          if (saved !== null) {
+            const idx = parseInt(saved, 10);
+            if (!Number.isNaN(idx) && idx > 0) setActiveLesson(idx);
+          }
+        }
       } catch {
         router.replace("/studio");
       } finally {
@@ -151,7 +165,7 @@ export default function StudioOnboardingUnitPage() {
       }
     };
     run().catch(() => undefined);
-  }, [router]);
+  }, [router, slug]);
 
   const unit = useMemo(() => units.find((item) => item.slug === slug), [units, slug]);
   const moduleKey = getModuleKeyFromSlug(unit?.slug || "");
@@ -162,6 +176,11 @@ export default function StudioOnboardingUnitPage() {
     const timer = window.setInterval(() => setTick(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  // Persistir lección activa en localStorage cada vez que cambia
+  useEffect(() => {
+    if (lessonStorageKey) localStorage.setItem(lessonStorageKey, String(activeLesson));
+  }, [activeLesson, lessonStorageKey]);
 
   const completedSet = useMemo(() => new Set(onboarding?.completed_units || []), [onboarding]);
   const isLessonDone = (lessonId: string) => completedSet.has(`${moduleKey}:${lessonId}`);
@@ -197,7 +216,7 @@ export default function StudioOnboardingUnitPage() {
   async function markLesson(lessonId: string) {
     if (!unit) return;
     setSaving(true);
-    setMessage("");
+    setLessonError("");
     try {
       const res = await fetch("/api/studio/onboarding/progress", {
         method: "POST",
@@ -208,9 +227,10 @@ export default function StudioOnboardingUnitPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo guardar avance.");
       setOnboarding(data.onboarding as Onboarding);
+      setLessonError("");
       setActiveLesson((prev) => Math.min(prev + 1, Math.max(0, lessons.length - 1)));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "No se pudo guardar avance.");
+      setLessonError(error instanceof Error ? error.message : "No se pudo guardar avance.");
     } finally {
       setSaving(false);
     }
@@ -254,6 +274,28 @@ export default function StudioOnboardingUnitPage() {
       setMessage(error instanceof Error ? error.message : "No se pudo completar módulo.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function requestUnlock() {
+    if (!unit || unlockRequested) return;
+    setUnlockSending(true);
+    try {
+      const res = await fetch("/api/studio/onboarding", {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "request_unlock", moduleKey }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "No se pudo enviar la solicitud.");
+      }
+      setUnlockRequested(true);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudo enviar la solicitud.");
+    } finally {
+      setUnlockSending(false);
     }
   }
 
@@ -373,6 +415,11 @@ export default function StudioOnboardingUnitPage() {
                   )}
                 </div>
               </div>
+              {lessonError ? (
+                <p className="mt-2 w-full rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                  {lessonError}
+                </p>
+              ) : null}
             </div>
           </article>
         ) : null}
@@ -452,7 +499,20 @@ export default function StudioOnboardingUnitPage() {
           <Link href="/studio/onboarding" className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50">Volver</Link>
         </div>
 
-        {status?.status === "failed_max_attempts" ? <p className="mt-2 text-sm text-rose-700">Alcanzaste el máximo de intentos. Solicita reset a un superadmin.</p> : null}
+        {status?.status === "failed_max_attempts" ? (
+          <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
+            <p className="text-sm font-semibold text-rose-800">Alcanzaste el máximo de intentos en este módulo.</p>
+            <p className="mt-0.5 text-xs text-rose-700">Un administrador puede resetearlo. Puedes solicitarlo directamente desde acá.</p>
+            <button
+              type="button"
+              onClick={requestUnlock}
+              disabled={unlockSending || unlockRequested}
+              className="mt-2 rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-xs font-semibold text-rose-800 disabled:opacity-60"
+            >
+              {unlockRequested ? "✓ Solicitud enviada" : unlockSending ? "Enviando…" : "Solicitar desbloqueo"}
+            </button>
+          </div>
+        ) : null}
 
         {showReinforceModal && failedTopics.length ? (
           <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 px-4" role="dialog" aria-modal="true" aria-label="Feedback de evaluación">
