@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Era, Project } from "@/content/experiencia";
 
 export function ExperienciaClient({
@@ -12,11 +12,11 @@ export function ExperienciaClient({
 }) {
   const [activeId, setActiveId] = useState(eras[0].id);
   const [transitioning, setTransitioning] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<string>(projects[0].id);
   const [revealed, setRevealed] = useState(false);
+  const [visibleStrips, setVisibleStrips] = useState<Set<string>>(new Set());
+  const stripRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const activeEra = eras.find((e) => e.id === activeId) ?? eras[0];
-  const activeProject = projects.find((p) => p.id === selectedProject) ?? projects[0];
 
   function selectEra(id: string) {
     if (id === activeId || transitioning) return;
@@ -30,6 +30,28 @@ export function ExperienciaClient({
   useEffect(() => {
     const t = setTimeout(() => setRevealed(true), 60);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const cleanups: (() => void)[] = [];
+    stripRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const id = projects[i]?.id;
+      if (!id) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisibleStrips((prev) => new Set([...prev, id]));
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(el);
+      cleanups.push(() => observer.disconnect());
+    });
+    return () => cleanups.forEach((fn) => fn());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const newClients = activeEra.clients.filter((c) => c.isNew);
@@ -133,79 +155,45 @@ export function ExperienciaClient({
         </div>
       </section>
 
-      {/* ── PROJECTS ── */}
+      {/* ── PROJECTS — editorial strips ── */}
       <section className="exp3-projects-section">
-        <div className="exp3-projects-inner">
-          <div className="exp3-projects-header">
-            <p className="exp3-eyebrow" style={{ color: "#94a3b8" }}>Proyectos destacados</p>
-            <h2 className="exp3-section-title font-tho-title">Proyectos destacados</h2>
-          </div>
-
-          <div className="exp3-split">
-            <div className="exp3-split-list">
-              {projects.map((project) => {
-                const isActive = selectedProject === project.id;
-                return (
-                  <div
-                    key={project.id}
-                    className={`exp3-split-item${isActive ? " is-active" : ""}`}
-                    style={isActive ? ({ "--item-accent": project.tagColor } as React.CSSProperties) : undefined}
-                  >
-                    <button
-                      className="exp3-split-item-trigger"
-                      onClick={() => setSelectedProject(project.id)}
-                      aria-expanded={isActive}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={project.illustration} alt="" className="exp3-split-item-bg-illustration" aria-hidden />
-                      <span
-                        className="exp3-split-tag"
-                        style={{ color: project.tagColor, background: project.tagColor + "12", borderColor: project.tagColor + "40" }}
-                      >
-                        {project.tag}
-                      </span>
-                      <span className="exp3-split-client">{project.client}</span>
-                      <span className="exp3-split-title">{project.title}</span>
-                      <span className="exp3-split-since">{project.since}</span>
-                      <span className="exp3-split-arrow" aria-hidden style={{ color: project.tagColor }}>
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                          <path d={isActive ? "M3 10l5-5 5 5" : "M6 3l5 5-5 5"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </span>
-                    </button>
-
-                    <div className={`exp3-split-item-inline${isActive ? " is-open" : ""}`}>
-                      <div className="exp3-split-item-inline-inner">
-                        <div className="exp3-split-detail-bar" style={{ background: project.tagColor }} />
-                        <p className="exp3-split-detail-body">{project.detail}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div
-              className="exp3-split-detail"
-              style={{ "--detail-accent": activeProject.tagColor } as React.CSSProperties}
-              key={activeProject.id}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={activeProject.illustration} alt="" className="exp3-split-detail-illustration" aria-hidden />
-              <div className="exp3-split-detail-bar" style={{ background: activeProject.tagColor }} />
-              <span
-                className="exp3-split-detail-tag"
-                style={{ color: activeProject.tagColor, background: activeProject.tagColor + "12", borderColor: activeProject.tagColor + "40" }}
-              >
-                {activeProject.tag}
-              </span>
-              <p className="exp3-split-detail-client">{activeProject.client}</p>
-              <h3 className="exp3-split-detail-title font-tho-title">{activeProject.title}</h3>
-              <p className="exp3-split-detail-since">{activeProject.since}</p>
-              <p className="exp3-split-detail-body">{activeProject.detail}</p>
-            </div>
-          </div>
+        <div className="exp3-projects-header">
+          <p className="exp3-eyebrow" style={{ color: "#94a3b8" }}>Proyectos</p>
+          <h2 className="exp3-section-title font-tho-title">Proyectos destacados</h2>
         </div>
+
+        {projects.map((project, index) => (
+          <div
+            key={project.id}
+            ref={(el) => { stripRefs.current[index] = el; }}
+            className={`exp3-strip${index % 2 === 1 ? " is-reversed" : ""}${visibleStrips.has(project.id) ? " is-visible" : ""}`}
+          >
+            <div className="exp3-strip-photo">
+              {project.photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={project.photo} alt={project.title} className="exp3-strip-photo-img" />
+              ) : (
+                <div className="exp3-strip-photo-illus" style={{ background: project.tagColor + "10" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={project.illustration} alt="" aria-hidden className="exp3-strip-illus-img" />
+                </div>
+              )}
+            </div>
+            <div className="exp3-strip-content">
+              <span
+                className="exp3-strip-tag"
+                style={{ color: project.tagColor, background: project.tagColor + "12", borderColor: project.tagColor + "40" }}
+              >
+                {project.tag}
+              </span>
+              <p className="exp3-strip-client">{project.client}</p>
+              <h3 className="exp3-strip-title font-tho-title">{project.title}</h3>
+              <p className="exp3-strip-since">{project.since}</p>
+              <p className="exp3-strip-body">{project.detail}</p>
+              <div className="exp3-strip-bar" style={{ background: project.tagColor }} />
+            </div>
+          </div>
+        ))}
       </section>
     </>
   );

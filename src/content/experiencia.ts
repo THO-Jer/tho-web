@@ -20,6 +20,7 @@ export type Project = {
   summary: string;
   detail: string;
   illustration: string;
+  photo?: string;
 };
 
 export const ERAS: Era[] = [
@@ -121,6 +122,7 @@ export const PROJECTS: Project[] = [
     detail:
       "Desde el segundo semestre de 2023 acompañamos el relacionamiento con las comunidades del Gran Concepción. Desde encuentros iniciales hasta documentos de consenso sobre desarrollo urbano, generamos confianza a través de programas que permiten vínculos auténticos entre el gremio y las organizaciones sociocomunitarias: la Escuela Itinerante, los Encuentros de Diseño Participativo y el documento Visión 2050.",
     illustration: "/ilustraciones/5.png",
+    photo: "/proyectos/cchc-comunidad.png",
   },
   {
     id: "indama",
@@ -133,6 +135,7 @@ export const PROJECTS: Project[] = [
     detail:
       "Acompañamos a INDAMA en la promoción de su cultura organizacional mediante una revista trimestral que abordaba eventos, cambios y proyecciones importantes para la empresa. Aniversarios, trabajadores con larga trayectoria, fiestas patrias e inauguración de nueva tecnología fueron contenidos valorados a lo largo del proceso.",
     illustration: "/ilustraciones/11.png",
+    photo: "/proyectos/indama-evento.png",
   },
   {
     id: "iap2",
@@ -145,6 +148,33 @@ export const PROJECTS: Project[] = [
     detail:
       "Con la certificación internacional de nuestro director como entrenador IAP2, realizamos formaciones a distintas organizaciones y empresas en el Enfoque IAP2 para la Participación Pública. Esta alianza ha permitido una internacionalización del trabajo de THO y un intercambio de experiencias que enriquece cada asesoría.",
     illustration: "/ilustraciones/10.png",
+    photo: "/proyectos/iap2-training.png",
+  },
+  {
+    id: "voceria",
+    client: "CChC Concepción",
+    title: "Mi Voz Construye",
+    tag: "Comunidad",
+    tagColor: "#fa7f33",
+    since: "2025",
+    summary: "Programa de vocería estratégica para mujeres líderes del sector construcción.",
+    detail:
+      "Acompañamos al Círculo de Mujeres de la CChC en un programa de formación en vocería estratégica. Mujeres líderes del sector construcción desarrollaron herramientas para comunicar con claridad, construir presencia pública y representar al gremio con confianza frente a medios, comunidades y autoridades.",
+    illustration: "/ilustraciones/3.png",
+    photo: "/proyectos/cchc-voceria.png",
+  },
+  {
+    id: "vanrom",
+    client: "Vanrom",
+    title: "Contenido Audiovisual",
+    tag: "Comunicaciones",
+    tagColor: "#1e71b8",
+    since: "Desde 2026",
+    summary: "Producción de contenido digital centrado en las personas de la empresa.",
+    detail:
+      "Producción audiovisual para Vanrom con foco en los equipos y operaciones reales de la empresa. El contenido muestra el trabajo desde adentro — rodajes en terreno, personas reales, procesos concretos — generando una presencia digital auténtica que conecta con sus audiencias.",
+    illustration: "/ilustraciones/7.png",
+    photo: "/proyectos/vanrom-rodaje.png",
   },
   {
     id: "paleoandes",
