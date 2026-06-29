@@ -1,18 +1,28 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import type { Metadata } from "next";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { CORE_TEAM, EXTENDED_TEAM } from "@/content/team";
+import { QuienesCompass } from "@/components/quienes/QuienesCompass";
+import { QuienesParallaxBg } from "@/components/quienes/QuienesParallaxBg";
+import { QuienesRevealObserver } from "@/components/quienes/QuienesRevealObserver";
+import { QuienesTeam } from "@/components/quienes/QuienesTeam";
 
-const BACKGROUND_IMAGES = [
-  "/ilustraciones/2.png",
-  "/ilustraciones/5.png",
-  "/ilustraciones/8.png",
-  "/ilustraciones/10.png",
-] as const;
+export const metadata: Metadata = {
+  title: "Quiénes somos · The Human Org",
+  description:
+    "Conoce al equipo de The Human Org: trayectorias que convergen en una misma tesis — los procesos exitosos tienen a las personas al centro.",
+  alternates: { canonical: "https://tho.cl/quienes" },
+  openGraph: {
+    type: "website",
+    title: "Quiénes somos · The Human Org",
+    description:
+      "Conoce al equipo de The Human Org: trayectorias que convergen en una misma tesis — los procesos exitosos tienen a las personas al centro.",
+    url: "https://tho.cl/quienes",
+    siteName: "The Human Org",
+    images: [{ url: "https://tho.cl/og.png", width: 1200, height: 630, alt: "The Human Org" }],
+  },
+};
 
 const IDENTITY_VALUES = [
   {
@@ -42,45 +52,11 @@ const IDENTITY_VALUES = [
 ] as const;
 
 export default function QuienesPage() {
-  const [scrollY, setScrollY] = useState(0);
-
-  useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.16, rootMargin: "0px 0px -10% 0px" },
-    );
-
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(() => {
-        setScrollY(window.scrollY);
-        ticking = false;
-      });
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
     <div className="min-h-screen bg-tho-bg">
       <Header />
       <main className="border-t border-slate-200" id="contenido">
+        {/* ── Hero ── */}
         <section className="relative min-h-[58vh] overflow-visible text-white md:min-h-[68vh]" data-reveal>
           <div className="hero-media-fade pointer-events-none absolute inset-0">
             <Image
@@ -104,24 +80,17 @@ export default function QuienesPage() {
           </div>
         </section>
 
+        {/* ── Sección con parallax de fondo ── */}
         <section className="relative overflow-hidden pb-10">
-          <div className="pointer-events-none absolute inset-0">
-            {BACKGROUND_IMAGES.map((imagePath, idx) => (
-              <figure
-                key={imagePath}
-                className={`quienes-bg-image quienes-bg-image-${idx + 1}`}
-                style={{ transform: `translate3d(0, ${scrollY * (0.03 + idx * 0.012)}px, 0)` }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imagePath} alt="" className="h-full w-full object-cover" />
-              </figure>
-            ))}
-          </div>
+          {/* Isla cliente: imágenes de fondo con parallax */}
+          <QuienesParallaxBg />
 
           <div className="relative z-10">
             <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
               <div data-reveal>
-                <h1 className="font-tho-title text-[2.8rem] leading-[0.95] text-slate-950 md:text-[4rem]">Trayectorias que convergen</h1>
+                <h1 className="font-tho-title text-[2.8rem] leading-[0.95] text-slate-950 md:text-[4rem]">
+                  Trayectorias que convergen
+                </h1>
                 <p className="mt-6 max-w-2xl text-left text-base leading-relaxed text-slate-700 md:text-lg">
                   THO se construye de los conocimientos acumulados de su equipo. Desde experiencias en desarrollo
                   organizacional, participación pública, gestión de cambio, análisis social y estrategia.
@@ -149,7 +118,7 @@ export default function QuienesPage() {
               </div>
             </section>
 
-            {/* ── Sección equipo ── ligeramente más ancha que las secciones adyacentes */}
+            {/* ── Equipo ── */}
             <section className="relative w-full px-4 py-14 md:py-20" data-reveal>
               <div className="mx-auto max-w-7xl">
                 <h2 className="font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.5rem]">El equipo</h2>
@@ -158,60 +127,16 @@ export default function QuienesPage() {
                   Personas con trayectorias distintas que comparten una misma tesis: los procesos exitosos tienen a las personas al centro.
                 </p>
 
-                {/* Fila principal — equipo fijo */}
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:gap-4">
-                  {CORE_TEAM.map((member) => (
-                    <div key={member.slug} className="team-card" style={{ height: "280px" }}>
-                      <div className="team-card-photo" style={{ backgroundColor: member.color }}>
-                        <span className="absolute inset-0 flex select-none items-center justify-center text-2xl font-medium text-white/90">
-                          {member.initials}
-                        </span>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={`/team/${member.slug}_tho.png`}
-                          alt={member.name}
-                          className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition-opacity duration-300"
-                          onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
-                          onError={(e) => { e.currentTarget.style.display = "none"; }}
-                        />
-                      </div>
-                      <div className="team-card-overlay">
-                        <p className="text-sm font-medium leading-snug text-white">{member.name}</p>
-                        <p className="mt-1 text-xs leading-snug text-white/75">{member.role}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Fila secundaria — equipo extendido */}
-                <div className="mt-3 grid grid-cols-2 gap-3 md:mt-4 md:grid-cols-4 md:gap-4">
-                  {EXTENDED_TEAM.map((member) => (
-                    <div key={member.slug} className="team-card" style={{ height: "210px" }}>
-                      <div className="team-card-photo" style={{ backgroundColor: member.color }}>
-                        <span className="absolute inset-0 flex select-none items-center justify-center text-xl font-medium text-white/90">
-                          {member.initials}
-                        </span>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={`/team/${member.slug}_tho.png`}
-                          alt={member.name}
-                          className="absolute inset-0 h-full w-full object-cover object-top opacity-0 transition-opacity duration-300"
-                          onLoad={(e) => { e.currentTarget.style.opacity = "1"; }}
-                          onError={(e) => { e.currentTarget.style.display = "none"; }}
-                        />
-                      </div>
-                      <div className="team-card-overlay">
-                        <p className="text-xs font-medium leading-snug text-white">{member.name}</p>
-                        <p className="mt-1 text-[10px] leading-snug text-white/75">{member.role}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {/* Isla cliente: team cards con onLoad/onError para foto */}
+                <QuienesTeam />
               </div>
             </section>
 
+            {/* ── Identidad ── */}
             <section className="identity-section mx-auto max-w-6xl px-4 py-16 md:py-20" data-reveal>
-              <h2 className="text-center font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.6rem]">Nuestra identidad</h2>
+              <h2 className="text-center font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.6rem]">
+                Nuestra identidad
+              </h2>
               <div className="mx-auto mt-5 h-[6px] w-36 rounded-sm brand-block-divider" />
 
               <p className="identity-block-space mx-auto mt-14 max-w-4xl text-left text-lg leading-relaxed text-slate-700 md:text-[1.22rem]">
@@ -263,7 +188,9 @@ export default function QuienesPage() {
                     <img src={value.icon} alt="" aria-hidden className="mx-auto h-24 w-24 object-contain md:h-28 md:w-28" />
                     <div className="mx-auto text-center md:mr-36 md:text-left lg:mr-52 xl:mr-64">
                       <h3 className={`text-2xl font-semibold ${value.color}`}>{value.title}</h3>
-                      <p className="mt-3 text-center text-base leading-relaxed text-slate-700 md:text-left md:text-lg">{value.description}</p>
+                      <p className="mt-3 text-center text-base leading-relaxed text-slate-700 md:text-left md:text-lg">
+                        {value.description}
+                      </p>
                     </div>
                   </article>
                 ))}
@@ -272,15 +199,10 @@ export default function QuienesPage() {
           </div>
         </section>
 
+        {/* ── Ética ── */}
         <section className="relative mx-auto max-w-6xl border-0 bg-transparent px-4 py-16 shadow-none md:min-h-[34rem] md:py-24">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/brujula.svg"
-            alt=""
-            aria-hidden
-            className="quienes-compass-bg pointer-events-none absolute right-[2%] top-[68%] z-0 hidden md:block"
-            style={{ transform: `translate3d(0, ${scrollY * 0.03}px, 0)` }}
-          />
+          {/* Isla cliente: brújula con parallax */}
+          <QuienesCompass />
 
           <div className="relative z-10 grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center" data-reveal>
             <div className="max-w-3xl border-0 bg-transparent shadow-none">
@@ -299,11 +221,11 @@ export default function QuienesPage() {
                 </p>
               </div>
             </div>
-
             <div className="hidden md:block" aria-hidden />
           </div>
         </section>
 
+        {/* ── Cierre ── */}
         <section className="mx-auto max-w-6xl px-4 pb-36 pt-14 md:pb-44 md:pt-24" data-reveal>
           <div className="md:ml-auto md:max-w-[62%] md:text-right">
             <p className="text-lg text-slate-800 md:text-xl">Detrás de cada organización hay personas.</p>
@@ -315,6 +237,9 @@ export default function QuienesPage() {
         </section>
       </main>
       <Footer />
+
+      {/* Isla cliente: observer de animaciones reveal (no renderiza HTML visible) */}
+      <QuienesRevealObserver />
     </div>
   );
 }

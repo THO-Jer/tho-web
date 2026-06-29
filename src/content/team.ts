@@ -40,13 +40,6 @@ export const CORE_TEAM: TeamMember[] = [
  */
 export const EXTENDED_TEAM: TeamMember[] = [
   {
-    name: "Rogelio Salinas",
-    role: "Asesor Desarrollo Organizacional",
-    slug: "rogelio",
-    color: "#5e8c14",
-    initials: "RS",
-  },
-  {
     name: "Felipe Muñoz",
     role: "Asesor Sociocomunitario",
     slug: "felipe",
