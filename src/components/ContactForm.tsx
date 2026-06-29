@@ -47,7 +47,7 @@ export function ContactForm(props: { ticket?: string }) {
 
       <input name="hp" className="hidden" tabIndex={-1} autoComplete="off" />
 
-      <Field label="Nombre">
+      <Field label="Nombre" required>
         <input
           name="name"
           required
@@ -62,7 +62,7 @@ export function ContactForm(props: { ticket?: string }) {
         />
       </Field>
 
-      <Field label="Email">
+      <Field label="Email" required>
         <input
           name="email"
           type="email"
@@ -93,18 +93,27 @@ export function ContactForm(props: { ticket?: string }) {
         {status === "sending" ? "Enviando…" : "Enviar"}
       </button>
 
-      {status === "ok" ? <div className="text-xs text-white/70">Listo. Te escribimos pronto.</div> : null}
+      {status === "ok" ? (
+        <div role="status" aria-live="polite" className="text-xs text-white/70">
+          Listo. Te escribimos pronto.
+        </div>
+      ) : null}
       {status === "error" ? (
-        <div className="text-xs text-white/70">Algo falló. Intenta de nuevo.</div>
+        <div role="alert" aria-live="assertive" className="text-xs text-white/70">
+          Algo falló. Intenta de nuevo.
+        </div>
       ) : null}
     </form>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children, required }: { label: string; children: React.ReactNode; required?: boolean }) {
   return (
     <label className="grid gap-1">
-      <span className="text-xs text-white/70">{label}</span>
+      <span className="text-xs text-white/70">
+        {label}
+        {required ? <span className="ml-0.5 text-white/50" aria-hidden>*</span> : null}
+      </span>
       {children}
     </label>
   );

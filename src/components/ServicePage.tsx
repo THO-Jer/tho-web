@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import Image from "next/image";
+import { type RefObject, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import type {
   CardVariant,
@@ -170,11 +171,13 @@ function LevelCard({
   accent,
   cardClass,
   onBrochureClick,
+  triggerRef,
 }: {
   level: PageLevel;
   accent: ServiceAccent;
   cardClass: string;
   onBrochureClick: () => void;
+  triggerRef?: RefObject<HTMLButtonElement | null>;
 }) {
   const accentClasses = ACCENT[accent];
   const isPrimary = level.variant === "primary";
@@ -247,6 +250,7 @@ function LevelCard({
 
       {isPrimary ? (
         <button
+          ref={triggerRef}
           type="button"
           onClick={onBrochureClick}
           className="btn-unified-motion btn-hero-services mt-5 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-slate-900"
@@ -277,6 +281,7 @@ export function ServicePage({
   const [brochureStatus, setBrochureStatus] = useState<FormStatus>("idle");
   const [contactStatus, setContactStatus] = useState<FormStatus>("idle");
   const [riskParallax, setRiskParallax] = useState(0);
+  const brochureTriggerRef = useRef<HTMLButtonElement>(null);
   const [levelChecks, setLevelChecks] = useState<Record<DiagnosticCheckKey, boolean>>({
     noMaterialityMap: false,
     investorPressure: false,
@@ -319,7 +324,11 @@ export function ServicePage({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpenBrochure(false);
+      if (event.key === "Escape") {
+        setOpenBrochure(false);
+        // Restaurar foco al botón que abrió el modal
+        brochureTriggerRef.current?.focus();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -401,13 +410,12 @@ export function ServicePage({
     <main className="esg-page bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       {/* HERO */}
       <section className="esg-hero relative min-h-[84vh] overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={content.heroImage}
           alt={content.heroAlt}
-          className="absolute inset-0 h-full w-full object-cover object-center"
-          loading="eager"
-          decoding="async"
+          fill
+          className="object-cover object-center"
+          priority
         />
         <div className={`absolute inset-0 bg-gradient-to-b ${accent.heroGradient}`} />
         <div className={`absolute inset-0 ${accent.heroRadial}`} />
@@ -507,6 +515,7 @@ export function ServicePage({
                   setOpenBrochure(true);
                   setBrochureStatus("idle");
                 }}
+                triggerRef={level.variant === "primary" ? brochureTriggerRef : undefined}
               />
             ))}
           </div>
@@ -718,7 +727,10 @@ export function ServicePage({
               </h4>
               <button
                 type="button"
-                onClick={() => setOpenBrochure(false)}
+                onClick={() => {
+                  setOpenBrochure(false);
+                  brochureTriggerRef.current?.focus();
+                }}
                 className="rounded-lg border border-slate-200 px-3 py-1 text-sm dark:border-slate-600 dark:text-slate-200"
               >
                 Cerrar

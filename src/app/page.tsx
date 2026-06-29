@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -93,23 +94,24 @@ export default async function HomePage() {
         {/* HERO — imagen de fondo (atenuada) + texto encima */}
         <section className="relative min-h-[72vh] overflow-visible text-white md:min-h-[80vh] lg:min-h-[88vh]">
         <div className="hero-media-fade pointer-events-none absolute inset-x-0 -bottom-28 top-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="/hero/hands.png"
             alt=""
-            className="absolute inset-0 h-full w-full object-cover object-[20%_36%] opacity-[0.75] md:object-center"
+            fill
+            className="object-cover object-[20%_36%] opacity-[0.75] md:object-center"
+            priority
           />
           <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
         </div>
 
         <div className="relative mx-auto flex h-full min-h-[72vh] max-w-6xl items-end justify-end px-4 pb-16 pt-8 md:min-h-[80vh] md:pb-20 md:pt-12 lg:min-h-[88vh] lg:pb-24 lg:pt-14">
           <div className="max-w-2xl text-right">
-            <div className="text-xs uppercase tracking-wide text-white/75">
-              Consultoría estratégica · Concepción
-            </div>
+            <h1 className="text-xs uppercase tracking-wide text-white/75">
+              The Human Org · Consultoría estratégica · Concepción
+            </h1>
             <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
 
-            <p className="mt-5 ml-auto max-w-xl text-base text-white/82 md:text-lg">
+            <p className="mt-5 ml-auto max-w-xl text-base text-white/80 md:text-lg">
               Integramos ESG, relacionamiento comunitario y desarrollo organizacional para construir estrategias
               accionables y decisiones que se sostienen en el tiempo.
             </p>
@@ -280,6 +282,13 @@ export default async function HomePage() {
                     <div className="text-xs text-slate-500">{p.minutes} min</div>
                     <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
                     <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
+                    {/* Visible solo en dispositivos touch (sin hover) */}
+                    <a
+                      href={`/blog/${p.slug}`}
+                      className="blog-card-mobile-cta mt-3 inline-flex text-sm font-semibold text-slate-800 underline underline-offset-2"
+                    >
+                      Leer artículo →
+                    </a>
                   </div>
                   <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card">
                     <a

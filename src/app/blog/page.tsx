@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BlogIndexClient } from "@/components/blog/BlogIndexClient";
@@ -31,11 +32,12 @@ export default async function BlogPage() {
       <main className="border-t border-slate-200 bg-white">
         <section className="relative min-h-[52vh] overflow-visible text-white md:min-h-[60vh]">
           <div className="hero-media-fade pointer-events-none absolute inset-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/hero/5.png"
               alt=""
-              className="absolute inset-0 h-full w-full object-cover opacity-[0.78]"
+              fill
+              className="object-cover opacity-[0.78]"
+              priority
             />
             <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.1)_0%,rgba(15,23,42,0.4)_52%,rgba(15,23,42,0.72)_100%)]" />
           </div>

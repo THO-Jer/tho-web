@@ -91,7 +91,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       "Gestión de stakeholders",
       "Cultura organizacional",
     ],
-    sameAs: [],
+    sameAs: [
+      "https://instagram.com/thehumanorg/",
+      "https://linkedin.com/company/thocl",
+    ],
   };
 
   return (

@@ -90,17 +90,7 @@ export default function NotFound() {
           </div>
         </section>
 
-        {/* Keyframes globales para esta página */}
-        <style>{`
-          @keyframes tho-404-in {
-            from { opacity: 0; transform: translateY(18px); }
-            to   { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes tho-404-float {
-            0%, 100% { transform: translateY(0px) rotate(-2deg); }
-            50%       { transform: translateY(-18px) rotate(2deg); }
-          }
-        `}</style>
+        {/* Keyframes en globals.css (tho-404-in, tho-404-float) */}
       </main>
 
       <Footer />

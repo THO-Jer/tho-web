@@ -1,4 +1,3 @@
-import Link from "next/link";
 
 const items = [
   {
@@ -36,28 +35,44 @@ const items = [
   },
 ];
 
+const whatsapp = items[0];
+
 export function SocialFloat() {
   return (
-    <div className="fixed right-4 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-3 lg:flex">
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={item.aria}
-          className="group relative"
-        >
-          <span
-            className={`flex h-12 w-12 items-center justify-center rounded-full text-white shadow-md transition-transform duration-200 group-hover:scale-110 ${item.tone}`}
+    <>
+      {/* Mobile: solo WhatsApp, esquina inferior derecha */}
+      <a
+        href={whatsapp.href}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={whatsapp.aria}
+        className={`fixed bottom-6 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition-transform duration-200 active:scale-95 lg:hidden ${whatsapp.tone}`}
+      >
+        {whatsapp.icon}
+      </a>
+
+      {/* Desktop: sidebar vertical centrado */}
+      <div className="fixed right-4 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-3 lg:flex">
+        {items.map((item) => (
+          <a
+            key={item.href}
+            href={item.href}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={item.aria}
+            className="group relative"
           >
-            {item.icon}
-          </span>
-          <span className="pointer-events-none absolute right-14 top-1/2 -translate-y-1/2 rounded-md bg-slate-900 px-2.5 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100">
-            {item.label}
-          </span>
-        </Link>
-      ))}
-    </div>
+            <span
+              className={`flex h-12 w-12 items-center justify-center rounded-full text-white shadow-md transition-transform duration-200 group-hover:scale-110 ${item.tone}`}
+            >
+              {item.icon}
+            </span>
+            <span className="pointer-events-none absolute right-14 top-1/2 -translate-y-1/2 rounded-md bg-slate-900 px-2.5 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100">
+              {item.label}
+            </span>
+          </a>
+        ))}
+      </div>
+    </>
   );
 }

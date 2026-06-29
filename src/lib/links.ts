@@ -6,7 +6,7 @@
  * un solo edit y no una cacería por todo el repo.
  */
 
-// URL del calendario de agendamiento. Hoy es un bit.ly que redirige al
-// servicio externo de booking. Cuando migremos a /agendar propio, sólo
-// cambiar este string.
-export const BOOK_URL = "https://bit.ly/bookTHO";
+// URL del calendario de agendamiento. Apunta a /agendar, que redirige al
+// servicio externo de booking vía next.config.ts redirects().
+// Para cambiar el destino, editar solo el redirect en next.config.ts.
+export const BOOK_URL = "/agendar";

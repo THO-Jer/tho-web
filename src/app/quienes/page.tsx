@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import { Footer } from "@/components/Footer";
@@ -82,8 +83,13 @@ export default function QuienesPage() {
       <main className="border-t border-slate-200" id="contenido">
         <section className="relative min-h-[58vh] overflow-visible text-white md:min-h-[68vh]" data-reveal>
           <div className="hero-media-fade pointer-events-none absolute inset-0">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/hero/4.png" alt="" className="absolute inset-0 h-full w-full object-cover object-[24%_center] opacity-[0.76] md:object-center" />
+            <Image
+              src="/hero/4.png"
+              alt=""
+              fill
+              className="object-cover object-[24%_center] opacity-[0.76] md:object-center"
+              priority
+            />
             <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.12)_0%,rgba(15,23,42,0.42)_54%,rgba(15,23,42,0.75)_100%)]" />
           </div>
 
@@ -116,7 +122,7 @@ export default function QuienesPage() {
             <section className="mx-auto max-w-6xl px-4 py-14 md:py-20">
               <div data-reveal>
                 <h1 className="font-tho-title text-[2.8rem] leading-[0.95] text-slate-950 md:text-[4rem]">Trayectorias que convergen</h1>
-                <p className="mt-6 max-w-2xl text-justify text-base leading-relaxed text-slate-700 md:text-lg">
+                <p className="mt-6 max-w-2xl text-left text-base leading-relaxed text-slate-700 md:text-lg">
                   THO se construye de los conocimientos acumulados de su equipo. Desde experiencias en desarrollo
                   organizacional, participación pública, gestión de cambio, análisis social y estrategia.
                 </p>
@@ -125,7 +131,7 @@ export default function QuienesPage() {
 
             <section className="mx-auto max-w-6xl px-4 py-6 md:py-10" data-reveal>
               <div className="mx-auto max-w-[48rem] p-3 md:pr-12 md:pl-0 lg:pr-20">
-                <p className="text-justify text-lg leading-relaxed text-slate-700 md:pr-8 md:text-[1.28rem] lg:pr-14">
+                <p className="text-left text-lg leading-relaxed text-slate-700 md:pr-8 md:text-[1.28rem] lg:pr-14">
                   Los profesionales que se suman a esta consultora traen sus trayectorias, las cuales buscan sinergia bajo
                   una misma tesis: <strong>Los procesos exitosos tienen a las personas al centro.</strong>
                 </p>
@@ -136,7 +142,7 @@ export default function QuienesPage() {
                   <li>• Análisis de impacto social</li>
                   <li>• Gestión estratégica en entornos complejos</li>
                 </ul>
-                <p className="mt-6 max-w-[44rem] text-justify text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
+                <p className="mt-6 max-w-[44rem] text-left text-lg leading-relaxed text-slate-700 md:text-[1.2rem]">
                   En The Human Org reconocemos estas trayectorias y sabemos que la expertise que cada uno trae profundiza
                   el propósito de la consultora.
                 </p>
@@ -208,7 +214,7 @@ export default function QuienesPage() {
               <h2 className="text-center font-tho-title text-[2.5rem] leading-[0.95] text-slate-950 md:text-[3.6rem]">Nuestra identidad</h2>
               <div className="mx-auto mt-5 h-[6px] w-36 rounded-sm brand-block-divider" />
 
-              <p className="identity-block-space mx-auto mt-14 max-w-4xl text-justify text-lg leading-relaxed text-slate-700 md:text-[1.22rem]">
+              <p className="identity-block-space mx-auto mt-14 max-w-4xl text-left text-lg leading-relaxed text-slate-700 md:text-[1.22rem]">
                 Transformamos la asesoría estratégica integrando innovación, humanidad y sostenibilidad, asegurando que
                 las organizaciones no solo alcancen sus objetivos, sino que lo hagan impactando positivamente a sus
                 comunidades y entorno. Esta mirada integra nuestra misión y visión en una misma dirección estratégica.
@@ -232,7 +238,7 @@ export default function QuienesPage() {
               </div>
 
               <div className="identity-block-space mt-12 flex flex-col items-start gap-4 sm:flex-row sm:items-center md:gap-6">
-                <p className="font-tho-title max-w-3xl text-justify text-[2.05rem] leading-[1.02] text-slate-900 md:text-[2.7rem]">
+                <p className="font-tho-title max-w-3xl text-left text-[2.05rem] leading-[1.02] text-slate-900 md:text-[2.7rem]">
                   Nuestra promesa es diseñar
                   <br />
                   soluciones estratégicas y exitosas.
@@ -244,7 +250,7 @@ export default function QuienesPage() {
                   className="h-16 w-16 shrink-0 object-contain md:h-20 md:w-20"
                 />
               </div>
-              <p className="identity-block-space mt-4 max-w-4xl text-justify text-base leading-relaxed text-slate-700 md:text-lg">
+              <p className="identity-block-space mt-4 max-w-4xl text-left text-base leading-relaxed text-slate-700 md:text-lg">
                 Desde esta promesa, la identidad se vuelve práctica: misión, visión y experiencia se entrelazan en
                 criterios que orientan decisiones concretas. Por eso, nuestros valores no son solo conceptos, sino
                 articuladores de sentido y conducta en cada relación, intervención y proceso que acompañamos.

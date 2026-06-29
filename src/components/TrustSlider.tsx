@@ -126,11 +126,12 @@ export function TrustSlider() {
               target="_blank"
               rel="noreferrer"
               aria-label={logo.alt}
-              onPointerUp={() => {
-                if (drag.current.moved) return;
-                window.open(logo.href, "_blank", "noreferrer");
+              onPointerUp={(e) => {
+                // Solo abrir si no fue un drag (mouse/touch).
+                // Activación por teclado (Enter/Space) no pasa por onPointerUp,
+                // así que el href actúa normalmente en ese caso.
+                if (drag.current.moved) e.preventDefault();
               }}
-              onClick={(e) => e.preventDefault()}
               className="shrink-0"
             >
               <div className="trust-logo-slot relative h-[58px] w-[150px] md:h-[68px] md:w-[175px]">
