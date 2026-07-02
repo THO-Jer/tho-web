@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { BrandLoader } from "@/components/BrandLoader";
+import { ConfirmDialog } from "@/components/studio/ConfirmDialog";
 
 type BlogPost = {
   slug: string;
@@ -28,6 +29,7 @@ export default function BlogStudioIndexPage() {
   const [message, setMessage] = useState("");
   const [blockedByOnboarding, setBlockedByOnboarding] = useState(false);
   const [filter, setFilter] = useState<PostFilter>("all");
+  const [confirmDeleteSlug, setConfirmDeleteSlug] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -86,7 +88,6 @@ export default function BlogStudioIndexPage() {
   }, [checkingAuth]);
 
   async function onDelete(slug: string) {
-    if (!confirm(`¿Eliminar ${slug}?`)) return;
     setLoading(true);
     setMessage("");
     try {
@@ -192,7 +193,7 @@ export default function BlogStudioIndexPage() {
                   <div className="flex flex-wrap gap-2">
                     <a href={`/blog/${post.slug}`} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">Ver</a>
                     <Link href={`/studio/blog/editor?slug=${encodeURIComponent(post.slug)}`} className="rounded-md border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">Editar</Link>
-                    <button type="button" onClick={() => onDelete(post.slug)} className="rounded-md border border-rose-200 px-3 py-1.5 text-xs text-rose-700 hover:bg-rose-50" disabled={loading}>Borrar</button>
+                    <button type="button" onClick={() => setConfirmDeleteSlug(post.slug)} className="rounded-md border border-rose-200 px-3 py-1.5 text-xs text-rose-700 hover:bg-rose-50" disabled={loading}>Borrar</button>
                   </div>
                 </div>
                 <p className="mt-2 text-sm text-slate-700">{post.excerpt}</p>
@@ -204,6 +205,20 @@ export default function BlogStudioIndexPage() {
           </div>
         </section>
       </div>
+
+      <ConfirmDialog
+        open={Boolean(confirmDeleteSlug)}
+        title="Eliminar entrada"
+        description={confirmDeleteSlug ? `Se eliminará "${confirmDeleteSlug}" de forma permanente. Esta acción no se puede deshacer.` : undefined}
+        confirmLabel="Eliminar"
+        destructive
+        onCancel={() => setConfirmDeleteSlug(null)}
+        onConfirm={() => {
+          const slug = confirmDeleteSlug;
+          setConfirmDeleteSlug(null);
+          if (slug) onDelete(slug).catch(() => undefined);
+        }}
+      />
     </main>
   );
 }

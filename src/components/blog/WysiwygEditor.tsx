@@ -125,32 +125,16 @@ const SLASH_ITEMS: SlashItem[] = [
     label: "YouTube",
     description: "Embeber video de YouTube",
     icon: "▶",
-    command: ({ editor, range }) => {
-      const url = window.prompt("URL del video de YouTube");
-      if (url)
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertContent({ type: "paragraph", content: [{ type: "text", text: url }] })
-          .run();
-    },
+    // La URL se pide vía diálogo propio (ver urlDialog en el componente).
+    command: () => {},
   },
   {
     id: "pdf",
     label: "PDF",
     description: "Embeber documento PDF",
     icon: "📄",
-    command: ({ editor, range }) => {
-      const url = window.prompt("URL del PDF");
-      if (url)
-        editor
-          .chain()
-          .focus()
-          .deleteRange(range)
-          .insertContent({ type: "paragraph", content: [{ type: "text", text: url }] })
-          .run();
-    },
+    // La URL se pide vía diálogo propio (ver urlDialog en el componente).
+    command: () => {},
   },
 ];
 
@@ -164,6 +148,19 @@ type SlashState = {
   x: number;    // screen x (left edge of cursor)
   y: number;    // screen y (bottom of cursor line)
 } | null;
+
+// ── URL dialog (reemplaza window.prompt) ─────────────────────────────────────
+
+type UrlDialogState = {
+  mode: "link" | "youtube" | "pdf";
+  range?: Range; // rango del comando slash a borrar al confirmar
+} | null;
+
+const URL_DIALOG_COPY: Record<"link" | "youtube" | "pdf", { title: string; placeholder: string }> = {
+  link: { title: "Insertar enlace", placeholder: "https://ejemplo.com o /blog/mi-post" },
+  youtube: { title: "Embeber video de YouTube", placeholder: "https://www.youtube.com/watch?v=..." },
+  pdf: { title: "Embeber documento PDF", placeholder: "https://.../documento.pdf" },
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public handle & component
@@ -195,6 +192,14 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
     // ── Slash menu state ──────────────────────────────────────────────────
     const [slash, setSlash] = useState<SlashState>(null);
     const [slashIndex, setSlashIndex] = useState(0);
+
+    // ── URL dialog state ──────────────────────────────────────────────────
+    const [urlDialog, setUrlDialog] = useState<UrlDialogState>(null);
+    const [urlValue, setUrlValue] = useState("");
+    const urlInputRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+      if (urlDialog) urlInputRef.current?.focus();
+    }, [urlDialog]);
 
     // Refs for the keyboard extension (created once, reads latest values)
     const slashRef = useRef<SlashState>(null);
@@ -319,7 +324,36 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
       const from = slashRef.current.from;
       const to = editor.state.selection.from;
       setSlash(null);
+      if (item.id === "youtube" || item.id === "pdf") {
+        setUrlValue("");
+        setUrlDialog({ mode: item.id, range: { from, to } });
+        return;
+      }
       item.command({ editor, range: { from, to } });
+    }
+
+    // ── URL dialog handlers ───────────────────────────────────────────────
+    function confirmUrlDialog() {
+      const dialog = urlDialog;
+      const url = urlValue.trim();
+      setUrlDialog(null);
+      setUrlValue("");
+      if (!editor || !dialog || !url) return;
+
+      if (dialog.mode === "link") {
+        editor.chain().focus().setLink({ href: url }).run();
+        return;
+      }
+
+      const chain = editor.chain().focus();
+      if (dialog.range) chain.deleteRange(dialog.range);
+      chain.insertContent({ type: "paragraph", content: [{ type: "text", text: url }] }).run();
+    }
+
+    function cancelUrlDialog() {
+      setUrlDialog(null);
+      setUrlValue("");
+      editor?.chain().focus().run();
     }
     // Keep ref in sync for keyboard extension
     executeItemRef.current = executeItem;
@@ -426,6 +460,40 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
           document.body
         )}
 
+        {/* ── URL dialog ─────────────────────────────────────────────── */}
+        {urlDialog && typeof document !== "undefined" && createPortal(
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/40 p-4"
+            onMouseDown={cancelUrlDialog}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-semibold text-slate-900">{URL_DIALOG_COPY[urlDialog.mode].title}</h3>
+              <input
+                ref={urlInputRef}
+                type="url"
+                value={urlValue}
+                onChange={(e) => setUrlValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); confirmUrlDialog(); }
+                  if (e.key === "Escape") { e.preventDefault(); cancelUrlDialog(); }
+                }}
+                placeholder={URL_DIALOG_COPY[urlDialog.mode].placeholder}
+                className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+              />
+              <div className="mt-4 flex justify-end gap-2">
+                <button type="button" onClick={cancelUrlDialog} className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Cancelar</button>
+                <button type="button" onClick={confirmUrlDialog} disabled={!urlValue.trim()} className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-50">Insertar</button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+
         {editor && (
           <>
             {/* ── Text bubble menu ──────────────────────────────────────── */}
@@ -460,8 +528,8 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
                 ) : (
                   <button type="button" title="Insertar enlace"
                     onClick={() => {
-                      const url = window.prompt("URL del enlace");
-                      if (url) editor.chain().focus().setLink({ href: url }).run();
+                      setUrlValue(String(editor.getAttributes("link").href || ""));
+                      setUrlDialog({ mode: "link" });
                     }}
                     className="wysiwyg-bubble-btn">🔗</button>
                 )}

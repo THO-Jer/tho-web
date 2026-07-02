@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, type MouseEvent } from "react";
 
-import type { BlogPost } from "@/lib/blogStore";
+import type { BlogPostMeta } from "@/lib/blogStore";
 
 type BlogMonthYearOption = {
   value: string;
@@ -13,7 +13,7 @@ type BlogMonthYearOption = {
   month: string;
 };
 
-export function BlogIndexClient({ posts }: { posts: BlogPost[] }) {
+export function BlogIndexClient({ posts }: { posts: BlogPostMeta[] }) {
   const [query, setQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState("");
   const [selectedYear, setSelectedYear] = useState("");

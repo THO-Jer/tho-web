@@ -17,16 +17,19 @@ export type BlogPost = {
   seoDescription?: string;
 };
 
+// Versión liviana para listados: todo menos `content`.
+export type BlogPostMeta = Omit<BlogPost, "content">;
+
 type BlogPostInput = Omit<BlogPost, "updatedAt"> & { updatedAt?: string };
 
 type BlogPostRow = {
   slug: string;
   title: string;
   excerpt: string;
-  content: string;
+  content?: string;
   minutes: number;
   tags: string[] | null;
-  category: string | null;
+  category?: string | null;
   status: BlogStatus;
   published_at: string | null;
   updated_at: string;
@@ -37,6 +40,24 @@ type BlogPostRow = {
 };
 
 const BLOG_TABLE = process.env.BLOG_POSTS_TABLE || "blog_posts";
+
+const META_COLUMNS = [
+  "slug",
+  "title",
+  "excerpt",
+  "minutes",
+  "tags",
+  "category",
+  "status",
+  "published_at",
+  "updated_at",
+  "cover_image",
+  "cover_image_alt",
+  "seo_title",
+  "seo_description",
+];
+
+const ALL_COLUMNS = [...META_COLUMNS, "content"];
 
 function getSupabaseEnv() {
   const url = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_SUPABASE_PUBLIC_URL || "")
@@ -68,14 +89,6 @@ function getMissingSupabaseColumn(error: unknown) {
   return null;
 }
 
-function stripUnsupportedColumns<T extends Record<string, unknown>>(payload: T, columns: string[]) {
-  const clone = { ...payload };
-  for (const col of columns) {
-    delete clone[col];
-  }
-  return clone;
-}
-
 async function supabaseRequest(pathname: string, init?: RequestInit) {
   const { url, service } = requireSupabaseEnv();
 
@@ -99,12 +112,62 @@ async function supabaseRequest(pathname: string, init?: RequestInit) {
   return res.json();
 }
 
+// ── Select helper ───────────────────────────────────────────────────────────
+// Consulta con filtros PostgREST y reintenta sin `category` si la columna no
+// existe todavía (tablas legacy sin migrar).
+async function selectRows(
+  filters: Record<string, string>,
+  columns: string[],
+  order?: string,
+): Promise<BlogPostRow[]> {
+  const buildPath = (cols: string[]) => {
+    const query = new URLSearchParams({ select: cols.join(","), ...(order ? { order } : {}), ...filters });
+    return `/rest/v1/${BLOG_TABLE}?${query.toString()}`;
+  };
+
+  try {
+    return ((await supabaseRequest(buildPath(columns))) || []) as BlogPostRow[];
+  } catch (error) {
+    if (getMissingSupabaseColumn(error) === "category" && columns.includes("category")) {
+      const rows = ((await supabaseRequest(buildPath(columns.filter((col) => col !== "category")))) || []) as BlogPostRow[];
+      return rows.map((row) => ({ ...row, category: null }));
+    }
+    throw error;
+  }
+}
+
+// Escritura (POST/PATCH) con el mismo reintento sin `category`.
+async function writeRows(
+  pathname: string,
+  method: "POST" | "PATCH",
+  payload: Record<string, unknown>,
+): Promise<BlogPostRow[]> {
+  const doRequest = (body: Record<string, unknown>) =>
+    supabaseRequest(pathname, {
+      method,
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(body),
+    }) as Promise<BlogPostRow[]>;
+
+  try {
+    return await doRequest(payload);
+  } catch (error) {
+    if (getMissingSupabaseColumn(error) === "category" && "category" in payload) {
+      const { category: _omit, ...rest } = payload;
+      void _omit;
+      const rows = await doRequest(rest);
+      return rows.map((row) => ({ ...row, category: null }));
+    }
+    throw error;
+  }
+}
+
 function rowToPost(row: BlogPostRow): BlogPost {
   return {
     slug: row.slug,
     title: row.title,
     excerpt: row.excerpt,
-    content: row.content,
+    content: row.content ?? "",
     minutes: row.minutes,
     tags: row.tags || [],
     category: row.category || undefined,
@@ -118,15 +181,20 @@ function rowToPost(row: BlogPostRow): BlogPost {
   };
 }
 
+function rowToMeta(row: BlogPostRow): BlogPostMeta {
+  const { content: _content, ...meta } = rowToPost(row);
+  void _content;
+  return meta;
+}
 
-function toChronologicalTime(post: BlogPost) {
+function toChronologicalTime(post: { publishedAt: string | null; updatedAt: string }) {
   const primary = post.publishedAt ? new Date(post.publishedAt).getTime() : Number.NaN;
   if (!Number.isNaN(primary)) return primary;
   const fallback = post.updatedAt ? new Date(post.updatedAt).getTime() : 0;
   return Number.isNaN(fallback) ? 0 : fallback;
 }
 
-function sortPostsByEditorialDate(posts: BlogPost[]) {
+function sortPostsByEditorialDate<T extends { publishedAt: string | null; updatedAt: string }>(posts: T[]) {
   return [...posts].sort((a, b) => toChronologicalTime(b) - toChronologicalTime(a));
 }
 
@@ -149,10 +217,10 @@ function postToRowInput(post: BlogPost) {
   };
 }
 
-function ensureUniqueSlug(baseSlug: string, posts: BlogPost[]) {
+function ensureUniqueSlug(baseSlug: string, existingSlugs: Iterable<string>) {
   let candidate = baseSlug;
   let counter = 2;
-  const existing = new Set(posts.map((post) => post.slug));
+  const existing = new Set(existingSlugs);
   while (existing.has(candidate)) {
     candidate = `${baseSlug}-${counter}`;
     counter += 1;
@@ -167,6 +235,11 @@ function normalizeSlug(slug: string) {
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-");
+}
+
+async function listSlugs(): Promise<string[]> {
+  const rows = await selectRows({}, ["slug"]);
+  return rows.map((row) => row.slug);
 }
 
 export function sanitizePostInput(input: Partial<BlogPostInput>) {
@@ -201,78 +274,53 @@ export function sanitizePostInput(input: Partial<BlogPostInput>) {
   };
 }
 
-export async function listAllPosts() {
-  try {
-    const query = new URLSearchParams({
-      select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-      order: "updated_at.desc",
-    });
-    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`)) as BlogPostRow[];
-    return sortPostsByEditorialDate(rows.map(rowToPost));
-  } catch (error) {
-    const missingColumn = getMissingSupabaseColumn(error);
-    if (missingColumn === "category") {
-      const legacyQuery = new URLSearchParams({
-        select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-        order: "updated_at.desc",
-      });
-      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`)) as Omit<BlogPostRow, "category">[];
-      return sortPostsByEditorialDate(rows.map((row) => rowToPost({ ...(row as BlogPostRow), category: null })));
-    }
+// ── Lecturas ────────────────────────────────────────────────────────────────
 
-    throw error;
-  }
+// Listado liviano para paneles de administración (sin `content`).
+export async function listPostsMeta(): Promise<BlogPostMeta[]> {
+  const rows = await selectRows({}, META_COLUMNS, "updated_at.desc");
+  return sortPostsByEditorialDate(rows.map(rowToMeta));
 }
 
-export async function listPublishedPosts() {
-  const posts = await listAllPosts();
-  return sortPostsByEditorialDate(posts.filter((post) => post.status === "published"));
+// Listado liviano de publicados para el sitio público (sin `content`).
+export async function listPublishedPosts(): Promise<BlogPostMeta[]> {
+  const rows = await selectRows({ status: "eq.published" }, META_COLUMNS, "updated_at.desc");
+  return sortPostsByEditorialDate(rows.map(rowToMeta));
 }
 
-export async function getPublishedPostBySlug(slug: string) {
-  const posts = await listPublishedPosts();
-  return posts.find((post) => post.slug === slug);
+// Post completo por slug, cualquier estado (uso administrativo).
+export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
+  const rows = await selectRows({ slug: `eq.${normalizeSlug(slug)}` }, ALL_COLUMNS);
+  return rows.length ? rowToPost(rows[0]) : undefined;
 }
+
+// Post completo publicado por slug (sitio público).
+export async function getPublishedPostBySlug(slug: string): Promise<BlogPost | undefined> {
+  const rows = await selectRows({ slug: `eq.${normalizeSlug(slug)}`, status: "eq.published" }, ALL_COLUMNS);
+  return rows.length ? rowToPost(rows[0]) : undefined;
+}
+
+// ── Escrituras ──────────────────────────────────────────────────────────────
 
 export async function createPost(input: Partial<BlogPostInput>) {
-  const posts = await listAllPosts();
   const next = sanitizePostInput(input);
-  const uniqueSlug = ensureUniqueSlug(next.slug, posts);
+  const uniqueSlug = ensureUniqueSlug(next.slug, await listSlugs());
   const created: BlogPost = { ...next, slug: uniqueSlug, updatedAt: new Date().toISOString() };
 
-  try {
-    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
-      method: "POST",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(postToRowInput(created)),
-    })) as BlogPostRow[];
-    return rowToPost(rows[0]);
-  } catch (error) {
-    if (getMissingSupabaseColumn(error) === "category") {
-      const payload = stripUnsupportedColumns(postToRowInput(created), ["category"]);
-      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}`, {
-        method: "POST",
-        headers: { Prefer: "return=representation" },
-        body: JSON.stringify(payload),
-      })) as Omit<BlogPostRow, "category">[];
-      return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
-    }
-    throw error;
-  }
+  const rows = await writeRows(`/rest/v1/${BLOG_TABLE}`, "POST", postToRowInput(created));
+  return rowToPost(rows[0]);
 }
 
 export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
-  const posts = await listAllPosts();
   const normalizedParamSlug = normalizeSlug(slug);
   const normalizedInputSlug = typeof input.slug === "string" ? normalizeSlug(input.slug) : "";
 
-  let index = posts.findIndex((post) => post.slug === normalizedParamSlug);
-  if (index === -1 && normalizedInputSlug) {
-    index = posts.findIndex((post) => post.slug === normalizedInputSlug);
+  let current = await getPostBySlug(normalizedParamSlug);
+  if (!current && normalizedInputSlug && normalizedInputSlug !== normalizedParamSlug) {
+    current = await getPostBySlug(normalizedInputSlug);
   }
-  if (index === -1) throw new Error("Post no encontrado.");
+  if (!current) throw new Error("Post no encontrado.");
 
-  const current = posts[index];
   const merged = sanitizePostInput({
     ...current,
     ...input,
@@ -282,47 +330,21 @@ export async function updatePost(slug: string, input: Partial<BlogPostInput>) {
     slug: input.slug?.trim() ? input.slug : current.slug,
   });
 
-  if (merged.slug !== current.slug && posts.some((post, i) => i !== index && post.slug === merged.slug)) {
-    throw new Error("Ya existe otro post con ese slug.");
+  if (merged.slug !== current.slug) {
+    const clash = await selectRows({ slug: `eq.${merged.slug}` }, ["slug"]);
+    if (clash.length) throw new Error("Ya existe otro post con ese slug.");
   }
 
   const updated: BlogPost = { ...merged, updatedAt: new Date().toISOString() };
 
-  const query = new URLSearchParams({
-    slug: `eq.${current.slug}`,
-    select: "slug,title,excerpt,content,minutes,tags,category,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-  });
-
-  try {
-    const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, {
-      method: "PATCH",
-      headers: { Prefer: "return=representation" },
-      body: JSON.stringify(postToRowInput(updated)),
-    })) as BlogPostRow[];
-    if (!rows.length) throw new Error("Post no encontrado.");
-    return rowToPost(rows[0]);
-  } catch (error) {
-    if (getMissingSupabaseColumn(error) === "category") {
-      const legacyQuery = new URLSearchParams({
-        slug: `eq.${current.slug}`,
-        select: "slug,title,excerpt,content,minutes,tags,status,published_at,updated_at,cover_image,cover_image_alt,seo_title,seo_description",
-      });
-      const payload = stripUnsupportedColumns(postToRowInput(updated), ["category"]);
-      const rows = (await supabaseRequest(`/rest/v1/${BLOG_TABLE}?${legacyQuery.toString()}`, {
-        method: "PATCH",
-        headers: { Prefer: "return=representation" },
-        body: JSON.stringify(payload),
-      })) as Omit<BlogPostRow, "category">[];
-      if (!rows.length) throw new Error("Post no encontrado.");
-      return rowToPost({ ...(rows[0] as BlogPostRow), category: null });
-    }
-    throw error;
-  }
+  const query = new URLSearchParams({ slug: `eq.${current.slug}` });
+  const rows = await writeRows(`/rest/v1/${BLOG_TABLE}?${query.toString()}`, "PATCH", postToRowInput(updated));
+  if (!rows.length) throw new Error("Post no encontrado.");
+  return rowToPost(rows[0]);
 }
 
 export async function deletePost(slug: string) {
-  const posts = await listAllPosts();
-  const target = posts.find((post) => post.slug === slug);
+  const target = await getPostBySlug(slug);
   if (!target) throw new Error("Post no encontrado.");
 
   const query = new URLSearchParams({ slug: `eq.${target.slug}` });

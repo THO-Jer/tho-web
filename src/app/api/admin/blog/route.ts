@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { readSession } from "@/lib/adminAuth";
-import { createPost, listAllPosts } from "@/lib/blogStore";
+import { createPost, listPostsMeta } from "@/lib/blogStore";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,8 @@ export async function GET(req: NextRequest) {
   const session = await readSession(req);
   if (!session || !session.canBlog) return unauthorized();
 
-  const posts = await listAllPosts();
+  // Listado liviano: no incluye `content` (usar GET /api/admin/blog/[slug]).
+  const posts = await listPostsMeta();
   return NextResponse.json({ posts });
 }
 

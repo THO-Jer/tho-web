@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { BrandLoader } from "@/components/BrandLoader";
-import { getToc } from "@/components/blog/BlogContent";
+import { BlogContent, getToc } from "@/components/blog/BlogContent";
 import { WysiwygEditor, type WysiwygEditorHandle } from "@/components/blog/WysiwygEditor";
+import { ConfirmDialog } from "@/components/studio/ConfirmDialog";
 
 type BlogPost = {
   slug: string;
@@ -15,6 +16,7 @@ type BlogPost = {
   content: string;
   minutes: number;
   tags: string[];
+  category?: string;
   status: "draft" | "published";
   publishedAt: string | null;
   updatedAt: string;
@@ -24,6 +26,9 @@ type BlogPost = {
   seoDescription?: string;
 };
 
+// Listado liviano que entrega GET /api/admin/blog (sin content).
+type PostMeta = Omit<BlogPost, "content">;
+
 type FormState = {
   slug: string;
   title: string;
@@ -31,6 +36,7 @@ type FormState = {
   content: string;
   minutes: string;
   tags: string;
+  category: string;
   publishedAt: string;
   status: "draft" | "published";
   coverImage: string;
@@ -54,6 +60,7 @@ const EMPTY_FORM: FormState = {
   content: "",
   minutes: "5",
   tags: "",
+  category: "",
   publishedAt: "",
   status: "published",
   coverImage: "",
@@ -72,6 +79,7 @@ function toFormState(post: BlogPost): FormState {
     content: post.content,
     minutes: String(post.minutes),
     tags: post.tags.join(", "),
+    category: post.category ?? "",
     publishedAt: post.publishedAt ? post.publishedAt.slice(0, 16) : "",
     status: post.status,
     coverImage: post.coverImage ?? "",
@@ -130,12 +138,20 @@ export default function BlogStudioPage() {
   const [email, setEmail] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<PostMeta[]>([]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [blockedByOnboarding, setBlockedByOnboarding] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState<"edit" | "preview">("edit");
+  const [confirmDeleteSlug, setConfirmDeleteSlug] = useState<string | null>(null);
+  // Estado del post tal como existe en el servidor (null = aún no existe).
+  const [serverStatus, setServerStatus] = useState<"draft" | "published" | null>(null);
+  const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const autosaveBusyRef = useRef(false);
+  const autoCreatedRef = useRef(false);
   const [repoPickerMode, setRepoPickerMode] = useState<"cover" | "inline" | null>(null);
   const [pickerSource, setPickerSource] = useState<"repo" | "storage">("repo");
   const [repoTree, setRepoTree] = useState<RepoTreeNode[]>([]);
@@ -198,8 +214,8 @@ export default function BlogStudioPage() {
     try {
       const saved = localStorage.getItem(draftKey);
       if (saved) {
-        const parsed = JSON.parse(saved) as FormState;
-        if (parsed.title || parsed.content || parsed.excerpt) setForm(parsed);
+        const parsed = JSON.parse(saved) as Partial<FormState>;
+        if (parsed.title || parsed.content || parsed.excerpt) setForm({ ...EMPTY_FORM, ...parsed });
       }
     } catch {
       // ignore malformed drafts
@@ -259,24 +275,48 @@ export default function BlogStudioPage() {
     fetchPosts().catch(() => undefined);
   }, [authenticated]);
 
-  useEffect(() => {
-    if (!selectedSlug || !posts.length) return;
-    const selected = posts.find((post) => post.slug === selectedSlug);
-    if (selected) {
-      fillForm(selected);
-      return;
+  // Carga una entrada completa por slug (el listado ya no incluye content).
+  async function loadPost(slug: string) {
+    setLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch(`/api/admin/blog/${encodeURIComponent(slug)}`, { credentials: "include", cache: "no-store" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `No se encontró la entrada ${slug}.`);
+      fillForm(data.post as BlogPost);
+      if (typeof window !== "undefined") {
+        window.history.replaceState({}, document.title, `/studio/blog/editor?slug=${encodeURIComponent(data.post.slug as string)}`);
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudo cargar la entrada.");
+    } finally {
+      setLoading(false);
     }
-    setMessage(`No se encontró la entrada ${selectedSlug}.`);
-  }, [selectedSlug, posts]);
+  }
+
+  useEffect(() => {
+    if (!authenticated || !selectedSlug) return;
+    loadPost(selectedSlug).catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated, selectedSlug]);
 
   function fillForm(post: BlogPost) {
     setEditingSlug(post.slug);
+    setServerStatus(post.status);
+    autoCreatedRef.current = false;
+    setAutosaveState("idle");
+    setLastSavedAt(null);
+    setView("edit");
     setForm(toFormState(post));
   }
 
   function resetForm() {
     setForm(EMPTY_FORM);
     setEditingSlug(null);
+    setServerStatus(null);
+    autoCreatedRef.current = false;
+    setAutosaveState("idle");
+    setLastSavedAt(null);
     localStorage.removeItem(draftKey);
   }
 
@@ -284,7 +324,7 @@ export default function BlogStudioPage() {
     setForm((prev) => ({ ...prev, minutes: String(smartMinutes) }));
   }
 
-  function insertInternalLink(post: BlogPost) {
+  function insertInternalLink(post: PostMeta) {
     editorRef.current?.insertLink(`Leer también: ${post.title}`, `/blog/${post.slug}`);
     setMessage(`Link interno insertado: /blog/${post.slug}`);
   }
@@ -406,6 +446,72 @@ export default function BlogStudioPage() {
     return { res, data };
   }
 
+  function buildPayload(status: "draft" | "published") {
+    return {
+      slug: form.slug,
+      title: form.title,
+      // El API exige excerpt: para autosave de borradores incompletos usamos
+      // un extracto derivado del contenido.
+      excerpt: form.excerpt.trim() || form.content.replace(/[#>*`\-\[\]()!]/g, " ").replace(/\s+/g, " ").trim().slice(0, 160),
+      content: form.content,
+      minutes: Number(form.minutes),
+      tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+      category: form.category.trim(),
+      publishedAt: status === "published" && form.publishedAt ? new Date(form.publishedAt).toISOString() : null,
+      status,
+      coverImage: form.coverImage,
+      coverImageAlt: form.coverImageAlt,
+      seoTitle: form.seoTitle,
+      seoDescription: form.seoDescription,
+    };
+  }
+
+  // ── Autosave de borradores al servidor ─────────────────────────────────
+  // Solo para entradas nuevas o que ya son borrador: nunca sobreescribe en
+  // caliente un post publicado (esos siguen respaldados en localStorage).
+  async function autosaveDraft() {
+    if (autosaveBusyRef.current || loading) return;
+    autosaveBusyRef.current = true;
+    setAutosaveState("saving");
+    try {
+      const payload = buildPayload("draft");
+      const endpoint = editingSlug ? `/api/admin/blog/${encodeURIComponent(editingSlug)}` : "/api/admin/blog";
+      const method = editingSlug ? "PATCH" : "POST";
+      const { res, data } = await savePost(endpoint, method, payload);
+      if (!res.ok) throw new Error(data.error || "Autosave falló");
+
+      const savedSlug = data.post?.slug ? String(data.post.slug) : editingSlug;
+      if (savedSlug && savedSlug !== editingSlug) {
+        if (!editingSlug) {
+          autoCreatedRef.current = true;
+          setServerStatus("draft");
+          fetchPosts().catch(() => undefined);
+        }
+        setEditingSlug(savedSlug);
+        if (typeof window !== "undefined") {
+          window.history.replaceState({}, document.title, `/studio/blog/editor?slug=${encodeURIComponent(savedSlug)}`);
+        }
+      }
+      setAutosaveState("saved");
+      setLastSavedAt(new Date());
+    } catch {
+      setAutosaveState("error");
+    } finally {
+      autosaveBusyRef.current = false;
+    }
+  }
+
+  useEffect(() => {
+    if (!authenticated || loading) return;
+    if (serverStatus === "published") return;
+    if (!form.title.trim() || form.content.trim().length < 30) return;
+    const timer = setTimeout(() => {
+      autosaveDraft().catch(() => undefined);
+    }, 2500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, authenticated, serverStatus, loading]);
+
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!canSubmit) return;
@@ -414,20 +520,7 @@ export default function BlogStudioPage() {
       return;
     }
 
-    const payload = {
-      slug: form.slug,
-      title: form.title,
-      excerpt: form.excerpt,
-      content: form.content,
-      minutes: Number(form.minutes),
-      tags: form.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
-      publishedAt: form.publishedAt ? new Date(form.publishedAt).toISOString() : null,
-      status: form.status,
-      coverImage: form.coverImage,
-      coverImageAlt: form.coverImageAlt,
-      seoTitle: form.seoTitle,
-      seoDescription: form.seoDescription,
-    };
+    const payload = buildPayload(form.status);
 
     const endpoint = editingSlug ? `/api/admin/blog/${editingSlug}` : "/api/admin/blog";
     const method = editingSlug ? "PATCH" : "POST";
@@ -459,8 +552,10 @@ export default function BlogStudioPage() {
         }
       }
       const savedSlug = data.post?.slug || editingSlug || form.slug;
+      const notice = editingSlug && !autoCreatedRef.current ? "updated" : "created";
+      localStorage.removeItem(draftKey);
       await fetchPosts();
-      router.replace(`/studio/blog?notice=${editingSlug ? "updated" : "created"}&slug=${encodeURIComponent(savedSlug)}`);
+      router.replace(`/studio/blog?notice=${notice}&slug=${encodeURIComponent(savedSlug)}`);
       return;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error guardando.");
@@ -470,7 +565,6 @@ export default function BlogStudioPage() {
   }
 
   async function onDelete(slug: string) {
-    if (!confirm(`Eliminar ${slug}?`)) return;
     setLoading(true);
     setMessage("");
     try {
@@ -521,13 +615,57 @@ export default function BlogStudioPage() {
             <h1 className="font-tho-title text-4xl text-slate-950 sm:text-5xl">Asistente de Redacción</h1>
             <p className="mt-2 text-sm text-slate-600">Sesión heredada desde /studio. Todo lo que edites aquí usa ese acceso común.</p>
           </div>
-          <Link href="/studio/blog" className="rounded-lg border border-slate-300 px-3 py-2 text-xs">Volver al listado</Link>
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-lg border border-slate-300 bg-white p-0.5">
+              <button
+                type="button"
+                onClick={() => setView("edit")}
+                className={`rounded-md px-3 py-1.5 text-xs font-semibold ${view === "edit" ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("preview")}
+                className={`rounded-md px-3 py-1.5 text-xs font-semibold ${view === "preview" ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-50"}`}
+              >
+                Vista previa
+              </button>
+            </div>
+            <Link href="/studio/blog" className="rounded-lg border border-slate-300 px-3 py-2 text-xs">Volver al listado</Link>
+          </div>
         </div>
 
         {message ? <p className="mt-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">{message}</p> : null}
         {loading ? <p className="mt-3 text-xs text-slate-500">Procesando cambios...</p> : null}
+        {serverStatus !== "published" && autosaveState !== "idle" ? (
+          <p className="mt-2 text-xs text-slate-500">
+            {autosaveState === "saving"
+              ? "Guardando borrador..."
+              : autosaveState === "saved"
+                ? `Borrador guardado automáticamente${lastSavedAt ? ` a las ${lastSavedAt.toLocaleTimeString()}` : ""}.`
+                : "No se pudo autoguardar el borrador (se mantiene el respaldo local)."}
+          </p>
+        ) : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
+          {view === "preview" ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Vista previa · así se verá en /blog</p>
+              {form.coverImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={form.coverImage} alt={form.coverImageAlt || form.title} className="mt-4 aspect-[16/9] w-full rounded-2xl border border-slate-200 object-cover" />
+              ) : null}
+              <h1 className="mt-6 text-3xl font-semibold text-slate-900">{form.title || "Sin título"}</h1>
+              {form.excerpt ? <p className="mt-3 text-lg text-slate-600">{form.excerpt}</p> : null}
+              <p className="mt-2 text-xs text-slate-500">
+                {smartMinutes} min de lectura{form.category ? ` · ${form.category}` : ""}
+              </p>
+              <div className="mt-4 border-t border-slate-200">
+                {form.content.trim() ? <BlogContent content={form.content} /> : <p className="mt-5 text-sm text-slate-500">Aún no hay contenido para previsualizar.</p>}
+              </div>
+            </div>
+          ) : (
           <form onSubmit={onSubmit} className="rounded-2xl border border-slate-200 bg-white p-5">
             <fieldset disabled={!authenticated || loading} className="contents">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -606,7 +744,10 @@ export default function BlogStudioPage() {
                 </div>
                 <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Texto alternativo de portada" value={form.coverImageAlt} onChange={(e) => setForm({ ...form, coverImageAlt: e.target.value })} />
 
-                <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Categoría (ej: Cultura organizacional)" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+                  <input className="rounded-lg border border-slate-300 px-3 py-2" placeholder="Tags (separados por coma)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+                </div>
                 <label className="text-xs text-slate-600">Fecha de publicación
                   <input type="datetime-local" className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" value={form.publishedAt} onChange={(e) => setForm({ ...form, publishedAt: e.target.value })} />
                 </label>
@@ -620,6 +761,7 @@ export default function BlogStudioPage() {
               </div>
             </fieldset>
           </form>
+          )}
 
           <aside className="space-y-5">
             <section className="rounded-2xl border border-slate-200 bg-white p-5">
@@ -666,8 +808,8 @@ export default function BlogStudioPage() {
                     <h3 className="mt-1 font-semibold text-slate-900">{post.title}</h3>
                     <p className="mt-1 text-xs text-slate-600">/{post.slug}</p>
                     <div className="mt-3 flex gap-2">
-                      <button type="button" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs" onClick={() => fillForm(post)}>Editar</button>
-                      <button type="button" className="rounded-md border border-rose-200 px-3 py-1.5 text-xs text-rose-700" onClick={() => onDelete(post.slug)}>Eliminar</button>
+                      <button type="button" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs" onClick={() => loadPost(post.slug).catch(() => undefined)}>Editar</button>
+                      <button type="button" className="rounded-md border border-rose-200 px-3 py-1.5 text-xs text-rose-700" onClick={() => setConfirmDeleteSlug(post.slug)}>Eliminar</button>
                     </div>
                   </article>
                 ))}
@@ -677,6 +819,20 @@ export default function BlogStudioPage() {
           </aside>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={Boolean(confirmDeleteSlug)}
+        title="Eliminar entrada"
+        description={confirmDeleteSlug ? `Se eliminará "${confirmDeleteSlug}" de forma permanente. Esta acción no se puede deshacer.` : undefined}
+        confirmLabel="Eliminar"
+        destructive
+        onCancel={() => setConfirmDeleteSlug(null)}
+        onConfirm={() => {
+          const slug = confirmDeleteSlug;
+          setConfirmDeleteSlug(null);
+          if (slug) onDelete(slug).catch(() => undefined);
+        }}
+      />
 
       {repoPickerMode ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
