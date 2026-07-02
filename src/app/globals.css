@@ -615,19 +615,35 @@ body {
   border: 0;
   background: transparent;
   box-shadow: none;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: none;          /* Let JS handle touch — prevents browser scroll interference */
-}
-
-.trust-slider:active {
-  cursor: grabbing;
+  /* Fade lateral sin overlays extra */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
 }
 
 .trust-track {
-  /* No CSS animation — position driven by JS via transform */
+  animation: trust-marquee 42s linear infinite;
   will-change: transform;
+}
+
+.trust-slider:hover .trust-track {
+  animation-play-state: paused;
+}
+
+@keyframes trust-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-track {
+    animation: none;
+  }
+
+  .trust-slider {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }
 
 .trust-logo-slot {
@@ -669,70 +685,6 @@ body {
     height: 520px;
     transform: rotateX(10deg) rotateY(-10deg) rotateZ(7deg);
   }
-
-  .blog-card-flip:hover .blog-card-inner {
-    transform: none;
-  }
-}
-
-@media (hover: none) {
-  .blog-card-face {
-    position: relative;
-    inset: auto;
-    backface-visibility: visible;
-  }
-
-  .blog-card-back {
-    display: none;
-    transform: none;
-  }
-}
-
-
-.blog-card-inner {
-  transform-style: preserve-3d;
-  transition: transform 0.65s ease;
-}
-
-.blog-card-flip:hover .blog-card-inner {
-  transform: rotateY(180deg);
-}
-
-/* CTA visible solo en dispositivos sin hover (touch / mobile) */
-.blog-card-mobile-cta {
-  display: none;
-}
-
-@media (hover: none) {
-  .blog-card-mobile-cta {
-    display: inline-flex;
-  }
-}
-
-.blog-card-face {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
-}
-
-.blog-card-front {
-  display: block;
-}
-
-.blog-card-back {
-  display: grid;
-  place-items: center;
-  transform: rotateY(180deg);
-}
-
-.home-blog-card {
-  background-color: #ffffff;
-}
-
-.home-blog-card.blog-card-front {
-  background-image: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.96) 100%), var(--blog-cover-image);
-  background-size: cover;
-  background-position: center;
 }
 
 .method-arc-shell {
@@ -1005,21 +957,6 @@ body {
     background: #111827;
   }
 
-  .home-blog-card {
-    background-color: #202020 !important;
-    border-color: rgba(148, 163, 184, 0.35) !important;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45) !important;
-  }
-
-  .home-blog-card.blog-card-front {
-    background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.82) 0%, rgba(15, 23, 42, 0.92) 100%), var(--blog-cover-image) !important;
-  }
-
-  .home-blog-card .text-slate-900,
-  .home-blog-card .text-slate-700,
-  .home-blog-card .text-slate-500 {
-    color: #e2e8f0 !important;
-  }
 }
 
 [data-reveal] {
@@ -1031,6 +968,200 @@ body {
 [data-reveal].is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ============================================================
+   Statement de problema — reveal tipográfico al scroll
+   ============================================================ */
+.statement-line {
+  color: rgba(148, 163, 184, 0.5);
+  opacity: 0.6;
+  transform: translateY(14px);
+  transition: color 0.7s ease, opacity 0.7s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--line-delay, 0ms);
+}
+
+.statement-line.is-visible {
+  color: #0f172a;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Subrayado de acento por pilar, se pinta al revelar */
+.statement-line::after {
+  content: "";
+  display: block;
+  margin: 0.05em auto 0;
+  height: 0.09em;
+  width: 0;
+  border-radius: 999px;
+  background: var(--line-accent, currentColor);
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--line-delay, 0ms) + 250ms);
+}
+
+.statement-line.is-visible::after {
+  width: 2.2em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .statement-line.is-visible {
+    color: #f8fafc;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statement-line {
+    color: #0f172a;
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .statement-line::after {
+    width: 2.2em;
+    transition: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .statement-line {
+      color: #f8fafc;
+    }
+  }
+}
+
+/* ============================================================
+   Banner de recursos — entrada deslizante no bloqueante
+   ============================================================ */
+.resources-banner {
+  animation: resources-banner-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes resources-banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resources-banner {
+    animation: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .resources-banner > div {
+    background-color: #1f1f1f;
+    border-color: rgba(148, 163, 184, 0.35);
+  }
+}
+
+/* ============================================================
+   Método — scrollytelling vertical
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  .method-steps-rail {
+    background-color: rgba(148, 163, 184, 0.25) !important;
+  }
+
+  .method-step-dot {
+    background-color: #1f1f1f !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .method-scrolly .transition-all {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   Blog — cards editoriales (v2, sin flip)
+   ============================================================ */
+.blog-card-v2 {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+}
+
+.blog-card-v2:hover,
+.blog-card-v2:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+}
+
+.blog-card-v2 .blog-card-v2-cover {
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blog-card-v2:hover .blog-card-v2-cover {
+  transform: scale(1.045);
+}
+
+.blog-card-v2 .blog-card-v2-arrow {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blog-card-v2:hover .blog-card-v2-arrow {
+  transform: translateX(5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-card-v2,
+  .blog-card-v2 .blog-card-v2-cover,
+  .blog-card-v2 .blog-card-v2-arrow {
+    transition: none;
+  }
+
+  .blog-card-v2:hover {
+    transform: none;
+  }
+
+  .blog-card-v2:hover .blog-card-v2-cover {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Servicios — módulos bento complementarios
+   ============================================================ */
+.bento-photo-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+}
+
+.bento-photo-card img {
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bento-photo-card:hover img {
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-photo-card img {
+    transition: none;
+  }
+
+  .bento-photo-card:hover img {
+    transform: none;
+  }
+}
+
+/* ============================================================
+   Hero tipográfico
+   ============================================================ */
+.hero-headline {
+  text-wrap: balance;
 }
 
 

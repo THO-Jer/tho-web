@@ -8,9 +8,10 @@ import { Section } from "@/components/Section";
 import { ContactForm } from "@/components/ContactForm";
 import { SERVICES } from "@/content/services";
 import { PILLAR_META } from "@/lib/brand";
-import MethodTimeline from "@/components/MethodTimeline";
+import MethodScrolly from "@/components/MethodScrolly";
 import { ActionGallery } from "@/components/ActionGallery";
-import { ResourcesModal } from "@/components/ResourcesModal";
+import { ResourcesBanner } from "@/components/ResourcesBanner";
+import { ProblemStatement } from "@/components/ProblemStatement";
 import { TrustSlider } from "@/components/TrustSlider";
 import { SocialFloat } from "@/components/SocialFloat";
 import { listPublishedPosts } from "@/lib/blogStore";
@@ -90,34 +91,38 @@ export default async function HomePage() {
       <SocialFloat />
 
       <main id="contenido">
-        <ResourcesModal autoOpen />
-        {/* HERO — imagen de fondo (atenuada) + texto encima */}
+        <ResourcesBanner />
+        {/* HERO — tipografía protagonista, imagen como soporte */}
         <section className="relative min-h-[72vh] overflow-visible text-white md:min-h-[80vh] lg:min-h-[88vh]">
         <div className="hero-media-fade pointer-events-none absolute inset-x-0 -bottom-28 top-0">
           <Image
             src="/hero/hands.png"
             alt=""
             fill
-            className="object-cover object-[20%_36%] opacity-[0.75] md:object-center"
+            className="object-cover object-[20%_36%] opacity-[0.7] md:object-center"
             priority
           />
-          <div className="absolute inset-0 bg-[linear-gradient(108deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.32)_52%,rgba(15,23,42,0.62)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(288deg,rgba(15,23,42,0.08)_0%,rgba(15,23,42,0.38)_52%,rgba(15,23,42,0.68)_100%)]" />
         </div>
 
-        <div className="relative mx-auto flex h-full min-h-[72vh] max-w-6xl items-end justify-end px-4 pb-16 pt-8 md:min-h-[80vh] md:pb-20 md:pt-12 lg:min-h-[88vh] lg:pb-24 lg:pt-14">
-          <div className="max-w-2xl text-right">
-            <h1 className="text-xs uppercase tracking-wide text-white/75">
+        <div className="relative mx-auto flex h-full min-h-[72vh] max-w-6xl items-end px-4 pb-16 pt-8 md:min-h-[80vh] md:pb-20 md:pt-12 lg:min-h-[88vh] lg:pb-24 lg:pt-14">
+          <div className="max-w-3xl">
+            <p className="text-xs uppercase tracking-wide text-white/75">
               The Human Org · Consultoría estratégica · Concepción
-            </h1>
-            <div className="mt-3 ml-auto h-[6px] w-36 rounded-sm brand-block-divider" />
+            </p>
+            <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
 
-            <p className="mt-5 ml-auto max-w-xl text-base text-white/80 md:text-lg">
-              Integramos ESG, relacionamiento comunitario y desarrollo organizacional para construir estrategias
-              accionables y decisiones que se sostienen en el tiempo.
+            <h1 className="hero-headline font-tho-title mt-6 text-[3rem] leading-[1.02] text-white md:text-[4.4rem] lg:text-[5.6rem]">
+              Estrategias que se sostienen en el tiempo.
+            </h1>
+
+            <p className="mt-5 max-w-xl text-base text-white/80 md:text-lg">
+              Integramos ESG, relacionamiento comunitario y desarrollo organizacional
+              para construir decisiones accionables.
             </p>
 
-            <div className="mt-6 flex flex-col items-end gap-3 sm:ml-auto sm:flex-row sm:justify-end">
-              {/* CTA primario — cualitativo, intención de conversación/agendamiento */}
+            <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row">
+              {/* CTA primario — conversación/agendamiento */}
               <a
                 href={BOOK_URL}
                 target="_blank"
@@ -138,17 +143,11 @@ export default async function HomePage() {
         </div>
         </section>
 
-      {/* PROBLEMA — editorial integrado al flujo, sin "tarjeta maqueta" */}
+      {/* PROBLEMA — statement tipográfico con reveal al scroll */}
       <section className="hero-transition-panel relative z-30 mt-14 bg-transparent md:mt-20 lg:mt-24">
         <div className="mx-auto max-w-5xl px-4 py-12 text-center md:py-16">
-                    <h2 className="font-tho-title mt-6 text-[2.45rem] font-normal text-slate-950 md:text-[3.7rem] lg:text-[5.2rem]">
-            Sostenibilidad desintegrada.
-            <br />
-            Comunidad descontenta.
-            <br />
-            Organización desalineada.
-          </h2>
-          <p className="mx-auto mt-6 max-w-3xl text-base text-slate-700 md:text-lg">
+          <ProblemStatement />
+          <p className="mx-auto mt-8 max-w-3xl text-base text-slate-700 md:text-lg">
             No tienes que llegar ahí. En The Human Org te ayudamos a seguir elevando el estándar.
           </p>
         </div>
@@ -200,6 +199,47 @@ export default async function HomePage() {
             );
           })}
           </div>
+
+          {/* Fila bento complementaria — diferenciador + terreno */}
+          <div className="mt-5 grid gap-5 xl:grid-cols-3">
+            <div className="rounded-[2rem] bg-slate-900 p-7 text-white shadow-[0_14px_30px_rgba(15,23,42,0.18)] xl:col-span-2">
+              <div className="h-[5px] w-24 rounded-sm brand-block-divider" aria-hidden />
+              <p className="font-tho-title mt-5 text-[1.6rem] leading-tight text-white md:text-[2rem]">
+                Boutique de verdad: el equipo que diseña la propuesta es el mismo que ejecuta en terreno.
+              </p>
+              <p className="mt-3 max-w-2xl text-sm text-slate-300 md:text-base">
+                No tercerizamos ni enviamos analistas sin experiencia. Si no sabes por dónde partir,
+                partamos por una conversación.
+              </p>
+              <a
+                href={BOOK_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-unified-motion btn-hero-services mt-6 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
+              >
+                Conversemos tu caso
+              </a>
+            </div>
+
+            <a href="#accion" className="bento-photo-card group block min-h-[220px]">
+              <Image
+                src="/accion/04.png"
+                alt="Equipo THO trabajando en terreno"
+                fill
+                sizes="(min-width: 1280px) 30vw, 100vw"
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0)_35%,rgba(15,23,42,0.72)_100%)]" />
+              <div className="absolute bottom-5 left-5 right-5 text-white">
+                <div className="text-[11px] font-bold uppercase tracking-[0.17em] text-white/80">
+                  THO en acción
+                </div>
+                <div className="mt-1 text-base font-semibold">
+                  Terreno real, no diapositivas →
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
       </Section>
 
@@ -208,31 +248,27 @@ export default async function HomePage() {
         title="Cómo trabajamos"
         subtitle="Nuestro método está diseñado para ser adaptable y entregar valor en un entorno complejo y cambiante, garantizando viabilidad. La consultoría en The Human Org seguirá las siguientes etapas durante el proceso."
       >
-        <MethodTimeline
+        <MethodScrolly
           steps={[
             {
               n: "01",
               title: "Lectura del Sistema",
               desc: "Mapeamos fuentes, levantamos datos y desarrollamos diagnósticos que evidencian riesgos, oportunidades y fundamentan el proceso.",
-              tone: "com",
             },
             {
               n: "02",
               title: "Diseño de Estrategia",
               desc: "Co-diseñamos rutas, actividades, metas e indicadores para que tu organización sepa qué hacer para alcanzar sus objetivos.",
-              tone: "esg",
             },
             {
               n: "03",
               title: "Implementación",
               desc: "Acompañamos la ejecución de la Estrategia en terreno, ajustando en tiempo real y coordinando soluciones que agregan valor.",
-              tone: "do",
             },
             {
               n: "04",
               title: "Evaluación y Aprendizaje",
               desc: "Reportamos resultados para evidenciar logros y desafíos, de manera que permita ajustar la Estrategia e iterar desde la evidencia para el próximo ciclo.",
-              tone: "neutral",
             },
           ]}
         />
@@ -260,7 +296,7 @@ export default async function HomePage() {
         <div className="mx-auto mt-10 h-[6px] w-36 rounded-sm brand-block-divider md:mt-12" aria-hidden />
       </Section>
 
-      <Section id="blog" title="Blog" subtitle="Análisis y reflexiones desde el terreno. Exploramos las tendencias que definen el presente y futuro de la estrategia organizacional y territorial.">
+      <Section id="blog" tone="soft" title="Blog" subtitle="Análisis y reflexiones desde el terreno. Exploramos las tendencias que definen el presente y futuro de la estrategia organizacional y territorial.">
         <div className="grid items-start gap-6 lg:grid-cols-[250px_1fr] md:gap-8">
           <Link
             href="/blog"
@@ -271,35 +307,28 @@ export default async function HomePage() {
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {posts.slice(0, 3).map((p) => (
-              <article key={p.slug} className="blog-card-flip h-[290px] [perspective:1200px]">
-                <div className="blog-card-inner relative h-full w-full">
+              <Link
+                key={p.slug}
+                href={`/blog/${p.slug}`}
+                className="blog-card-v2 rounded-2xl border border-slate-200 bg-white shadow-sm"
+              >
+                <div className="relative h-36 shrink-0 overflow-hidden">
                   <div
-                    className="blog-card-face blog-card-front rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card"
-                    style={{
-                      ["--blog-cover-image" as string]: `url(${p.coverImage || "/hero/4.png"})`,
-                    }}
-                  >
-                    <div className="text-xs text-slate-500">{p.minutes} min</div>
-                    <div className="mt-2 text-base font-semibold text-slate-900">{p.title}</div>
-                    <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 22)}</p>
-                    {/* Visible solo en dispositivos touch (sin hover) */}
-                    <a
-                      href={`/blog/${p.slug}`}
-                      className="blog-card-mobile-cta mt-3 inline-flex text-sm font-semibold text-slate-800 underline underline-offset-2"
-                    >
-                      Leer artículo →
-                    </a>
-                  </div>
-                  <div className="blog-card-face blog-card-back rounded-2xl border border-slate-200 bg-white p-6 shadow-sm home-blog-card">
-                    <a
-                      href={`/blog/${p.slug}`}
-                      className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-900"
-                    >
-                      Leer +
-                    </a>
-                  </div>
+                    className="blog-card-v2-cover absolute inset-0 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${p.coverImage || "/hero/4.png"})` }}
+                    aria-hidden
+                  />
                 </div>
-              </article>
+                <div className="flex flex-1 flex-col p-5">
+                  <div className="text-xs text-slate-500">{p.minutes} min de lectura</div>
+                  <h3 className="mt-2 text-base font-semibold text-slate-900">{p.title}</h3>
+                  <p className="mt-2 text-sm text-slate-700">{clampWords(p.excerpt, 18)}</p>
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-slate-900">
+                    Leer artículo
+                    <span className="blog-card-v2-arrow" aria-hidden>→</span>
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -316,7 +345,8 @@ export default async function HomePage() {
               <br />
               Déjanos tu contacto o agenda una reunión para evaluar una consultoría en Sostenibilidad, Relacionamiento Comunitario o Desarrollo Organizacional.
             </p>
-            <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              {/* CTA primario — agenda */}
               <a
                 href={BOOK_URL}
                 target="_blank"
@@ -325,11 +355,12 @@ export default async function HomePage() {
               >
                 Conversemos tu caso
               </a>
+              {/* CTA secundario — mail como enlace */}
               <a
                 href="mailto:hola@tho.cl"
-                className="btn-unified-motion btn-hero-services inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
+                className="text-sm font-semibold text-slate-200 underline underline-offset-4 transition-colors hover:text-white"
               >
-                Escribir por mail
+                o escríbenos a hola@tho.cl
               </a>
             </div>
           </div>
