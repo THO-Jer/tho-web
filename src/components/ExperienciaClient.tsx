@@ -21,45 +21,6 @@ const BIG_YEAR: Record<string, string> = { origen: "Pre-2023" };
 
 type Tenure = { name: string; start: number; end: number; accent: string };
 
-function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState(0);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        obs.disconnect();
-        if (reduced) {
-          setDisplay(value);
-          return;
-        }
-        const t0 = performance.now();
-        const duration = 1100;
-        const tick = (t: number) => {
-          const p = Math.min(1, (t - t0) / duration);
-          setDisplay(Math.round((1 - Math.pow(1 - p, 3)) * value));
-          if (p < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-      },
-      { threshold: 0.4 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [value]);
-
-  return (
-    <span ref={ref}>
-      {display}
-      {suffix}
-    </span>
-  );
-}
-
 export function ExperienciaClient({
   eras,
   projects,
@@ -89,16 +50,6 @@ export function ExperienciaClient({
     });
     return [...map.values()];
   }, [eras]);
-
-  const stats = useMemo(() => {
-    const dayOne = tenures.filter((t) => t.start === TL_START && t.end === TL_END).length;
-    return [
-      { value: TL_END - TL_START, suffix: "", label: "años de operación" },
-      { value: tenures.length, suffix: "", label: "clientes y aliados" },
-      { value: dayOne, suffix: "", label: "relaciones desde el día uno" },
-      { value: 4, suffix: "", label: "áreas de servicio" },
-    ];
-  }, [tenures]);
 
   useEffect(() => {
     const t = setTimeout(() => setRevealed(true), 60);
@@ -141,20 +92,6 @@ export function ExperienciaClient({
               Trabajo en terreno desde 2023, convertido en método y relaciones que duran.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* ── PROOF BAR ── */}
-      <section className="exp4-proof-section">
-        <div className="exp4-proof">
-          {stats.map((s) => (
-            <div key={s.label} className="exp4-proof-item">
-              <span className="exp4-proof-value font-tho-title">
-                <CountUp value={s.value} suffix={s.suffix} />
-              </span>
-              <span className="exp4-proof-label">{s.label}</span>
-            </div>
-          ))}
         </div>
       </section>
 

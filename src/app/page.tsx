@@ -114,11 +114,11 @@ export default async function HomePage() {
             </p>
             <div className="mt-3 h-[6px] w-36 rounded-sm brand-block-divider" />
 
-            <h1 className="hero-headline font-tho-title mt-6 text-[3rem] leading-[1.02] text-white md:text-[4.4rem] lg:text-[5.6rem]">
+            <h1 className="hero-headline font-tho-title mt-6 text-[3.2rem] leading-[1.0] text-white md:text-[4.7rem] lg:text-[5.9rem]">
               Estrategias que se sostienen en el tiempo.
             </h1>
 
-            <p className="mt-5 max-w-xl text-base text-white/80 md:text-lg">
+            <p className="mt-5 max-w-lg text-sm leading-relaxed text-white/70 md:text-base">
               Integramos ESG, relacionamiento comunitario y desarrollo organizacional
               para construir decisiones accionables.
             </p>

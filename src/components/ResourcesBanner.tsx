@@ -47,26 +47,29 @@ export function ResourcesBanner() {
     <>
       {showBanner && !open ? (
         <div className="resources-banner fixed bottom-4 left-4 right-4 z-40 sm:left-auto sm:right-6 sm:w-[22rem]">
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-xl shadow-slate-900/10">
-            <div className="mx-0 h-[4px] w-16 rounded-sm brand-block-divider" aria-hidden />
-            <p className="mt-3 text-sm font-semibold text-slate-900">
-              Llévate el manual THO
+          <div className="rounded-2xl border border-tho-pink/30 bg-white p-4 shadow-xl shadow-tho-pink/10">
+            <div className="mx-0 h-[4px] w-16 rounded-sm bg-tho-pink" aria-hidden />
+            <p className="mt-3 text-xs font-bold uppercase tracking-[0.14em] text-tho-pink">
+              Recurso gratuito
+            </p>
+            <p className="mt-1.5 text-sm font-semibold text-slate-900">
+              Manual para la Gestión de la Diversidad (2024)
             </p>
             <p className="mt-1 text-sm text-slate-600">
-              Estructura mejores decisiones con nuestro enfoque, gratis.
+              Marco conceptual, checklist inicial y errores frecuentes, en PDF.
             </p>
             <div className="mt-3 flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="btn-unified-motion btn-hero-services rounded-xl bg-white px-4 py-2 text-sm font-bold text-slate-900"
+                className="btn-unified-motion rounded-xl bg-tho-pink px-4 py-2 text-sm font-bold text-white hover:brightness-110"
               >
-                Ver recurso
+                Descargar manual
               </button>
               <button
                 type="button"
                 onClick={dismiss}
-                className="text-sm font-medium text-slate-500 underline-offset-2 hover:underline"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900"
               >
                 Ahora no
               </button>
@@ -88,10 +91,10 @@ export function ResourcesBanner() {
             }
           }}
         >
-          <div className="max-h-[88vh] w-full max-w-3xl overflow-auto rounded-3xl border border-tho-blue/30 bg-tho-bg p-4 shadow-2xl shadow-tho-blue/10 md:p-5">
+          <div className="max-h-[88vh] w-full max-w-3xl overflow-auto rounded-3xl border border-tho-pink/30 bg-tho-bg p-4 shadow-2xl shadow-tho-pink/10 md:p-5">
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-sm text-slate-700">
-                Llévate el manual y estructura decisiones con el enfoque THO.
+                Llévate el Manual para la Gestión de la Diversidad (2024) y estructura decisiones con el enfoque THO.
               </p>
               <button
                 ref={closeButtonRef}

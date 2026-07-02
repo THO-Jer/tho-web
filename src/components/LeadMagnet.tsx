@@ -45,9 +45,9 @@ export function LeadMagnet() {
     <div className="lead-capture-shell rounded-3xl p-4 md:p-6">
       <div className="lead-capture-grid grid gap-5 md:grid-cols-[1.15fr_0.85fr] md:gap-7">
         <section>
-          <p className="lead-capture-kicker text-xs font-semibold uppercase tracking-[0.14em]">Recurso recomendado</p>
+          <p className="lead-capture-kicker text-xs font-semibold uppercase tracking-[0.14em]">Recurso recomendado · 2024</p>
           <h3 className="lead-capture-title mt-2 text-[1.65rem] font-bold leading-tight md:text-[2rem]">
-            Descarga el Manual de Gestión de la Diversidad
+            Descarga el Manual para la Gestión de la Diversidad
           </h3>
           <p className="lead-capture-subtitle mt-2 text-sm leading-relaxed md:text-base">
             Obtén el recurso en PDF con marco conceptual, checklist inicial y errores frecuentes para decidir con criterio.
