@@ -12,6 +12,7 @@ import MethodScrolly from "@/components/MethodScrolly";
 import { ActionGallery } from "@/components/ActionGallery";
 import { ResourcesBanner } from "@/components/ResourcesBanner";
 import { ProblemStatement } from "@/components/ProblemStatement";
+import { RevealObserver } from "@/components/RevealObserver";
 import { TrustSlider } from "@/components/TrustSlider";
 import { SocialFloat } from "@/components/SocialFloat";
 import { listPublishedPosts } from "@/lib/blogStore";
@@ -91,6 +92,7 @@ export default async function HomePage() {
       <SocialFloat />
 
       <main id="contenido">
+        <RevealObserver />
         <ResourcesBanner />
         {/* HERO — tipografía protagonista, imagen como soporte */}
         <section className="relative min-h-[72vh] overflow-visible text-white md:min-h-[80vh] lg:min-h-[88vh]">
@@ -189,56 +191,24 @@ export default async function HomePage() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={`/servicios/${service.slug}`}
-                  className="btn-unified-motion btn-hero-services mt-6 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-slate-900"
-                >
-                  Conoce los niveles
-                </a>
+                <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
+                  <a
+                    href={`/servicios/${service.slug}`}
+                    className="btn-unified-motion btn-hero-services inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-slate-900"
+                  >
+                    Conoce los niveles
+                  </a>
+                  <a
+                    href={`/servicios/${service.slug}`}
+                    className="service-brochure-link inline-flex items-center gap-1.5 text-sm font-semibold text-slate-800 underline underline-offset-4"
+                  >
+                    Descargar brochure
+                    <span className="service-brochure-arrow" aria-hidden>→</span>
+                  </a>
+                </div>
               </article>
             );
           })}
-          </div>
-
-          {/* Fila bento complementaria — diferenciador + terreno */}
-          <div className="mt-5 grid gap-5 xl:grid-cols-3">
-            <div className="rounded-[2rem] bg-slate-900 p-7 text-white shadow-[0_14px_30px_rgba(15,23,42,0.18)] xl:col-span-2">
-              <div className="h-[5px] w-24 rounded-sm brand-block-divider" aria-hidden />
-              <p className="font-tho-title mt-5 text-[1.6rem] leading-tight text-white md:text-[2rem]">
-                Boutique de verdad: el equipo que diseña la propuesta es el mismo que ejecuta en terreno.
-              </p>
-              <p className="mt-3 max-w-2xl text-sm text-slate-300 md:text-base">
-                No tercerizamos ni enviamos analistas sin experiencia. Si no sabes por dónde partir,
-                partamos por una conversación.
-              </p>
-              <a
-                href={BOOK_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-unified-motion btn-hero-services mt-6 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-900"
-              >
-                Conversemos tu caso
-              </a>
-            </div>
-
-            <a href="#accion" className="bento-photo-card group block min-h-[220px]">
-              <Image
-                src="/accion/04.png"
-                alt="Equipo THO trabajando en terreno"
-                fill
-                sizes="(min-width: 1280px) 30vw, 100vw"
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0)_35%,rgba(15,23,42,0.72)_100%)]" />
-              <div className="absolute bottom-5 left-5 right-5 text-white">
-                <div className="text-[11px] font-bold uppercase tracking-[0.17em] text-white/80">
-                  THO en acción
-                </div>
-                <div className="mt-1 text-base font-semibold">
-                  Terreno real, no diapositivas →
-                </div>
-              </div>
-            </a>
           </div>
         </div>
       </Section>
@@ -277,7 +247,7 @@ export default async function HomePage() {
       <section id="accion" className="relative z-30 border-t border-slate-200/70 bg-tho-bg pt-10 md:pt-14">
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 lg:grid-cols-[0.9fr_1.1fr] md:py-16">
           <div>
-            <h2 className="font-tho-title text-[2.4rem] text-slate-950 md:text-[3.3rem] lg:text-[4.2rem]">THO en Acción</h2>
+            <h2 data-reveal className="font-tho-title text-[2.4rem] text-slate-950 md:text-[3.3rem] lg:text-[4.2rem]">THO en Acción</h2>
             <p className="mt-3 text-sm text-slate-700 md:text-base">
               Lo que ves aquí es terreno real: procesos, facilitación, sesiones ejecutivas y acompañamiento en momentos críticos.
               Diseñamos con evidencia, ejecutamos con equipos y dejamos capacidad instalada.
@@ -337,7 +307,7 @@ export default async function HomePage() {
       <section className="border-t border-slate-200 bg-slate-900 text-white" id="contacto">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 lg:grid-cols-2">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight lg:text-4xl">
+            <h2 data-reveal className="text-3xl font-semibold tracking-tight lg:text-4xl">
               ¿Hablamos de lo que realmente importa?
             </h2>
             <p className="mt-4 text-slate-200">

@@ -8,6 +8,12 @@ import { useRef, useState } from "react";
 import { SERVICES } from "@/content/services";
 import { BOOK_URL } from "@/lib/links";
 
+const menuPanelClass =
+  "rounded-2xl border border-slate-200 bg-white p-2 shadow-lg shadow-slate-900/5 dark:border-slate-700 dark:bg-slate-900";
+
+const menuLinkClass =
+  "main-nav-menu-link block rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100";
+
 export function Header() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -19,6 +25,10 @@ export function Header() {
     tabletServicesRef.current?.removeAttribute("open");
     tabletQuienesRef.current?.removeAttribute("open");
   };
+
+  const isQuienes = pathname === "/quienes" || pathname === "/nuestra-experiencia";
+  const isServicios = pathname.startsWith("/servicios");
+  const isBlog = pathname.startsWith("/blog");
 
   return (
     <header className="main-header sticky top-0 z-40 border-b border-slate-200/70 bg-tho-bg/80 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/80">
@@ -50,13 +60,16 @@ export function Header() {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-1 xl:flex">
+        {/* Desktop */}
+        <nav className="hidden items-center gap-6 xl:flex">
           <div className="group relative">
-            <button className="tho-nav-chip" type="button">Servicios</button>
-            <div className="pointer-events-none absolute left-0 top-full z-30 w-72 pt-2 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
-              <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-md dark:border-slate-700 dark:bg-slate-900">
+            <button className={`tho-nav-link ${isServicios ? "is-active" : ""}`} type="button">
+              Servicios
+            </button>
+            <div className="pointer-events-none absolute left-0 top-full z-30 w-72 pt-3 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+              <div className={menuPanelClass}>
                 {SERVICES.map((service) => (
-                  <Link key={service.slug} href={`/servicios/${service.slug}`} className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">
+                  <Link key={service.slug} href={`/servicios/${service.slug}`} className={menuLinkClass}>
                     {service.menuLabel}
                   </Link>
                 ))}
@@ -64,78 +77,85 @@ export function Header() {
             </div>
           </div>
           <div className="group relative">
-            <button className={`tho-nav-chip ${pathname === "/quienes" || pathname === "/nuestra-experiencia" ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`} type="button">Quiénes somos</button>
-            <div className="pointer-events-none absolute left-0 top-full z-30 w-64 pt-2 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
-              <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-md dark:border-slate-700 dark:bg-slate-900">
-                <Link href="/quienes" className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Quiénes somos</Link>
-                <Link href="/nuestra-experiencia" className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Nuestra experiencia</Link>
+            <button className={`tho-nav-link ${isQuienes ? "is-active" : ""}`} type="button">
+              Quiénes somos
+            </button>
+            <div className="pointer-events-none absolute left-0 top-full z-30 w-64 pt-3 opacity-0 transition group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+              <div className={menuPanelClass}>
+                <Link href="/quienes" className={menuLinkClass}>Quiénes somos</Link>
+                <Link href="/nuestra-experiencia" className={menuLinkClass}>Nuestra experiencia</Link>
               </div>
             </div>
           </div>
-          <Link href="/blog" className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Blog</Link>
-          <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
+          <Link href="/blog" className={`tho-nav-link ${isBlog ? "is-active" : ""}`}>
+            Blog
+          </Link>
+          <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-4 py-2 text-sm font-bold text-white">
             <span className="relative z-10">Agendar</span>
           </a>
         </nav>
 
-        <nav className="hidden items-center gap-2 md:flex xl:hidden">
+        {/* Tablet */}
+        <nav className="hidden items-center gap-5 md:flex xl:hidden">
           <details ref={tabletServicesRef} className="group relative">
-            <summary className="list-none tho-nav-chip cursor-pointer">Servicios</summary>
-            <div className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-2 shadow-md dark:border-slate-700 dark:bg-slate-900">
+            <summary className={`tho-nav-link list-none cursor-pointer ${isServicios ? "is-active" : ""}`}>Servicios</summary>
+            <div className={`absolute right-0 z-50 mt-3 w-72 ${menuPanelClass}`}>
               {SERVICES.map((service) => (
-                <Link key={`tablet-${service.slug}`} href={`/servicios/${service.slug}`} onClick={closeTabletMenus} className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">
+                <Link key={`tablet-${service.slug}`} href={`/servicios/${service.slug}`} onClick={closeTabletMenus} className={menuLinkClass}>
                   {service.menuLabel}
                 </Link>
               ))}
             </div>
           </details>
           <details ref={tabletQuienesRef} className="group relative">
-            <summary className="list-none tho-nav-chip cursor-pointer">Quiénes</summary>
-            <div className="absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-md dark:border-slate-700 dark:bg-slate-900">
-              <Link href="/quienes" onClick={closeTabletMenus} className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Quiénes somos</Link>
-              <Link href="/nuestra-experiencia" onClick={closeTabletMenus} className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100">Nuestra experiencia</Link>
+            <summary className={`tho-nav-link list-none cursor-pointer ${isQuienes ? "is-active" : ""}`}>Quiénes</summary>
+            <div className={`absolute right-0 z-50 mt-3 w-56 ${menuPanelClass}`}>
+              <Link href="/quienes" onClick={closeTabletMenus} className={menuLinkClass}>Quiénes somos</Link>
+              <Link href="/nuestra-experiencia" onClick={closeTabletMenus} className={menuLinkClass}>Nuestra experiencia</Link>
             </div>
           </details>
-          <Link href="/blog" onClick={closeTabletMenus} className={`tho-nav-chip ${pathname.startsWith("/blog") ? "text-slate-950 dark:text-slate-100" : "text-slate-700 dark:text-slate-300"}`}>Blog</Link>
-          <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
+          <Link href="/blog" onClick={closeTabletMenus} className={`tho-nav-link ${isBlog ? "is-active" : ""}`}>Blog</Link>
+          <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient rounded-xl border border-slate-700/20 bg-slate-900 px-4 py-2 text-sm font-bold text-white">
             <span className="relative z-10">Agendar</span>
           </a>
         </nav>
 
+        {/* Toggle móvil — hamburguesa */}
         <button
           type="button"
           onClick={() => setMobileOpen((prev) => !prev)}
-          className="inline-flex items-center rounded-xl border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-700 md:hidden dark:border-slate-700 dark:text-slate-200"
+          className="nav-burger inline-flex h-10 w-10 flex-col items-center justify-center gap-[5px] rounded-xl border border-slate-300 md:hidden dark:border-slate-700"
           aria-expanded={mobileOpen}
-          aria-label="Abrir menú"
+          aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
         >
-          Menú
+          <span className={`nav-burger-line ${mobileOpen ? "is-open-top" : ""}`} />
+          <span className={`nav-burger-line ${mobileOpen ? "is-open-mid" : ""}`} />
+          <span className={`nav-burger-line ${mobileOpen ? "is-open-bot" : ""}`} />
         </button>
       </div>
 
       {mobileOpen ? (
-        <div className="border-t border-slate-200 bg-white px-4 py-3 md:hidden dark:border-slate-800 dark:bg-slate-950">
-          <div className="grid gap-2">
-            <div className="rounded-xl border border-slate-200 p-2 dark:border-slate-700">
-              <p className="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">Servicios</p>
-              {SERVICES.map((service) => (
-                <Link
-                  key={`mobile-${service.slug}`}
-                  href={`/servicios/${service.slug}`}
-                  onClick={closeMobileMenu}
-                  className="main-nav-menu-link block rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                >
-                  {service.menuLabel}
-                </Link>
-              ))}
-            </div>
-            <Link href="/quienes" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Quiénes somos</Link>
-            <Link href="/nuestra-experiencia" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Nuestra experiencia</Link>
-            <Link href="/blog" onClick={closeMobileMenu} className="tho-nav-chip text-slate-700 dark:text-slate-300">Blog</Link>
-            <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient inline-flex justify-center rounded-xl border border-slate-700/20 bg-slate-900 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white">
+        <div className="border-t border-slate-200 bg-white px-4 py-4 md:hidden dark:border-slate-800 dark:bg-slate-950">
+          <nav className="grid gap-1">
+            <p className="px-3 pb-1 pt-1 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Servicios</p>
+            {SERVICES.map((service) => (
+              <Link
+                key={`mobile-${service.slug}`}
+                href={`/servicios/${service.slug}`}
+                onClick={closeMobileMenu}
+                className={menuLinkClass}
+              >
+                {service.menuLabel}
+              </Link>
+            ))}
+            <p className="px-3 pb-1 pt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-400">Nosotros</p>
+            <Link href="/quienes" onClick={closeMobileMenu} className={menuLinkClass}>Quiénes somos</Link>
+            <Link href="/nuestra-experiencia" onClick={closeMobileMenu} className={menuLinkClass}>Nuestra experiencia</Link>
+            <Link href="/blog" onClick={closeMobileMenu} className={menuLinkClass}>Blog</Link>
+            <a href={BOOK_URL} target="_blank" rel="noreferrer" className="btn-unified-motion btn-tho-hover-gradient mt-3 inline-flex justify-center rounded-xl border border-slate-700/20 bg-slate-900 px-4 py-2.5 text-sm font-bold text-white">
               <span className="relative z-10">Agendar</span>
             </a>
-          </div>
+          </nav>
         </div>
       ) : null}
     </header>

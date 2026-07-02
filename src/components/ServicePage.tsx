@@ -536,10 +536,11 @@ export function ServicePage({
                 {content.faqs.map((item) => (
                   <details
                     key={item.q}
-                    className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80"
+                    className="faq-item rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/80"
                   >
-                    <summary className="cursor-pointer text-base font-semibold text-slate-900 dark:text-slate-100">
+                    <summary className="faq-summary flex cursor-pointer items-center justify-between gap-4 text-base font-semibold text-slate-900 dark:text-slate-100">
                       {item.q}
+                      <span className="faq-chevron shrink-0 text-slate-400" aria-hidden>▾</span>
                     </summary>
                     <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
                       {item.a}
@@ -614,18 +615,19 @@ export function ServicePage({
                 <a
                   key={post.slug}
                   href={`/blog/${post.slug}`}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
+                  className="service-brochure-link flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
                 >
                   <p className={`text-xs font-semibold uppercase tracking-wide ${accent.blogTag}`}>
-                    Blog
+                    Blog · {post.tags.slice(0, 2).join(" · ")}
                   </p>
                   <h4 className="mt-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
                     {post.title}
                   </h4>
                   <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{post.excerpt}</p>
-                  <p className="mt-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    {post.tags.slice(0, 2).join(" · ")}
-                  </p>
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    Leer artículo
+                    <span className="service-brochure-arrow" aria-hidden>→</span>
+                  </span>
                 </a>
               ))}
             </div>
