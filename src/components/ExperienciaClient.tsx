@@ -16,8 +16,8 @@ const TL_START = 2023;
 const TL_END = 2026;
 const TL_SPAN = TL_END - TL_START + 1;
 
-/* Año grande del panel sticky (origen muestra el inicio de la trayectoria) */
-const BIG_YEAR: Record<string, string> = { origen: "2009" };
+/* Año grande del panel sticky */
+const BIG_YEAR: Record<string, string> = { origen: "Pre-2023" };
 
 type Tenure = { name: string; start: number; end: number; accent: string };
 
@@ -93,7 +93,7 @@ export function ExperienciaClient({
   const stats = useMemo(() => {
     const dayOne = tenures.filter((t) => t.start === TL_START && t.end === TL_END).length;
     return [
-      { value: 10, suffix: "+", label: "años de trabajo en terreno" },
+      { value: TL_END - TL_START, suffix: "", label: "años de operación" },
       { value: tenures.length, suffix: "", label: "clientes y aliados" },
       { value: dayOne, suffix: "", label: "relaciones desde el día uno" },
       { value: 4, suffix: "", label: "áreas de servicio" },
@@ -138,7 +138,7 @@ export function ExperienciaClient({
               Nuestra<br />experiencia
             </h1>
             <p className={`mt-4 ml-auto max-w-xl text-base text-white/85 md:text-lg${revealed ? " exp4-title-in" : " exp4-title-out"}`} style={{ transitionDelay: "0.08s" }}>
-              Más de una década de trabajo en terreno, convertida en método y relaciones que duran.
+              Trabajo en terreno desde 2023, convertido en método y relaciones que duran.
             </p>
           </div>
         </div>
@@ -198,7 +198,12 @@ export function ExperienciaClient({
 
           {/* Panel sticky: año gigante + permanencia de clientes */}
           <aside className="exp4-sticky" aria-label="Relaciones con clientes en el tiempo">
-            <div key={activeEra.id} className="exp4-big-year font-tho-title" style={{ color: activeEra.accent }} aria-hidden>
+            <div
+              key={activeEra.id}
+              className={`exp4-big-year font-tho-title${(BIG_YEAR[activeEra.id] ?? activeEra.year).length > 4 ? " is-long" : ""}`}
+              style={{ color: activeEra.accent }}
+              aria-hidden
+            >
               {BIG_YEAR[activeEra.id] ?? activeEra.year}
             </div>
 

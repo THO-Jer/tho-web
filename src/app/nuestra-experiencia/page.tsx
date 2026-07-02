@@ -11,13 +11,13 @@ const SITE = "https://tho.cl";
 export const metadata: Metadata = {
   title: "Nuestra Experiencia · The Human Org",
   description:
-    "Más de una década de trabajo en terreno. Proyectos en relacionamiento comunitario, desarrollo organizacional y sostenibilidad con empresas y organizaciones en Chile.",
+    "Trabajo en terreno desde 2023. Proyectos en relacionamiento comunitario, desarrollo organizacional y sostenibilidad con empresas y organizaciones en Chile.",
   alternates: { canonical: `${SITE}/nuestra-experiencia` },
   openGraph: {
     type: "website",
     title: "Nuestra Experiencia · The Human Org",
     description:
-      "Más de una década de trabajo en terreno. Proyectos en relacionamiento comunitario, desarrollo organizacional y sostenibilidad con empresas en Chile.",
+      "Trabajo en terreno desde 2023. Proyectos en relacionamiento comunitario, desarrollo organizacional y sostenibilidad con empresas en Chile.",
     url: `${SITE}/nuestra-experiencia`,
     siteName: "The Human Org",
     images: [{ url: `${SITE}/og.png`, width: 1200, height: 630, alt: "The Human Org" }],
@@ -64,8 +64,8 @@ export default function NuestraExperienciaPage() {
         <div className="sr-only">
           <h1>Nuestra experiencia — The Human Org</h1>
           <p>
-            The Human Org es una consultora estratégica con sede en Concepción, Chile, con más de una década
-            de trabajo en terreno en relacionamiento comunitario, desarrollo organizacional y sostenibilidad corporativa.
+            The Human Org es una consultora estratégica con sede en Concepción, Chile, en operación desde 2023,
+            con trabajo en terreno en relacionamiento comunitario, desarrollo organizacional y sostenibilidad corporativa.
           </p>
           {ERAS.map((era) => (
             <section key={era.id}>

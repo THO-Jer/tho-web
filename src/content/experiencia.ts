@@ -154,8 +154,8 @@ export const PROJECTS: Project[] = [
     id: "voceria",
     client: "CChC Concepción",
     title: "Mi Voz Construye",
-    tag: "Comunidad",
-    tagColor: "#fa7f33",
+    tag: "Formación",
+    tagColor: "#f2b705",
     since: "2025",
     summary: "Programa de vocería estratégica para mujeres líderes del sector construcción.",
     detail:

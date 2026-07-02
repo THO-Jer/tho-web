@@ -1967,6 +1967,10 @@ body {
   animation: exp4-year-in 0.45s ease;
   white-space: nowrap;
 }
+.exp4-big-year.is-long {
+  font-size: clamp(2.2rem, 3.6vw, 3.4rem);
+  padding-top: 0.5rem;
+}
 @keyframes exp4-year-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
