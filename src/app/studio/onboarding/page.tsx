@@ -103,20 +103,11 @@ export default function StudioOnboardingLandingPage() {
     run().catch(() => undefined);
   }, [router, reloadToken]);
 
+  // Primer módulo no validado; si todos están validados, el primero (revisión).
   const nextUnit = useMemo(() => {
     if (!data) return units[0];
     const status = new Map((data.module_status || []).map((row) => [row.moduleKey, row.status]));
-    // Primer módulo no validado, ignorando last_seen_unit si ya está validado
-    const firstIncomplete = units.find((unit) => status.get(getModuleKeyFromSlug(unit.slug)) !== "validated");
-    if (!firstIncomplete) return units[0]; // todos validados → apuntar al primero para revisión
-    // Dentro del módulo incompleto, preferir last_seen_unit si coincide
-    if (
-      data.last_seen_unit &&
-      data.last_seen_unit === firstIncomplete.slug
-    ) {
-      return firstIncomplete;
-    }
-    return firstIncomplete;
+    return units.find((unit) => status.get(getModuleKeyFromSlug(unit.slug)) !== "validated") ?? units[0];
   }, [data, units]);
 
   const totalMinutes = useMemo(() => units.reduce((sum, unit) => sum + (unit.durationMinutes || 0), 0), [units]);
@@ -259,7 +250,7 @@ export default function StudioOnboardingLandingPage() {
           <Link href="/studio" className="mt-3 inline-flex text-xs text-slate-500 underline underline-offset-2 hover:text-slate-700">Volver al Studio</Link>
         </div>
 
-        {message ? <p className="mt-4 text-sm text-slate-700">{message}</p> : null}
+        {message ? <p role="status" aria-live="polite" className="mt-4 text-sm text-slate-700">{message}</p> : null}
         </div>
       </section>
     </main>

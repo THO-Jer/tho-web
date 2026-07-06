@@ -513,10 +513,9 @@ async function persistModuleStatus(record: OnboardingRecord, status: ModuleStatu
   }
 }
 
-export async function getUnits() {
-  const state = await readState();
-  return state.units;
-}
+// Nota: la edición de contenido (units/quiz) desde el panel admin se eliminó
+// deliberadamente. El contenido del onboarding vive como fuente única en código
+// (src/content/onboarding*), donde pasa por revisión editorial vía git.
 
 /**
  * Quiz que ve el participante: para cada módulo, una variante determinista
@@ -543,25 +542,6 @@ function buildParticipantQuiz(state: OnboardingState, record: OnboardingRecord) 
       moduleKey,
     }));
   });
-}
-
-export async function getQuizForAdmin() {
-  const state = await readState();
-  return state.quiz;
-}
-
-export async function setUnits(units: OnboardingUnit[]) {
-  const state = await readStateFromJson();
-  state.units = units;
-  await writeStateToJson(state);
-  return state.units;
-}
-
-export async function setQuiz(quiz: OnboardingQuizQuestion[]) {
-  const state = await readStateFromJson();
-  state.quiz = quiz;
-  await writeStateToJson(state);
-  return state.quiz;
 }
 
 export async function getOrCreateOnboardingRecord(email: string) {

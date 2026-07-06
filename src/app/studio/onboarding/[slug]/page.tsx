@@ -76,7 +76,6 @@ export default function StudioOnboardingUnitPage() {
   const [interactionProgress, setInteractionProgress] = useState({ completed: 0, total: 0 });
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
   const [showReinforceModal, setShowReinforceModal] = useState(false);
-  const [quizScore, setQuizScore] = useState<number | null>(null);
   const [unlockRequested, setUnlockRequested] = useState(false);
   const [unlockSending, setUnlockSending] = useState(false);
   const [tick, setTick] = useState(() => Date.now());
@@ -102,12 +101,21 @@ export default function StudioOnboardingUnitPage() {
         setQuiz((data.quiz || []) as QuizQuestion[]);
         setOnboarding(data.onboarding as Onboarding);
         setMinLessonSeconds(Number(data?.config?.minLessonTimeSeconds || 12));
-        // Restaurar lección activa desde localStorage
+        // Restaurar lección activa: preferencia local (localStorage) si existe;
+        // si no, reanudar desde el servidor en la primera lección incompleta
+        // (permite continuar desde otro dispositivo/navegador).
         if (slug) {
           const saved = localStorage.getItem(`tho_onboarding_lesson_${slug}`);
-          if (saved !== null) {
-            const idx = parseInt(saved, 10);
-            if (!Number.isNaN(idx) && idx > 0) setActiveLesson(idx);
+          const savedIdx = saved !== null ? parseInt(saved, 10) : NaN;
+          if (!Number.isNaN(savedIdx) && savedIdx > 0) {
+            setActiveLesson(savedIdx);
+          } else {
+            const unitData = ((data.units || []) as Unit[]).find((item) => item.slug === slug);
+            const mk = getModuleKeyFromSlug(slug);
+            const completed = new Set<string>((data.onboarding?.completed_units as string[]) || []);
+            const lessonList = parseLessons(unitData?.content || []);
+            const firstIncomplete = lessonList.findIndex((item) => !completed.has(`${mk}:${item.id}`));
+            if (firstIncomplete > 0) setActiveLesson(firstIncomplete);
           }
         }
       } catch {
@@ -255,7 +263,6 @@ export default function StudioOnboardingUnitPage() {
       setFailedTopics(Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []);
       if (data.passed) {
         const score = typeof data.score === "number" ? data.score : null;
-        setQuizScore(score);
         setMessage(score !== null ? `Módulo validado con ${score}%. ¡Excelente!` : "Módulo validado. Puedes continuar al siguiente.");
         setTimeout(() => router.push("/studio/onboarding"), 2200);
       } else {
@@ -263,7 +270,6 @@ export default function StudioOnboardingUnitPage() {
         const maxAttempts = data?.moduleStatus?.maxAttempts ?? 3;
         const failedMax = attempts >= maxAttempts;
         const score = typeof data.score === "number" ? data.score : null;
-        setQuizScore(score);
         setShowReinforceModal(Boolean((Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []).length));
         setMessage(
           `Obtuviste ${score !== null ? `${score}%` : "puntaje insuficiente"}. Intento ${attempts}/${maxAttempts}.${
@@ -376,6 +382,35 @@ export default function StudioOnboardingUnitPage() {
           <div className="mt-4 h-[4px] w-full rounded-sm brand-block-divider" aria-hidden />
         </div>
 
+        {/* Índice de lecciones: estado por lección y salto directo */}
+        {lessons.length > 1 ? (
+          <nav aria-label="Índice de lecciones" className="mt-5 flex flex-wrap gap-2">
+            {lessons.map((item, idx) => {
+              const done = isLessonDone(item.id);
+              const current = idx === activeLesson;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setActiveLesson(idx)}
+                  aria-current={current ? "step" : undefined}
+                  title={item.title}
+                  className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
+                    current
+                      ? "border-slate-900 bg-slate-900 font-semibold text-white"
+                      : done
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <span aria-hidden>{done && !current ? "✓" : idx + 1}</span>
+                  <span className="hidden max-w-[18ch] truncate sm:inline">{item.title}</span>
+                </button>
+              );
+            })}
+          </nav>
+        ) : null}
+
         {lesson ? (
           <article ref={lessonRef} className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
             {renderLesson()}
@@ -431,7 +466,7 @@ export default function StudioOnboardingUnitPage() {
                 </div>
               </div>
               {lessonError ? (
-                <p className="mt-2 w-full rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                <p role="alert" className="mt-2 w-full rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
                   {lessonError}
                 </p>
               ) : null}
@@ -538,7 +573,15 @@ export default function StudioOnboardingUnitPage() {
                 {failedTopics.map((topic) => <li key={`modal-${topic}`}>{`Revisar: ${topicReviewLabel[topic] || topic}`}</li>)}
               </ul>
               <div className="mt-4 flex justify-end">
-                <button type="button" className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white" onClick={() => setShowReinforceModal(false)}>
+                <button
+                  type="button"
+                  autoFocus
+                  className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white"
+                  onClick={() => setShowReinforceModal(false)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") setShowReinforceModal(false);
+                  }}
+                >
                   Entendido
                 </button>
               </div>
@@ -546,7 +589,7 @@ export default function StudioOnboardingUnitPage() {
           </div>
         ) : null}
         <p className="mt-4 text-xs text-slate-500">Progreso total: {onboarding?.progress ?? 0}% · Último guardado: {onboarding?.last_saved_at || "Sin registro"}</p>
-        {message ? <p className="mt-2 text-sm text-slate-700">{message}</p> : null}
+        {message ? <p role="status" aria-live="polite" className="mt-2 text-sm text-slate-700">{message}</p> : null}
       </section>
     </main>
   );
