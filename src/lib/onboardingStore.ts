@@ -2,6 +2,8 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 
 import { defaultOnboardingQuiz, defaultOnboardingUnits, OnboardingQuizQuestion, OnboardingUnit } from "@/content/onboardingContent";
+import { countInteractions } from "@/content/onboarding/blocks";
+import { getLessonDoc } from "@/content/onboarding/lessonDocs";
 import {
   getModuleVisibilityFromSupabase,
   getOnboardingAdminOverviewRows,
@@ -566,7 +568,7 @@ export async function getOrCreateOnboardingRecord(email: string) {
   return created;
 }
 
-export async function markLessonCompleted(email: string, moduleKey: string, lessonId: string, unitSlug: string, elapsedSeconds = 0, reachedEnd = false) {
+export async function markLessonCompleted(email: string, moduleKey: string, lessonId: string, unitSlug: string, elapsedSeconds = 0, reachedEnd = false, interactionsCompleted = 0) {
   const normalized = normalizeEmail(email);
   if (!normalized) throw new Error("Email inválido.");
   if (!lessonId.trim()) throw new Error("Lección inválida.");
@@ -582,7 +584,15 @@ export async function markLessonCompleted(email: string, moduleKey: string, less
     last_access_at: now,
   };
 
-  if (elapsedSeconds < MIN_LESSON_TIME_SECONDS || !reachedEnd) {
+  // Gating por tipo de lección: si la lección tiene actividades interactivas,
+  // el requisito es responderlas todas; si no, aplica el mínimo de lectura.
+  const lessonDoc = getLessonDoc(moduleKey, lessonId);
+  const requiredInteractions = lessonDoc ? countInteractions(lessonDoc.blocks) : 0;
+  if (requiredInteractions > 0) {
+    if (interactionsCompleted < requiredInteractions) {
+      throw new Error("Para completar la lección debes responder todas las actividades.");
+    }
+  } else if (elapsedSeconds < MIN_LESSON_TIME_SECONDS || !reachedEnd) {
     throw new Error(`Para completar la lección debes llegar al final y permanecer al menos ${MIN_LESSON_TIME_SECONDS} segundos.`);
   }
 

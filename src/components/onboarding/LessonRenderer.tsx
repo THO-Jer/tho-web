@@ -1,3 +1,7 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import type {
   BlockTone,
   CardItem,
@@ -5,6 +9,7 @@ import type {
   LessonDoc,
   TableColStyle,
 } from "@/content/onboarding/blocks";
+import { countInteractions } from "@/content/onboarding/blocks";
 import { LessonShell } from "@/components/onboarding/LessonShell";
 import { ScenarioBox } from "@/components/onboarding/ScenarioBox";
 import { SynthesisBox } from "@/components/onboarding/SynthesisBox";
@@ -253,6 +258,205 @@ function Card({ item, accent, flat, keyPrefix }: { item: CardItem; accent: Modul
   );
 }
 
+// ---------------------------------------------------------------------------
+// Bloques interactivos
+// ---------------------------------------------------------------------------
+
+const VERDICT_STYLES: Record<string, { box: string; label: string; labelText: string }> = {
+  correcto: { box: "border-emerald-200 bg-emerald-50", label: "text-emerald-700", labelText: "Decisión alineada con el estándar" },
+  riesgoso: { box: "border-amber-200 bg-amber-50", label: "text-amber-700", labelText: "Decisión riesgosa" },
+  incorrecto: { box: "border-rose-200 bg-rose-50", label: "text-rose-700", labelText: "Fuera del estándar THO" },
+};
+
+function CheckBlock({
+  block,
+  accent,
+  onDone,
+}: {
+  block: Extract<LessonBlock, { kind: "check" }>;
+  accent: ModuleAccent;
+  onDone: () => void;
+}) {
+  const [selected, setSelected] = useState<number | null>(null);
+
+  function choose(idx: number) {
+    if (selected !== null) return;
+    setSelected(idx);
+    onDone();
+  }
+
+  return (
+    <section className={`rounded-xl border p-4 ${accent.softBorder} bg-white`}>
+      <p className={`text-xs font-semibold uppercase tracking-wide ${accent.labelText}`}>Checkpoint</p>
+      <p className="mt-2 text-[16px] font-semibold leading-relaxed text-slate-900">{block.question}</p>
+      <div className="mt-3 grid gap-2">
+        {block.options.map((option, idx) => {
+          const isSelected = selected === idx;
+          const resolved = selected !== null;
+          const showAsCorrect = resolved && option.correct;
+          const showAsWrong = resolved && isSelected && !option.correct;
+          return (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => choose(idx)}
+              disabled={resolved}
+              className={`rounded-lg border px-3 py-2 text-left text-[15px] leading-relaxed transition-colors ${
+                showAsCorrect
+                  ? "border-emerald-300 bg-emerald-50 text-slate-900"
+                  : showAsWrong
+                  ? "border-rose-300 bg-rose-50 text-slate-800"
+                  : resolved
+                  ? "border-slate-200 bg-white text-slate-500"
+                  : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
+              }`}
+            >
+              <span className="flex items-start gap-2">
+                <span className="mt-[2px] text-sm" aria-hidden>
+                  {showAsCorrect ? "✓" : showAsWrong ? "✗" : "○"}
+                </span>
+                <span>{option.text}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {selected !== null ? (
+        <div
+          className={`mt-3 rounded-lg border px-3 py-2 ${
+            block.options[selected]?.correct ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"
+          }`}
+        >
+          <p className={`text-xs font-semibold uppercase tracking-wide ${block.options[selected]?.correct ? "text-emerald-700" : "text-rose-700"}`}>
+            {block.options[selected]?.correct ? "Correcto" : "No exactamente"}
+          </p>
+          <p className="mt-1 text-[14px] leading-relaxed text-slate-800">{block.options[selected]?.feedback}</p>
+          {!block.options[selected]?.correct ? (
+            <p className="mt-2 text-[14px] leading-relaxed text-slate-700">
+              <span className="font-semibold">Respuesta según el estándar: </span>
+              {block.options.find((option) => option.correct)?.text}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function DecisionBlock({
+  block,
+  accent,
+  onDone,
+}: {
+  block: Extract<LessonBlock, { kind: "decision" }>;
+  accent: ModuleAccent;
+  onDone: () => void;
+}) {
+  const [chosen, setChosen] = useState<number | null>(null);
+  const [explored, setExplored] = useState<Set<number>>(new Set());
+
+  function choose(idx: number) {
+    if (chosen === null) {
+      setChosen(idx);
+      setExplored(new Set([idx]));
+      onDone();
+    } else {
+      setExplored((prev) => new Set(prev).add(idx));
+    }
+  }
+
+  return (
+    <section className={`rounded-xl border p-4 ${accent.softBorder} ${accent.softBg}`}>
+      <p className={`text-xs font-semibold uppercase tracking-wide ${accent.labelText}`}>Escenario de decisión</p>
+      {block.scenario?.map((line, idx) => (
+        <p key={`sc-${idx}`} className="mt-2 text-[15px] leading-relaxed text-slate-700">
+          {line}
+        </p>
+      ))}
+      <p className="mt-3 text-[16px] font-semibold leading-relaxed text-slate-900">{block.prompt}</p>
+      <div className="mt-3 grid gap-2">
+        {block.options.map((option, idx) => {
+          const isExplored = explored.has(idx);
+          const verdict = VERDICT_STYLES[option.verdict];
+          return (
+            <div key={idx}>
+              <button
+                type="button"
+                onClick={() => choose(idx)}
+                className={`w-full rounded-lg border px-3 py-2 text-left text-[15px] leading-relaxed transition-colors ${
+                  isExplored
+                    ? "border-slate-300 bg-white text-slate-900"
+                    : chosen !== null
+                    ? "border-slate-200 bg-white/60 text-slate-500 hover:bg-white"
+                    : "border-slate-300 bg-white text-slate-800 hover:bg-slate-50"
+                }`}
+              >
+                {option.text}
+                {chosen !== null && !isExplored ? (
+                  <span className="ml-2 text-xs text-slate-400">(ver consecuencia)</span>
+                ) : null}
+              </button>
+              {isExplored ? (
+                <div className={`mt-1 rounded-lg border px-3 py-2 ${verdict.box}`}>
+                  <p className={`text-xs font-semibold uppercase tracking-wide ${verdict.label}`}>
+                    {verdict.labelText}
+                    {chosen === idx ? " · tu elección" : ""}
+                  </p>
+                  <p className="mt-1 text-[14px] leading-relaxed text-slate-800">{option.outcome}</p>
+                </div>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function RevealBlock({
+  block,
+  accent,
+  onDone,
+}: {
+  block: Extract<LessonBlock, { kind: "reveal" }>;
+  accent: ModuleAccent;
+  onDone: () => void;
+}) {
+  const [revealed, setRevealed] = useState(false);
+
+  function reveal() {
+    if (revealed) return;
+    setRevealed(true);
+    onDone();
+  }
+
+  return (
+    <section className="rounded-xl border border-slate-300 bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Para pensar</p>
+      <p className="mt-2 text-[16px] font-semibold leading-relaxed text-slate-900">{block.prompt}</p>
+      {block.hint ? <p className="mt-1 text-[14px] leading-relaxed text-slate-500">{block.hint}</p> : null}
+      {revealed ? (
+        <div className={`mt-3 rounded-lg border p-3 ${accent.softBorder} ${accent.softBg}`}>
+          <p className={`text-xs font-semibold uppercase tracking-wide ${accent.labelText}`}>Criterio THO</p>
+          <div className="mt-1 space-y-2 text-[15px] leading-relaxed text-slate-800">
+            {block.answer.map((line, idx) => (
+              <p key={idx}>{line}</p>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={reveal}
+          className="mt-3 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800"
+        >
+          Ver el criterio THO
+        </button>
+      )}
+    </section>
+  );
+}
+
 function SectionHeading({ text, intro, keyPrefix }: { text?: string; intro?: string[]; keyPrefix: string }) {
   if (!text && !intro?.length) return null;
   return (
@@ -271,12 +475,23 @@ export function BlockRenderer({
   block,
   accent,
   keyPrefix,
+  onInteractionDone,
 }: {
   block: LessonBlock;
   accent: ModuleAccent;
   keyPrefix: string;
+  /** Notifica (una vez por bloque) que una interacción fue completada. */
+  onInteractionDone?: (blockKey: string) => void;
 }) {
   switch (block.kind) {
+    case "check":
+      return <CheckBlock block={block} accent={accent} onDone={() => onInteractionDone?.(keyPrefix)} />;
+
+    case "decision":
+      return <DecisionBlock block={block} accent={accent} onDone={() => onInteractionDone?.(keyPrefix)} />;
+
+    case "reveal":
+      return <RevealBlock block={block} accent={accent} onDone={() => onInteractionDone?.(keyPrefix)} />;
     case "paragraphs": {
       const textClass = block.emphasis
         ? "text-[16px] font-medium leading-relaxed text-slate-800"
@@ -601,7 +816,13 @@ export function BlockRenderer({
           </div>
           <div className="mt-3 space-y-4">
             {block.blocks.map((child, idx) => (
-              <BlockRenderer key={`${keyPrefix}-${idx}`} block={child} accent={accent} keyPrefix={`${keyPrefix}-${idx}`} />
+              <BlockRenderer
+                key={`${keyPrefix}-${idx}`}
+                block={child}
+                accent={accent}
+                keyPrefix={`${keyPrefix}-${idx}`}
+                onInteractionDone={onInteractionDone}
+              />
             ))}
           </div>
         </section>
@@ -629,14 +850,33 @@ export function LessonRenderer({
   elapsedSeconds,
   reachedEnd,
   minLessonSeconds,
+  onInteractionsChange,
 }: {
   doc: LessonDoc;
   moduleKey: string;
   elapsedSeconds: number;
   reachedEnd: boolean;
   minLessonSeconds: number;
+  /** Reporta avance de interacciones (completadas, total) al contenedor. */
+  onInteractionsChange?: (completed: number, total: number) => void;
 }) {
   const accent = MODULE_ACCENTS[moduleKey] || MODULE_ACCENTS.A;
+  const interactionTotal = useMemo(() => countInteractions(doc.blocks), [doc]);
+  const [doneKeys, setDoneKeys] = useState<Set<string>>(new Set());
+
+  const handleInteractionDone = useCallback((blockKey: string) => {
+    setDoneKeys((prev) => {
+      if (prev.has(blockKey)) return prev;
+      const next = new Set(prev);
+      next.add(blockKey);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    onInteractionsChange?.(Math.min(doneKeys.size, interactionTotal), interactionTotal);
+  }, [doneKeys, interactionTotal, onInteractionsChange]);
+
   return (
     <LessonShell
       label={doc.label}
@@ -645,10 +885,17 @@ export function LessonRenderer({
       reachedEnd={reachedEnd}
       minLessonSeconds={minLessonSeconds}
       maxWidth={doc.wide ? "max-w-[760px]" : "max-w-[720px]"}
+      interactions={interactionTotal > 0 ? { completed: doneKeys.size, total: interactionTotal } : undefined}
     >
       <div className="mt-6 space-y-8">
         {doc.blocks.map((block, idx) => (
-          <BlockRenderer key={idx} block={block} accent={accent} keyPrefix={`blk-${idx}`} />
+          <BlockRenderer
+            key={idx}
+            block={block}
+            accent={accent}
+            keyPrefix={`blk-${idx}`}
+            onInteractionDone={handleInteractionDone}
+          />
         ))}
       </div>
     </LessonShell>

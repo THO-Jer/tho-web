@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { BrandLoader } from "@/components/BrandLoader";
 import { GenericLesson } from "@/components/onboarding/lessons/GenericLesson";
@@ -72,6 +72,8 @@ export default function StudioOnboardingUnitPage() {
   const [lessonStartAt, setLessonStartAt] = useState<number>(Date.now());
   const [reachedEnd, setReachedEnd] = useState(false);
   const [minLessonSeconds, setMinLessonSeconds] = useState(12);
+  // Avance de actividades interactivas de la lección activa (gating nuevo).
+  const [interactionProgress, setInteractionProgress] = useState({ completed: 0, total: 0 });
   const [failedTopics, setFailedTopics] = useState<string[]>([]);
   const [showReinforceModal, setShowReinforceModal] = useState(false);
   const [quizScore, setQuizScore] = useState<number | null>(null);
@@ -141,7 +143,15 @@ export default function StudioOnboardingUnitPage() {
   useEffect(() => {
     setLessonStartAt(Date.now());
     setReachedEnd(false);
+    setInteractionProgress({ completed: 0, total: 0 });
   }, [activeLesson, moduleKey]);
+
+  // Callback estable para que LessonRenderer reporte avance sin re-render loop.
+  const handleInteractionsChange = useCallback((completed: number, total: number) => {
+    setInteractionProgress((prev) =>
+      prev.completed === completed && prev.total === total ? prev : { completed, total },
+    );
+  }, []);
 
   useEffect(() => {
     lessonRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -161,7 +171,12 @@ export default function StudioOnboardingUnitPage() {
   }, [activeLesson, lessons.length]);
 
   const elapsedSeconds = Math.floor((tick - lessonStartAt) / 1000);
-  const canMarkLesson = elapsedSeconds >= minLessonSeconds && reachedEnd;
+  // Gating: si la lección tiene actividades, completar = responderlas todas.
+  // Si no tiene (lecciones aún no interactivas), aplica el timer + scroll clásico.
+  const isInteractiveLesson = interactionProgress.total > 0;
+  const canMarkLesson = isInteractiveLesson
+    ? interactionProgress.completed >= interactionProgress.total
+    : elapsedSeconds >= minLessonSeconds && reachedEnd;
 
   async function markLesson(lessonId: string) {
     if (!unit) return;
@@ -172,7 +187,14 @@ export default function StudioOnboardingUnitPage() {
         method: "POST",
         credentials: "include",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ moduleKey, lessonId, unitSlug: unit.slug, elapsedSeconds, reachedEnd }),
+        body: JSON.stringify({
+          moduleKey,
+          lessonId,
+          unitSlug: unit.slug,
+          elapsedSeconds,
+          reachedEnd,
+          interactionsCompleted: interactionProgress.completed,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "No se pudo guardar avance.");
@@ -278,7 +300,17 @@ export default function StudioOnboardingUnitPage() {
     }
 
     const doc = getLessonDoc(moduleKey, lesson.id);
-    if (doc) return <LessonRenderer doc={doc} moduleKey={moduleKey} {...shellProps} />;
+    if (doc) {
+      return (
+        <LessonRenderer
+          key={`${moduleKey}:${lesson.id}`}
+          doc={doc}
+          moduleKey={moduleKey}
+          onInteractionsChange={handleInteractionsChange}
+          {...shellProps}
+        />
+      );
+    }
 
     return (
       <GenericLesson
@@ -361,7 +393,9 @@ export default function StudioOnboardingUnitPage() {
                     </button>
                   ) : (
                     <span className="rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-400">
-                      Termina de leer para continuar
+                      {isInteractiveLesson
+                        ? `Actividades ${interactionProgress.completed}/${interactionProgress.total}`
+                        : "Termina de leer para continuar"}
                     </span>
                   )}
                 </div>

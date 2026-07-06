@@ -131,7 +131,48 @@ export type LessonBlock =
       blocks: LessonBlock[];
     }
   | { kind: "synthesis"; lines: string[]; heading?: string }
-  | { kind: "reflection"; text: string; heading?: string };
+  | { kind: "reflection"; text: string; heading?: string }
+  // --- Bloques interactivos (gatean el avance de la lección) ---
+  | {
+      kind: "check";
+      /** Pregunta de comprensión con feedback inmediato. No afecta el quiz. */
+      question: string;
+      options: Array<{ text: string; correct?: boolean; feedback: string }>;
+    }
+  | {
+      kind: "decision";
+      /** Escenario de decisión: eliges una respuesta y ves su consecuencia. */
+      scenario?: string[];
+      prompt: string;
+      options: Array<{
+        text: string;
+        verdict: "correcto" | "riesgoso" | "incorrecto";
+        outcome: string;
+      }>;
+    }
+  | {
+      kind: "reveal";
+      /** Pregunta para pensar; el botón revela el criterio institucional. */
+      prompt: string;
+      hint?: string;
+      answer: string[];
+    };
+
+/** Kinds de bloque que requieren interacción del usuario. */
+const INTERACTIVE_KINDS = new Set(["check", "decision", "reveal"]);
+
+/**
+ * Cuenta los bloques interactivos de una lección (recursivo en panels).
+ * Lo usa el cliente para el gating y el servidor para validar el avance.
+ */
+export function countInteractions(blocks: LessonBlock[]): number {
+  let count = 0;
+  for (const block of blocks) {
+    if (INTERACTIVE_KINDS.has(block.kind)) count += 1;
+    if (block.kind === "panel") count += countInteractions(block.blocks);
+  }
+  return count;
+}
 
 export type LessonDoc = {
   label: string;
