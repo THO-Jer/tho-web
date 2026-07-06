@@ -7,61 +7,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { BrandLoader } from "@/components/BrandLoader";
 import { GenericLesson } from "@/components/onboarding/lessons/GenericLesson";
-import { LessonA0 } from "@/components/onboarding/lessons/LessonA0";
-import { LessonA1 } from "@/components/onboarding/lessons/LessonA1";
-import { LessonA2 } from "@/components/onboarding/lessons/LessonA2";
-import { LessonA3 } from "@/components/onboarding/lessons/LessonA3";
-import { LessonA4 } from "@/components/onboarding/lessons/LessonA4";
-import { LessonA5 } from "@/components/onboarding/lessons/LessonA5";
-import { LessonA6 } from "@/components/onboarding/lessons/LessonA6";
-import { LessonA7 } from "@/components/onboarding/lessons/LessonA7";
 import { LessonA8, type IntegrationAnswers } from "@/components/onboarding/lessons/LessonA8";
-import { LessonB1 } from "@/components/onboarding/lessons/LessonB1";
-import { LessonB2 } from "@/components/onboarding/lessons/LessonB2";
-import { LessonB3 } from "@/components/onboarding/lessons/LessonB3";
-import { LessonB4 } from "@/components/onboarding/lessons/LessonB4";
-import { LessonB5 } from "@/components/onboarding/lessons/LessonB5";
-import { LessonB6 } from "@/components/onboarding/lessons/LessonB6";
-import { LessonB7 } from "@/components/onboarding/lessons/LessonB7";
-import { LessonC1 } from "@/components/onboarding/lessons/LessonC1";
-import { LessonC2 } from "@/components/onboarding/lessons/LessonC2";
-import { LessonC3 } from "@/components/onboarding/lessons/LessonC3";
-import { LessonC4 } from "@/components/onboarding/lessons/LessonC4";
-import { LessonC5 } from "@/components/onboarding/lessons/LessonC5";
-import { LessonC6 } from "@/components/onboarding/lessons/LessonC6";
-import { LessonC7 } from "@/components/onboarding/lessons/LessonC7";
-import { LessonC8 } from "@/components/onboarding/lessons/LessonC8";
-import { LessonC9 } from "@/components/onboarding/lessons/LessonC9";
-import { LessonD1 } from "@/components/onboarding/lessons/LessonD1";
-import { LessonD2 } from "@/components/onboarding/lessons/LessonD2";
-import { LessonD3 } from "@/components/onboarding/lessons/LessonD3";
-import { LessonD4 } from "@/components/onboarding/lessons/LessonD4";
-import { LessonD5 } from "@/components/onboarding/lessons/LessonD5";
-import { LessonD6 } from "@/components/onboarding/lessons/LessonD6";
-import { LessonD7 } from "@/components/onboarding/lessons/LessonD7";
-import { LessonD8 } from "@/components/onboarding/lessons/LessonD8";
-import { LessonD9 } from "@/components/onboarding/lessons/LessonD9";
-import { LessonD10 } from "@/components/onboarding/lessons/LessonD10";
-import { LessonDCierre } from "@/components/onboarding/lessons/LessonDCierre";
+import { LessonRenderer } from "@/components/onboarding/LessonRenderer";
+import { getLessonDoc } from "@/content/onboarding/lessonDocs";
 
 type ShellProps = { elapsedSeconds: number; reachedEnd: boolean; minLessonSeconds: number };
-
-/**
- * Mapa declarativo de lecciones hand-crafted por clave "MÓDULO:ID".
- * Para agregar un módulo E: solo añadir entradas aquí y crear el componente.
- * LessonA8 se maneja aparte porque requiere props adicionales de estado.
- */
-const LESSON_MAP: Record<string, React.ComponentType<ShellProps>> = {
-  "A:A0": LessonA0, "A:A1": LessonA1, "A:A2": LessonA2, "A:A3": LessonA3,
-  "A:A4": LessonA4, "A:A5": LessonA5, "A:A6": LessonA6, "A:A7": LessonA7,
-  "B:B1": LessonB1, "B:B2": LessonB2, "B:B3": LessonB3, "B:B4": LessonB4,
-  "B:B5": LessonB5, "B:B6": LessonB6, "B:B7": LessonB7,
-  "C:C1": LessonC1, "C:C2": LessonC2, "C:C3": LessonC3, "C:C4": LessonC4,
-  "C:C5": LessonC5, "C:C6": LessonC6, "C:C7": LessonC7, "C:C8": LessonC8, "C:C9": LessonC9,
-  "D:D1": LessonD1, "D:D2": LessonD2, "D:D3": LessonD3, "D:D4": LessonD4,
-  "D:D5": LessonD5, "D:D6": LessonD6, "D:D7": LessonD7, "D:D8": LessonD8,
-  "D:D9": LessonD9, "D:D10": LessonD10, "D:DCierre": LessonDCierre,
-};
 import { topicReviewLabel } from "@/content/onboarding/lessonGuides";
 import {
   getLessonGuide,
@@ -307,8 +257,9 @@ export default function StudioOnboardingUnitPage() {
   const lessonProgressPct = lessons.length ? Math.round((completedLessonCount / lessons.length) * 100) : 0;
   const lessonGuide = lesson ? getLessonGuide(moduleKey, lesson) : null;
 
-  // Resuelve el componente de cada lección via LESSON_MAP.
-  // LessonA8 se trata aparte porque necesita props de estado propios.
+  // Resuelve el render de cada lección via el registro data-driven
+  // (getLessonDoc + LessonRenderer). LessonA8 se trata aparte porque es
+  // interactiva y necesita props de estado propios.
   const renderLesson = () => {
     if (!lesson) return null;
     const shellProps: ShellProps = { elapsedSeconds, reachedEnd, minLessonSeconds };
@@ -326,8 +277,8 @@ export default function StudioOnboardingUnitPage() {
       );
     }
 
-    const LessonComp = LESSON_MAP[`${moduleKey}:${lesson.id}`];
-    if (LessonComp) return <LessonComp {...shellProps} />;
+    const doc = getLessonDoc(moduleKey, lesson.id);
+    if (doc) return <LessonRenderer doc={doc} moduleKey={moduleKey} {...shellProps} />;
 
     return (
       <GenericLesson
