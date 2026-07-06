@@ -22,6 +22,7 @@ import {
   upsertOnboardingSupabaseProgress,
 } from "@/lib/onboardingStoreSupabase";
 import { resolveVisibleModules } from "@/lib/onboarding";
+import { buildQuizVariant, quizVariantSeed } from "@/lib/quizVariant";
 import { getWritableDataPath } from "@/lib/storagePaths";
 
 // La rama/área de la organización a la que pertenece el usuario (su "track").
@@ -75,6 +76,9 @@ function defaultModuleVisibility(): ModuleVisibilityConfig {
 }
 
 const MODULE_MAX_ATTEMPTS = Math.max(1, Number(process.env.ONBOARDING_MAX_ATTEMPTS_DEFAULT || 3));
+// Preguntas por intento de evaluación: se muestrean del banco del módulo.
+// Si el banco tiene menos, se usan todas (igual con orden/alternativas barajadas).
+const QUIZ_QUESTIONS_PER_MODULE = Math.max(1, Number(process.env.ONBOARDING_QUIZ_QUESTIONS_PER_MODULE || 8));
 const PASS_SCORE_PERCENT = Number(process.env.ONBOARDING_PASS_PERCENT || process.env.ONBOARDING_PASS_SCORE_PERCENT || 80);
 const MIN_LESSON_TIME_SECONDS = Math.max(0, Number(process.env.MIN_LESSON_TIME_SECONDS || 12));
 
@@ -514,14 +518,31 @@ export async function getUnits() {
   return state.units;
 }
 
-export async function getQuizForParticipant() {
-  const state = await readState();
-  return state.quiz.map((question) => ({
-    id: question.id,
-    prompt: question.prompt,
-    options: question.options,
-    topic: question.topic,
-  }));
+/**
+ * Quiz que ve el participante: para cada módulo, una variante determinista
+ * del intento en curso (muestreo del banco + orden de preguntas y de
+ * alternativas barajados), sin exponer correctIndex. Cada pregunta lleva su
+ * moduleKey para que el cliente filtre por módulo sin heurísticas de tópicos.
+ *
+ * La misma variante se regenera en submitModuleQuiz con la misma semilla
+ * (email|módulo|attempts) para corregir de forma consistente.
+ */
+function buildParticipantQuiz(state: OnboardingState, record: OnboardingRecord) {
+  const statuses = computeModuleStatuses(record, state);
+  return state.units.flatMap((unit, index) => {
+    const moduleKey = moduleKeyFromUnit(unit, index);
+    const bank = state.quiz.filter((q) => getUnitByTopic(state.units, q.topic)?.slug === unit.slug);
+    if (!bank.length) return [];
+    const attempts = getModuleStatus(statuses, moduleKey)?.attempts ?? 0;
+    const variant = buildQuizVariant(bank, quizVariantSeed(record.email, moduleKey, attempts), QUIZ_QUESTIONS_PER_MODULE);
+    return variant.map((question) => ({
+      id: question.id,
+      prompt: question.prompt,
+      options: question.options,
+      topic: question.topic,
+      moduleKey,
+    }));
+  });
 }
 
 export async function getQuizForAdmin() {
@@ -653,20 +674,35 @@ export async function submitModuleQuiz(email: string, moduleKey: string, answers
     throw new Error("Debes completar todas las lecciones del módulo antes de enviar la evaluación.");
   }
 
-  const moduleQuiz = state.quiz.filter((q) => getUnitByTopic(state.units, q.topic)?.slug === unit.slug);
-  const map = new Map(moduleQuiz.map((q) => [q.id, q]));
-  if (!moduleQuiz.length) throw new Error("No hay evaluación para este módulo.");
+  const moduleQuizBank = state.quiz.filter((q) => getUnitByTopic(state.units, q.topic)?.slug === unit.slug);
+  if (!moduleQuizBank.length) throw new Error("No hay evaluación para este módulo.");
+
+  // Regenera la MISMA variante servida para este intento (semilla determinista:
+  // email|módulo|attempts). El correctIndex de la variante ya está remapeado al
+  // orden barajado de alternativas que vio el usuario.
+  const variant = buildQuizVariant(
+    moduleQuizBank,
+    quizVariantSeed(normalized, moduleKey, currentStatus.attempts),
+    QUIZ_QUESTIONS_PER_MODULE,
+  );
+  const map = new Map(variant.map((q) => [q.id, q]));
 
   let correct = 0;
   const missedTopics: string[] = [];
+  const answeredIds = new Set<string>();
   for (const answer of answers) {
     const question = map.get(answer.question_id);
     if (!question) continue;
+    answeredIds.add(question.id);
     if (Number(answer.selected_index) === question.correctIndex) correct += 1;
     else missedTopics.push(question.topic);
   }
+  // Preguntas de la variante sin respuesta cuentan como tópico a reforzar.
+  for (const question of variant) {
+    if (!answeredIds.has(question.id)) missedTopics.push(question.topic);
+  }
 
-  const total = moduleQuiz.length;
+  const total = variant.length;
   const score = Math.round((correct / total) * 100);
   const passed = score >= PASS_SCORE_PERCENT;
   const attempts = currentStatus.attempts + 1;
@@ -760,7 +796,7 @@ export async function getOnboardingSnapshot(email: string, role?: string) {
   const record = await getOrCreateOnboardingRecord(email);
   const units = getApplicableUnitsForUser(state, record.email, record.track);
   const summary = summarizeOnboarding(record, state, role);
-  const quiz = await getQuizForParticipant();
+  const quiz = buildParticipantQuiz(state, record);
   const quizResults = hasSupabaseStore()
     ? await getOnboardingQuizResultRows({ quizResultsTable: ONBOARDING_QUIZ_RESULTS_TABLE, email: record.email, track: record.track })
     : [];

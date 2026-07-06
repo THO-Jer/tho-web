@@ -31,7 +31,7 @@ type Unit = {
   resources?: Array<{ label: string; href: string }>;
 };
 
-type QuizQuestion = { id: string; prompt: string; options: string[]; topic: string };
+type QuizQuestion = { id: string; prompt: string; options: string[]; topic: string; moduleKey?: string };
 type ModuleStatus = { moduleKey: string; status: "locked" | "in_progress" | "validated" | "failed_max_attempts"; attempts: number; maxAttempts: number };
 type Onboarding = {
   completed_units: string[];
@@ -121,7 +121,15 @@ export default function StudioOnboardingUnitPage() {
 
   const unit = useMemo(() => units.find((item) => item.slug === slug), [units, slug]);
   const moduleKey = getModuleKeyFromSlug(unit?.slug || "");
-  const unitQuiz = useMemo(() => (unit ? quiz.filter((q) => unitTopicMap(unit.slug, q.topic)) : []), [quiz, unit]);
+  // Filtra por moduleKey (lo etiqueta el servidor al servir la variante).
+  // Fallback a la heurística de tópicos para payloads antiguos sin moduleKey.
+  const unitQuiz = useMemo(
+    () =>
+      unit
+        ? quiz.filter((q) => (q.moduleKey ? q.moduleKey === moduleKey : unitTopicMap(unit.slug, q.topic)))
+        : [],
+    [quiz, unit, moduleKey],
+  );
   const lessons = useMemo(() => parseLessons(unit?.content || []), [unit]);
 
   useEffect(() => {
@@ -208,6 +216,22 @@ export default function StudioOnboardingUnitPage() {
     }
   }
 
+  // Tras un intento fallido, el servidor genera una variante nueva del quiz
+  // (otras preguntas, otro orden). Hay que refrescarla y limpiar respuestas.
+  async function refreshQuizVariant() {
+    try {
+      const res = await fetch("/api/studio/onboarding", { credentials: "include", cache: "no-store" });
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.quiz)) {
+        setQuiz(data.quiz as QuizQuestion[]);
+        setAnswers({});
+      }
+    } catch {
+      // Si falla el refetch, se mantiene la variante actual visible;
+      // el servidor rechazará respuestas inconsistentes de todos modos.
+    }
+  }
+
   async function completeModule() {
     if (!unit) return;
     if (!allLessonsDone) return setMessage("Debes completar todas las lecciones antes de rendir el quiz del módulo.");
@@ -237,10 +261,16 @@ export default function StudioOnboardingUnitPage() {
       } else {
         const attempts = data?.moduleStatus?.attempts ?? 0;
         const maxAttempts = data?.moduleStatus?.maxAttempts ?? 3;
+        const failedMax = attempts >= maxAttempts;
         const score = typeof data.score === "number" ? data.score : null;
         setQuizScore(score);
         setShowReinforceModal(Boolean((Array.isArray(data.topics_to_reinforce) ? data.topics_to_reinforce : []).length));
-        setMessage(`Obtuviste ${score !== null ? `${score}%` : "puntaje insuficiente"}. Intento ${attempts}/${maxAttempts}.`);
+        setMessage(
+          `Obtuviste ${score !== null ? `${score}%` : "puntaje insuficiente"}. Intento ${attempts}/${maxAttempts}.${
+            failedMax ? "" : " El próximo intento trae preguntas distintas."
+          }`,
+        );
+        if (!failedMax) await refreshQuizVariant();
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "No se pudo completar módulo.");
