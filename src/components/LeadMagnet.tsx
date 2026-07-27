@@ -5,6 +5,22 @@ import { useState } from "react";
 import { getUtm } from "@/lib/utm";
 
 const RESOURCE_FILE_URL = "/downloads/manual-diversidad-v1.pdf";
+const RESOURCE_FILE_NAME = "Manual-Gestion-de-la-Diversidad-THO.pdf";
+
+/**
+ * Dispara la descarga del PDF de forma programática.
+ * El atributo `download` fuerza la descarga (mismo origen) en vez de
+ * abrir el archivo inline en una pestaña, que a veces el navegador bloquea.
+ */
+function triggerDownload() {
+  const a = document.createElement("a");
+  a.href = RESOURCE_FILE_URL;
+  a.download = RESOURCE_FILE_NAME;
+  a.rel = "noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
 
 export function LeadMagnet() {
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
@@ -35,7 +51,13 @@ export function LeadMagnet() {
         body: JSON.stringify(payload),
       });
       setStatus(res.ok ? "ok" : "error");
-      if (res.ok) (e.currentTarget as HTMLFormElement).reset();
+      if (res.ok) {
+        (e.currentTarget as HTMLFormElement).reset();
+        // Sólo entregamos el manual si el lead quedó capturado (res.ok = llegó
+        // al correo O al CRM). La descarga arranca dentro del mismo gesto de
+        // envío para evitar que el navegador la bloquee.
+        triggerDownload();
+      }
     } catch {
       setStatus("error");
     }
@@ -86,14 +108,22 @@ export function LeadMagnet() {
 
             {status === "ok" ? (
               <div className="lead-capture-success mt-2 rounded-lg p-3 text-sm">
-                <p>¡Listo! Ya puedes abrir el recurso.</p>
-                <a href={RESOURCE_FILE_URL} target="_blank" rel="noreferrer" className="mt-1 inline-flex underline underline-offset-2">
-                  Abrir PDF
+                <p>¡Listo! La descarga debería iniciarse automáticamente.</p>
+                <a
+                  href={RESOURCE_FILE_URL}
+                  download={RESOURCE_FILE_NAME}
+                  className="mt-1 inline-flex underline underline-offset-2"
+                >
+                  ¿No se descargó? Descárgalo aquí
                 </a>
               </div>
             ) : null}
 
-            {status === "error" ? <p className="lead-capture-error mt-1 text-sm">Algo falló. Intenta de nuevo.</p> : null}
+            {status === "error" ? (
+              <p className="lead-capture-error mt-1 text-sm">
+                No pudimos procesar tu solicitud. Vuelve a intentarlo en unos segundos.
+              </p>
+            ) : null}
           </form>
         </section>
 
