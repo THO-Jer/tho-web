@@ -576,11 +576,32 @@ export const WysiwygEditor = forwardRef<WysiwygEditorHandle, WysiwygEditorProps>
             >
               <div className="wysiwyg-bubble-menu">
                 {(() => {
-                  const { size: curSize, align: curAlign } = parseImgTitle(
-                    editor.getAttributes("image").title ?? null
-                  );
+                  const imgAttrs = editor.getAttributes("image");
+                  const { size: curSize, align: curAlign } = parseImgTitle(imgAttrs.title ?? null);
                   return (
                     <>
+                      {/* Pie de foto (alt). Vacío = sin pie de foto en el blog. */}
+                      <input
+                        key={editor.state.selection.from}
+                        type="text"
+                        defaultValue={imgAttrs.alt ?? ""}
+                        placeholder="Pie de foto (opcional)"
+                        aria-label="Pie de foto"
+                        className="w-48 rounded-md border border-slate-300 bg-white px-2 py-1 text-xs text-slate-800 outline-none focus:border-slate-500"
+                        onChange={(e) => {
+                          editor.chain().updateAttributes("image", { alt: e.target.value }).run();
+                        }}
+                        onKeyDown={(e) => {
+                          // Enter no debe enviar el formulario del post.
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            editor.commands.focus();
+                          }
+                        }}
+                      />
+
+                      <div className="wysiwyg-bubble-divider" />
+
                       {(["small", "medium", "full"] as const).map((size) => (
                         <button key={size} type="button"
                           title={size === "small" ? "Pequeña (33%)" : size === "medium" ? "Mediana (60%)" : "Completa"}

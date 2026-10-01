@@ -358,7 +358,8 @@ export default function BlogStudioPage() {
       if (!res.ok) throw new Error(data.error || "No se pudo subir la imagen");
 
       if (mode === "inline") {
-        editorRef.current?.insertImage(String(data.url || ""), file.name);
+        // Sin pie de foto por defecto: se agrega desde el menú de la imagen.
+        editorRef.current?.insertImage(String(data.url || ""), "");
       }
       setForm((prev) => ({
         ...prev,
@@ -429,9 +430,8 @@ export default function BlogStudioPage() {
       setForm((prev) => ({ ...prev, coverImage: path }));
       setMessage(`Portada seleccionada: ${path}`);
     } else if (repoPickerMode === "inline") {
-      const filename = path.split("/").pop() || "Imagen";
-      const alt = filename.replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " ");
-      editorRef.current?.insertImage(path, alt);
+      // Sin pie de foto por defecto: se agrega desde el menú de la imagen.
+      editorRef.current?.insertImage(path, "");
       setMessage(`Imagen insertada: ${path}`);
     }
     setRepoPickerMode(null);

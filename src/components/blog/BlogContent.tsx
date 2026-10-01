@@ -108,7 +108,17 @@ function AutoEmbed({ url }: { url: string }) {
 // El editor codifica "[size]:[align]" en el atributo title del markdown,
 // p. ej. ![alt](src "small:left"). Defaults (full + center) no llevan title.
 
+// Antes el editor rellenaba el texto alternativo con el nombre del archivo
+// (p. ej. "IMG_6201.jpg"), que terminaba visible como pie de foto. Esos textos
+// no se muestran ni se usan como alt.
+const FILENAME_LIKE = /(\.(jpe?g|png|webp|gif|heic|heif|avif|svg)$)|^(img|dsc|dscn|pxl|photo|image|screenshot|captura)[\s_-]*\d[\d\s_-]*$/i;
+
+function isFilenameLike(text: string) {
+  return FILENAME_LIKE.test(text.trim());
+}
+
 function MarkdownImage({ src, alt, title }: { src?: string; alt?: string; title?: string }) {
+  const caption = alt && !isFilenameLike(alt) ? alt.trim() : "";
   const [sizeToken, alignToken] = (title ?? "").split(":");
   const size = sizeToken === "small" || sizeToken === "medium" ? sizeToken : "full";
   const align = alignToken === "left" || alignToken === "right" ? alignToken : sizeToken === "left" || sizeToken === "right" ? sizeToken : "center";
@@ -119,9 +129,9 @@ function MarkdownImage({ src, alt, title }: { src?: string; alt?: string; title?
   return (
     <figure className={`mt-8 ${widthClass} ${alignClass} overflow-hidden rounded-2xl border border-slate-200 bg-slate-50`}>
       <div className="relative aspect-[16/9] w-full">
-        <Image src={src || ""} alt={alt || "Imagen del artículo"} fill className="object-cover" />
+        <Image src={src || ""} alt={caption || "Imagen del artículo"} fill className="object-cover" />
       </div>
-      {alt ? <figcaption className="px-4 py-2 text-xs text-slate-500">{alt}</figcaption> : null}
+      {caption ? <figcaption className="px-4 py-2 text-xs text-slate-500">{caption}</figcaption> : null}
     </figure>
   );
 }
