@@ -71,6 +71,15 @@ const EMPTY_FORM: FormState = {
 
 const DRAFT_KEY_PREFIX = "blog_studio_draft";
 
+// Convierte un ISO (UTC) al formato local que espera <input type="datetime-local">.
+// Antes se cortaba el ISO en UTC y, al volver a guardar, la fecha se corría 3 horas.
+function toLocalInputValue(iso: string) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function toFormState(post: BlogPost): FormState {
   return {
     slug: post.slug,
@@ -80,7 +89,7 @@ function toFormState(post: BlogPost): FormState {
     minutes: String(post.minutes),
     tags: post.tags.join(", "),
     category: post.category ?? "",
-    publishedAt: post.publishedAt ? post.publishedAt.slice(0, 16) : "",
+    publishedAt: post.publishedAt ? toLocalInputValue(post.publishedAt) : "",
     status: post.status,
     coverImage: post.coverImage ?? "",
     coverImageAlt: post.coverImageAlt ?? "",
@@ -151,6 +160,11 @@ export default function BlogStudioPage() {
   const [autosaveState, setAutosaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const autosaveBusyRef = useRef(false);
+  // Promesa del autosave en curso: onSubmit la espera para que un PATCH "draft"
+  // tardío no pise el cambio a "published".
+  const autosavePromiseRef = useRef<Promise<string | null> | null>(null);
+  // Mientras se guarda manualmente (y después, al navegar), no se autoguarda.
+  const submittingRef = useRef(false);
   const autoCreatedRef = useRef(false);
   const [repoPickerMode, setRepoPickerMode] = useState<"cover" | "inline" | null>(null);
   const [pickerSource, setPickerSource] = useState<"repo" | "storage">("repo");
@@ -469,8 +483,14 @@ export default function BlogStudioPage() {
   // ── Autosave de borradores al servidor ─────────────────────────────────
   // Solo para entradas nuevas o que ya son borrador: nunca sobreescribe en
   // caliente un post publicado (esos siguen respaldados en localStorage).
-  async function autosaveDraft() {
-    if (autosaveBusyRef.current || loading) return;
+  function autosaveDraft(): Promise<string | null> {
+    if (autosaveBusyRef.current || loading || submittingRef.current) return Promise.resolve(null);
+    const promise = runAutosaveDraft();
+    autosavePromiseRef.current = promise;
+    return promise;
+  }
+
+  async function runAutosaveDraft(): Promise<string | null> {
     autosaveBusyRef.current = true;
     setAutosaveState("saving");
     try {
@@ -494,15 +514,18 @@ export default function BlogStudioPage() {
       }
       setAutosaveState("saved");
       setLastSavedAt(new Date());
+      return savedSlug || null;
     } catch {
       setAutosaveState("error");
+      return null;
     } finally {
       autosaveBusyRef.current = false;
+      autosavePromiseRef.current = null;
     }
   }
 
   useEffect(() => {
-    if (!authenticated || loading) return;
+    if (!authenticated || loading || submittingRef.current) return;
     if (serverStatus === "published") return;
     if (!form.title.trim() || form.content.trim().length < 30) return;
     const timer = setTimeout(() => {
@@ -520,17 +543,24 @@ export default function BlogStudioPage() {
       return;
     }
 
-    const payload = buildPayload(form.status);
-
-    const endpoint = editingSlug ? `/api/admin/blog/${editingSlug}` : "/api/admin/blog";
-    const method = editingSlug ? "PATCH" : "POST";
-
+    // Bloquea nuevos autosaves y espera el que esté en curso: si no, ese PATCH
+    // con status "draft" podía llegar después y devolver la entrada a borrador.
+    submittingRef.current = true;
     setLoading(true);
     setMessage("");
+    const pendingAutosaveSlug = autosavePromiseRef.current ? await autosavePromiseRef.current : null;
+    const targetSlug = editingSlug || pendingAutosaveSlug;
+
+    const payload = buildPayload(form.status);
+
+    const endpoint = targetSlug ? `/api/admin/blog/${encodeURIComponent(targetSlug)}` : "/api/admin/blog";
+    const method = targetSlug ? "PATCH" : "POST";
+
+    let saved = false;
     try {
       let { res, data } = await savePost(endpoint, method, payload);
 
-      if (!res.ok && method === "PATCH" && payload.slug && payload.slug !== editingSlug && (res.status === 400 || res.status === 404)) {
+      if (!res.ok && method === "PATCH" && payload.slug && payload.slug !== targetSlug && (res.status === 400 || res.status === 404)) {
         const retryEndpoint = `/api/admin/blog/${encodeURIComponent(String(payload.slug))}`;
         ({ res, data } = await savePost(retryEndpoint, "PATCH", payload));
       }
@@ -545,14 +575,16 @@ export default function BlogStudioPage() {
       }
       if (data.post) {
         setEditingSlug(data.post.slug);
+        setServerStatus((data.post as BlogPost).status);
         setForm(toFormState(data.post as BlogPost));
         if (typeof window !== "undefined") {
           const nextUrl = `/studio/blog/editor?slug=${encodeURIComponent(data.post.slug as string)}`;
           window.history.replaceState({}, document.title, nextUrl);
         }
       }
-      const savedSlug = data.post?.slug || editingSlug || form.slug;
+      const savedSlug = data.post?.slug || targetSlug || form.slug;
       const notice = editingSlug && !autoCreatedRef.current ? "updated" : "created";
+      saved = true;
       localStorage.removeItem(draftKey);
       await fetchPosts();
       router.replace(`/studio/blog?notice=${notice}&slug=${encodeURIComponent(savedSlug)}`);
@@ -560,6 +592,7 @@ export default function BlogStudioPage() {
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Error guardando.");
     } finally {
+      if (!saved) submittingRef.current = false;
       setLoading(false);
     }
   }

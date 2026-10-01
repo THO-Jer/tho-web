@@ -1,9 +1,20 @@
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 import { readSession } from "@/lib/adminAuth";
 import { deletePost, getPostBySlug, updatePost } from "@/lib/blogStore";
 
 export const dynamic = "force-dynamic";
+
+// El sitio público (/, /blog, /blog/[slug], sitemap) se genera estáticamente y se
+// regenera cada hora. Sin esto, un post recién publicado no aparecía hasta una
+// hora después (y si la URL ya se había visitado como borrador, seguía en 404).
+function revalidateBlog(...slugs: (string | null | undefined)[]) {
+  revalidatePath("/");
+  revalidatePath("/blog");
+  revalidatePath("/sitemap.xml");
+  for (const slug of new Set(slugs.filter(Boolean))) revalidatePath(`/blog/${slug}`);
+}
 
 function unauthorized() {
   return NextResponse.json({ error: "No autorizado" }, { status: 401 });
@@ -34,6 +45,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ sl
     const payload = await req.json();
     const { slug } = await params;
     const post = await updatePost(slug, payload);
+    revalidateBlog(slug, post.slug);
     return NextResponse.json({ post });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo actualizar el post.";
@@ -49,6 +61,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ s
   try {
     const { slug } = await params;
     await deletePost(slug);
+    revalidateBlog(slug);
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "No se pudo eliminar el post.";
