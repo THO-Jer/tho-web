@@ -1,6 +1,6 @@
-# Studio Presencia
+# Studio Search Console
 
-`/studio/presencia` muestra **cómo encuentran a THO** en todo el sitio, no solo en el blog:
+`/studio/search-console` (antes `/studio/presencia`, que ahora redirige ahí) muestra **cómo encuentran a THO** en todo el sitio, no solo en el blog:
 
 - **Visitas** por día y **canal de llegada**: buscadores, redes sociales, asistentes de IA, correo, otros sitios, campañas con UTM, publicidad y directo.
 - **Contactos por canal**: por qué canal llegó por primera vez cada persona que escribió (en los 90 días previos), y por qué página entró.
@@ -48,4 +48,4 @@ Los datos empiezan a acumularse desde ese momento.
 | `src/app/api/lead/route.ts` | Guarda el origen de cada contacto y lo incluye en correo y CRM |
 | `src/lib/searchConsole.ts` | `getSitePerformance`: Google para todo el sitio |
 | `src/app/api/admin/presence-metrics/route.ts` | Arma el panel y las sugerencias |
-| `src/app/studio/presencia/page.tsx` | Studio Presencia |
+| `src/app/studio/search-console/page.tsx` | Studio Search Console (`/studio/presencia` redirige aquí) |

@@ -47,10 +47,10 @@ const modules: ModuleItem[] = [
     allowed: (p) => Boolean(p?.canBlog),
   },
   {
-    key: "presencia",
-    title: "Studio Presencia",
+    key: "search-console",
+    title: "Studio Search Console",
     desc: "Cómo encuentran a THO: canales de llegada, búsquedas en Google, páginas que atraen y origen de cada contacto.",
-    href: "/studio/presencia",
+    href: "/studio/search-console",
     status: "Nuevo",
     external: false,
     allowed: (p) => Boolean(p?.canBlog || p?.canCrm),
