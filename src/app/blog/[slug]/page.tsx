@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { BlogContent, getToc } from "@/components/blog/BlogContent";
 import { BlogTocClient } from "@/components/blog/BlogTocClient";
+import { BlogViewTracker } from "@/components/blog/BlogViewTracker";
 import { getPublishedPostBySlug, listPublishedPosts } from "@/lib/blogStore";
 
 const SITE = "https://tho.cl";
@@ -98,6 +99,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     <div className="min-h-screen">
       <Header />
       <main className="border-t border-slate-200 bg-white">
+        <BlogViewTracker slug={post.slug} />
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-14 lg:grid-cols-[1fr_280px]">
           <div className="max-w-3xl">
             <div className="text-xs text-slate-500">{post.minutes} min</div>

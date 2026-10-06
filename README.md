@@ -73,6 +73,9 @@ Configura estas variables para salir del modo stub:
 | `SUPABASE_SERVICE_ROLE_KEY` | Service key para validar allowlist de editores en backend. |
 | `STUDIO_AUTH_REDIRECT_URL` | URL de retorno post-OAuth (server-side). |
 | `NEXT_PUBLIC_STUDIO_AUTH_REDIRECT_URL` | Idem, para el cliente. |
+| `GSC_CLIENT_EMAIL` | Opcional. Cuenta de servicio de Google con acceso a Search Console (panel de Studio Blog). |
+| `GSC_PRIVATE_KEY` | Opcional. Clave privada de esa cuenta de servicio (`private_key` del JSON). |
+| `GSC_SITE_URL` | Opcional. Propiedad de Search Console. Default: `sc-domain:tho.cl`. |
 
 Supabase: requiere tablas `blog_editors`, `blog_posts`, `incidents`, etc. — ver SQL en `sql/`.
 
@@ -82,6 +85,7 @@ En Supabase Auth habilita el proveedor **Azure/Microsoft** y agrega como Redirec
 
 ## Documentación
 
+- **[Analítica del blog](./docs/blog-analytics.md)** — centro de comando de Studio Blog: lecturas, contactos atribuidos y Google Search Console.
 - **[Troubleshooting](./docs/troubleshooting.md)** — errores comunes del pipeline de leads, Studio Auth, persistencia en producción, tipografías.
 - **[Migración Canal Confidencial](./docs/supabase-migration-canal-confidencial.md)** — proceso de migración a Supabase del módulo de incidentes.
 - **[Brochures · upload](./docs/brochures-upload.md)** — cómo subir nuevos brochures.

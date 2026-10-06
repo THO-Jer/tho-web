@@ -13,6 +13,8 @@
  * dentro de la sesión).
  */
 
+import { getBlogTouch } from "@/lib/blogReadTracking";
+
 const STORAGE_KEY = "tho_utm";
 
 const UTM_KEYS = [
@@ -79,9 +81,12 @@ export function captureUtm() {
 }
 
 /**
- * Llamar al momento de enviar un formulario. Retorna los UTM persistidos.
+ * Llamar al momento de enviar un formulario. Retorna los UTM persistidos
+ * más el contexto del blog (blog_post = última entrada leída, blog_read =
+ * entradas leídas en los últimos 30 días), así todos los formularios lo
+ * envían sin cambios y el CRM lo recibe dentro de `utm`.
  * Si no hay nada capturado, retorna {}.
  */
 export function getUtm(): UtmRecord {
-  return safeParseStored();
+  return { ...safeParseStored(), ...getBlogTouch() };
 }

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { describeAnalyticsError, isAnalyticsConfigured, isValidSlug, recordLeadEvent } from "@/lib/blogAnalytics";
 import { CRMRequestError, type LeadPayload, pushToCRM } from "@/lib/crm";
 import { sendMail } from "@/lib/mail";
 
@@ -55,6 +56,20 @@ function toPayload(body: Record<string, unknown>): LeadPayload {
     levelId: optional(body.levelId),
     levelName: optional(body.levelName),
     eventLabel: optional(body.eventLabel),
+  };
+}
+
+// Contexto del blog que el navegador adjunta dentro de `utm` (ver lib/utm.ts).
+function blogTouchFrom(payload: LeadPayload) {
+  const utm = payload.utm || {};
+  const last = String(utm.blog_post || "").trim().toLowerCase();
+  const read = String(utm.blog_read || "")
+    .split(",")
+    .map((slug) => slug.trim().toLowerCase())
+    .filter(isValidSlug);
+  return {
+    slug: isValidSlug(last) ? last : null,
+    slugsRead: Array.from(new Set(read)).slice(0, 15),
   };
 }
 
@@ -142,6 +157,8 @@ function buildMailHtml(payload: LeadPayload, typeLabel: string): string {
                   ${row("Nivel", payload.levelName || payload.levelId)}
                   ${row("Ticket", payload.ticket)}
                   ${row("URL", payload.pageUrl)}
+                  ${row("Blog (última)", blogTouchFrom(payload).slug || undefined)}
+                  ${row("Blog (leídas)", blogTouchFrom(payload).slugsRead.join(", ") || undefined)}
                   ${row("UTM", utmEntries)}
                 </tbody>
               </table>
@@ -196,6 +213,8 @@ function buildMail(payload: LeadPayload) {
     `Level Name: ${payload.levelName || "-"}`,
     `Ticket: ${payload.ticket || "-"}`,
     `URL: ${payload.pageUrl || "-"}`,
+    `Blog (última entrada leída): ${blogTouchFrom(payload).slug || "-"}`,
+    `Blog (entradas leídas): ${blogTouchFrom(payload).slugsRead.join(", ") || "-"}`,
     "",
     `UTM: ${JSON.stringify(payload.utm || {}, null, 2)}`,
   ];
@@ -232,8 +251,9 @@ export async function POST(req: NextRequest) {
     }
 
     const mail = buildMail(payload);
+    const blogTouch = blogTouchFrom(payload);
 
-    const [mailResult, crmResult] = await Promise.allSettled([
+    const [mailResult, crmResult, analyticsResult] = await Promise.allSettled([
       sendMail({
         to: "hola@tho.cl",
         subject: mail.subject,
@@ -241,7 +261,15 @@ export async function POST(req: NextRequest) {
         html: mail.html,
       }),
       pushToCRM(payload),
+      // Analítica del blog (sin datos personales). Nunca bloquea el lead.
+      isAnalyticsConfigured()
+        ? recordLeadEvent({ leadType: payload.type, source: payload.source, ...blogTouch })
+        : Promise.resolve(),
     ]);
+
+    if (analyticsResult.status === "rejected") {
+      console.error("[LEAD BLOG ANALYTICS ERROR]", describeAnalyticsError(analyticsResult.reason));
+    }
 
     // Mail channel — independiente, no bloquea.
     if (mailResult.status === "rejected") {
