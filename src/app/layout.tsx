@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import localFont from "next/font/local";
+import { SiteTracker } from "@/components/SiteTracker";
 import { UtmTracker } from "@/components/UtmTracker";
 
 const thocl = localFont({
@@ -112,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }}
         />
         <UtmTracker />
+        <SiteTracker />
         {children}
       </body>
     </html>

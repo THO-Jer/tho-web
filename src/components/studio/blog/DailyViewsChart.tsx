@@ -22,7 +22,7 @@ function formatDay(day: string, long = false) {
   return d.toLocaleDateString("es-CL", long ? { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" } : { day: "numeric", month: "short", timeZone: "UTC" });
 }
 
-export function DailyViewsChart({ data }: { data: Array<{ day: string; views: number }> }) {
+export function DailyViewsChart({ data, unitLabel = "lecturas" }: { data: Array<{ day: string; views: number }>; unitLabel?: string }) {
   const [hover, setHover] = useState<number | null>(null);
   const max = useMemo(() => niceMax(Math.max(0, ...data.map((d) => d.views))), [data]);
   const ticks = [0, max / 2, max];
@@ -53,7 +53,7 @@ export function DailyViewsChart({ data }: { data: Array<{ day: string; views: nu
                 onFocus={() => setHover(i)}
                 onBlur={() => setHover(null)}
                 tabIndex={0}
-                aria-label={`${formatDay(d.day, true)}: ${d.views} lecturas`}
+                aria-label={`${formatDay(d.day, true)}: ${d.views} ${unitLabel}`}
               >
                 <div
                   className="w-full max-w-[24px] rounded-t-[4px] transition-opacity"
@@ -77,7 +77,7 @@ export function DailyViewsChart({ data }: { data: Array<{ day: string; views: nu
             style={{ left: `calc(2.5rem + (100% - 2.5rem) * ${(hover + 0.5) / data.length})` }}
           >
             <div className="text-slate-500">{formatDay(data[hover].day, true)}</div>
-            <div className="font-semibold tabular-nums text-slate-900">{data[hover].views.toLocaleString("es-CL")} lecturas</div>
+            <div className="font-semibold tabular-nums text-slate-900">{data[hover].views.toLocaleString("es-CL")} {unitLabel}</div>
           </div>
         ) : null}
       </div>
@@ -85,7 +85,7 @@ export function DailyViewsChart({ data }: { data: Array<{ day: string; views: nu
       {/* Eje X: primer día, pico y último día */}
       <div className="mt-1 flex justify-between pl-10 text-[10px] text-slate-400">
         <span>{formatDay(data[0].day)}</span>
-        {total > 0 ? <span className="text-slate-500">Pico: {formatDay(data[peakIndex].day)} · {data[peakIndex].views} lecturas</span> : <span>Sin lecturas en el período</span>}
+        {total > 0 ? <span className="text-slate-500">Pico: {formatDay(data[peakIndex].day)} · {data[peakIndex].views} {unitLabel}</span> : <span>Sin {unitLabel} en el período</span>}
         <span>{formatDay(data[data.length - 1].day)}</span>
       </div>
 
@@ -96,7 +96,7 @@ export function DailyViewsChart({ data }: { data: Array<{ day: string; views: nu
             <thead className="sticky top-0 bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-3 py-1.5 font-medium">Día</th>
-                <th className="px-3 py-1.5 text-right font-medium">Lecturas</th>
+                <th className="px-3 py-1.5 text-right font-medium">{unitLabel.charAt(0).toUpperCase() + unitLabel.slice(1)}</th>
               </tr>
             </thead>
             <tbody>

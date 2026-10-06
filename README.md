@@ -85,6 +85,7 @@ En Supabase Auth habilita el proveedor **Azure/Microsoft** y agrega como Redirec
 
 ## Documentación
 
+- **[Studio Presencia](./docs/studio-presencia.md)** — cómo encuentran a THO: canales, Google para todo el sitio y origen de los contactos.
 - **[Analítica del blog](./docs/blog-analytics.md)** — centro de comando de Studio Blog: lecturas, contactos atribuidos y Google Search Console.
 - **[Troubleshooting](./docs/troubleshooting.md)** — errores comunes del pipeline de leads, Studio Auth, persistencia en producción, tipografías.
 - **[Migración Canal Confidencial](./docs/supabase-migration-canal-confidencial.md)** — proceso de migración a Supabase del módulo de incidentes.

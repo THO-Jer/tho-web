@@ -39,7 +39,7 @@ export function isAnalyticsConfigured() {
   return Boolean(url && service);
 }
 
-async function supabaseFetch(pathname: string, body: unknown, prefer?: string) {
+export async function supabaseFetch(pathname: string, body: unknown, prefer?: string) {
   const { url, service } = getSupabaseEnv();
   if (!url || !service) throw new Error("Supabase no configurado para analítica del blog.");
 
@@ -86,17 +86,45 @@ export type LeadBlogTouch = {
   slugsRead: string[];
 };
 
-export async function recordLeadEvent(touch: LeadBlogTouch) {
-  await supabaseFetch(
-    "/rest/v1/blog_lead_events",
-    {
-      lead_type: touch.leadType.slice(0, 40),
-      source: touch.source ? touch.source.slice(0, 120) : null,
-      slug: touch.slug ?? null,
-      slugs_read: touch.slugsRead,
-    },
-    "return=minimal",
-  );
+// Origen del contacto (Studio Presencia, sql/web_analytics.sql).
+export type LeadOrigin = {
+  firstChannel?: string | null;
+  firstSource?: string | null;
+  firstLanding?: string | null;
+  lastChannel?: string | null;
+  lastSource?: string | null;
+  heardFrom?: string | null;
+  pagePath?: string | null;
+};
+
+export async function recordLeadEvent(touch: LeadBlogTouch, origin: LeadOrigin = {}) {
+  const base = {
+    lead_type: touch.leadType.slice(0, 40),
+    source: touch.source ? touch.source.slice(0, 120) : null,
+    slug: touch.slug ?? null,
+    slugs_read: touch.slugsRead,
+  };
+  const extended = {
+    ...base,
+    first_channel: origin.firstChannel ?? null,
+    first_source: origin.firstSource ?? null,
+    first_landing: origin.firstLanding ?? null,
+    last_channel: origin.lastChannel ?? null,
+    last_source: origin.lastSource ?? null,
+    heard_from: origin.heardFrom ?? null,
+    page_path: origin.pagePath ?? null,
+  };
+
+  try {
+    await supabaseFetch("/rest/v1/blog_lead_events", extended, "return=minimal");
+  } catch (error) {
+    // Si aún no se ejecutó sql/web_analytics.sql, guarda al menos lo del blog.
+    if (/PGRST204|Could not find the .* column|column .* does not exist/i.test(error instanceof Error ? error.message : "")) {
+      await supabaseFetch("/rest/v1/blog_lead_events", base, "return=minimal");
+      return;
+    }
+    throw error;
+  }
 }
 
 // ── Lectura para el panel ───────────────────────────────────────────────────

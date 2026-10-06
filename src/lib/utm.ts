@@ -14,6 +14,7 @@
  */
 
 import { getBlogTouch } from "@/lib/blogReadTracking";
+import { getWebTouch } from "@/lib/webTracking";
 
 const STORAGE_KEY = "tho_utm";
 
@@ -88,5 +89,6 @@ export function captureUtm() {
  * Si no hay nada capturado, retorna {}.
  */
 export function getUtm(): UtmRecord {
-  return { ...safeParseStored(), ...getBlogTouch() };
+  // first_channel / last_channel / first_landing: cómo llegó la persona (Studio Presencia).
+  return { ...safeParseStored(), ...getBlogTouch(), ...getWebTouch() };
 }

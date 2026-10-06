@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getUtm } from "@/lib/utm";
+import { HEARD_FROM } from "@/lib/webChannels";
 
 export function ContactForm(props: { ticket?: string }) {
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "error">("idle");
@@ -25,6 +26,7 @@ export function ContactForm(props: { ticket?: string }) {
       ticket: props.ticket,
       pageUrl: window.location.href,
       hp: String(form.get("hp") || ""),
+      heardFrom: String(form.get("heardFrom") || "") || undefined,
       utm: getUtm(),
     };
 
@@ -84,6 +86,21 @@ export function ContactForm(props: { ticket?: string }) {
           rows={3}
           className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 ring-1 ring-white/10 outline-none"
         />
+      </Field>
+
+      <Field label="¿Cómo supiste de THO?">
+        <select
+          name="heardFrom"
+          defaultValue=""
+          className="w-full rounded-xl bg-white/10 px-4 py-3 text-sm text-white ring-1 ring-white/10 outline-none [&>option]:text-slate-900"
+        >
+          <option value="">Elige una opción (opcional)</option>
+          {Object.entries(HEARD_FROM).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
       </Field>
 
       <button

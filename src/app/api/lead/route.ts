@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { describeAnalyticsError, isAnalyticsConfigured, isValidSlug, recordLeadEvent } from "@/lib/blogAnalytics";
 import { CRMRequestError, type LeadPayload, pushToCRM } from "@/lib/crm";
 import { sendMail } from "@/lib/mail";
+import { CHANNELS, HEARD_FROM, isChannel, isHeardFrom, normalizePath } from "@/lib/webChannels";
 
 // ---------------------------------------------------------------------------
 // Rate limiting en memoria: máximo 5 envíos por IP cada 10 minutos.
@@ -71,6 +72,37 @@ function blogTouchFrom(payload: LeadPayload) {
     slug: isValidSlug(last) ? last : null,
     slugsRead: Array.from(new Set(read)).slice(0, 15),
   };
+}
+
+// Origen del contacto (Studio Presencia). Canal y fuente llegan dentro de `utm`
+// (ver lib/webTracking.ts); "¿Cómo supiste de THO?" llega como `utm.heard_from`.
+function cleanSource(value: unknown) {
+  const v = String(value || "").toLowerCase().replace(/[^a-z0-9.\-_ ]/g, "").slice(0, 60);
+  return v || null;
+}
+
+function originFrom(payload: LeadPayload) {
+  const utm = payload.utm || {};
+  let pagePath: string | null = null;
+  try {
+    pagePath = payload.pageUrl ? normalizePath(new URL(payload.pageUrl).pathname) : null;
+  } catch {
+    pagePath = null;
+  }
+  return {
+    firstChannel: isChannel(utm.first_channel) ? utm.first_channel : null,
+    firstSource: cleanSource(utm.first_source),
+    firstLanding: normalizePath(String(utm.first_landing || "")) ,
+    lastChannel: isChannel(utm.last_channel) ? utm.last_channel : null,
+    lastSource: cleanSource(utm.last_source),
+    heardFrom: isHeardFrom(utm.heard_from) ? utm.heard_from : null,
+    pagePath,
+  };
+}
+
+function originLabel(channel: string | null, source: string | null) {
+  if (!channel || !isChannel(channel)) return undefined;
+  return `${CHANNELS[channel].short}${source ? ` (${source})` : ""}`;
 }
 
 function leadTypeLabel(type: LeadPayload["type"]) {
@@ -157,6 +189,9 @@ function buildMailHtml(payload: LeadPayload, typeLabel: string): string {
                   ${row("Nivel", payload.levelName || payload.levelId)}
                   ${row("Ticket", payload.ticket)}
                   ${row("URL", payload.pageUrl)}
+                  ${row("Cómo nos conoció", originFrom(payload).heardFrom ? HEARD_FROM[originFrom(payload).heardFrom!] : undefined)}
+                  ${row("Llegó por (1ª vez)", originLabel(originFrom(payload).firstChannel, originFrom(payload).firstSource))}
+                  ${row("Entró por", originFrom(payload).firstLanding || undefined)}
                   ${row("Blog (última)", blogTouchFrom(payload).slug || undefined)}
                   ${row("Blog (leídas)", blogTouchFrom(payload).slugsRead.join(", ") || undefined)}
                   ${row("UTM", utmEntries)}
@@ -213,6 +248,9 @@ function buildMail(payload: LeadPayload) {
     `Level Name: ${payload.levelName || "-"}`,
     `Ticket: ${payload.ticket || "-"}`,
     `URL: ${payload.pageUrl || "-"}`,
+    `Cómo nos conoció: ${originFrom(payload).heardFrom ? HEARD_FROM[originFrom(payload).heardFrom!] : "-"}`,
+    `Llegó por (primera vez): ${originLabel(originFrom(payload).firstChannel, originFrom(payload).firstSource) || "-"}`,
+    `Página de entrada: ${originFrom(payload).firstLanding || "-"}`,
     `Blog (última entrada leída): ${blogTouchFrom(payload).slug || "-"}`,
     `Blog (entradas leídas): ${blogTouchFrom(payload).slugsRead.join(", ") || "-"}`,
     "",
@@ -245,6 +283,9 @@ export async function POST(req: NextRequest) {
     if (body.hp) return NextResponse.json({ ok: true });
 
     const payload = toPayload(body);
+    // "¿Cómo supiste de THO?" viaja a correo, CRM (dentro de utm) y analítica.
+    if (isHeardFrom(body.heardFrom)) payload.utm = { ...(payload.utm || {}), heard_from: body.heardFrom };
+    else if (payload.utm && "heard_from" in payload.utm) delete payload.utm.heard_from;
 
     if (!payload.name || !payload.email || !payload.type) {
       return NextResponse.json({ ok: false, error: "Missing fields" }, { status: 400 });
@@ -263,7 +304,7 @@ export async function POST(req: NextRequest) {
       pushToCRM(payload),
       // Analítica del blog (sin datos personales). Nunca bloquea el lead.
       isAnalyticsConfigured()
-        ? recordLeadEvent({ leadType: payload.type, source: payload.source, ...blogTouch })
+        ? recordLeadEvent({ leadType: payload.type, source: payload.source, ...blogTouch }, originFrom(payload))
         : Promise.resolve(),
     ]);
 

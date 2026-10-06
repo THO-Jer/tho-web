@@ -47,6 +47,15 @@ const modules: ModuleItem[] = [
     allowed: (p) => Boolean(p?.canBlog),
   },
   {
+    key: "presencia",
+    title: "Studio Presencia",
+    desc: "Cómo encuentran a THO: canales de llegada, búsquedas en Google, páginas que atraen y origen de cada contacto.",
+    href: "/studio/presencia",
+    status: "Nuevo",
+    external: false,
+    allowed: (p) => Boolean(p?.canBlog || p?.canCrm),
+  },
+  {
     key: "crm",
     title: "Studio Leads y CRM",
     desc: "Acceso directo a CRM para revisar formularios, estado comercial y seguimiento.",

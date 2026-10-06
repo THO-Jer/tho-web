@@ -59,7 +59,7 @@ async function getAccessToken(config: GscConfig) {
   return cachedToken.token;
 }
 
-type GscRow = { keys: string[]; clicks: number; impressions: number; ctr: number; position: number };
+type GscRow = { keys?: string[]; clicks: number; impressions: number; ctr: number; position: number };
 
 async function querySearchAnalytics(config: GscConfig, body: Record<string, unknown>): Promise<GscRow[]> {
   const token = await getAccessToken(config);
@@ -139,7 +139,7 @@ export async function getBlogSearchPerformance(startDate: string, endDate: strin
   const pages = new Map<string, Acc>();
   const total: Acc = { clicks: 0, impressions: 0, positionWeighted: 0 };
   for (const row of pageRows) {
-    const slug = slugFromUrl(row.keys[0] || "");
+    const slug = slugFromUrl(row.keys?.[0] || "");
     if (!slug) continue;
     const acc = pages.get(slug) ?? { clicks: 0, impressions: 0, positionWeighted: 0 };
     acc.clicks += row.clicks;
@@ -153,8 +153,8 @@ export async function getBlogSearchPerformance(startDate: string, endDate: strin
 
   const queries = new Map<string, Map<string, Acc>>();
   for (const row of queryRows) {
-    const slug = slugFromUrl(row.keys[0] || "");
-    const query = row.keys[1];
+    const slug = slugFromUrl(row.keys?.[0] || "");
+    const query = row.keys?.[1];
     if (!slug || !query) continue;
     const bySlug = queries.get(slug) ?? new Map<string, Acc>();
     const acc = bySlug.get(query) ?? { clicks: 0, impressions: 0, positionWeighted: 0 };
@@ -178,4 +178,98 @@ export async function getBlogSearchPerformance(startDate: string, endDate: strin
   }
 
   return { bySlug, totals: finish(total) };
+}
+
+// ── Sitio completo (Studio Presencia) ──────────────────────────────────────
+
+// Búsquedas "de marca": quien ya conoce a THO y la busca por nombre.
+const BRAND_QUERY = /(human\s*org|thehumanorg|\btho\b|tho\.cl)/i;
+
+export function isBrandQuery(query: string) {
+  return BRAND_QUERY.test(query);
+}
+
+export type GscTotals = { clicks: number; impressions: number; ctr: number; position: number };
+
+export type GscSitePerformance = {
+  totals: GscTotals;
+  prevTotals: GscTotals;
+  daily: Array<{ day: string; clicks: number; impressions: number }>;
+  queries: Array<GscQuery & { ctr: number; brand: boolean }>;
+  pages: Array<{ path: string; clicks: number; impressions: number; ctr: number; position: number }>;
+  brand: { clicks: number; impressions: number };
+  topics: { clicks: number; impressions: number };
+};
+
+function totalsFrom(rows: GscRow[]): GscTotals {
+  const r = rows[0];
+  return r ? { clicks: r.clicks, impressions: r.impressions, ctr: r.ctr, position: r.position } : { clicks: 0, impressions: 0, ctr: 0, position: 0 };
+}
+
+function pathFromUrl(url: string) {
+  try {
+    const { pathname } = new URL(url);
+    return pathname.length > 1 ? pathname.replace(/\/+$/, "") : "/";
+  } catch {
+    return null;
+  }
+}
+
+export async function getSitePerformance(startDate: string, endDate: string, prevStart: string, prevEnd: string): Promise<GscSitePerformance> {
+  const config = getConfig();
+  if (!config) throw new Error("Search Console no configurado.");
+
+  const [cur, prev, daily, queries, pageRows] = await Promise.all([
+    querySearchAnalytics(config, { startDate, endDate }),
+    querySearchAnalytics(config, { startDate: prevStart, endDate: prevEnd }),
+    querySearchAnalytics(config, { startDate, endDate, dimensions: ["date"], rowLimit: 200 }),
+    querySearchAnalytics(config, { startDate, endDate, dimensions: ["query"], rowLimit: 250 }),
+    querySearchAnalytics(config, { startDate, endDate, dimensions: ["page"], rowLimit: 200 }),
+  ]);
+
+  // Una misma página puede venir con y sin www o con "/" final: se agrupan.
+  const pages = new Map<string, Acc>();
+  for (const row of pageRows) {
+    const path = pathFromUrl(row.keys?.[0] || "");
+    if (!path) continue;
+    const acc = pages.get(path) ?? { clicks: 0, impressions: 0, positionWeighted: 0 };
+    acc.clicks += row.clicks;
+    acc.impressions += row.impressions;
+    acc.positionWeighted += row.position * row.impressions;
+    pages.set(path, acc);
+  }
+
+  const queryList = queries
+    .filter((row) => row.keys?.[0])
+    .map((row) => ({
+      query: row.keys![0],
+      clicks: row.clicks,
+      impressions: row.impressions,
+      ctr: row.ctr,
+      position: row.position,
+      brand: isBrandQuery(row.keys![0]),
+    }));
+
+  const brand = { clicks: 0, impressions: 0 };
+  const topics = { clicks: 0, impressions: 0 };
+  for (const q of queryList) {
+    const bucket = q.brand ? brand : topics;
+    bucket.clicks += q.clicks;
+    bucket.impressions += q.impressions;
+  }
+
+  return {
+    totals: totalsFrom(cur),
+    prevTotals: totalsFrom(prev),
+    daily: daily
+      .filter((row) => row.keys?.[0])
+      .map((row) => ({ day: row.keys![0], clicks: row.clicks, impressions: row.impressions }))
+      .sort((a, b) => a.day.localeCompare(b.day)),
+    queries: queryList,
+    pages: Array.from(pages.entries())
+      .map(([path, acc]) => ({ path, ...finish(acc) }))
+      .sort((a, b) => b.impressions - a.impressions),
+    brand,
+    topics,
+  };
 }
